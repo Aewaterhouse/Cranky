@@ -5,6 +5,9 @@ import {
   HOOD,
   WHEELS,
   bullbarGeo,
+  eskyGeo,
+  flagsGeo,
+  ploughGeo,
   damageGroups,
   glassGeo,
   paintGeo,
@@ -80,6 +83,9 @@ export function makeBus() {
   })
   const bullbar = add(bullbarGeo(), VC)
   const spikes = add(spikesGeo(), VC)
+  const plough = add(ploughGeo(), VC)
+  const flags = add(flagsGeo(), VC)
+  const esky = add(eskyGeo(), VC)
   const plates = plateGroups(TIERS).map((geo) => add(geo, VC))
   const soot = damageGroups(SOOT).map((geo) => add(geo, VC))
 
@@ -161,8 +167,11 @@ export function makeBus() {
     if (key === lookKey) return
     lookKey = key
     baseCol = new THREE.Color(cosmetic(look.paint)?.colour ?? VIS.busColour)
-    bullbar.visible = !!look.bullbar
-    spikes.visible = !!look.spikes
+    bullbar.visible = look.bullbar === 'bullbar'
+    plough.visible = look.bullbar === 'bullbar-plough'
+    spikes.visible = look.spikes === 'spikes'
+    flags.visible = look.spikes === 'roof-flags'
+    esky.visible = look.spikes === 'roof-esky'
   }
   setLook({})
 

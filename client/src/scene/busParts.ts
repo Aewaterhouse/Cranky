@@ -190,3 +190,45 @@ export function damageGroups(n: number) {
     )
   return ms.map((x) => x.build())
 }
+
+/** A wedge plough in place of the bull bar. */
+export function ploughGeo() {
+  const m = new Mesher(0.06)
+  for (const s of [-1, 1]) {
+    m.add(box(1.75, 1.3, 0.1), '#c9a227', [s * 0.8, 1.05, -6.15], [0.25, s * 0.55, 0])
+    m.add(box(1.75, 0.16, 0.12), '#26262b', [s * 0.8, 1.72, -6.2], [0.25, s * 0.55, 0])
+  }
+  for (const x of [-1.1, 1.1])
+    m.add(cyl(0.07, 0.07, 1.1, 6), STEEL, [x, 1.2, -5.5], [Math.PI / 2, 0, 0])
+  return m.build()
+}
+
+/** Two tattered pirate flags on poles at the back of the roof. */
+export function flagsGeo() {
+  const m = new Mesher(0.05)
+  for (const x of [-1.25, 1.25]) {
+    m.add(cyl(0.04, 0.04, 2.4, 5), '#4a3a2a', [x, ROOF_Y + 1.5, 4.4])
+    m.add(box(0.03, 0.7, 1.1), '#15151a', [x, ROOF_Y + 2.3, 5.0])
+    m.add(
+      new THREE.IcosahedronGeometry(0.16, 0),
+      '#e8e6df',
+      [x, ROOF_Y + 2.38, 5.0],
+      [0, 0, 0],
+      [0.3, 1, 1],
+    )
+    m.add(box(0.035, 0.07, 0.5), '#e8e6df', [x, ROOF_Y + 2.12, 5.0], [0.5, 0, 0])
+    m.add(box(0.035, 0.07, 0.5), '#e8e6df', [x, ROOF_Y + 2.12, 5.0], [-0.5, 0, 0])
+  }
+  return m.build()
+}
+
+/** A roof esky and a surfboard strapped on the back half of the roof. */
+export function eskyGeo() {
+  const m = new Mesher(0.05)
+  m.add(box(0.9, 0.5, 0.6), '#2f7fd1', [0.7, ROOF_Y + 0.45, 4.2])
+  m.add(box(0.94, 0.12, 0.64), '#f4f4f0', [0.7, ROOF_Y + 0.74, 4.2])
+  m.add(box(0.55, 0.09, 2.9), '#f2e3b0', [-0.75, ROOF_Y + 0.32, 3.4], [0, 0.04, 0])
+  m.add(box(0.12, 0.1, 2.9), '#e94f37', [-0.75, ROOF_Y + 0.33, 3.4], [0, 0.04, 0])
+  m.add(cone(0.12, 0.3, 4), '#f2e3b0', [-0.75, ROOF_Y + 0.5, 4.6], [0.4, 0, 0])
+  return m.build()
+}

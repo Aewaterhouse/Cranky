@@ -42,7 +42,7 @@ const CREW: SceneRider[] = [
     c: 0.95,
     st: 'riding',
     cadence: 90,
-    look: { hat: 'hat-cap', outfit: 'outfit-hivis' },
+    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis' },
   },
   {
     id: 'b',
@@ -50,7 +50,7 @@ const CREW: SceneRider[] = [
     c: 0.7,
     st: 'riding',
     cadence: 82,
-    look: { hat: 'hat-viking', outfit: 'outfit-purple' },
+    look: { hat: q.get('hat2') ?? 'hat-viking', outfit: 'outfit-purple' },
   },
   { id: 'c', name: 'Dazza', c: 0.35, st: 'fell', cadence: 0, look: { hat: 'hat-cone' } },
   {
@@ -59,7 +59,7 @@ const CREW: SceneRider[] = [
     c: 0.9,
     st: 'riding',
     cadence: 100,
-    look: { hat: 'hat-crown', outfit: 'outfit-gold' },
+    look: { hat: q.get('hat3') ?? 'hat-crown', outfit: 'outfit-gold' },
   },
   { id: 'e', name: 'Spec', c: null, st: 'spectator', cadence: 0, look: { outfit: 'outfit-black' } },
   { id: 'f', name: 'Kaz', c: 0.8, st: 'riding', cadence: 76 },
@@ -68,8 +68,8 @@ const CREW: SceneRider[] = [
 function apply() {
   const look = {
     paint: st.paint || undefined,
-    bullbar: st.bullbar ? 'bullbar' : undefined,
-    spikes: st.spikes ? 'spikes' : undefined,
+    bullbar: q.get('bullbarId') ?? (st.bullbar ? 'bullbar' : undefined),
+    spikes: q.get('roofId') ?? (st.spikes ? 'spikes' : undefined),
   }
   world.state = {
     speed: st.speed,
