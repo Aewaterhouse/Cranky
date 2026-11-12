@@ -1,0 +1,75 @@
+{
+ "id": "bus-crew-60",
+ "name": "Bus Crew 60",
+ "desc": "A full hour with three roadblocks.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "sprint",
+   "dur": 5,
+   "label": "Opener"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Easy"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 480,
+     "pct": 88,
+     "label": "Long haul"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 50,
+     "label": "Servo stop"
+    },
+    {
+     "type": "over-under",
+     "dur": 360,
+     "pct": [
+      90,
+      105
+     ],
+     "step": 60,
+     "label": "Horde surge"
+    },
+    {
+     "type": "sprint",
+     "dur": 15,
+     "label": "Roadblock"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

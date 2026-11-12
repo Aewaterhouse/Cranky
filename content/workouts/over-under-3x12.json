@@ -1,0 +1,47 @@
+{
+ "id": "over-under-3x12",
+ "name": "Over-Unders 3x12",
+ "desc": "Alternating 95% and 105% every 2 minutes.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 720,
+     "pct": [
+      95,
+      105
+     ],
+     "step": 120,
+     "label": "Over-under"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

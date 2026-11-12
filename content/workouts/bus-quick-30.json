@@ -1,0 +1,58 @@
+{
+ "id": "bus-quick-30",
+ "name": "Bus Quick 30",
+ "desc": "A short sharp zombie run.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 90,
+     "label": "Long haul"
+    },
+    {
+     "type": "sprint",
+     "dur": 10,
+     "label": "Roadblock"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "over-under",
+   "dur": 240,
+   "pct": [
+    90,
+    105
+   ],
+   "step": 60,
+   "label": "Horde surge"
+  },
+  {
+   "type": "ramp",
+   "dur": 180,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

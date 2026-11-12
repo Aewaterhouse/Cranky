@@ -1,0 +1,43 @@
+{
+ "id": "ss-2x20",
+ "name": "Sweet Spot 2x20",
+ "desc": "Two 20 minute sweet spot blocks.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 1200,
+     "pct": 90,
+     "label": "Sweet spot"
+    },
+    {
+     "type": "steady",
+     "dur": 360,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,42 @@
+{
+ "id": "sprint-8x10",
+ "name": "Sprints 8x10",
+ "desc": "Eight 10 second all-out sprints.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 8,
+   "blocks": [
+    {
+     "type": "sprint",
+     "dur": 10,
+     "label": "Sprint"
+    },
+    {
+     "type": "steady",
+     "dur": 150,
+     "pct": 50,
+     "label": "Spin"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

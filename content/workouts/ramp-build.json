@@ -1,0 +1,46 @@
+{
+ "id": "ramp-build",
+ "name": "Ramp Build",
+ "desc": "Three ramps climbing from tempo to threshold.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "ramp",
+     "dur": 480,
+     "pct": [
+      70,
+      105
+     ],
+     "label": "Ramp"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

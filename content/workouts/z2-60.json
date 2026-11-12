@@ -1,0 +1,31 @@
+{
+ "id": "z2-60",
+ "name": "Zone 2 Endurance",
+ "desc": "Steady endurance riding.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 2700,
+   "pct": 65,
+   "label": "Zone 2"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

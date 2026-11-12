@@ -1,0 +1,19 @@
+import type { Tier } from './types'
+
+export const CFG = {
+  tierFactor: { hard: 1, medium: 0.9, easy: 0.8 } as Record<Tier, number>,
+  erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1 },
+  compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },
+  sprint: { hit: 0.75, great: 0.95, mega: 1.0, comboCap: 8 },
+  sprintDur: { min: 5, max: 30 },
+  net: { sendHz: 2, reconnectMs: 2000 },
+  curveDurations: [1, 5, 15, 30, 60, 120, 300, 600, 1200, 3600],
+  defaultCurvePct: { 1: 4.0, 5: 3.5, 15: 2.5, 30: 1.8, 60: 1.5, 120: 1.3, 300: 1.15, 600: 1.1, 1200: 1.05, 3600: 1.0 } as Record<number, number>,
+  bestWindowDays: 90,
+  ftpSuggestThreshold: 0.03,
+  zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
+  recordHz: 1,
+  localStorageKey: 'zombiebus.profile',
+  sim: { baseWatts: 150, baseCadence: 90, noiseW: 4 },
+  scene: { speedMax: 22 },
+}

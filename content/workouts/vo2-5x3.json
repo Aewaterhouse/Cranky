@@ -1,0 +1,43 @@
+{
+ "id": "vo2-5x3",
+ "name": "VO2 5x3",
+ "desc": "Five 3 minute efforts at 115%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 5,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 115,
+     "label": "VO2"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}
