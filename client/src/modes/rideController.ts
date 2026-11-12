@@ -23,6 +23,8 @@ export class RideController {
   live: Live = { power: 0, cadence: 0, avg: 0, c: null, band: false }
   frame: Frame | null = null
   combo = 0
+  /** While true the clock is stopped, so nothing is recorded. */
+  paused = false
   onSprint: (r: SprintResult) => void = () => {}
   private sprint: { i: number; dur: number; samples: number[] } | null = null
   private timers: ReturnType<typeof setInterval>[] = []
@@ -83,7 +85,7 @@ export class RideController {
 
   private second() {
     const f = this.frame
-    if (!f) return
+    if (!f || this.paused) return
     this.rec.sample(f.i, this.live.power, this.live.cadence, f.tgt, this.live.c, this.live.band)
   }
 

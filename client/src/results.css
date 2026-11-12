@@ -1,0 +1,340 @@
+/* Results screen */
+.res {
+  max-width: 1120px;
+}
+.res-hero {
+  margin-bottom: 8px;
+  animation: res-in 0.5s ease-out both;
+}
+.res-hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  color: var(--acc);
+  margin: 4px 0 6px;
+  text-shadow: 0 3px 0 #15130c;
+}
+.res-hero p {
+  margin: 0;
+  color: var(--dim);
+  font-size: 1.05rem;
+}
+.res-hero p b {
+  color: var(--fg);
+}
+.res-tiles,
+.res-bus {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.res-tile {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 12px 16px;
+  animation: res-in 0.5s ease-out both;
+  min-width: 0;
+}
+.res-tiles .res-tile:nth-child(2) {
+  animation-delay: 0.05s;
+}
+.res-tiles .res-tile:nth-child(3) {
+  animation-delay: 0.1s;
+}
+.res-tiles .res-tile:nth-child(4) {
+  animation-delay: 0.15s;
+}
+.res-tiles .res-tile:nth-child(5) {
+  animation-delay: 0.2s;
+}
+.res-tiles .res-tile:nth-child(6) {
+  animation-delay: 0.25s;
+}
+.res-tiles .res-tile:nth-child(7) {
+  animation-delay: 0.3s;
+}
+.res-tile span {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-weight: 600;
+}
+.res-tile b {
+  display: block;
+  font: 400 clamp(1.6rem, 3.4vw, 2.3rem) / 1.15 var(--display);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.res-tile small {
+  color: var(--dim);
+  font-size: 0.8rem;
+}
+.res-tile.wide {
+  border-color: color-mix(in srgb, var(--acc) 50%, var(--line));
+}
+.res-tile.wide b {
+  color: var(--acc);
+}
+.res-tile.good b {
+  color: var(--tox);
+}
+
+.res-prs {
+  background: linear-gradient(135deg, #2b2410, var(--card) 60%);
+  animation: res-in 0.5s 0.3s ease-out both;
+}
+.res-prlist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.res-pr {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(242, 183, 5, 0.12);
+  border: 1px solid color-mix(in srgb, var(--acc) 55%, transparent);
+}
+.res-pr .flag {
+  font: 400 0.8rem var(--display);
+  background: var(--acc);
+  color: var(--acc-ink);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+.res-pr b {
+  font: 400 1.3rem var(--display);
+  color: var(--acc);
+}
+.res-pr small {
+  color: var(--dim);
+}
+.res-ftp {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.res-scrap {
+  font-size: 1.05rem;
+}
+.res-scrap b {
+  color: var(--tox);
+  font: 400 1.3rem var(--display);
+}
+
+.res-chart {
+  height: clamp(220px, 34vh, 360px);
+}
+.res-chart .wchart {
+  width: 100%;
+  height: 100%;
+}
+
+.res-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 0 12px;
+}
+.res-zrow {
+  display: grid;
+  grid-template-columns: 112px 1fr 52px 38px;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+.res-zrow span {
+  font-weight: 700;
+}
+.res-zrow span small {
+  margin-left: 8px;
+  color: var(--dim);
+  font-weight: 400;
+}
+.res-zrow em {
+  font-style: normal;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.res-zrow > small {
+  color: var(--dim);
+  text-align: right;
+}
+.res-zbar {
+  height: 14px;
+  border-radius: 7px;
+  background: var(--bg2);
+  overflow: hidden;
+}
+.res-zbar i {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+  animation: res-grow 0.8s ease-out both;
+  transform-origin: left;
+}
+
+.res-sprints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.res-spr {
+  min-width: 96px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  text-align: center;
+  background: var(--bg2);
+  border: 2px solid currentColor;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.res-spr b {
+  font: 400 1.25rem var(--display);
+}
+.res-spr span {
+  color: var(--fg);
+  font-weight: 700;
+}
+.res-spr small {
+  color: var(--dim);
+}
+.res-spr.grade-LEGEND {
+  font-size: 1em;
+  box-shadow: 0 0 18px rgba(255, 221, 0, 0.35);
+}
+.res-spr.grade-MEGA {
+  box-shadow: 0 0 14px rgba(255, 0, 255, 0.3);
+}
+
+.res-bus {
+  grid-template-columns: 2fr repeat(4, 1fr);
+  align-items: stretch;
+}
+.res-bus .res-tile {
+  background: var(--bg2);
+}
+.res-score {
+  border-radius: var(--r);
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #3a2f08, var(--bg2));
+  border: 1px solid var(--acc);
+}
+.res-score span {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+  font-weight: 600;
+}
+.res-score b {
+  font: 400 clamp(2.2rem, 5vw, 3.4rem) / 1.1 var(--display);
+  color: var(--acc);
+}
+.res-awards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+.res-award {
+  position: relative;
+  padding: 14px 16px 12px 64px;
+  border-radius: var(--r);
+  background: var(--bg2);
+  border: 1px solid var(--line);
+}
+.res-award.mine {
+  border-color: var(--acc);
+  background: linear-gradient(135deg, #2b2410, var(--bg2));
+}
+.res-trophy {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.res-award b {
+  font: 400 1rem var(--display);
+  display: block;
+}
+.res-award .who {
+  font-weight: 700;
+}
+tr.me td {
+  background: rgba(242, 183, 5, 0.08);
+  font-weight: 700;
+}
+.res-comp {
+  position: relative;
+  display: inline-block;
+  min-width: 84px;
+  padding: 1px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow: hidden;
+  z-index: 0;
+}
+.res-comp i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: -1;
+  opacity: 0.28;
+}
+.res-comp.good {
+  color: var(--tox);
+}
+.res-comp.good i {
+  background: var(--tox);
+}
+.res-comp.miss {
+  color: var(--bad);
+}
+.res-comp.miss i {
+  background: var(--bad);
+}
+.res-actions {
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+.res-actions .primary {
+  padding: 12px 22px;
+}
+
+@keyframes res-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@keyframes res-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@media (max-width: 760px) {
+  .res-tiles,
+  .res-bus {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .res-score {
+    grid-column: 1 / -1;
+  }
+}
+
+.res-bus .res-tile b {
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+}
