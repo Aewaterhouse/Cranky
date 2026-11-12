@@ -48,8 +48,8 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Bots to fill the bus | NPC riders so a crew of two still has a full, lively bus | M |
 | ✅ Admin page | Add riders and reset passwords in the browser instead of editing config | S |
 | ✅ TV / second-screen mode | Pair on the laptop, watch on a TV or iPad (spectator view by code, `/?watch=CODE`) | M |
-| iPad and phone layout pass | Test Bluefy on iPad; fix HUD and solo layouts for touch | M |
-| Number tuning | Tune horde, damage, fell-off and scrap after the first real ride | S |
+| iPad and phone layout pass | Test Bluefy on iPad; fix HUD and solo layouts for touch. **Needs the owner:** a real iPad with Bluefy; skipped for now | M |
+| Number tuning | Tune horde, damage, fell-off and scrap after the first real ride. **Needs the owner:** waits for the first real group ride; skipped for now | S |
 | ✅ Automated end-to-end test | Put the Playwright ride test in the repo so regressions are caught | S |
 
 ## 2. Data, graphs and export
@@ -64,7 +64,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Fitness trends | Weekly TSS, fitness / fatigue / form (CTL, ATL, TSB), calendar heatmap, streaks | M |
 | ✅ PR timeline and badges | When each best was set; badges for milestones (first 300 W minute, 100 rides) | S |
 | Extra ride metrics | HR drift, efficiency factor, variability index, cadence histogram, W′ balance | M |
-| intervals.icu sync | Push rides and pull planned workouts | M |
+| intervals.icu sync | Push rides and pull planned workouts. **Needs the owner:** an intervals.icu API key and athlete ID; skipped for now | M |
 | ✅ Discord post | The server posts each finished bus ride's summary to a channel webhook. **Needs the owner:** set `ZB_DISCORD_WEBHOOK` to the channel's webhook URL and restart; not yet tried against a real Discord channel. The postcard image is not attached (it is drawn in the browser) | S |
 | ★ Strava export (later) | Connect Strava once, then every ride uploads automatically. Parked for now; needs a free Strava API app | M |
 

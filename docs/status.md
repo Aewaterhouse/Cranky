@@ -8,14 +8,22 @@
 - Game: ramp-up hill event, difficulty levels, 20 more cosmetics, announcer, Discord summary (needs a webhook URL).
 - Polish: Cranky rebrand and logo, settings screen, automatic graphics quality, first-run welcome.
 
+- Rider data: deeper profile, power curve chart, ride history, fitness trends, PR timeline and badges.
+- Solo extras: FTP tests, resistance and slope modes, cadence targets, coach cues, add-time buttons, media corner, ghost of the last attempt.
+- Game extras: personal mini-challenges, nitro, weekly mutators, season ladder, TV spectator mode.
+- Free ride: ride physics, GPX routes, elevation profiles and an OpenStreetMap map (not yet looked at in a browser).
+
 ## In progress
-- Rider data: profile depth, power curve chart, ride history, fitness trends, badges.
-- Solo extras: FTP tests, resistance and slope modes, cadence targets, coach cues, add-time buttons.
-- TV spectator mode.
+- Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
 
 ## Next
-- Watch party, free ride on GPX routes, then deeper Zombie Bus mechanics.
+- Compare with mates, extra ride metrics, workout builder, training plans, then watch party, the rest of free ride and deeper Zombie Bus mechanics.
+- Skipped until the owner can help: iPad layout pass, number tuning, intervals.icu sync (notes beside each in the roadmap).
 - The owner's hardware checks are listed in `docs/owner-checks.md`.
+
+## Working on this PC
+- The owner wants it kept cool. Run builds and tests as `systemd-run --user --scope -q -p CPUQuota=300% nice -n 19 <command>` and use at most one or two agents at a time.
+- After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
 - Most features are tested only against the simulated trainer and headless Chromium.
