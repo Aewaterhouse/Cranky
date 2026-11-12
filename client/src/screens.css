@@ -497,3 +497,17 @@ kbd {
     row-gap: 16px;
   }
 }
+
+.solo + .solo {
+  margin-top: 12px;
+}
+.solo.soon {
+  opacity: 0.55;
+  border: 1px dashed var(--line);
+  background: none;
+}
+.solo.soon .arrow {
+  font: 700 0.7rem/1 var(--ui);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}

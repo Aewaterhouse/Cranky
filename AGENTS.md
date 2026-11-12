@@ -41,3 +41,10 @@ Agents degrade when their context fills with code. Keep reading minimal and stat
 8. If stuck after three attempts, stub or simplify, note it under known issues in docs/status.md and move on.
 9. If the context is getting long, finish the current item, write status and start a fresh session.
 10. Use sub-agents for exploration or broad searches when available and keep only their summary.
+
+Work loop
+• The backlog is docs/roadmap.md. Pick the next unfinished item, build it, commit, mark it done in the roadmap, then repeat without waiting for the owner.
+• Order: follow the "Suggested milestones" table top to bottom. Within a milestone, take that milestone's items in the order they appear in their section tables. Skip anything marked parked or later.
+• Mark a finished item by putting ✅ at the start of its name in the roadmap table, in the same commit as the work. If an item is only partly done, leave it unticked and add a short note of what remains.
+• One item per commit. Tests, type-check and lint must pass before each commit. Log any assumption in docs/decisions.md.
+• If an item needs something only the owner can supply (an API key, a hardware test, a product decision), note that beside the item, skip it and carry on with the next.

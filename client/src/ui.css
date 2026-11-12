@@ -53,7 +53,6 @@ a {
 .logo em {
   font-style: normal;
   color: var(--acc);
-  margin-left: 0.3em;
 }
 .logo .bus {
   display: inline-grid;

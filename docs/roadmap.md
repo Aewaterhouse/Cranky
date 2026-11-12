@@ -43,7 +43,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Ride crash recovery | Save the ride every few seconds so a refresh or crash loses nothing | M |
 | Server restart survival | Persist room state so a restart resumes the ride | M |
 | ERG pre-scheduling | Schedule block changes off the server clock so targets are never late | S |
-| Rebrand to Cranky | Rename the app, logo and tab title; the home screen becomes a mode picker (Zombie Bus, Watch Party, Solo, later games) | S |
+| ✅ Rebrand to Cranky | Rename the app, logo and tab title; the home screen becomes a mode picker (Zombie Bus, Watch Party, Solo, later games) | S |
 | Full-bus handling | Six seats stays; show "bus full" clearly and let a seventh rider spectate | S |
 | Bots to fill the bus | NPC riders so a crew of two still has a full, lively bus | M |
 | Admin page | Add riders and reset passwords in the browser instead of editing config | S |

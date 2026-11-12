@@ -7,8 +7,8 @@ export const logo = (big = false) =>
   h(
     'div',
     { class: `logo${big ? ' big' : ''}` },
-    h('span', { class: 'bus' }, '🚌'),
-    h('span', {}, 'Zombie', h('em', {}, 'Bus')),
+    h('span', { class: 'bus' }, '🚴'),
+    h('span', {}, 'Crank', h('em', {}, 'y')),
   )
 
 /** Pick your rider tile, then type the password. */

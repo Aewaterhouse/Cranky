@@ -56,6 +56,15 @@ function busCard(r: Room, join: (code: string) => void) {
 }
 
 /** Ride tab: open buses first, then a new bus, then solo. */
+const soon = (emoji: string, name: string, blurb: string) =>
+  h(
+    'div',
+    { class: 'solo soon' },
+    h('span', { class: 'big-emoji' }, emoji),
+    h('span', {}, h('b', {}, name), h('small', {}, blurb)),
+    h('span', { class: 'arrow' }, 'coming soon'),
+  )
+
 export function rideTab(p: Profile, act: HomeActions) {
   const list = h('div', { class: 'buses' })
   let seen = ''
@@ -108,7 +117,8 @@ export function rideTab(p: Profile, act: HomeActions) {
     h(
       'section',
       { class: 'hero' },
-      h('h1', {}, 'Ride the bus with the crew'),
+      h('h2', { class: 'label' }, 'Crew game'),
+      h('h1', {}, '🧟 Zombie Bus'),
       h(
         'p',
         { class: 'lede' },
@@ -153,6 +163,8 @@ export function rideTab(p: Profile, act: HomeActions) {
       ),
       h('span', { class: 'arrow' }, '→'),
     ),
+    soon('📺', 'Watch party', 'Same workout, same video, all in sync.'),
+    soon('🎮', 'More games', 'Handicap race, chaingang, last rider standing.'),
   )
   const wrap = h('div', {}, main)
   return wrap
