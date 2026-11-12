@@ -702,7 +702,6 @@
     flex: none;
   }
 }
-<<<<<<< HEAD
 .pp-import {
   border-style: dashed;
   align-items: center;
@@ -729,7 +728,6 @@
 }
 .pp-del:hover {
   color: var(--bad);
-=======
 .bot-row {
   display: flex;
   align-items: center;
@@ -751,5 +749,4 @@
   position: absolute;
   top: 5px;
   right: 8px;
->>>>>>> worktree-agent-a99f0fb4e2f127e29
 }
