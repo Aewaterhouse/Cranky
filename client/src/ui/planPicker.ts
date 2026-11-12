@@ -139,7 +139,7 @@ export function planPicker(o: PickerOpts) {
       h('h3', { class: 'label' }, title, h('small', {}, note)),
       h('div', { class: 'pp-grid' }, ...ids.map(card)),
     )
-  const ids = PLANS.map((p) => p.id).filter((i) => !isMine(i))
+  const ids = PLANS.filter((p) => p.goal !== 'test' && !isMine(p.id)).map((p) => p.id)
   const goalOf = (id: string) =>
     isMine(id) ? 'mine' : (PLANS.find((p) => p.id === id)?.goal ?? 'endurance')
   const order = o.first === 'workout' ? [...GOALS.slice(1), GOALS[0]] : GOALS

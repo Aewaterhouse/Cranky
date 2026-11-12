@@ -1,5 +1,6 @@
 import '../../solo.css'
 import type { Profile } from '../../core/curve'
+import { recordFtp } from '../../core/curve'
 import { frameAt, planTotal, startOf } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
 import { RideRecorder } from '../../core/ride'
@@ -288,7 +289,7 @@ export function runDrill(
         ['Accept', 'Keep old'],
       )
       if (pick === 0) {
-        profile.ftp = r
+        recordFtp(profile, r)
         saveProfile(profile)
       }
     }

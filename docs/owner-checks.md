@@ -8,6 +8,13 @@ Everything below was built and tested against the simulated trainer only. Tick t
 - [ ] Walk out of Bluetooth range for 30 s and come back. It should reconnect by itself.
 - [ ] Open another app that grabs the trainer mid-ride. Cranky should retry, then fail clearly and release after repeated failures.
 
+## Solo modes
+- [ ] Resistance mode (the riskiest one): switch to Resistance in the solo player. Does the trainer accept it, and does 0 to 100% feel sensible? If not, the scale in `client/src/config.ts` (`ftms.resMax`) needs changing.
+- [ ] Slope mode: change the gradient and check the resistance follows. Switch ERG → Resistance → Slope → ERG and make sure the trainer never gets stuck.
+- [ ] Ramp test: does ERG follow the one-minute steps, and do "I'm done" and the automatic stop feel right?
+- [ ] 20-minute test: is the free-ride section rideable with ERG off?
+- [ ] "+5 min" and "+1 min": do the ERG transitions feel smooth?
+
 ## Heart-rate strap
 - [ ] Pair a strap from the trainer window ("Heart rate (optional)"). The bpm should show in the pill, the solo player, the game cockpit and the results.
 - [ ] Trainer and strap connected together for a whole ride without dropouts.
