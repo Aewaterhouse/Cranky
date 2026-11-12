@@ -48,6 +48,7 @@ export const CFG = {
     resWatts: 1 / 30,
   },
   cueS: 8,
+  extend: { minuteS: 60, easyS: 300, easyPct: 50, graceS: 20 },
   ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
   scene: { speedMax: 22 },
 }
