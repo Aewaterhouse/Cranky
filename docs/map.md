@@ -25,7 +25,7 @@
 - `effects.ts` resistance modifier bus with caps.
 - `plan.ts` plan parsing, flattening, frame lookup, session generator.
 - `profile.ts` local profile cache and server sync.
-- `ride.ts` per-ride recorder, summary, NP/IF/TSS.
+- `ride.ts` per-ride recorder (JSON save and restore), summary, NP/IF/TSS; `snapshot.ts` crash-recovery snapshots in localStorage and the remembered bus code.
 
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.

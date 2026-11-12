@@ -73,3 +73,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Simulated HR (offered in the trainer modal once the simulated trainer is in use): resting 60 bpm plus 115 bpm times power/FTP (so 175 at FTP, capped at 200), approached with a 30 s first-order lag. Numbers live in `CFG.hr`.
 - `Profile.maxHr` is optional. With it set, the solo HR tile is coloured by zone: below 60%, 60-70, 70-80, 80-90, 90%+ (blue, teal, amber, orange, red).
 
+## Ride crash recovery (2026-11-12)
+- Solo: every 5 s (`CFG.recovery.saveMs`) `localStorage["cranky.solo.<riderId>"]` gets the generated plan, plan time, intensity, tier, the recorder (`RideRecorder.toJSON`), the chart x positions, compliance sums and a wall-clock stamp. The Ride tab offers "Resume your workout?" for a snapshot under 30 min old (`CFG.recovery.maxAgeMs`). Resume restarts with the normal 5 s countdown at the saved plan time; the gap while the page was away is simply not recorded. Ending or finishing a ride clears it. Nothing is saved before the first recorded second.
+- Crew: `cranky.bus.<riderId>.<code>` holds the rider's recorder only (plus plan id); the server still owns the clock. `startBusRide` restores it when the code and plan id match and it is under 30 min old. It is cleared on finish or leave.
+- The last bus code is also kept in `localStorage["cranky.buscode.<riderId>"]` so a closed tab can find its way back. The Ride tab shows "Rejoin bus ABCD" only when `/api/rooms` lists that code. The server lists a room only while someone is connected, so a rider who was alone on the bus will not get the card after a refresh (the code field is still prefilled from sessionStorage). Listing rooms that are running but empty would fix it; left for a server change.
+- Sprint combo is not restored (it restarts at 0).
+

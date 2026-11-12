@@ -2,7 +2,9 @@ import '../../solo.css'
 import { zoneOf, type Profile } from '../../core/curve'
 import { frameAt, planTotal, startOf } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
-import { loadStats } from '../../core/ride'
+import { loadStats, RideRecorder } from '../../core/ride'
+import { clearSnap, saveSnap, soloKey, type SoloSnap } from '../../core/snapshot'
+import { CFG } from '../../config'
 import { SFX } from '../../ui/audio'
 import { fmt, show } from '../../ui/dom'
 import { finishRide } from '../../ui/results'
@@ -21,14 +23,23 @@ export function runDrill(
   profile: Profile,
   trainer: Trainer,
   done: (p: Profile) => void,
+  resume?: SoloSnap,
 ) {
   const total = planTotal(plan.blocks)
   const fast = +(new URLSearchParams(location.search).get('fast') ?? 1)
-  const ride = new RideController(trainer, profile, plan)
+  if (resume) profile.tier = resume.tier
+  const ride = new RideController(
+    trainer,
+    profile,
+    plan,
+    undefined,
+    undefined,
+    resume && RideRecorder.fromJSON(resume.rec),
+  )
   const isSim = trainer.name.toLowerCase().includes('sim')
-  let el = 0
+  let el = resume?.el ?? 0
   let count = START_S
-  let intensity = 1
+  let intensity = resume?.intensity ?? 1
   let manual = false
   let auto = false
   let finished = false
@@ -39,10 +50,11 @@ export function runDrill(
   let lastCount = 0
   let splashUntil = 0
   // incremental stats: one entry per recorded second
-  const xs: number[] = []
+  const xs: number[] = resume?.xs ?? []
   const zones = Array(7).fill(0)
-  let cSum = 0
-  let cN = 0
+  resume?.rec.power.forEach((w) => zones[zoneOf(w, profile.ftp)]++)
+  let cSum = resume?.cSum ?? 0
+  let cN = resume?.cN ?? 0
   let load = loadStats([], profile.ftp)
   let loadN = 0
   let cadAvg = 0
@@ -215,12 +227,19 @@ export function runDrill(
     })
   }
   const timer = setInterval(tick, 200)
+  const key = soloKey(profile.id)
+  const saver = setInterval(() => {
+    if (!finished && ride.rec.power.length)
+      saveSnap(key, { plan, el, intensity, tier: profile.tier, rec: ride.rec, xs, cSum, cN })
+  }, CFG.recovery.saveMs)
   tick()
 
   async function end() {
     if (finished) return
     finished = true
     clearInterval(timer)
+    clearInterval(saver)
+    clearSnap(key)
     removeEventListener('keydown', onKey)
     await ride.stop()
     finishRide(profile, ride.rec.summary(), done)

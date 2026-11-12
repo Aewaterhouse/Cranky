@@ -42,11 +42,23 @@ export class RideRecorder {
   hr: (number | null)[] = []
   private rows: { i: number; p: number; tgt: number | null; c: number | null; band: boolean }[] = []
   sprints: SprintResult[] = []
-  readonly startedAt = new Date().toISOString()
+  startedAt = new Date().toISOString()
   constructor(
     public plan: Plan,
     public ftp: number,
   ) {}
+
+  /** Plain-data copy of everything recorded so far, for crash recovery. */
+  toJSON() {
+    const { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints } = this
+    return { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints }
+  }
+
+  static fromJSON(j: ReturnType<RideRecorder['toJSON']>): RideRecorder {
+    const r = new RideRecorder(j.plan, j.ftp)
+    Object.assign(r, structuredClone(j))
+    return r
+  }
 
   sample(
     i: number,

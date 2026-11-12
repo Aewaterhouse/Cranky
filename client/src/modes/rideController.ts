@@ -40,9 +40,10 @@ export class RideController {
     plan: Plan,
     private now = () => performance.now() / 1000,
     private hrNow: () => number | null = currentHr,
+    rec?: RideRecorder,
   ) {
     this.erg = new ErgController(trainer, profile.ftp, now)
-    this.rec = new RideRecorder(plan, profile.ftp)
+    this.rec = rec ?? new RideRecorder(plan, profile.ftp)
     trainer.onData((d) => this.data(d.power, d.cadence))
     trainer.onStatus((s) => {
       if (this.stopped) return

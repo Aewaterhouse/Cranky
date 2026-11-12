@@ -1,6 +1,7 @@
 import type { Profile } from '../../core/curve'
 import { api } from '../../core/api'
 import { saveProfile } from '../../core/profile'
+import { forgetBus, rememberBus } from '../../core/snapshot'
 import type { Lobby, ServerMsg } from '../../net/protocol'
 import { WsClient } from '../../net/wsClient'
 import { h, show } from '../../ui/dom'
@@ -25,6 +26,7 @@ export async function crew(
     }
   }
   sessionStorage.setItem('zombiebus.code', code)
+  rememberBus(profile.id, code)
   const net = new WsClient(code)
   let lobby: Lobby | null = null
   let ride: BusRide | null = null
@@ -43,6 +45,7 @@ export async function crew(
     net.close()
     ride?.abort()
     sessionStorage.removeItem('zombiebus.code')
+    forgetBus(profile.id)
     home(profile)
   }
 

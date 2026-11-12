@@ -2,6 +2,8 @@ import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { frameAt, planTotal } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
+import { RideRecorder } from '../../core/ride'
+import { busKey, clearSnap, loadSnap, saveSnap, type BusSnap } from '../../core/snapshot'
 import type { Lobby, Tick } from '../../net/protocol'
 import type { WsClient } from '../../net/wsClient'
 import { World, debugPanel } from '../../scene/world'
@@ -40,7 +42,16 @@ export function startBusRide(
   let l = lobby0
   const plan = l.plan
   const total = planTotal(plan.blocks)
-  const ride = new RideController(trainer, profile, plan)
+  const key = busKey(profile.id, l.code)
+  const saved = loadSnap<BusSnap>(key)
+  const ride = new RideController(
+    trainer,
+    profile,
+    plan,
+    undefined,
+    undefined,
+    saved?.planId === plan.id ? RideRecorder.fromJSON(saved.rec) : undefined,
+  )
   const isHost = () => l.host === profile.id
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
@@ -86,6 +97,10 @@ export function startBusRide(
       s: ride.frame?.tgt ? v.c : null,
     })
   }, 1000 / CFG.net.sendHz)
+  const saver = setInterval(
+    () => ride.rec.power.length && saveSnap(key, { planId: plan.id, rec: ride.rec }),
+    CFG.recovery.saveMs,
+  )
   let lastI = -2
   let lastEv = ''
   let lastCount = 0
@@ -148,6 +163,8 @@ export function startBusRide(
 
   const cleanup = async () => {
     clearInterval(sender)
+    clearInterval(saver)
+    clearSnap(key)
     stopAudio()
     await ride.stop()
     world.dispose()
