@@ -21,13 +21,41 @@
      "type": "steady",
      "dur": 1200,
      "pct": 89,
-     "label": "Sweet spot"
+     "label": "Sweet spot",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Twenty minutes. Settle in, nobody is chasing you."
+      },
+      {
+       "at": 300,
+       "text": "Five down. Plenty of road left, mate."
+      },
+      {
+       "at": 600,
+       "text": "Halfway. Shoulders down, breathe."
+      },
+      {
+       "at": 900,
+       "text": "Five to go. Think of the pub."
+      },
+      {
+       "at": 1140,
+       "text": "Last minute. Finish like you meant it."
+      }
+     ]
     },
     {
      "type": "steady",
      "dur": 300,
      "pct": 50,
-     "label": "Recover"
+     "label": "Recover",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Easy now. Have a drink."
+      }
+     ]
     }
    ]
   },
@@ -38,7 +66,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

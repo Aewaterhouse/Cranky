@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { hrZone } from '../core/curve'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
@@ -105,6 +106,8 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   )
   tierSel.value = tier
   const ov = h('div', { class: 'overlay' })
+  const cueEl = h('div', { class: 'cue' })
+  let cueTimer: ReturnType<typeof setTimeout> | undefined
   const panel = soloPanel(plan, () => tierSel.value as Tier, ftp)
   const acts = soloActions()
   const modes = modeSwitch({ set: on.mode, nudge: on.nudge })
@@ -148,7 +151,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       { class: 'solo-main' },
       h('div', { class: 'bigrow' }, tgt.el, pow.el, cad.el, hr.el, left.el),
       h('div', { class: 'gwrap' }, gauge, dev),
-      h('div', { class: 'chartbox main' }, main.el, ov),
+      h('div', { class: 'chartbox main' }, main.el, ov, cueEl),
       h(
         'div',
         { class: 'chartbox zoom' },
@@ -202,6 +205,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       key = k
     },
     confirmEnd,
+    /** Non-blocking coach banner, gone after CFG.cueS seconds. */
+    cue(text: string) {
+      clearTimeout(cueTimer)
+      cueEl.textContent = text
+      cueEl.classList.add('show')
+      cueTimer = setTimeout(() => cueEl.classList.remove('show'), CFG.cueS * 1000)
+    },
     /** Modal question over the chart; resolves with the index of the button pressed. */
     prompt(title: string, lines: string[], buttons: string[]) {
       return new Promise<number>((res) =>

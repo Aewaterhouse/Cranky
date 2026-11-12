@@ -21,13 +21,33 @@
      "type": "steady",
      "dur": 1200,
      "pct": 97,
-     "label": "Threshold"
+     "label": "Threshold",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Threshold. It is meant to sting a little."
+      },
+      {
+       "at": 600,
+       "text": "Halfway. The sting is the point."
+      },
+      {
+       "at": 1080,
+       "text": "Two minutes to go. The hard part is behind you."
+      }
+     ]
     },
     {
      "type": "steady",
      "dur": 480,
      "pct": 50,
-     "label": "Recover"
+     "label": "Recover",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Easy spin. Breathe out."
+      }
+     ]
     }
    ]
   },
@@ -38,7 +58,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

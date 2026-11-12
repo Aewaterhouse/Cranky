@@ -9,13 +9,25 @@
    "type": "steady",
    "dur": 300,
    "pct": 50,
-   "label": "Warm-up"
+   "label": "Warm-up",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Easy start. Save it for the ramp."
+    }
+   ]
   },
   {
    "type": "steady",
    "dur": 60,
    "pct": 46,
-   "label": "Ramp 46%"
+   "label": "Ramp 46%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Ramp begins. Every minute gets a bit harder."
+    }
+   ]
   },
   {
    "type": "steady",
@@ -69,7 +81,13 @@
    "type": "steady",
    "dur": 60,
    "pct": 100,
-   "label": "Ramp 100%"
+   "label": "Ramp 100%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "FTP territory. This is where it gets honest."
+    }
+   ]
   },
   {
    "type": "steady",
@@ -99,7 +117,13 @@
    "type": "steady",
    "dur": 60,
    "pct": 130,
-   "label": "Ramp 130%"
+   "label": "Ramp 130%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Past FTP. Hold on as long as you can."
+    }
+   ]
   },
   {
    "type": "steady",
@@ -117,7 +141,13 @@
    "type": "steady",
    "dur": 60,
    "pct": 148,
-   "label": "Ramp 148%"
+   "label": "Ramp 148%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Top step. Absolute legend."
+    }
+   ]
   },
   {
    "type": "ramp",
@@ -126,7 +156,13 @@
     55,
     40
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Test done. Spin the legs out, you weapon."
+    }
+   ]
   }
  ]
 }

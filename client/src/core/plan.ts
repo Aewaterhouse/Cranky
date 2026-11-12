@@ -29,6 +29,10 @@ function flatten(blocks: Block[], where: string): Block[] {
       const [lo, hi] = Array.isArray(b.cad) && b.cad.length === 2 ? b.cad : [0, 0]
       if (!(lo > 0 && hi >= lo)) throw new Error(`${at}: cad must be [lo, hi] rpm`)
     }
+    if (b.cues !== undefined) {
+      const ok = Array.isArray(b.cues) && b.cues.every((c) => c?.at >= 0 && !!c.text)
+      if (!ok) throw new Error(`${at}: cues must be [{at, text}]`)
+    }
     if (!(b.dur > 0)) throw new Error(`${at}: dur must be > 0`)
     if (b.type === 'sprint' && (b.dur < CFG.sprintDur.min || b.dur > CFG.sprintDur.max))
       throw new Error(`${at}: sprint dur must be ${CFG.sprintDur.min}-${CFG.sprintDur.max}s`)

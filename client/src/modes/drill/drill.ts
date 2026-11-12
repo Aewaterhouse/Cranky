@@ -13,6 +13,7 @@ import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { CadenceTally } from './cadence'
+import { CueTracker } from './cues'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
 
 const START_S = 5
@@ -67,6 +68,7 @@ export function runDrill(
   let loadN = 0
   let cadAvg = 0
   const tally = new CadenceTally(plan.blocks)
+  const cues = new CueTracker(plan.blocks, el)
   resume?.rec.cadence.forEach((c, n) => tally.add(locate(plan.blocks, xs[n])?.i ?? 0, c))
 
   const view = soloView(
@@ -206,6 +208,11 @@ export function runDrill(
     const f = scaled(base, intensity)
     if (count <= 0) {
       ride.setFrame(paused ? { ...f, type: 'steady', tgt: Math.round(profile.ftp * PAUSE_ERG) } : f)
+      const cue = paused ? undefined : cues.due(f.i, f.bel)
+      if (cue) {
+        view.cue(cue)
+        SFX.cue()
+      }
       if (f.i !== lastI) {
         if (lastI >= 0) SFX.block()
         lastI = f.i

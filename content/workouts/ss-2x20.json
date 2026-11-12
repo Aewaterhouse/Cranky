@@ -21,7 +21,21 @@
      "type": "steady",
      "dur": 1200,
      "pct": 90,
-     "label": "Sweet spot"
+     "label": "Sweet spot",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Sweet spot. Hard enough to count, easy enough to finish."
+      },
+      {
+       "at": 600,
+       "text": "Halfway. This is where the fitness gets built."
+      },
+      {
+       "at": 1080,
+       "text": "Two minutes. You have got this."
+      }
+     ]
     },
     {
      "type": "steady",
@@ -38,7 +52,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

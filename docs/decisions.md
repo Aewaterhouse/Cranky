@@ -113,3 +113,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Scoring is separate from power compliance: the player counts, per block, the recorded seconds with cadence inside the band (stopped pedalling counts as out). It is shown under the interval as "Cadence 110-120 rpm · 82% in band" (green from 80%) and is not part of the ride summary or results.
 - The cadence tile shows the band in place of "rpm" and is green inside it, amber outside. The chart draws bands (translucent blue, on the 40-140 rpm scale) only while the "Cadence line" toggle is on. Seconds spent paused are not counted. A resumed ride rebuilds the tally from the saved cadence samples.
 - Three cadence drills (goal endurance): `cad-spin-ups` (8 x 1 min at 110-120), `cad-low-strength` (5 x 4 min at 80% and 55-65 rpm), `cad-pyramid` (90 up to 120 and back, 3 min each).
+
+## Coach text cues (2026-11-12)
+- A block may carry `cues: [{at, text}]` (seconds into the block, text non-empty). The parser checks the shape and keeps the cues through set expansion, so a cue inside a repeated set shows on every rep. The server ignores the field.
+- The player shows a cue as a pill over the top of the main chart for 8 s (`CFG.cueS`, real seconds, so `?fast` does not shorten it), with a soft two-note sine chime. It does not block anything and replaces an earlier cue still showing. Each cue shows once per ride; if several fall due in the same tick (a skip, a fast clock) only the newest shows. Cues in a skipped block, and cues before the resume point, stay quiet. Nothing fires while paused.
+- Cues added to 8 workouts: both FTP tests, ss-3x20, ss-2x20, thr-2x20, over-under-2x16, vo2-4x4 and z2-90.

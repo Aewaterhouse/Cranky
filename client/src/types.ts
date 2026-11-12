@@ -13,6 +13,8 @@ export interface Block {
   rep?: number
   /** Optional cadence band [lo, hi] in rpm for this block. */
   cad?: [number, number]
+  /** Coach messages shown `at` seconds into the block. */
+  cues?: { at: number; text: string }[]
   blocks?: Block[]
 }
 export interface Plan {

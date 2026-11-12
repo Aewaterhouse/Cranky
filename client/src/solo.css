@@ -528,3 +528,27 @@
 .iv-c.good {
   color: var(--tox);
 }
+
+.cue {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  max-width: min(86%, 640px);
+  transform: translate(-50%, -12px);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--acc) 92%, #000);
+  color: #1a1400;
+  font: 700 1.1rem var(--ui);
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+}
+.cue.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
