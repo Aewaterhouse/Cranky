@@ -1,4 +1,5 @@
 import { CFG } from '../config'
+import { token } from '../core/api'
 import type { ClientMsg, ServerMsg } from './protocol'
 
 /** WebSocket with automatic reconnect. `onOpen` runs on every (re)connect. */
@@ -9,17 +10,14 @@ export class WsClient {
   private ws?: WebSocket
   private closed = false
 
-  constructor(
-    private code: string,
-    private id: string,
-  ) {
+  constructor(private code: string) {
     this.open()
   }
 
   private open() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws'
     this.ws = new WebSocket(
-      `${proto}://${location.host}/ws/${this.code}?id=${encodeURIComponent(this.id)}`,
+      `${proto}://${location.host}/ws/${this.code}?token=${encodeURIComponent(token())}`,
     )
     this.ws.onopen = () => (this.onStatus(true), this.onOpen())
     this.ws.onmessage = (e) => this.onMsg(JSON.parse(e.data))

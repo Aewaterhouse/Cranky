@@ -49,7 +49,7 @@ export function finishRide(
   const banked = group ? bankScrap(group.scrap, myAwards) : 0
   if (banked) p = { ...p, scrap: p.scrap + banked }
   saveProfile(p)
-  if (s.record.secs >= 30) postRide(p.id, s)
+  if (s.record.secs >= 30) postRide(s)
   const prs =
     p === profile
       ? []

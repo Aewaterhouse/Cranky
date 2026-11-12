@@ -42,8 +42,9 @@ def server():
 
 
 async def rider(port, code, n, results, drop=False):
-    url = f"ws://127.0.0.1:{port}/ws/{code}?id=bot{n}"
+    url = f"ws://127.0.0.1:{port}/ws/{code}?token={TOKENS[n]}"
     ticks, targets, ended = 0, set(), None
+    await asyncio.sleep(0.2 * (n > 0))  # bot0 joins first so it is the host
     async with websockets.connect(url) as ws:
         await ws.send(json.dumps({"t": "join", "name": f"Bot{n}", "ftp": 200 + n * 20, "tier": "hard"}))
         if n == 0:
@@ -93,10 +94,17 @@ async def rider(port, code, n, results, drop=False):
     results[n] = {"ticks": ticks, "targets": targets, "summary": ended}
 
 
+TOKENS: dict[int, str] = {}
+
+
 def test_four_riders_five_minutes(server):
     from fastapi.testclient import TestClient
 
-    code = TestClient(app_mod.app).post("/api/rooms").json()["code"]
+    client = TestClient(app_mod.app)
+    for n in range(4):
+        app_mod.store.add_user(f"Bot{n}", "pw")
+        TOKENS[n] = client.post("/api/login", json={"name": f"bot{n}", "password": "PW"}).json()["token"]
+    code = client.post("/api/rooms", headers={"Authorization": f"Bearer {TOKENS[0]}"}).json()["code"]
     app_mod.rooms[code].plan = generate(PLAN, 0)
     results: dict = {}
 

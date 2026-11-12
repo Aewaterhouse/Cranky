@@ -68,3 +68,6 @@ COMBO_STEP = 0.25
 SHOP = {"plating": 40, "repellent": 60, "sync": 50}
 PLATING_ARMOUR = 25
 SYNC_WIDEN_RPM = 3
+
+# Accounts seeded at startup. Password is the name (case-insensitive) — friends-only hobby server.
+SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack"]

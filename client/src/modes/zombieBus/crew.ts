@@ -1,6 +1,7 @@
 import { PLANS } from '../../content'
 import type { Profile } from '../../core/curve'
 import { planTotal } from '../../core/plan'
+import { api } from '../../core/api'
 import { saveProfile } from '../../core/profile'
 import type { Lobby, ServerMsg } from '../../net/protocol'
 import { WsClient } from '../../net/wsClient'
@@ -19,13 +20,13 @@ export async function crew(
 ) {
   if (!code) {
     try {
-      code = (await (await fetch('/api/rooms', { method: 'POST' })).json()).code as string
+      code = (await api<{ code: string }>('/api/rooms', { method: 'POST' })).code
     } catch {
       return alert('No game server reachable. Solo drill still works.')
     }
   }
   sessionStorage.setItem('zombiebus.code', code)
-  const net = new WsClient(code, profile.id)
+  const net = new WsClient(code)
   let lobby: Lobby | null = null
   let ride: BusRide | null = null
   let inResults = false
