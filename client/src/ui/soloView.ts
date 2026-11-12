@@ -1,6 +1,8 @@
+import { hrZone } from '../core/curve'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
 import { fmt, h } from './dom'
+import { ZONE_COLOURS } from './planGraph'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
@@ -24,6 +26,7 @@ export interface ViewState {
   power: number[]
   xs: number[]
   cadence: number[]
+  hr: (number | null)[]
 }
 
 const TIERS: Tier[] = ['hard', 'medium', 'easy']
@@ -31,7 +34,7 @@ const BAND = 0.05
 const SPAN = 0.3
 
 /** Solo workout player layout: header controls, big numbers, band gauge, charts, interval list and overlays. */
-export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) {
+export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, maxHr?: number) {
   const num = (label: string, cls = '') => {
     const v = h('b', {}, '–')
     return { v, el: h('div', { class: `sbig ${cls}` }, h('span', {}, label), v) }
@@ -39,11 +42,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
   const tgt = num('Target')
   const pow = num('Power · 3 s')
   const cad = num('Cadence')
+  const hr = num('HR')
   const left = num('Interval left', 'clock')
   const unit = (n: { el: HTMLElement }, u: string) => n.el.append(h('small', {}, u))
   unit(tgt, 'W')
   unit(pow, 'W')
   unit(cad, 'rpm')
+  unit(hr, 'bpm')
   const blockName = h('div', { class: 'blockname' })
   const next = h('div', { class: 'next' })
   left.el.append(next)
@@ -67,14 +72,18 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
   const main = workoutChart(ftp)
   const zoom = workoutChart(ftp, 60)
   let showCad = false
-  const cadBtn = h(
-    'button',
-    {
-      class: 'ghost',
-      onclick: () => ((showCad = !showCad), cadBtn.classList.toggle('cad-on', showCad)),
-    },
-    'Cadence line',
-  )
+  let showHr = false
+  const toggle = (label: string, on: (v: boolean) => void) => {
+    let v = false
+    const b = h(
+      'button',
+      { class: 'ghost', onclick: () => (on((v = !v)), b.classList.toggle('cad-on', v)) },
+      label,
+    )
+    return b
+  }
+  const cadBtn = toggle('Cadence line', (v) => (showCad = v))
+  const hrBtn = toggle('HR line', (v) => (showHr = v))
   const pauseBtn = h('button', { onclick: on.pause })
   const intens = h('b', { class: 'pct' }, '100%')
   const tierSel = h(
@@ -114,6 +123,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
         'div',
         { class: 'ctl' },
         cadBtn,
+        hrBtn,
         pauseBtn,
         h('button', { onclick: on.skip, title: 'Skip interval (→ or N)' }, 'Skip ', kbd('N')),
         h('button', { class: 'danger', onclick: () => confirmEnd() }, 'End ride'),
@@ -122,7 +132,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
     h(
       'section',
       { class: 'solo-main' },
-      h('div', { class: 'bigrow' }, tgt.el, pow.el, cad.el, left.el),
+      h('div', { class: 'bigrow' }, tgt.el, pow.el, cad.el, hr.el, left.el),
       h('div', { class: 'gwrap' }, gauge, dev),
       h('div', { class: 'chartbox main' }, main.el, ov),
       h(
@@ -185,6 +195,8 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
       tgt.el.classList.toggle('word', t == null)
       pow.v.textContent = String(Math.round(f.type === 'sprint' ? live.power : live.avg))
       cad.v.textContent = String(Math.round(live.cadence))
+      hr.v.textContent = live.hr ? String(live.hr) : '–'
+      hr.v.style.color = live.hr && maxHr ? (ZONE_COLOURS[hrZone(live.hr, maxHr)] ?? '') : ''
       left.v.textContent = fmt(f.dur - f.bel)
       blockName.textContent = f.label
       next.textContent = f.next
@@ -215,11 +227,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers) 
         power: s.power,
         xs: s.xs,
         cadence: s.cadence,
+        hr: s.hr,
         now: f.el,
         showCadence: showCad,
+        showHr,
       }
       main.set(data)
-      zoom.set({ ...data, showCadence: showCad })
+      zoom.set(data)
       panel.frame(f.i, s.intensity)
       panel.stats(s.stats)
     },

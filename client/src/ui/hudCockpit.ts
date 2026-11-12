@@ -33,8 +33,9 @@ export function makeCockpit() {
   const fill = h('i', { class: 'cp-fill' })
   const mark = h('i', { class: 'cp-mark' })
   const sbar = h('div', { class: 'cp-sbar' }, fill, mark)
-  const cell = (label: string, v: HTMLElement, unit = '') =>
-    h('div', { class: 'cp-cell' }, el('cp-lab', label), v, unit ? el('cp-unit', unit) : '')
+  const cadLab = el('cp-lab', 'CADENCE')
+  const cell = (label: string, v: HTMLElement, unit = '', lab = el('cp-lab', label)) =>
+    h('div', { class: 'cp-cell' }, lab, v, unit ? el('cp-unit', unit) : '')
   const root = h(
     'section',
     { class: 'hud-glass cp' },
@@ -50,7 +51,7 @@ export function makeCockpit() {
     h(
       'div',
       { class: 'cp-row' },
-      cell('CADENCE', cad, 'rpm'),
+      cell('CADENCE', cad, 'rpm', cadLab),
       cell('INTERVAL', left),
       cell('COMPLIANCE', comp),
     ),
@@ -65,7 +66,8 @@ export function makeCockpit() {
       root.classList.toggle('nogauge', !sprint && !f?.tgt)
       if (sprint && !wasSprint) pulse(root, 'go')
       wasSprint = sprint
-      set(cad, `${Math.round(live.cadence)}`)
+      set(cad, `${Math.round(live.cadence)}${live.hr ? ` · ${live.hr}` : ''}`)
+      set(cadLab, live.hr ? 'CADENCE · BPM' : 'CADENCE')
       set(left, f ? fmt(f.dur - f.bel) : '–')
       set(comp, sprint || live.c == null ? '–' : `${Math.round(live.c * 100)}%`)
       if (sprint) {

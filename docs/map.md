@@ -25,14 +25,14 @@
 - `effects.ts` resistance modifier bus with caps.
 - `plan.ts` plan parsing, flattening, frame lookup, session generator.
 - `profile.ts` local profile cache and server sync.
-- `ride.ts` per-ride recorder, summary, NP/IF/TSS.
+- `ride.ts` per-ride recorder (JSON save and restore), summary, NP/IF/TSS; `snapshot.ts` crash-recovery snapshots in localStorage and the remembered bus code.
 
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
-- `net/protocol.ts` message types mirroring docs/protocol.md; `wsClient.ts` WebSocket with reconnect (token in URL).
-- `trainer/ftms.ts` Web Bluetooth FTMS driver; `ergController.ts` only module writing to the trainer; `simTrainer.ts` simulated trainer and keys.
+- `net/protocol.ts` message types mirroring docs/protocol.md; `wsClient.ts` WebSocket with reconnect (token in URL); `clockSync.ts` server session clock estimate for ERG pre-scheduling.
+- `trainer/ftms.ts` Web Bluetooth FTMS driver; `heartRate.ts` HR strap driver, simulated HR and the `currentHr()` singleton; `ergController.ts` only module writing to the trainer; `simTrainer.ts` simulated trainer and keys.
 
 ### scene/ (no UI, three.js)
 - `world.ts` scene owner, render loop, `SceneState`, fx entry; `debug.ts` debug panel; `params.ts` tunable visuals (`VIS`); `util.ts` clamp, lerp, smooth.

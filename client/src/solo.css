@@ -77,7 +77,7 @@
 }
 .bigrow {
   display: grid;
-  grid-template-columns: 1fr 1.15fr 0.9fr 1.7fr;
+  grid-template-columns: 1fr 1.15fr 0.9fr 0.9fr 1.7fr;
   gap: 10px;
 }
 .sbig {
@@ -470,7 +470,7 @@
     max-height: 260px;
   }
   .bigrow {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
   .sbig.clock {
     grid-column: 1 / -1;

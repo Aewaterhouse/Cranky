@@ -8,6 +8,8 @@ export interface ChartData {
   power: number[]
   xs?: number[]
   cadence?: number[]
+  hr?: (number | null)[]
+  showHr?: boolean
   /** Now-cursor in plan seconds; omit for a finished ride. */
   now?: number
   showCadence?: boolean
@@ -17,6 +19,7 @@ export interface ChartData {
 
 const PAD = { l: 46, r: 12, t: 10, b: 22 }
 const CAD = [40, 140]
+const HR = [60, 200]
 const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim()
 const niceStep = (span: number, max: number, steps: number[]) =>
   steps.find((s) => span / s <= max) ?? steps[steps.length - 1]
@@ -162,11 +165,11 @@ function paint(
   ctx.fillText(`FTP ${ftp} W`, R - 4, y(ftp) - 3)
 
   // series, split into runs wherever the ride jumped (skipped intervals)
-  const runs = (vals: number[], map: (v: number) => number, smooth: number) => {
+  const runs = (vals: number[], map: (v: number) => number, smooth: number, idx?: number[]) => {
     const out: [number, number][][] = []
     let prev = -Infinity
     for (let i = 0; i < vals.length; i++) {
-      const t = d.xs?.[i] ?? i
+      const t = d.xs?.[idx ? idx[i] : i] ?? (idx ? idx[i] : i)
       if (t < v0 - 5 || t > v1 + 5) continue
       let s = 0
       let n = 0
@@ -220,6 +223,27 @@ function paint(
     ctx.textAlign = 'left'
     ctx.textBaseline = 'top'
     ctx.fillText('cadence 40-140 rpm', L + 6, T + 4)
+  }
+
+  if (d.showHr && d.hr) {
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = '#ff6b81'
+    const have = d.hr.map((v, i) => (v === null ? -1 : i)).filter((i) => i >= 0)
+    for (const run of runs(
+      have.map((i) => d.hr![i]!),
+      (v) => B - ((v - HR[0]) / (HR[1] - HR[0])) * (B - T),
+      smooth * 2,
+      have,
+    )) {
+      trace(run)
+      ctx.stroke()
+    }
+    if (!zoom) {
+      ctx.fillStyle = '#ff6b81'
+      ctx.textAlign = 'left'
+      ctx.textBaseline = 'top'
+      ctx.fillText('heart rate 60-200 bpm', L + 6, T + (d.showCadence ? 18 : 4))
+    }
   }
 
   // now cursor

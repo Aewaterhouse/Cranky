@@ -39,15 +39,37 @@ export class RideRecorder {
   power: number[] = []
   cadence: number[] = []
   target: (number | null)[] = []
+  hr: (number | null)[] = []
   private rows: { i: number; p: number; tgt: number | null; c: number | null; band: boolean }[] = []
   sprints: SprintResult[] = []
-  readonly startedAt = new Date().toISOString()
+  startedAt = new Date().toISOString()
   constructor(
     public plan: Plan,
     public ftp: number,
   ) {}
 
-  sample(i: number, p: number, cad: number, tgt: number | null, c: number | null, band: boolean) {
+  /** Plain-data copy of everything recorded so far, for crash recovery. */
+  toJSON() {
+    const { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints } = this
+    return { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints }
+  }
+
+  static fromJSON(j: ReturnType<RideRecorder['toJSON']>): RideRecorder {
+    const r = new RideRecorder(j.plan, j.ftp)
+    Object.assign(r, structuredClone(j))
+    return r
+  }
+
+  sample(
+    i: number,
+    p: number,
+    cad: number,
+    tgt: number | null,
+    c: number | null,
+    band: boolean,
+    hr: number | null = null,
+  ) {
+    this.hr.push(hr)
     this.power.push(p)
     this.cadence.push(cad)
     this.target.push(tgt)
@@ -82,6 +104,7 @@ export class RideRecorder {
       zones,
     }
     const load = loadStats(this.power, this.ftp)
+    const hrs = this.hr.filter((v): v is number => v !== null)
     return {
       plan: this.plan.id,
       planName: this.plan.name,
@@ -102,6 +125,9 @@ export class RideRecorder {
       avgCadence: Math.round(mean(this.cadence)),
       power: [...this.power],
       target: [...this.target],
+      hr: [...this.hr],
+      avgHr: hrs.length ? Math.round(mean(hrs)) : null,
+      maxHr: hrs.length ? Math.max(...hrs) : null,
     }
   }
 }

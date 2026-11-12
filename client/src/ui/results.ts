@@ -136,6 +136,8 @@ export function finishRide(
       total: s.power.length,
       power: s.power,
       cadence: [],
+      hr: s.hr,
+      showHr: s.avgHr != null,
     })
   else chartBox.hidden = true
 
@@ -159,6 +161,9 @@ export function finishRide(
         tile('TSS', String(s.tss), 'training stress'),
         tile('Energy', `${s.record.kj} kJ`),
         tile('Avg cadence', `${s.avgCadence} rpm`),
+        ...(s.avgHr == null
+          ? []
+          : [tile('Avg HR', `${s.avgHr} bpm`), tile('Max HR', `${s.maxHr} bpm`)]),
         tile(
           'Compliance',
           pctStr(s.compliance),

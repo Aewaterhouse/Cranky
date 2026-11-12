@@ -49,4 +49,26 @@ describe('trainer dropout', () => {
     await ride.stop()
     expect(sim.log.slice(-2)).toEqual(['erg 100', 'release'])
   })
+
+  it('exposes live.hr and records it each second', async () => {
+    let bpm: number | null = null
+    const sim = new SimTrainer(undefined, () => 0.5)
+    const plan = { id: 'p', name: 'P', blocks: [{ type: 'steady' as const, dur: 600 }] }
+    const ride = new RideController(
+      sim,
+      newProfile('a', 'A', 200),
+      plan,
+      () => Date.now() / 1000,
+      () => bpm,
+    )
+    ride.start()
+    ride.setFrame(frame)
+    await vi.advanceTimersByTimeAsync(1000)
+    bpm = 150
+    sim.step(0.25)
+    await vi.advanceTimersByTimeAsync(1000)
+    await ride.stop()
+    expect(ride.live.hr).toBe(150)
+    expect(ride.rec.hr).toEqual([null, 150])
+  })
 })

@@ -1,4 +1,5 @@
 import { FtmsTrainer } from '../trainer/ftms'
+import { BleHr, currentHr, hrSource, onHrChange, setHr, SimHr } from '../trainer/heartRate'
 import { bindKeys, SimTrainer } from '../trainer/simTrainer'
 import type { Trainer, TrainerStatus } from '../types'
 import { h } from './dom'
@@ -13,6 +14,7 @@ const subs = new Set<() => void>()
 export const currentTrainer = () => trainer
 
 const notify = () => subs.forEach((f) => f())
+onHrChange(notify)
 const set = (t: Trainer | null) => {
   const same = trainer === t
   if (trainer && !same) trainer.close?.()
@@ -64,7 +66,13 @@ export function trainerPill() {
     el.classList.toggle('warn', status === 'reconnecting')
     el.replaceChildren(
       h('i', { class: 'dot' }),
-      h('span', {}, trainer ? `${trainer.name} · ${reading()}` : 'No trainer'),
+      h(
+        'span',
+        {},
+        trainer
+          ? `${trainer.name} · ${reading()}${currentHr() ? ` · ${currentHr()} bpm` : ''}`
+          : 'No trainer',
+      ),
     )
   })
 }
@@ -118,6 +126,61 @@ function useSim(ftp: number) {
     bindKeys(sim, ftp)
   }
   set(sim)
+}
+
+async function connectHr() {
+  if (!navigator.bluetooth) return toast('Web Bluetooth needs Chrome or Edge over HTTPS.', 'bad')
+  try {
+    const s = new BleHr()
+    await s.connect()
+    setHr(s)
+  } catch (e) {
+    const msg = (e as Error).message
+    if (!/cancel/i.test(msg)) toast(`Could not connect the strap: ${msg}`, 'bad')
+  }
+}
+
+/** Optional heart-rate section of the trainer modal. */
+function hrSection() {
+  const sec = h('section', { class: 'hr-sec' })
+  return live(sec, () => {
+    const src = hrSource()
+    const bpm = currentHr()
+    sec.replaceChildren(
+      h('h3', {}, 'Heart rate (optional)'),
+      src
+        ? h(
+            'div',
+            { class: 'readout' },
+            h('i', { class: `dot${bpm ? ' on' : ''}` }),
+            h('b', {}, src.name),
+            h('span', { class: 'num' }, bpm ? `${bpm} bpm` : 'waiting for data…'),
+          )
+        : h('p', {}, 'Pair a Bluetooth chest strap or armband to record and show your heart rate.'),
+      h(
+        'div',
+        { class: 'row' },
+        src
+          ? h('button', { onclick: () => setHr(null) }, 'Disconnect')
+          : h('button', { onclick: () => void connectHr() }, 'Connect strap'),
+        !src && trainer === sim
+          ? h(
+              'button',
+              {
+                onclick: () =>
+                  setHr(
+                    new SimHr(
+                      () => sim!.power,
+                      () => ftpNow,
+                    ),
+                  ),
+              },
+              'Simulated heart rate',
+            )
+          : '',
+      ),
+    )
+  })
 }
 
 let ftpNow = 200
@@ -180,6 +243,7 @@ export function openTrainer(then?: () => void) {
         h('button', { onclick: () => (useSim(ftpNow), done(true)) }, 'Use simulator'),
       ),
     ),
+    hrSection(),
   )
 }
 

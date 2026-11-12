@@ -1,14 +1,16 @@
 import { PLANS } from '../content'
 import { api } from '../core/api'
 import { generate, parsePlan } from '../core/plan'
+import { clearSnap, loadSnap, rememberedBus, soloKey, type SoloSnap } from '../core/snapshot'
 import type { Profile } from '../core/curve'
 import type { Plan } from '../types'
-import { avatar, h } from './dom'
+import { avatar, fmt, h } from './dom'
 import { soloSetup } from './solo'
 import { needTrainer } from './trainer'
 
 export interface HomeActions {
   drill(plan: Plan): void
+  resume(snap: SoloSnap): void
   create(): void
   join(code: string): void
   logout(): void
@@ -27,6 +29,16 @@ const POLL_MS = 3000
 export function planFor(id: string, minutes: number): Plan {
   const raw = PLANS.find((p) => p.id === id)!
   return minutes ? generate(raw, minutes) : parsePlan(raw)
+}
+
+function rejoinCard(r: Room, join: (code: string) => void) {
+  return h(
+    'section',
+    { class: 'resume' },
+    h('span', { class: 'big-emoji' }, '🚌'),
+    h('span', {}, h('b', {}, `Rejoin bus ${r.code}`), h('small', {}, r.plan)),
+    h('button', { class: 'primary', onclick: needTrainer(() => join(r.code)) }, 'Rejoin'),
+  )
 }
 
 function busCard(r: Room, join: (code: string) => void) {
@@ -69,13 +81,36 @@ const soon = (emoji: string, name: string, blurb: string) =>
     h('span', { class: 'arrow' }, 'coming soon'),
   )
 
+/** Card offering to carry on a solo ride that a refresh or crash cut short. */
+function resumeCard(p: Profile, act: HomeActions) {
+  const snap = loadSnap<SoloSnap>(soloKey(p.id))
+  if (!snap) return h('div')
+  const card = h('section', { class: 'resume' })
+  const discard = () => (clearSnap(soloKey(p.id)), card.remove())
+  card.append(
+    h('span', { class: 'big-emoji' }, '⏪'),
+    h(
+      'span',
+      {},
+      h('b', {}, 'Resume your workout?'),
+      h('small', {}, `${snap.plan.name}, ${fmt(snap.el)} in`),
+    ),
+    h('button', { class: 'primary', onclick: needTrainer(() => act.resume(snap)) }, 'Resume'),
+    h('button', { onclick: discard }, 'Discard'),
+  )
+  return card
+}
+
 export function rideTab(p: Profile, act: HomeActions) {
   const list = h('div', { class: 'buses' })
+  const rejoin = h('div')
   let seen = ''
   const render = (rooms: Room[] | null) => {
     const key = JSON.stringify(rooms)
     if (key === seen) return
     seen = key
+    const mine = rooms?.find((r) => r.code === rememberedBus(p.id))
+    rejoin.replaceChildren(mine ? rejoinCard(mine, act.join) : '')
     if (!rooms) return list.replaceChildren(h('p', { class: 'dim' }, 'Looking for buses…'))
     list.replaceChildren(
       ...(rooms.length
@@ -118,6 +153,8 @@ export function rideTab(p: Profile, act: HomeActions) {
   const main = h(
     'div',
     { class: 'ride' },
+    resumeCard(p, act),
+    rejoin,
     h(
       'section',
       { class: 'hero' },

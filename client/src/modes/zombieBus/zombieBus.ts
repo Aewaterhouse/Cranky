@@ -2,6 +2,9 @@ import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { frameAt, planTotal } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
+import { RideRecorder } from '../../core/ride'
+import { busKey, clearSnap, loadSnap, saveSnap, type BusSnap } from '../../core/snapshot'
+import { ClockSync } from '../../net/clockSync'
 import type { Lobby, Tick } from '../../net/protocol'
 import type { WsClient } from '../../net/wsClient'
 import { World, debugPanel } from '../../scene/world'
@@ -40,7 +43,16 @@ export function startBusRide(
   let l = lobby0
   const plan = l.plan
   const total = planTotal(plan.blocks)
-  const ride = new RideController(trainer, profile, plan)
+  const key = busKey(profile.id, l.code)
+  const saved = loadSnap<BusSnap>(key)
+  const ride = new RideController(
+    trainer,
+    profile,
+    plan,
+    undefined,
+    undefined,
+    saved?.planId === plan.id ? RideRecorder.fromJSON(saved.rec) : undefined,
+  )
   const isHost = () => l.host === profile.id
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
@@ -86,6 +98,21 @@ export function startBusRide(
       s: ride.frame?.tgt ? v.c : null,
     })
   }, 1000 / CFG.net.sendHz)
+  const saver = setInterval(
+    () => ride.rec.power.length && saveSnap(key, { planId: plan.id, rec: ride.rec }),
+    CFG.recovery.saveMs,
+  )
+  // Block changes are scheduled off a local estimate of the server clock, not the 2 Hz tick.
+  const clock = new ClockSync()
+  let running = false
+  const localFrame = () => {
+    const el = running ? clock.now(performance.now()) : null
+    return el === null ? null : frameAt(plan.blocks, el, profile.tier, profile.ftp)
+  }
+  const scheduler = setInterval(() => {
+    const f = localFrame()
+    if (f) ride.setFrame(f)
+  }, 1000 / CFG.clock.hz)
   let lastI = -2
   let lastEv = ''
   let lastCount = 0
@@ -97,13 +124,15 @@ export function startBusRide(
       hud.setTier(me.tier)
       saveProfile(profile)
     }
+    clock.tick(m.el, performance.now())
+    running = m.i >= 0
     if (m.i < 0) {
       hud.countdown(Math.ceil(-m.el), ride.live)
       ride.setFrame(null)
     } else {
-      const f = frameAt(plan.blocks, m.el, profile.tier, profile.ftp)
+      const f = localFrame() ?? frameAt(plan.blocks, m.el, profile.tier, profile.ftp)
       if (f) {
-        f.tgt = me?.tgt ?? f.tgt
+        if (f.i === m.i) f.tgt = me?.tgt ?? f.tgt
         ride.setFrame(f)
         hud.frame(f, ride.live, total, m.ev)
         const count = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
@@ -148,6 +177,10 @@ export function startBusRide(
 
   const cleanup = async () => {
     clearInterval(sender)
+    clearInterval(saver)
+    clearInterval(scheduler)
+    running = false
+    clearSnap(key)
     stopAudio()
     await ride.stop()
     world.dispose()

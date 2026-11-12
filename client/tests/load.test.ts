@@ -35,3 +35,23 @@ describe('summary', () => {
     expect(s.tss).toBe(Math.round((40 / 3600) * 100))
   })
 })
+
+describe('heart rate in the summary', () => {
+  const plan = { id: 'x', name: 'X', blocks: [{ type: 'steady' as const, dur: 60 }] }
+  it('has null hr and avg/max without a strap', () => {
+    const r = new RideRecorder(plan, 200)
+    r.sample(0, 200, 90, 200, 1, true)
+    const s = r.summary()
+    expect(s.hr).toEqual([null])
+    expect(s.avgHr).toBeNull()
+    expect(s.maxHr).toBeNull()
+  })
+  it('averages and maxes the recorded samples, skipping gaps', () => {
+    const r = new RideRecorder(plan, 200)
+    for (const hr of [120, null, 140, 160]) r.sample(0, 200, 90, 200, 1, true, hr)
+    const s = r.summary()
+    expect(s.hr).toEqual([120, null, 140, 160])
+    expect(s.avgHr).toBe(140)
+    expect(s.maxHr).toBe(160)
+  })
+})

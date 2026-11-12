@@ -23,6 +23,7 @@ function home(p: Profile = profile) {
   profile = p
   showHome(profile, {
     drill: (plan) => (keepAwake(true), runDrill(plan, profile, currentTrainer()!, home)),
+    resume: (s) => (keepAwake(true), runDrill(s.plan, profile, currentTrainer()!, home, s)),
     create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
     join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),
     logout: () => {

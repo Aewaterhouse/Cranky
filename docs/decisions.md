@@ -14,7 +14,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The 2 s smoothing restarts a linear ramp from the current value whenever the target moves by more than 1 W. On a steady ramp block that gives roughly a 2 s lag, which is fine.
 - The server also caps targets at 150% FTP, as belt and braces.
 - At the end of every ride the ERG failsafe runs: 50% FTP, then release.
-- ERG changes are not pre-scheduled from the server clock. Targets come from each 2 Hz tick, so they can be up to about 0.5 s plus latency late.
+- ERG targets in the crew game are pre-scheduled from a local estimate of the server clock (`net/clockSync.ts`): a 4 Hz timer computes the frame for the estimated session time, so block and over-under changes land on time instead of waiting for the next 2 Hz tick. The estimate runs about one network delay behind the server (latency is not measured). The tick stays authoritative for tier, targets within a block, and the HUD.
 
 ## Power curve and sprints
 - Default curve points not listed in the plan: 1 s 400%, 2 min 130%, 10 min 110%, 60 min 100% of FTP.
@@ -74,3 +74,20 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Installable app: web manifest, icon and a small service worker (network first, cache fallback; never caches /api or /ws). Offline, the last logged-in rider on that device can still open the app and ride solo; the ride is saved locally but not uploaded to the server afterwards.
 - Ramp-up: a ramp block that is not the warm-up or cool-down is the Ramp-up event (neutral 0.82). The scene shifts to a misty valley mood and the camera drops and looks up the road to sell the climb. "Valley of the Dead" is the bus run built around it.
 - Difficulty: easy/normal/hard/nightmare shift every event's neutral compliance by -0.08/0/+0.05/+0.10, scale armour damage by 0.6/1/1.3/1.7 and the final score by 0.8/1/1.25/1.6.
+
+## Heart-rate strap (2026-11-12)
+- Client-only for now: HR is recorded in the ride summary (`hr[]`, `avgHr`, `maxHr`, null when no strap) and posted with the solo ride, but it is not sent to the server during a ride and other riders do not see it.
+- `trainer/heartRate.ts` holds the BLE driver (service 0x180D, characteristic 0x2A37, uint8 or uint16 by flags bit 0), reconnecting with the same 1, 2, 4, then 5 s backoff as the trainer, plus a module singleton (`currentHr()`). `RideController` reads it once a second for `live.hr` and the recorder.
+- Simulated HR (offered in the trainer modal once the simulated trainer is in use): resting 60 bpm plus 115 bpm times power/FTP (so 175 at FTP, capped at 200), approached with a 30 s first-order lag. Numbers live in `CFG.hr`.
+- `Profile.maxHr` is optional. With it set, the solo HR tile is coloured by zone: below 60%, 60-70, 70-80, 80-90, 90%+ (blue, teal, amber, orange, red).
+
+## Ride crash recovery (2026-11-12)
+- Solo: every 5 s (`CFG.recovery.saveMs`) `localStorage["cranky.solo.<riderId>"]` gets the generated plan, plan time, intensity, tier, the recorder (`RideRecorder.toJSON`), the chart x positions, compliance sums and a wall-clock stamp. The Ride tab offers "Resume your workout?" for a snapshot under 30 min old (`CFG.recovery.maxAgeMs`). Resume restarts with the normal 5 s countdown at the saved plan time; the gap while the page was away is simply not recorded. Ending or finishing a ride clears it. Nothing is saved before the first recorded second.
+- Crew: `cranky.bus.<riderId>.<code>` holds the rider's recorder only (plus plan id); the server still owns the clock. `startBusRide` restores it when the code and plan id match and it is under 30 min old. It is cleared on finish or leave.
+- The last bus code is also kept in `localStorage["cranky.buscode.<riderId>"]` so a closed tab can find its way back. The Ride tab shows "Rejoin bus ABCD" only when `/api/rooms` lists that code. The server lists a room only while someone is connected, so a rider who was alone on the bus will not get the card after a refresh (the code field is still prefilled from sessionStorage). Listing rooms that are running but empty would fix it; left for a server change.
+- Sprint combo is not restored (it restarts at 0).
+
+## ERG pre-scheduling (2026-11-12)
+- `ClockSync` keeps (el, arrival time) for each tick, measures the rate over the last 4 s (1 normally, so a time-scaled test server works), clamps it to 0.5-30, eases small errors out at 20% per tick, snaps when more than 1 s out, never runs backwards except on a snap, and goes quiet after 3 s without a tick.
+- Nothing is scheduled during the countdown (tick `i < 0`) or after the last tick. The ErgController's 2 s ramp is unchanged. Within the same block the server's own `tgt` still wins; across a block boundary the local frame wins until the server tick catches up.
+
