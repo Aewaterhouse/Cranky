@@ -53,7 +53,7 @@
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
-- `freeRideSetup.ts` free ride route picker and GPX import; `freeRideView.ts` free ride player layout (`freeride.css`).
+- `freeRideSetup.ts` free ride route picker and GPX import; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets

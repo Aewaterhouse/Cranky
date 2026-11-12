@@ -91,7 +91,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ ★ GPX routes | Import any GPX (or a Strava route) and ride it; the trainer follows the gradient | L |
 | ✅ Ride physics | Speed from power, weight, gradient, drag and rolling resistance; trainer difficulty slider | M |
 | Route library | Famous climbs (Alpe d'Huez, Ventoux, Stelvio) and your local loops, with length and elevation | M |
-| Elevation profile and map | Live position on an elevation chart and an OpenStreetMap map | M |
+| ✅ Elevation profile and map | Live position on an elevation chart and an OpenStreetMap map. Checked by type-check, unit tests and build only; not yet looked at in a browser | M |
 | Group free ride | Ride a route together with drafting and an optional keep-together rubber band | L |
 | Segments | Timed climbs and sprints on each route with personal and crew leaderboards | M |
 | 3D route view | Low-poly road that follows the real bends and gradient, reusing the scene engine | L |

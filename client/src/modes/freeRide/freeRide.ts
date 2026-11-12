@@ -1,5 +1,6 @@
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
+import { normalisedPower } from '../../core/ride'
 import { stepSpeed, totalMass, trainerGrade } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { show } from '../../ui/dom'
@@ -141,6 +142,7 @@ export function runFreeRide(
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
+    const pw = ride.rec.power
     view.frame({
       live,
       speed,
@@ -150,8 +152,10 @@ export function runFreeRide(
       el,
       paused: manual ? 'manual' : auto ? 'auto' : null,
       starting,
-      difficulty,
-      ascentDone: ride.rec.ascent,
+      avgPower: pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0,
+      np: normalisedPower(pw),
+      weightKg: profile.weightKg || F.defaultKg,
+      etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
     })
     if (dist >= route.distance) void end()
   }

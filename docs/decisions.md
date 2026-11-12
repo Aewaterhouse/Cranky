@@ -174,3 +174,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Auto-pause: 3 s of zero power or cadence stops the clock, but only once speed has dropped under 2 m/s, so coasting down a hill does not pause the ride. The ride starts paused ("Start pedalling") until 1.5 s of pedalling. While paused the trainer is sent 0% gradient.
 - The ride ends on reaching the end of the route, or with End ride. `?fast=N` speeds the ride clock up N times (physics and distance), as in the solo player; recording stays at 1 Hz real time.
 - Trainer difficulty is remembered per browser (`cranky.trainerDifficulty`), default 50%.
+
+## Free ride: elevation profile and map (2026-11-13)
+- Two canvas profiles: the whole route (ridden part dimmed) and a strip from 100 m behind to 900 m ahead. Columns are coloured by gradient: green under 2%, yellow under 5%, orange under 8%, red under 12%, then magenta.
+- The map is Leaflet 1.9.4 (new dependency, BSD-2-Clause) with standard OpenStreetMap tiles and attribution. It is loaded lazily and only when the route has coordinates and the browser is online; any failure just hides the panel, so offline rides and tests never depend on it.
+- The player now also shows climbed / climb to go, ETA at the average speed so far (with a clock time), average power, NP and W/kg.
+- This item was finished from uncommitted work left when the PC was switched off mid-session. It passes type-check, lint, unit tests and build but nobody has looked at it in a browser yet.
