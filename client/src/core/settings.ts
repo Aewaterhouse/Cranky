@@ -9,10 +9,18 @@ export interface Settings {
   hudScale: number
   /** Colour-blind-friendly zone colours. */
   colourBlind: boolean
+  /** Spoken commentary during bus rides. */
+  announcer: boolean
 }
 
 const KEY = 'cranky.settings'
-const DEFAULTS: Settings = { volume: 1, gfx: 'auto', hudScale: 0, colourBlind: false }
+const DEFAULTS: Settings = {
+  volume: 1,
+  gfx: 'auto',
+  hudScale: 0,
+  colourBlind: false,
+  announcer: true,
+}
 
 export const settings: Settings = { ...DEFAULTS, ...read() }
 

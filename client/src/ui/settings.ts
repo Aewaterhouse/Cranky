@@ -33,6 +33,18 @@ export function settingsTab() {
       { class: 'card' },
       row('Sound', 'Beeps, splashes and the event drone.', vol),
       row(
+        'Announcer',
+        'A dry voice calling the action on bus rides.',
+        seg(
+          [
+            ['on', 'On'],
+            ['off', 'Off'],
+          ],
+          settings.announcer ? 'on' : 'off',
+          (v) => saveSettings({ announcer: v === 'on' }),
+        ),
+      ),
+      row(
         'Graphics',
         'Auto drops the quality if the bus scene runs slowly.',
         seg<Settings['gfx']>(

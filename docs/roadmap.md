@@ -153,7 +153,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Art pass | Replace procedural models with one cohesive CC0 or commissioned low-poly set; animated zombies | L |
 | Sound design | Real engine, horde, impact and UI sounds in place of synth beeps | M |
 | Adaptive music | A soundtrack that shifts with the event and intensity | L |
-| Announcer | A dry Aussie voice calling events and sprint grades | M |
+| ✅ Announcer | A dry voice calling events and sprint grades, using the browser's built-in speech (Australian voice where the device has one). Untested by ear: built on a headless machine | M |
 | ✅ Onboarding | First-run tutorial: pair the trainer, set FTP, what compliance means | M |
 | ✅ Settings | Volume, graphics quality, in-ride display size and colour-blind zone colours, under the rider menu. Units (miles, pounds) are not done: everything is metric | M |
 | ✅ Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |

@@ -93,3 +93,4 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 
 - Graphics quality: four levels (potato, low, medium, high) change pixel ratio and shadows. Auto mode starts high, drops a level after two 2-second windows under 40 fps and never climbs back to a level that proved too slow. `?gfx=low` (or potato/medium/high/auto) pins it; a settings screen control is still to come.
 - Settings are per device (localStorage), not per account: a TV and a laptop want different sizes and quality. The colour-blind palette is Okabe-Ito.
+- Announcer: browser speech synthesis, en-AU voice if installed, else en-GB, else any English. At most one line every 3.5 s; roadblocks, falls and MEGA/LEGEND sprints interrupt. Off switch in Settings.

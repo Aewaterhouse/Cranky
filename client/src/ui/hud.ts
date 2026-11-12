@@ -1,3 +1,4 @@
+import { announce } from './announcer'
 import '../hud.css'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
@@ -116,6 +117,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       roster.update(m.riders, meId, m.el)
       shop.update(m.bus.shop, m.bus.scrap)
       for (const fx of m.fx) {
+        if (fx.id !== meId || fx.k === 'fell')
+          announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
         if (CARD_FX.has(fx.k)) continue
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
         const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
@@ -137,7 +140,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     /** Generic splash, kept for the solo mode. */
     banner: (text: string, cls = '', ms = 2500) => sp.splash(`sp-title ${cls}`, text, '', ms, 1),
     toast: (text: string) => sp.line('', text),
-    sprint: (r: SprintResult) => sp.grade(r),
+    sprint: (r: SprintResult) => (announce(r.grade), sp.grade(r)),
   }
   return api
 }
