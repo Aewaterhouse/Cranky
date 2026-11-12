@@ -1,0 +1,240 @@
+/* HUD: my stats, servo shop and event feed. */
+/* My stats */
+.st {
+  width: 100%;
+  overflow: hidden;
+}
+.st-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--fg);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-align: left;
+  text-shadow: inherit;
+}
+.st-strip span:nth-child(2) {
+  flex: 1;
+  white-space: nowrap;
+}
+.st-strip kbd {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 0.12);
+  font: 700 0.62rem var(--ui);
+  color: var(--dim);
+}
+.st-body {
+  display: none;
+  padding: 12px 14px 4px;
+}
+.st.open .st-body {
+  display: block;
+}
+.st.open .st-strip {
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+.st-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 8px;
+  margin-bottom: 12px;
+}
+.st-cell b {
+  font: 1.3rem/1.1 var(--display);
+}
+.st-zones {
+  display: flex;
+  height: 12px;
+  margin: 4px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.08);
+}
+.st-zleg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  margin-bottom: 10px;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+.st-sprints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 8px;
+}
+.st-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--g);
+  color: var(--g);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+.st-none {
+  color: var(--dim);
+  font-size: 0.72rem;
+}
+
+/* Servo shop */
+.sh {
+  position: absolute;
+  left: 50%;
+  bottom: 236px;
+  translate: -50% 0;
+  width: min(600px, 52vw);
+  padding: 12px 14px;
+  border-top: 3px solid #7fd13b;
+  animation: sp-rise 0.4s;
+}
+.sh[hidden] {
+  display: none;
+}
+.sh-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font: 1rem var(--display);
+  color: var(--tox);
+}
+.sh-head span:last-child {
+  font: 800 0.72rem var(--ui);
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+.sh-head b {
+  font: 1.1rem var(--display);
+  color: var(--fg);
+}
+.sh-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.sh-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px 8px;
+  border-radius: 14px;
+  border: 1px solid rgb(127 209 59 / 0.55);
+  background: linear-gradient(180deg, rgb(127 209 59 / 0.18), rgb(255 255 255 / 0.04));
+  color: var(--fg);
+  text-align: center;
+  text-shadow: inherit;
+  transition:
+    transform 0.15s,
+    filter 0.15s;
+}
+.sh-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  filter: brightness(1.2);
+}
+.sh-card:disabled {
+  opacity: 1;
+  border-color: rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.04);
+  filter: grayscale(0.8) brightness(0.8);
+}
+.sh-ico {
+  font-size: 1.8rem;
+}
+.sh-card b {
+  font: 0.82rem/1.1 var(--display);
+}
+.sh-desc {
+  min-height: 2.4em;
+  color: var(--dim);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+.sh-cost {
+  padding: 2px 12px;
+  border-radius: 999px;
+  background: var(--acc);
+  color: var(--acc-ink);
+  font: 800 0.85rem var(--ui);
+  text-shadow: none;
+}
+.sh-card:disabled .sh-cost {
+  background: rgb(255 255 255 / 0.18);
+  color: var(--dim);
+}
+.sh-need {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--tox);
+}
+.sh-card:disabled .sh-need {
+  color: var(--bad);
+}
+.sh-card.bought {
+  animation: sh-buy 0.5s;
+}
+.sh-log {
+  margin-top: 8px;
+  font-size: 0.74rem;
+  color: var(--dim);
+  font-weight: 600;
+}
+.sh-log:empty {
+  display: none;
+}
+@keyframes sh-buy {
+  40% {
+    transform: scale(1.08);
+    box-shadow: 0 0 30px var(--tox);
+  }
+}
+
+/* Feed */
+.hud-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border-radius: 12px;
+  border-left: 3px solid var(--acc);
+  background: rgb(12 13 17 / 0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.25;
+  animation: fd-in 0.35s;
+  transition:
+    opacity 0.5s,
+    transform 0.5s;
+}
+.fd.bad {
+  border-left-color: var(--bad);
+}
+.fd.out {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.fd-ico {
+  font-size: 1.1rem;
+}
+@keyframes fd-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
