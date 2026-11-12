@@ -54,4 +54,24 @@ export const CFG = {
   scene: { speedMax: 22 },
   /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
   tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
+  freeRide: {
+    defaultKg: 75,
+    bikeKg: 9,
+    crr: 0.004,
+    cda: 0.32,
+    rho: 1.225,
+    drivetrain: 0.975,
+    maxMs: 22,
+    maxDriveN: 600,
+    difficulty: 0.5,
+    /** Range sent to the trainer, in %. */
+    grade: [-10, 20],
+    sendEveryS: 1,
+    sendDeltaPct: 0.2,
+    spacingM: 10,
+    smoothM: 100,
+    maxGradePct: 20,
+    maxStored: 4000,
+    ftpFrac: 0.75,
+  },
 }

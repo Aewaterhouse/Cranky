@@ -184,12 +184,19 @@ export function finishRide(
         ...(s.avgHr == null
           ? []
           : [tile('Avg HR', `${s.avgHr} bpm`), tile('Max HR', `${s.maxHr} bpm`)]),
-        tile(
-          'Compliance',
-          pctStr(s.compliance),
-          `FTP ${s.ftp} W`,
-          s.compliance >= 0.9 ? 'good' : '',
-        ),
+        ...(s.distance == null
+          ? [
+              tile(
+                'Compliance',
+                pctStr(s.compliance),
+                `FTP ${s.ftp} W`,
+                s.compliance >= 0.9 ? 'good' : '',
+              ),
+            ]
+          : [
+              tile('Distance', `${(s.distance / 1000).toFixed(1)} km`),
+              tile('Climbed', `${s.ascent ?? 0} m`),
+            ]),
       ),
       prs.length
         ? h(

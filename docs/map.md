@@ -23,6 +23,7 @@
 - `cosmetics.ts` catalogue and purchase logic.
 - `badges.ts` milestone badges, PR timeline.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths.
+- `physics.ts` free-ride speed from power, gradient and mass; `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
 - `plan.ts` plan parsing, flattening, frame lookup, session generator.
@@ -32,6 +33,7 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map.
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD); `spectate.ts` TV spectator view (`watch`, no trainer).
@@ -55,6 +57,7 @@
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
+- `freeRideSetup.ts` free ride route picker and GPX import; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets

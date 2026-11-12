@@ -13,6 +13,7 @@ import type { Profile } from './core/curve'
 import { loadProfile, syncProfile } from './core/profile'
 import { runDrill } from './modes/drill/drill'
 import { keepAwake } from './ui/wakeLock'
+import { runFreeRide } from './modes/freeRide/freeRide'
 import { crew } from './modes/zombieBus/crew'
 import { spectate } from './modes/zombieBus/spectate'
 import { showLogin } from './ui/login'
@@ -26,6 +27,7 @@ function home(p: Profile = profile) {
   profile = p
   showHome(profile, {
     drill: (plan) => (keepAwake(true), runDrill(plan, profile, currentTrainer()!, home)),
+    freeRide: (r) => (keepAwake(true), runFreeRide(r, profile, currentTrainer()!, home)),
     resume: (s) => (keepAwake(true), runDrill(s.plan, profile, currentTrainer()!, home, s)),
     create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
     join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),

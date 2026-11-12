@@ -168,3 +168,23 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Ticks carry no sprint history, so the TV board builds each rider's sprint grades from `sprint` fx lines since it joined (a late joiner misses earlier grades).
 - The TV HUD reuses the header, bus panel and splash pieces, laid out 600 px tall and CSS-zoomed to the screen (`CFG.tv`). The end summary is a plain full-screen group view, never `finishRide`, so nothing touches a profile.
 - A full bus on the home screen shows "Bus full · Watch" (the seventh rider spectates).
+
+## Free ride physics (2026-11-12)
+- Speed comes from a plain power balance: rider (`profile.weightKg`, default 75 kg) plus a 9 kg bike, Crr 0.004, CdA 0.32, air density 1.225, 97.5% drivetrain efficiency (`CFG.freeRide`). 200 W on the flat gives about 33 km/h and 250 W at 8% about 12.5 km/h for 84 kg (the roadmap's rough 10-11 km/h figure did not survive the arithmetic).
+- Speed is integrated each tick in 0.1 s sub-steps. Drive force is capped at 600 N and the speed floor for the force is 0.5 m/s so starting from a standstill is stable. Speed never goes negative (no rolling backwards) and is capped at 22 m/s (about 80 km/h; the rider brakes on very steep descents).
+- `trainerDifficulty` (default 0.5) multiplies only the gradient sent to the trainer, which is then clamped to -10..+20%. The simulated speed always uses the real road gradient.
+
+## Free ride: GPX routes and the ride loop (2026-11-12)
+- GPX is read with a regex over `<trkpt>` / `<rtept>` (no DOM, so vitest can run it). Distance is cumulative haversine, ignoring elevation. Missing `<ele>` is interpolated between neighbours (flat if none at all). The route is resampled to 10 m, elevation is smoothed with a ±50 m (100 m) symmetric moving average that shrinks at the ends so start and finish heights stay put, gradients are per-sample and clamped to ±20%. Ascent is the sum of rises in the smoothed profile.
+- Routes over 40 km get a wider sample spacing (a multiple of 10 m) so no route stores more than 4000 samples. Imported routes live in `localStorage` (`cranky.myRoutes`); if the browser refuses the write the import says so.
+- A free ride uses `RideController` for recording with a synthetic `free` frame whose `tgt` is null, so nothing is scored. The trainer is driven by `ErgController.setGrade` in the free-ride range (-10 to +20%, 0.1% steps); no ERG power is ever written. The grade is re-sent whenever it moves by more than 0.2% or once a second.
+- The ride recorder gets a one-block `free` plan named after the route, with a duration estimate at 75% FTP. `distance` and `ascent` are additive fields on the summary; the results screen shows Distance and Climbed tiles in place of Compliance when they are present.
+- Auto-pause: 3 s of zero power or cadence stops the clock, but only once speed has dropped under 2 m/s, so coasting down a hill does not pause the ride. The ride starts paused ("Start pedalling") until 1.5 s of pedalling. While paused the trainer is sent 0% gradient.
+- The ride ends on reaching the end of the route, or with End ride. `?fast=N` speeds the ride clock up N times (physics and distance), as in the solo player; recording stays at 1 Hz real time.
+- Trainer difficulty is remembered per browser (`cranky.trainerDifficulty`), default 50%.
+
+## Free ride: elevation profile and map (2026-11-13)
+- Two canvas profiles: the whole route (ridden part dimmed) and a strip from 100 m behind to 900 m ahead. Columns are coloured by gradient: green under 2%, yellow under 5%, orange under 8%, red under 12%, then magenta.
+- The map is Leaflet 1.9.4 (new dependency, BSD-2-Clause) with standard OpenStreetMap tiles and attribution. It is loaded lazily and only when the route has coordinates and the browser is online; any failure just hides the panel, so offline rides and tests never depend on it.
+- The player now also shows climbed / climb to go, ETA at the average speed so far (with a clock time), average power, NP and W/kg.
+- This item was finished from uncommitted work left when the PC was switched off mid-session. It passes type-check, lint, unit tests and build but nobody has looked at it in a browser yet.
