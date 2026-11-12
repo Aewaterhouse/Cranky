@@ -117,7 +117,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Trophies and bus history | LEGEND sprints bolt a permanent trophy on the bus; a plaque lists past runs | S |
 | Horn, emotes and heckles | Quick reactions; spectators and fallen riders can cheer or heckle | S |
 | Highlights and replay | Auto-clip the best moments (MEGA sprint, last-second escape) for the results page | L |
-| Season ladder | Crew score table per season with resets and titles | M |
+| ✅ Season ladder | Crew score table per season with resets and titles | M |
 
 ## 6. Watch party ★
 

@@ -434,3 +434,39 @@ a {
 .welcome-dots i.on {
   background: var(--acc);
 }
+.ladder .chips {
+  margin-bottom: 16px;
+}
+.ladder-titles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ladder-titles .card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-color: var(--acc);
+}
+.ladder-titles p {
+  margin: 2px 0 0;
+}
+.ladder-who {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.ladder table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.ladder th,
+.ladder td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.ladder .card {
+  margin-bottom: 16px;
+}

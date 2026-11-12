@@ -365,6 +365,7 @@ class ZombieBus:
                     "inBandSecs": round(r.band_s),
                     "sprints": r.sprints,
                     "falls": r.falls,
+                    "bot": r.bot,
                 }
                 for r in rs
             ],

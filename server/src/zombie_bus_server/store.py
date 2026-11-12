@@ -23,6 +23,7 @@ class Store:
             CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT, salt TEXT, hash TEXT);
             CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, id TEXT);
             CREATE TABLE IF NOT EXISTS rooms (code TEXT PRIMARY KEY, json TEXT, saved_at REAL);
+            CREATE TABLE IF NOT EXISTS results (n INTEGER PRIMARY KEY, date TEXT, plan TEXT, json TEXT);
             """)
 
     def get_profile(self, rid: str) -> dict | None:
@@ -167,3 +168,19 @@ class Store:
         for old in sorted(folder.glob("cranky-*.db"))[:-keep]:
             old.unlink()
         return dest
+
+    def add_result(self, plan: str, summary: dict) -> None:
+        """Records a finished bus ride for the season ladder."""
+        with self.lock, self.db:
+            self.db.execute(
+                "INSERT INTO results (date, plan, json) VALUES (?, ?, ?)",
+                (time.strftime("%Y-%m-%d"), plan, json.dumps(summary)),
+            )
+
+    def results(self, start: str, end: str) -> list[dict]:
+        """Bus rides with start <= date < end (ISO dates), each as its summary plus date and plan."""
+        with self.lock:
+            rows = self.db.execute(
+                "SELECT date, plan, json FROM results WHERE date >= ? AND date < ? ORDER BY n", (start, end)
+            ).fetchall()
+        return [{**json.loads(j), "date": d, "plan": p} for d, p, j in rows]

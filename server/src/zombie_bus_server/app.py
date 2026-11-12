@@ -2,15 +2,17 @@
 
 import asyncio
 import random
+import re
 import time
 from contextlib import asynccontextmanager
+from datetime import date
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError
 
-from . import config
+from . import config, ladder
 from .plan import flatten, load_plans, total
 from .session import Room
 from .store import Store
@@ -142,6 +144,15 @@ def put_profile(rid: str, profile: dict, u: User) -> dict:
 def post_ride(body: dict, u: User) -> dict:
     store.add_ride(u["id"], body.get("summary") or {})
     return {"ok": True}
+
+
+@app.get("/api/ladder")
+def get_ladder(u: User, season: str | None = None) -> dict:
+    """The season ladder for a season id like 2026-Q4 (default: the current one)."""
+    season = season or ladder.season_of(date.today())
+    if not re.fullmatch(r"\d{4}-Q[1-4]", season):
+        raise HTTPException(400, "Season looks like 2026-Q4")
+    return ladder.build(season, store.results(*ladder.bounds(season)))
 
 
 @app.get("/api/rides")

@@ -7,6 +7,7 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 
 | Method | Path | Body / result |
 | --- | --- | --- |
+| GET | `/api/ladder?season=2026-Q4` | Season ladder: top runs, rider standings and titles. Season defaults to the current quarter |
 | GET | `/api/health` | → `{ok: true}` (no auth) |
 | GET | `/api/riders` | → seeded riders `[{id, name}]` for the login tiles (no auth) |
 | POST | `/api/login` | `{name, password}` → `{token, id, name}`; 401 if wrong. Password is the name, case-insensitive. |

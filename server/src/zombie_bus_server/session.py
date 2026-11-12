@@ -315,6 +315,8 @@ class Room:
             self.task.cancel()
         self.summary = self.mode.summary(self)
         await self.broadcast({"t": "end", "summary": self.summary})
+        if self.store:
+            self.store.add_result(self.plan["name"], self.summary)
         text = discord.format_summary(self.plan["name"], self.summary)
         self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))
         await self.lobby()

@@ -1,3 +1,4 @@
+import { ladderTab } from './ladder'
 import { settingsTab } from './settings'
 import { me } from '../core/api'
 import type { Profile } from '../core/curve'
@@ -9,7 +10,7 @@ import { logo } from './login'
 import { riderTab } from './rider'
 import { listen, setSimFtp, trainerPill } from './trainer'
 
-const TABS = { ride: 'Ride', garage: 'Garage', rider: 'Rider' }
+const TABS = { ride: 'Ride', ladder: 'Ladder', garage: 'Garage', rider: 'Rider' }
 type Tab = keyof typeof TABS
 const current = (): Tab | 'admin' | 'settings' => {
   const t = location.hash.slice(1)
@@ -69,11 +70,13 @@ export function showHome(p: Profile, act: HomeActions) {
         ? settingsTab()
         : tab === 'admin' && admin
           ? adminTab(p.id)
-          : tab === 'garage'
-            ? garageTab(p, render)
-            : tab === 'rider'
-              ? riderTab(p)
-              : rideTab(p, act)
+          : tab === 'ladder'
+            ? ladderTab()
+            : tab === 'garage'
+              ? garageTab(p, render)
+              : tab === 'rider'
+                ? riderTab(p)
+                : rideTab(p, act)
     bar = h(
       'header',
       { class: 'top' },
