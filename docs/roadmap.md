@@ -39,7 +39,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Trainer auto-reconnect | If Bluetooth drops mid-ride, reconnect and resume ERG without leaving the ride | M |
 | FTMS response handling | Read control-point replies, retry rejected writes, show a clear error | S |
 | Heart-rate monitor | Pair a BLE HR strap; record and show HR everywhere | M |
-| Screen wake lock | Stop the laptop sleeping mid-ride | S |
+| ✅ Screen wake lock | Stop the laptop sleeping mid-ride | S |
 | Ride crash recovery | Save the ride every few seconds so a refresh or crash loses nothing | M |
 | Server restart survival | Persist room state so a restart resumes the ride | M |
 | ERG pre-scheduling | Schedule block changes off the server clock so targets are never late | S |

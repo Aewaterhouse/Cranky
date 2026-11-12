@@ -10,6 +10,7 @@ import { logout, me, type Me } from './core/api'
 import type { Profile } from './core/curve'
 import { loadProfile, syncProfile } from './core/profile'
 import { runDrill } from './modes/drill/drill'
+import { keepAwake } from './ui/wakeLock'
 import { crew } from './modes/zombieBus/crew'
 import { showLogin } from './ui/login'
 import { showHome } from './ui/shell'
@@ -18,11 +19,12 @@ import { currentTrainer } from './ui/trainer'
 let profile: Profile
 
 function home(p: Profile = profile) {
+  keepAwake(false)
   profile = p
   showHome(profile, {
-    drill: (plan) => runDrill(plan, profile, currentTrainer()!, home),
-    create: () => crew(null, profile, currentTrainer()!, home),
-    join: (code) => crew(code, profile, currentTrainer()!, home),
+    drill: (plan) => (keepAwake(true), runDrill(plan, profile, currentTrainer()!, home)),
+    create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
+    join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),
     logout: () => {
       logout()
       showLogin(enter)
