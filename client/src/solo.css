@@ -514,3 +514,17 @@
 .erg.noerg .sbig:first-child {
   border-color: color-mix(in srgb, var(--acc) 60%, var(--line));
 }
+
+.iv-c {
+  grid-column: 2 / -1;
+  margin-top: -4px;
+  font-size: 0.74rem;
+  color: #4cc9f0;
+  font-variant-numeric: tabular-nums;
+}
+.iv-c:empty {
+  display: none;
+}
+.iv-c.good {
+  color: var(--tox);
+}

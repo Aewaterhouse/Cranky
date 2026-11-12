@@ -44,6 +44,8 @@ export function soloPanel(plan: Plan, tier: () => Tier, ftp: number) {
   const rows = plan.blocks.map((b, i) => {
     const target = h('span', { class: 'iv-w' })
     const result = h('span', { class: 'iv-r' })
+    const band = b.cad ? `Cadence ${b.cad[0]}–${b.cad[1]} rpm` : ''
+    const cadEl = h('span', { class: 'iv-c' }, band)
     const row = h(
       'li',
       {
@@ -55,8 +57,9 @@ export function soloPanel(plan: Plan, tier: () => Tier, ftp: number) {
       h('span', { class: 'iv-d' }, fmt(b.dur)),
       target,
       result,
+      cadEl,
     )
-    return { row, target, result, b }
+    return { row, target, result, b, cadEl, band }
   })
   const list = h('ol', { class: 'ivlist' }, ...rows.map((r) => r.row))
   const vals = TILES.map(() => h('b', {}, '–'))
@@ -104,6 +107,15 @@ export function soloPanel(plan: Plan, tier: () => Tier, ftp: number) {
             ? `${s.avgPower} W`
             : `${s.avgPower} W ${ok ? '✓' : '✗'}`
       }
+    },
+    /** Share of each block's seconds spent inside its cadence band. */
+    cadence(pcts: (number | null)[]) {
+      rows.forEach((r, i) => {
+        const v = pcts[i]
+        if (!r.band || v == null) return
+        r.cadEl.textContent = `${r.band} · ${Math.round(v * 100)}% in band`
+        r.cadEl.classList.toggle('good', v >= 0.8)
+      })
     },
     stats(s: LiveStats) {
       TILES.forEach(([, f], i) => (vals[i].textContent = f(s)))

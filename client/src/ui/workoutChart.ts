@@ -209,6 +209,12 @@ function paint(
     ctx.shadowBlur = 0
   }
   if (d.showCadence && d.cadence) {
+    const cy = (v: number) => B - ((v - CAD[0]) / (CAD[1] - CAD[0])) * (B - T)
+    ctx.fillStyle = 'rgba(76,201,240,0.16)'
+    for (const s of d.segs) {
+      if (!s.cad || s.t1 < v0 || s.t0 > v1) continue
+      ctx.fillRect(x(s.t0), cy(s.cad[1]), x(s.t1) - x(s.t0), cy(s.cad[0]) - cy(s.cad[1]))
+    }
     ctx.lineWidth = 1.5
     ctx.strokeStyle = '#4cc9f0'
     for (const run of runs(

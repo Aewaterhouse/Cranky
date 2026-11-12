@@ -107,3 +107,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Scoring in non-ERG modes still uses the plan target (the rider aims for it themselves). The target tile reads "Aim for · ERG off" with an amber border. The mode and its level are not saved in crash recovery (a resumed ride starts in ERG).
 - Tests and fast checks: SimTrainer gets simple physics. Resistance: watts = level x cadence / 30 (50% at 90 rpm is 150 W). Slope: speed = cadence x 0.075 m/s per rpm (a fixed gear), 80 kg, Crr 0.005, CdA 0.32, so +5% at 85 rpm is about 280 W. At 0% grade the sim keeps using the arrow-key watts (that is the sprint and free-ride behaviour), so physics only applies off 0%.
 - FTP tests lock the mode to ERG (the switch is hidden).
+
+## Cadence targets (2026-11-12)
+- A block may carry `cad: [lo, hi]` (rpm, 0 < lo <= hi). `parsePlan` rejects anything else and keeps the band through `set` expansion; `frameAt` passes it on. The Python server reads the same JSON and ignores the field (its tests still pass; no server code changed).
+- Scoring is separate from power compliance: the player counts, per block, the recorded seconds with cadence inside the band (stopped pedalling counts as out). It is shown under the interval as "Cadence 110-120 rpm · 82% in band" (green from 80%) and is not part of the ride summary or results.
+- The cadence tile shows the band in place of "rpm" and is green inside it, amber outside. The chart draws bands (translucent blue, on the 40-140 rpm scale) only while the "Cadence line" toggle is on. Seconds spent paused are not counted. A resumed ride rebuilds the tally from the saved cadence samples.
+- Three cadence drills (goal endurance): `cad-spin-ups` (8 x 1 min at 110-120), `cad-low-strength` (5 x 4 min at 80% and 55-65 rpm), `cad-pyramid` (90 up to 120 and back, 3 min each).

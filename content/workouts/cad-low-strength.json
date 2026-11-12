@@ -1,0 +1,52 @@
+{
+ "id": "cad-low-strength",
+ "name": "Low Cadence Strength",
+ "goal": "endurance",
+ "desc": "Five four-minute grinds at 80% FTP and 55 to 65 rpm. Sit down, push through the pedals, stay relaxed on the bars.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    45,
+    65
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 5,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 80,
+     "cad": [
+      55,
+      65
+     ],
+     "label": "Grind"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "cad": [
+      85,
+      95
+     ],
+     "label": "Spin out"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

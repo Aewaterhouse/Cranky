@@ -1,6 +1,6 @@
 import '../../solo.css'
 import { zoneOf, type Profile } from '../../core/curve'
-import { frameAt, planTotal, startOf } from '../../core/plan'
+import { frameAt, locate, planTotal, startOf } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
 import { loadStats, RideRecorder } from '../../core/ride'
 import { clearSnap, saveSnap, soloKey, type SoloSnap } from '../../core/snapshot'
@@ -12,6 +12,7 @@ import { stepMode, type ModeState, type RideMode } from '../../ui/soloMode'
 import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { CadenceTally } from './cadence'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
 
 const START_S = 5
@@ -65,6 +66,8 @@ export function runDrill(
   let load = loadStats([], profile.ftp)
   let loadN = 0
   let cadAvg = 0
+  const tally = new CadenceTally(plan.blocks)
+  resume?.rec.cadence.forEach((c, n) => tally.add(locate(plan.blocks, xs[n])?.i ?? 0, c))
 
   const view = soloView(
     plan,
@@ -163,6 +166,7 @@ export function runDrill(
     for (; xs.length < p.length; xs.push(el)) {
       const n = xs.length
       zones[zoneOf(p[n], profile.ftp)]++
+      tally.add(locate(plan.blocks, el)?.i ?? 0, ride.rec.cadence[n])
       if (live.c !== null) {
         cSum += live.c
         cN++
@@ -254,6 +258,7 @@ export function runDrill(
       cadence: ride.rec.cadence,
       hr: ride.rec.hr,
       mode,
+      cadPct: tally.pct(),
       actions: inRamp(f.i)
         ? [{ id: 'done', label: "I'm done", cls: 'primary', run: rampDone }]
         : [],

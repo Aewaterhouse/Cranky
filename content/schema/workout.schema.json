@@ -35,6 +35,7 @@
         "label": { "type": "string" },
         "step": { "type": "number", "exclusiveMinimum": 0 },
         "rep": { "type": "integer", "minimum": 1 },
+        "cad": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
         "pct": {
           "oneOf": [
             { "$ref": "#/definitions/pctOne" },

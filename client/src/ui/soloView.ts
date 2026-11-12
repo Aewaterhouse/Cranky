@@ -1,6 +1,7 @@
 import { hrZone } from '../core/curve'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
+import { inCadBand } from '../modes/drill/cadence'
 import { fmt, h } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { soloActions, type SoloAction } from './soloExtras'
@@ -32,6 +33,7 @@ export interface ViewState {
   cadence: number[]
   hr: (number | null)[]
   actions: SoloAction[]
+  cadPct: (number | null)[]
   mode: ModeState
 }
 
@@ -54,6 +56,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   unit(tgt, 'W')
   unit(pow, 'W')
   unit(cad, 'rpm')
+  const cadUnit = cad.el.lastElementChild!
   unit(hr, 'bpm')
   const blockName = h('div', { class: 'blockname' })
   const next = h('div', { class: 'next' })
@@ -237,6 +240,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       tgt.el.classList.toggle('word', t == null)
       pow.v.textContent = String(Math.round(f.type === 'sprint' ? live.power : live.avg))
       cad.v.textContent = String(Math.round(live.cadence))
+      cadUnit.textContent = f.cad ? `${f.cad[0]}–${f.cad[1]} rpm` : 'rpm'
+      cad.v.style.color = f.cad
+        ? inCadBand(f.cad, live.cadence)
+          ? 'var(--tox)'
+          : 'var(--acc)'
+        : ''
+      panel.cadence(s.cadPct)
       hr.v.textContent = live.hr ? String(live.hr) : '–'
       hr.v.style.color = live.hr && maxHr ? (ZONE_COLOURS[hrZone(live.hr, maxHr)] ?? '') : ''
       left.v.textContent = fmt(f.dur - f.bel)

@@ -11,6 +11,8 @@ export interface Block {
   pct?: Pct | [Pct, Pct]
   step?: number
   rep?: number
+  /** Optional cadence band [lo, hi] in rpm for this block. */
+  cad?: [number, number]
   blocks?: Block[]
 }
 export interface Plan {
@@ -33,6 +35,8 @@ export interface Frame {
   dur: number
   /** Target watts, or null when ERG is off (sprint, free). */
   tgt: number | null
+  /** Cadence band for this block, when the plan sets one. */
+  cad?: [number, number]
   next?: { type: BlockType; label: string; in: number; tgt: number | null }
   event?: string
 }

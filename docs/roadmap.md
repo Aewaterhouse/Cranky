@@ -79,7 +79,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Training plans | Multi-week plans with a calendar and "today's workout" | L |
 | Coach text cues | Timed on-screen messages inside workouts | S |
 | ✅ Resistance and slope modes | Ride without ERG at a fixed resistance or gradient | S |
-| Cadence targets | Optional cadence band per interval, scored like power | S |
+| ✅ Cadence targets | Optional cadence band per interval, scored like power | S |
 | Ghost of last attempt | Overlay your previous trace on the same workout | M |
 | Extend cool-down / add time | One-tap "+5 min" at the end | S |
 | Media corner | Space for a video or music player beside the chart | S |
