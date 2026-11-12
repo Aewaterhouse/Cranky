@@ -13,6 +13,7 @@ TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5
 MAX_RIDERS = 6
 ROOM_IDLE_S = 600
+DISCORD_WEBHOOK = os.environ.get("ZB_DISCORD_WEBHOOK", "")
 BACKUP_DIR = Path(os.environ.get("ZB_BACKUPS", DB_PATH.parent / "backups"))
 BACKUP_EVERY_S = 24 * 3600
 BACKUP_KEEP = 14

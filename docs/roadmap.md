@@ -65,7 +65,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | PR timeline and badges | When each best was set; badges for milestones (first 300 W minute, 100 rides) | S |
 | Extra ride metrics | HR drift, efficiency factor, variability index, cadence histogram, W′ balance | M |
 | intervals.icu sync | Push rides and pull planned workouts | M |
-| Discord post | Auto-post the ride summary and postcard to the group chat by webhook | S |
+| ✅ Discord post | The server posts each finished bus ride's summary to a channel webhook. **Needs the owner:** set `ZB_DISCORD_WEBHOOK` to the channel's webhook URL and restart; not yet tried against a real Discord channel. The postcard image is not attached (it is drawn in the browser) | S |
 | ★ Strava export (later) | Connect Strava once, then every ride uploads automatically. Parked for now; needs a free Strava API app | M |
 
 ## 3. Solo trainer mode

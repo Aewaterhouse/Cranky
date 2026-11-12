@@ -142,3 +142,14 @@ def test_bus_is_full_at_six():
         assert room.riders["r0"].ftp == 210
 
     asyncio.run(go())
+
+
+def test_discord_summary_text():
+    from zombie_bus_server.discord import format_summary, post
+
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 0.9)
+    run(room, bus, 10)
+    text = format_summary("Bus Quick 30", bus.summary(room))
+    assert "Bus Quick 30" in text and "Iron Lungs" in text and "Crew: R0 90%" in text
+    post(text)  # no webhook configured: a silent no-op

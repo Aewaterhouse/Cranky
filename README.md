@@ -100,3 +100,8 @@ Point an HTTPS proxy (Caddy: `reverse_proxy localhost:8000`) at port 8000, passi
 - Chrome or Edge on Mac and Windows. Safari and Firefox have no Web Bluetooth.
 - iPad: needs the Bluefy browser (untested), or use the iPad as a display only while another device pairs with the trainer.
 - Close MyWhoosh, Wahoo and any other app using the trainer before pairing; FTMS allows one connection at a time.
+
+## Optional extras
+
+- `ZB_DISCORD_WEBHOOK`: a Discord channel webhook URL. When set, the server posts each finished Zombie Bus ride summary there.
+- `ZB_BACKUPS`: folder for the daily database backups (default `server/backups/`, newest 14 kept).

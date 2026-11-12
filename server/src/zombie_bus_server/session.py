@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING
 
 from fastapi import WebSocket
 
-from . import bots
+from . import bots, discord
 from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
@@ -303,4 +303,6 @@ class Room:
             self.task.cancel()
         self.summary = self.mode.summary(self)
         await self.broadcast({"t": "end", "summary": self.summary})
+        text = discord.format_summary(self.plan["name"], self.summary)
+        self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))
         await self.lobby()
