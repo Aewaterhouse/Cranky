@@ -1,3 +1,5 @@
+import { settings } from '../core/settings'
+
 let ctx: AudioContext | null = null
 const ac = () => (ctx ??= new AudioContext())
 
@@ -15,7 +17,7 @@ export function beep(
     o.type = type
     o.frequency.value = freq
     const t = c.currentTime + at
-    g.gain.setValueAtTime(gain, t)
+    g.gain.setValueAtTime(Math.max(0.0001, gain * settings.volume), t)
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur)
     o.connect(g).connect(c.destination)
     o.start(t)
@@ -67,7 +69,7 @@ export function mood(m: string) {
     }
     const hz = MOOD_HZ[m] ?? 0
     if (hz) drone.o.frequency.setTargetAtTime(hz, c.currentTime, 0.5)
-    drone.g.gain.setTargetAtTime(hz ? 0.025 : 0, c.currentTime, 0.8)
+    drone.g.gain.setTargetAtTime(hz ? 0.025 * settings.volume : 0, c.currentTime, 0.8)
   } catch {
     /* no audio */
   }

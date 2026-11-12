@@ -13,6 +13,7 @@
 .hud {
   --amber: #ffb020;
   --ev: var(--acc);
+  zoom: var(--hud-scale, 1);
   position: absolute;
   inset: 0;
   pointer-events: none;

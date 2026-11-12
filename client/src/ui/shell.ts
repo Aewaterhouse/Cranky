@@ -1,3 +1,4 @@
+import { settingsTab } from './settings'
 import { me } from '../core/api'
 import type { Profile } from '../core/curve'
 import { adminTab, changeMyPassword } from './admin'
@@ -10,9 +11,9 @@ import { listen, setSimFtp, trainerPill } from './trainer'
 
 const TABS = { ride: 'Ride', garage: 'Garage', rider: 'Rider' }
 type Tab = keyof typeof TABS
-const current = (): Tab | 'admin' => {
+const current = (): Tab | 'admin' | 'settings' => {
   const t = location.hash.slice(1)
-  return t in TABS || t === 'admin' ? (t as Tab) : 'ride'
+  return t in TABS || t === 'admin' || t === 'settings' ? (t as Tab) : 'ride'
 }
 
 function riderChip(p: Profile, act: HomeActions, admin: boolean) {
@@ -20,6 +21,7 @@ function riderChip(p: Profile, act: HomeActions, admin: boolean) {
     'div',
     { class: 'menu', hidden: true },
     h('a', { href: '#rider' }, 'Rider profile'),
+    h('a', { href: '#settings' }, 'Settings'),
     admin ? h('a', { href: '#admin' }, 'Admin') : '',
     h(
       'button',
@@ -63,13 +65,15 @@ export function showHome(p: Profile, act: HomeActions) {
     if (bar && !bar.isConnected) return
     const tab = current()
     const body =
-      tab === 'admin' && admin
-        ? adminTab(p.id)
-        : tab === 'garage'
-          ? garageTab(p, render)
-          : tab === 'rider'
-            ? riderTab(p)
-            : rideTab(p, act)
+      tab === 'settings'
+        ? settingsTab()
+        : tab === 'admin' && admin
+          ? adminTab(p.id)
+          : tab === 'garage'
+            ? garageTab(p, render)
+            : tab === 'rider'
+              ? riderTab(p)
+              : rideTab(p, act)
     bar = h(
       'header',
       { class: 'top' },

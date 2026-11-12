@@ -92,3 +92,4 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Nothing is scheduled during the countdown (tick `i < 0`) or after the last tick. The ErgController's 2 s ramp is unchanged. Within the same block the server's own `tgt` still wins; across a block boundary the local frame wins until the server tick catches up.
 
 - Graphics quality: four levels (potato, low, medium, high) change pixel ratio and shadows. Auto mode starts high, drops a level after two 2-second windows under 40 fps and never climbs back to a level that proved too slow. `?gfx=low` (or potato/medium/high/auto) pins it; a settings screen control is still to come.
+- Settings are per device (localStorage), not per account: a TV and a laptop want different sizes and quality. The colour-blind palette is Okabe-Ito.

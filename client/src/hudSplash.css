@@ -251,7 +251,7 @@
 }
 @media (min-width: 1700px) and (min-height: 950px) {
   .hud {
-    zoom: 1.3;
+    zoom: var(--hud-scale, 1.3);
   }
 }
 @media (max-height: 740px) {

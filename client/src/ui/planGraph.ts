@@ -12,6 +12,12 @@ export const ZONE_COLOURS = [
   '#e94f37',
   '#c2185b',
 ]
+const STANDARD = [...ZONE_COLOURS]
+const COLOUR_BLIND = ['#999999', '#0072b2', '#009e73', '#f0e442', '#e69f00', '#d55e00', '#cc79a7']
+/** Swaps the shared palette in place, so every chart drawn afterwards uses it. */
+export function setZonePalette(colourBlind: boolean) {
+  ZONE_COLOURS.splice(0, ZONE_COLOURS.length, ...(colourBlind ? COLOUR_BLIND : STANDARD))
+}
 export const SPRINT_COLOUR = '#e040fb'
 export function zoneColour(frac: number) {
   const i = CFG.zones.findIndex((z) => frac < z)

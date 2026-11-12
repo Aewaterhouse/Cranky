@@ -377,3 +377,37 @@ a {
     transform: translateY(6px);
   }
 }
+.set-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.set-row:last-child {
+  border-bottom: 0;
+}
+.set-row p {
+  margin: 2px 0 0;
+}
+.set-row input[type='range'] {
+  width: 220px;
+  accent-color: var(--acc);
+}
+.set-cb {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+.set-zones {
+  display: flex;
+  gap: 4px;
+}
+.set-zones i {
+  width: 28px;
+  height: 14px;
+  border-radius: 3px;
+}

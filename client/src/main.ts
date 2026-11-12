@@ -3,6 +3,7 @@ import '@fontsource/inter/latin-400.css'
 import '@fontsource/inter/latin-600.css'
 import '@fontsource/inter/latin-800.css'
 import './style.css'
+import { applySettings } from './core/settings'
 import './ui.css'
 import './screens.css'
 import './setup.css'
@@ -45,6 +46,7 @@ addEventListener(
   (e) => e.key === '`' && import('./scene/world').then((m) => m.debugPanel()),
 )
 
+applySettings()
 me().then(enter, () => showLogin(enter))
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator)
