@@ -485,3 +485,19 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+.sactions {
+  display: none;
+  flex-basis: 100%;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.sactions.on {
+  display: flex;
+}
+.sactions button {
+  padding: 8px 16px;
+}
+.erg.testing .field {
+  display: none;
+}

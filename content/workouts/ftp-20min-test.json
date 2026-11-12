@@ -1,0 +1,67 @@
+{
+ "id": "ftp-20min-test",
+ "name": "FTP 20 Minute Test",
+ "goal": "test",
+ "test": "ftp20",
+ "desc": "Warm-up, openers, a 5 minute blow-out, then 20 minutes free ride with ERG off: pace it yourself. Your FTP is 95% of the 20 minute average.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    45,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 100,
+     "label": "Opener"
+    },
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 50,
+     "label": "Easy"
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 55,
+   "label": "Settle"
+  },
+  {
+   "type": "free",
+   "dur": 300,
+   "label": "Blow-out"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "free",
+   "dur": 1200,
+   "label": "20 min test"
+  },
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

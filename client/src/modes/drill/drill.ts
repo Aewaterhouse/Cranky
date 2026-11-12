@@ -11,6 +11,7 @@ import { finishRide } from '../../ui/results'
 import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { coolStart, ftpResult, testSpec } from './ftpTest'
 
 const START_S = 5
 const PAUSE_ERG = 0.4
@@ -27,7 +28,10 @@ export function runDrill(
 ) {
   const total = planTotal(plan.blocks)
   const fast = +(new URLSearchParams(location.search).get('fast') ?? 1)
+  const origTier = profile.tier
+  const spec = testSpec(plan)
   if (resume) profile.tier = resume.tier
+  if (plan.test) profile.tier = 'hard'
   const ride = new RideController(
     trainer,
     profile,
@@ -39,7 +43,8 @@ export function runDrill(
   const isSim = trainer.name.toLowerCase().includes('sim')
   let el = resume?.el ?? 0
   let count = START_S
-  let intensity = resume?.intensity ?? 1
+  let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
+  let below = 0
   let manual = false
   let auto = false
   let finished = false
@@ -67,8 +72,9 @@ export function runDrill(
       pause: () => togglePause(),
       skip: () => skip(),
       end: () => end(),
-      intensity: (d) => (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
-      tier: (t) => ((profile.tier = t), saveProfile(profile)),
+      intensity: (d) =>
+        !plan.test && (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
+      tier: (t) => !plan.test && ((profile.tier = t), saveProfile(profile)),
     },
     profile.maxHr,
   )
@@ -85,6 +91,14 @@ export function runDrill(
     )
   }
 
+  const inRamp = (i: number | undefined) =>
+    spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
+  function rampDone() {
+    el = coolStart(plan) ?? el
+    below = 0
+    splashUntil = performance.now() + 2800
+    view.overlay('Ramp over', 'Well ridden. Easy spin now.', 'count')
+  }
   const sprinting = () => ride.frame?.type === 'sprint'
   function togglePause() {
     if (count > 0 || sprinting()) return
@@ -105,13 +119,15 @@ export function runDrill(
         ? (togglePause(), true)
         : k === 'n' || k === 'N' || (k === 'ArrowRight' && !isSim)
           ? (skip(), true)
-          : k === '+' || k === '='
-            ? ((intensity = Math.min(1.5, +(intensity + 0.01).toFixed(2))), true)
-            : k === '-' || k === '_'
-              ? ((intensity = Math.max(0.5, +(intensity - 0.01).toFixed(2))), true)
-              : k === 'Escape'
-                ? (view.confirmEnd(), true)
-                : false
+          : plan.test
+            ? false
+            : k === '+' || k === '='
+              ? ((intensity = Math.min(1.5, +(intensity + 0.01).toFixed(2))), true)
+              : k === '-' || k === '_'
+                ? ((intensity = Math.max(0.5, +(intensity - 0.01).toFixed(2))), true)
+                : k === 'Escape'
+                  ? (view.confirmEnd(), true)
+                  : false
     if (used) e.preventDefault()
   }
   addEventListener('keydown', onKey)
@@ -148,6 +164,12 @@ export function runDrill(
       overlay = count > 0 ? [String(Math.ceil(count)), 'Get ready to ride', 'count'] : [null]
     } else {
       const stopped = live.power === 0 || live.cadence === 0
+      const tgt = ride.frame?.tgt
+      below =
+        inRamp(ride.frame?.i) && !manual && tgt && live.avg < tgt * CFG.ftpTest.failBelow
+          ? below + dt
+          : 0
+      if (below >= CFG.ftpTest.failS) rampDone()
       idleFor = stopped ? idleFor + dt : 0
       activeFor = stopped ? 0 : activeFor + dt
       if (!manual && !auto && !sprinting() && idleFor >= STOP_S) auto = true
@@ -212,6 +234,9 @@ export function runDrill(
       xs,
       cadence: ride.rec.cadence,
       hr: ride.rec.hr,
+      actions: inRamp(f.i)
+        ? [{ id: 'done', label: "I'm done", cls: 'primary', run: rampDone }]
+        : [],
       stats: {
         elapsed: el,
         remaining: total - el,
@@ -242,6 +267,20 @@ export function runDrill(
     clearSnap(key)
     removeEventListener('keydown', onKey)
     await ride.stop()
+    profile.tier = origTier
+    record()
+    const r = ftpResult(plan, ride.rec.power, xs)
+    if (r) {
+      const pick = await view.prompt(
+        `Your new FTP: ${r} W`,
+        [`Was ${profile.ftp} W. Use it for all your workouts?`],
+        ['Accept', 'Keep old'],
+      )
+      if (pick === 0) {
+        profile.ftp = r
+        saveProfile(profile)
+      }
+    }
     finishRide(profile, ride.rec.summary(), done)
   }
 }

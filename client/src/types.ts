@@ -18,6 +18,8 @@ export interface Plan {
   name: string
   desc?: string
   goal?: string
+  /** Marks an FTP test: the player works out a new FTP at the end. */
+  test?: 'ramp' | 'ftp20'
   blocks: Block[]
 }
 

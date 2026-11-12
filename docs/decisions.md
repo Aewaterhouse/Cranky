@@ -91,3 +91,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `ClockSync` keeps (el, arrival time) for each tick, measures the rate over the last 4 s (1 normally, so a time-scaled test server works), clamps it to 0.5-30, eases small errors out at 20% per tick, snaps when more than 1 s out, never runs backwards except on a snap, and goes quiet after 3 s without a tick.
 - Nothing is scheduled during the countdown (tick `i < 0`) or after the last tick. The ErgController's 2 s ramp is unchanged. Within the same block the server's own `tgt` still wins; across a block boundary the local frame wins until the server tick catches up.
 
+
+## FTP tests (2026-11-12)
+- Two plans with goal `test` (and a plan-level `test: "ramp" | "ftp20"` marker): `ftp-ramp-test` and `ftp-20min-test`. They are plain JSON; the ramp steps are 18 one-minute steady blocks (46% to 148%, so under the 150% cap) labelled "Ramp N%". The measured blocks are found by label ("Ramp ..." to "Cool-down", or "20 min test"). The picker has no "test" group and I may not edit it, so the tests live on a "Test your FTP" card on the solo setup screen (and under All).
+- Test plans always ride at the hard tier and 100% intensity: the tier and intensity controls are hidden and ignored, or the percentages would be meaningless. The rider's own tier is restored afterwards.
+- Ramp ends when the rider presses "I'm done" or has been under 50% of the target for 10 s (real seconds, counted even while auto-paused). Either one jumps the clock to the cool-down. Result = 75% of the best 60 plan seconds inside the ramp (needs at least 54 s and 3 samples).
+- 20 minute test: the blow-out and the 20 minutes are `free` blocks (ERG off). Result = 95% of the mean power over the 20 minute block; needs at least 90% of it ridden, else no result is offered.
+- The result prompt (Accept / Keep old) appears when the ride ends, before the usual results screen. Accept sets `profile.ftp` and saves it; there is no FTP history helper yet. Ending a ramp early still offers a result if a full minute was ridden.
+- The test plans also appear in the bus lobby picker (not mine to hide); a bus ride with a free block works but is pointless.

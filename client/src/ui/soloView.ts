@@ -3,6 +3,7 @@ import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
 import { fmt, h } from './dom'
 import { ZONE_COLOURS } from './planGraph'
+import { soloActions, type SoloAction } from './soloExtras'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
@@ -27,6 +28,7 @@ export interface ViewState {
   xs: number[]
   cadence: number[]
   hr: (number | null)[]
+  actions: SoloAction[]
 }
 
 const TIERS: Tier[] = ['hard', 'medium', 'easy']
@@ -97,11 +99,12 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   tierSel.value = tier
   const ov = h('div', { class: 'overlay' })
   const panel = soloPanel(plan, () => tierSel.value as Tier, ftp)
+  const acts = soloActions()
   const kbd = (t: string) => h('kbd', {}, t)
 
   const root = h(
     'div',
-    { class: 'erg' },
+    { class: `erg${plan.test ? ' testing' : ''}` },
     h(
       'header',
       { class: 'solo-head' },
@@ -128,6 +131,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         h('button', { onclick: on.skip, title: 'Skip interval (→ or N)' }, 'Skip ', kbd('N')),
         h('button', { class: 'danger', onclick: () => confirmEnd() }, 'End ride'),
       ),
+      acts.root,
     ),
     h(
       'section',
@@ -188,8 +192,32 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       key = k
     },
     confirmEnd,
+    /** Modal question over the chart; resolves with the index of the button pressed. */
+    prompt(title: string, lines: string[], buttons: string[]) {
+      return new Promise<number>((res) =>
+        say(
+          [
+            h(
+              'div',
+              { class: 'dlg' },
+              h('h2', {}, title),
+              ...lines.map((l) => h('p', { class: 'dim' }, l)),
+              h(
+                'div',
+                { class: 'row' },
+                ...buttons.map((b, n) =>
+                  h('button', { class: n === 0 ? 'primary' : '', onclick: () => res(n) }, b),
+                ),
+              ),
+            ),
+          ],
+          'dialog',
+        ),
+      )
+    },
     frame(s: ViewState) {
       const { f, live } = s
+      acts.set(s.actions)
       const t = f.tgt
       tgt.v.textContent = t == null ? (f.type === 'sprint' ? 'ALL OUT' : 'FREE') : String(t)
       tgt.el.classList.toggle('word', t == null)
