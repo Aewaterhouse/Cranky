@@ -19,7 +19,9 @@ const watts = h('input', { type: 'number', value: 150 })
 let erg: ErgController | null = null
 const use = (t: Trainer) => {
   t.onData((d) => (live.textContent = `${d.power} W · ${Math.round(d.cadence)} rpm`))
-  t.onDisconnect(() => (status.textContent = 'Disconnected'))
+  t.onStatus(
+    (s) => (status.textContent = s === 'connected' ? `Connected: ${t.name}` : 'Reconnecting…'),
+  )
   erg = new ErgController(t, +ftp.value)
   setInterval(() => erg!.tick(), 250)
   status.textContent = `Connected: ${t.name}`

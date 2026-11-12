@@ -166,9 +166,15 @@ export function runDrill(
           'sprint',
         ]
       else if (n > 0 && n <= 3) overlay = [String(n), 'Sprint next. ERG switches off', 'count']
+      if (ride.trainerStatus === 'reconnecting')
+        overlay = [
+          'Trainer disconnected, reconnecting…',
+          'Keep pedalling, we will carry on when it is back.',
+          'pause',
+        ]
     }
     record(live)
-    if (now >= splashUntil || overlay[0] === 'PAUSED') {
+    if (now >= splashUntil || overlay[2] === 'pause') {
       view.overlay(...overlay)
     }
     const p = ride.rec.power

@@ -154,6 +154,11 @@ a {
   border-color: rgb(127 209 59 / 0.5);
   color: #c9f0a6;
 }
+.pill.warn {
+  background: rgb(255 176 32 / 0.14);
+  border-color: rgb(255 176 32 / 0.6);
+  color: #ffd98a;
+}
 .dot {
   flex: none;
   width: 9px;

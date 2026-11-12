@@ -4,7 +4,7 @@ import { gradeSprint, type Profile } from '../core/curve'
 import { EffectsBus } from '../core/effects'
 import { RideRecorder } from '../core/ride'
 import { ErgController } from '../trainer/ergController'
-import type { Frame, Plan, SprintResult, Trainer } from '../types'
+import type { Frame, Plan, SprintResult, Trainer, TrainerStatus } from '../types'
 
 export interface Live {
   power: number
@@ -25,7 +25,10 @@ export class RideController {
   combo = 0
   /** While true the clock is stopped, so nothing is recorded. */
   paused = false
+  trainerStatus: TrainerStatus = 'connected'
+  onTrainerStatus: (s: TrainerStatus) => void = () => {}
   onSprint: (r: SprintResult) => void = () => {}
+  private stopped = false
   private sprint: { i: number; dur: number; samples: number[] } | null = null
   private timers: ReturnType<typeof setInterval>[] = []
 
@@ -38,7 +41,14 @@ export class RideController {
     this.erg = new ErgController(trainer, profile.ftp, now)
     this.rec = new RideRecorder(plan, profile.ftp)
     trainer.onData((d) => this.data(d.power, d.cadence))
-    trainer.onDisconnect(() => this.erg.failsafe())
+    trainer.onStatus((s) => {
+      if (this.stopped) return
+      this.trainerStatus = s
+      this.erg.setAway(s === 'reconnecting')
+      this.onTrainerStatus(s)
+      if (s === 'reconnecting')
+        this.live = { ...this.live, power: 0, cadence: 0, avg: 0, c: null, band: false }
+    })
   }
 
   start() {
@@ -47,6 +57,7 @@ export class RideController {
   }
 
   private data(power: number, cadence: number) {
+    if (this.trainerStatus === 'reconnecting') return
     const avg = this.avg.push(this.now(), power)
     const tgt = this.frame?.tgt ?? null
     this.live = { power, cadence, avg, c: score(avg, tgt), band: inBand(avg, tgt) }
@@ -91,6 +102,7 @@ export class RideController {
 
   async stop() {
     this.timers.forEach(clearInterval)
+    this.stopped = true
     if (this.sprint) this.finishSprint()
     await this.erg.failsafe()
   }

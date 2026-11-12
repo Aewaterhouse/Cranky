@@ -34,11 +34,16 @@ export interface Frame {
   event?: string
 }
 
+export type TrainerStatus = 'connected' | 'reconnecting'
+
 export interface Trainer {
   name: string
   connect(): Promise<void>
   onData(cb: (d: { power: number; cadence: number }) => void): void
-  onDisconnect(cb: () => void): void
+  /** Fires 'reconnecting' when the link drops and 'connected' once it is back. Listeners add up. */
+  onStatus(cb: (s: TrainerStatus) => void): void
+  /** Stops any reconnecting and drops the link. */
+  close?(): void
   requestControl(): Promise<void>
   setPower(watts: number): Promise<void>
   setSim(gradePct: number): Promise<void>

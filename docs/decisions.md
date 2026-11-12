@@ -61,3 +61,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The app is called **Cranky**. Zombie Bus is the first game inside it. The code and UI still say "Zombie Bus" until the rebrand item in `docs/roadmap.md` is done.
 - Six bus seats stays.
 - Strava export is parked. Watch party (shared video plus synced ERG workout) is on the roadmap.
+
+## Trainer auto-reconnect (2026-11-12)
+- On `gattserverdisconnected` the FTMS driver retries `gatt.connect()` after 1 s, 2 s, 4 s, then every 5 s, forever, until `close()` (picking another trainer). It re-fetches the service and characteristics, re-attaches the notification listeners and clears its control flag, so the next ERG write re-requests control.
+- While away, `ErgController` writes nothing and does not count failures. On return it re-requests control and re-sends the target. Live power and cadence read 0 meanwhile, so solo auto-pause behaves. Failsafe now needs 5 consecutive failed writes with the trainer present.
+- Untested on real hardware: only the simulated trainer (`dropFor`) exercises this path.
