@@ -56,7 +56,7 @@ export function finishRide(
   s: RideSummary,
   onDone: (p: Profile) => void,
   group?: GroupSummary,
-  doneLabel = 'Back to garage',
+  doneLabel = 'Done',
 ) {
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, s.record) : profile

@@ -63,21 +63,25 @@ export interface PickerOpts {
 /** Plan cards in two groups plus length chips. `set()` moves the selection without firing `onChange`. */
 export function planPicker(o: PickerOpts) {
   let { plan, minutes } = o
-  const cards = new Map<string, { el: HTMLElement; gfx: HTMLElement; dur: HTMLElement }>()
+  const cards = new Map<
+    string,
+    { el: HTMLElement; gfx: HTMLElement; dur: HTMLElement; tags: HTMLElement }
+  >()
   const card = (id: string) => {
     const raw = parsePlan(PLANS.find((p) => p.id === id))
     const gfx = h('div', { class: 'pg' })
     const dur = h('span', { class: 'dur' })
+    const tags = h('div', { class: 'tags' })
     const el = h(
       'button',
       { class: 'plan-card', 'aria-pressed': 'false', onclick: () => pick(id, minutes) },
       gfx,
       h('div', { class: 'ttl' }, h('b', {}, raw.name), dur),
       h('p', {}, raw.desc ?? ''),
-      h('div', { class: 'tags' }, ...tagEls(raw)),
+      tags,
       h('span', { class: 'tick' }, '✓'),
     )
-    cards.set(id, { el, gfx, dur })
+    cards.set(id, { el, gfx, dur, tags })
     return el
   }
   const paint = () => {
@@ -85,7 +89,8 @@ export function planPicker(o: PickerOpts) {
       const on = id === plan
       c.el.classList.toggle('on', on)
       c.el.setAttribute('aria-pressed', String(on))
-      const p = planFor(id, on ? minutes : 0)
+      const p = planFor(id, minutes)
+      c.tags.replaceChildren(...tagEls(p))
       c.gfx.replaceChildren(planGraph(p.blocks))
       c.dur.textContent = minsLabel(p.blocks)
     }

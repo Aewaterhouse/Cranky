@@ -140,12 +140,12 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   return next
 }
 
-/** Suggested FTP when 95% of the 20 min best differs from FTP by more than the threshold. */
+/** Suggested FTP when 95% of the 20 min best beats FTP by more than the threshold (never suggests a drop). */
 export function ftpSuggestion(p: Profile): number | null {
   const b = p.allTime[1200]
   if (!b) return null
   const s = Math.round(b.w * 0.95)
-  return Math.abs(s - p.ftp) / p.ftp > CFG.ftpSuggestThreshold ? s : null
+  return (s - p.ftp) / p.ftp > CFG.ftpSuggestThreshold ? s : null
 }
 
 export const zoneOf = (w: number, ftp: number) => {
