@@ -54,13 +54,13 @@ a {
   font-style: normal;
   color: var(--acc);
 }
-.logo .bus {
+.logo .mark {
   display: inline-grid;
   place-items: center;
   width: 1.8em;
   height: 1.8em;
-  border-radius: 10px;
-  background: var(--acc);
+  border-radius: 22%;
+  box-shadow: 0 0 0 2px var(--acc);
   font-size: 0.85em;
   transform: rotate(-4deg);
 }
@@ -69,7 +69,7 @@ a {
   text-shadow: 0 4px 0 #000;
   gap: 18px;
 }
-.logo.big .bus {
+.logo.big .mark {
   border-radius: 18px;
   text-shadow: none;
   box-shadow: 0 6px 0 #8a6800;

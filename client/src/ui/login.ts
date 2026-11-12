@@ -7,7 +7,7 @@ export const logo = (big = false) =>
   h(
     'div',
     { class: `logo${big ? ' big' : ''}` },
-    h('span', { class: 'bus' }, '🚴'),
+    h('img', { class: 'mark', src: '/icon.svg', alt: '' }),
     h('span', {}, 'Crank', h('em', {}, 'y')),
   )
 

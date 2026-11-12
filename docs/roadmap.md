@@ -161,7 +161,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Rider avatars | Body, face and bike customisation beyond hats and kit | M |
 | More cosmetics | Done: 20 more items (6 paints, zombie plough, pirate flags, roof esky and surfboard, 6 hats, 5 kits). Still to do: paint patterns, decals, horns, exhaust flames, rider celebrations | M |
 | ✅ Installable app | Add-to-home-screen with offline solo mode | S |
-| Logo and domain | A proper Cranky logo, favicon, share image and domain | S |
+| Logo and domain | Done: a chainring-and-crank logo, favicon and app icon. Still to do, **needs the owner:** pick and register a domain; a share image for link previews | S |
 
 ## 9. Social and scheduling
 
