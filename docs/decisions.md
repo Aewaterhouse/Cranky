@@ -188,3 +188,17 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The map is Leaflet 1.9.4 (new dependency, BSD-2-Clause) with standard OpenStreetMap tiles and attribution. It is loaded lazily and only when the route has coordinates and the browser is online; any failure just hides the panel, so offline rides and tests never depend on it.
 - The player now also shows climbed / climb to go, ETA at the average speed so far (with a clock time), average power, NP and W/kg.
 - This item was finished from uncommitted work left when the PC was switched off mid-session. It passes type-check, lint, unit tests and build but nobody has looked at it in a browser yet.
+
+## 2026-11-13: workout builder
+- Builder opens as a full-screen overlay from the My workouts group in the solo picker (+ Build workout, and a pencil on built cards). Saved with the same `my-` ids and localStorage store as imports.
+- Plans keep an optional `edit` field (the builder blocks) so they can be edited again; imported workouts have none and are not editable.
+- Intervals block = on/off pair repeated, stored as a `set`. Cue and cadence apply to the on part.
+- Percentages are clamped to 20-150 (the ERG cap from config); sprints and free blocks carry no target; sprint time clamps to the config range.
+- IF is normalised power over FTP (sprint counted as 120
+## 2026-11-13: workout builder
+- Builder opens as a full-screen overlay from the My workouts group in the solo picker (+ Build workout, and a pencil on built cards). Saved with the same `my-` ids and localStorage store as imports.
+- Plans keep an optional `edit` field (the builder blocks) so they can be edited again; imported workouts have none and are not editable.
+- Intervals block = on/off pair repeated, stored as a `set`. Cue and cadence apply to the on part.
+- Percentages clamp to 20-150 (ERG cap from config); sprint and free blocks carry no target; sprint time clamps to the config range.
+- IF is normalised power over FTP (sprint counted as 120 per cent, free as 50); TSS = hours x IF squared x 100.
+- Preview uses the existing plan graph, not the player chart. Delete is the existing X on the card.

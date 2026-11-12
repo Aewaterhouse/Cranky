@@ -26,7 +26,7 @@
 - `physics.ts` free-ride speed from power, gradient and mass; `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
-- `plan.ts` plan parsing, flattening, frame lookup, session generator.
+- `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, session generator.
 - `profile.ts` local profile cache and server sync.
 - `ride.ts` per-ride recorder (JSON save and restore), summary, NP/IF/TSS; `snapshot.ts` crash-recovery snapshots in localStorage and the remembered bus code.
 
@@ -53,7 +53,7 @@
 - `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `svg.ts` SVG helpers.
 - `trainer.ts` trainer pill and connect modal.
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
-- `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.
+- `builder.ts` workout builder screen (`builder.css`); `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
@@ -61,7 +61,7 @@
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets
-- `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
+- `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `public/assets/CREDITS.md` asset credits.
 
 ## server/ (FastAPI, uv)

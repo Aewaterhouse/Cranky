@@ -5,6 +5,7 @@ import type { Block, Plan, Tier } from '../types'
 import { h } from './dom'
 import { DURATIONS, planFor } from './home'
 import { planGraph, zoneColour } from './planGraph'
+import { openBuilder } from './builder'
 import { toast } from './toast'
 
 export const isBusRun = (id: string) => id.startsWith('bus-')
@@ -196,6 +197,10 @@ export function planPicker(o: PickerOpts) {
       toast((e as Error).message, 'bad')
     }
   })
+  const built = (p: Plan) => {
+    fillMine()
+    pick(p.id, 0)
+  }
   const fillMine = () => {
     for (const id of [...cards.keys()].filter(isMine)) cards.delete(id)
     mineGrid.replaceChildren(
@@ -209,9 +214,21 @@ export function planPicker(o: PickerOpts) {
           if (plan === p.id) pick(ids[0], minutes)
           else paint()
         })
-        c.append(x)
+        const ed = h('span', { class: 'pp-del pp-edit', title: 'Edit', role: 'button' }, '✎')
+        ed.addEventListener('click', (e) => {
+          e.stopPropagation()
+          if (p.edit) openBuilder(p, built)
+          else toast('Only workouts from the builder can be edited', 'bad')
+        })
+        c.append(ed, x)
         return c
       }),
+      h(
+        'button',
+        { class: 'plan-card pp-import', onclick: () => openBuilder(null, built) },
+        h('b', {}, '+ Build workout'),
+        h('p', {}, 'drag and drop your own'),
+      ),
       h(
         'button',
         { class: 'plan-card pp-import', onclick: () => file.click() },
@@ -223,7 +240,7 @@ export function planPicker(o: PickerOpts) {
   const mine = h(
     'section',
     { class: 'pp-group' },
-    h('h3', { class: 'label' }, 'My workouts', h('small', {}, 'imported, solo only')),
+    h('h3', { class: 'label' }, 'My workouts', h('small', {}, 'built or imported, solo only')),
     mineGrid,
     file,
   )

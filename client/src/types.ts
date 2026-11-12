@@ -25,6 +25,22 @@ export interface Plan {
   /** Marks an FTP test: the player works out a new FTP at the end. */
   test?: 'ramp' | 'ftp20'
   blocks: Block[]
+  /** Workout builder source blocks, kept so the workout can be edited again. */
+  edit?: BuilderBlock[]
+}
+
+/** One block as the workout builder holds it. Percentages are of FTP. */
+export interface BuilderBlock {
+  kind: 'steady' | 'ramp' | 'intervals' | 'sprint' | 'free'
+  dur: number
+  pct?: number
+  /** Ramp end. */
+  pct2?: number
+  reps?: number
+  offDur?: number
+  offPct?: number
+  cad?: [number, number]
+  cue?: string
 }
 
 /** What the rider should be doing right now; produced locally (drill) or from a server tick. */
