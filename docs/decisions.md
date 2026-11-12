@@ -42,8 +42,17 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Cosmetics are bought with personal scrap in the garage. The bus shows the host's (driver's) paint and parts. Riders show their own hat and outfit.
 - Profile, scrap and owned items live in localStorage and sync to the server; the newer `updated` wins. It isn't cheat-proof, and it doesn't need to be.
 - Route vote at Servo Stop is not built.
+- Shop items are bought with a `buy` message at a Servo Stop: plating 40, repellent 60, sync 50 scrap.
 
 ## Tech
 - No asset packs yet. Everything is procedural Three.js primitives and WebAudio synth sounds, which sidesteps licence and style-mismatch issues for now.
 - Commits are per phase chunk rather than per checklist item, to keep momentum.
-- Profiles have no login: a UUID in localStorage is the identity. Clearing browser data makes a new rider.
+
+## Accounts, solo and UI
+- Accounts are name = password (case-insensitive) for six seeded friends (`SEED_USERS`). Passwords are hashed and tokens are random, but there is no rate limiting or signup. Friends only; the owner plans to host over Tailscale. The profile is still cached in localStorage and synced to the server.
+- The FTP suggestion only ever suggests an increase (95% of the 20 min best beats FTP by more than the threshold). A sub-maximal workout must never suggest lowering FTP.
+- The plan picker scales every card to the chosen length, so the graphs show what you will actually ride.
+- Solo is an ERG workout player with no 3D, and the bus game is crew-only. A crew of one still works as a solo bus.
+- Solo controls: pause drops ERG to 40% FTP; auto-pause after 3 s of zero power or cadence, resuming after 1.5 s of pedalling (never during sprints); intensity 50 to 150% in 1% steps scales ERG targets (still capped at 150% FTP). Load is shown as NP (30 s rolling, 4th-power mean), IF and TSS.
+- CSS is split per area: `style.css` (tokens), `ui.css` (shell, login, modal), `screens.css` (tabs), `setup.css` (picker, solo setup, lobby, rider stats), `solo.css`, `results.css`, and `hud*.css` (HUD, class prefixes keep it separate).
+- Icons are emoji for now (no icon assets to license).

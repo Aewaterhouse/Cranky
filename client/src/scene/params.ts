@@ -26,6 +26,7 @@ export const VIS = {
   camDist: 11.5,
   camLook: -8,
   camSide: 0,
+  viewShift: 0.14,
   fov: 54,
   fovKick: 0.35,
   fogNear: 25,

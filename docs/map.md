@@ -1,51 +1,63 @@
 # Code map
 
 ## Root
-- `PLAN.md` design and phases; `AGENTS.md` working rules; `README.md` setup; `Dockerfile`, `.dockerignore` production image (client build + server).
+- `PLAN.md` design and phases; `AGENTS.md` working rules; `README.md` setup; `Dockerfile` production image (client build + server).
 - `scripts/run.sh` build client and start server on :8000; `scripts/selfsigned.sh` self-signed certs for LAN HTTPS.
-- `docs/protocol.md` wire protocol; `docs/testing.md` manual test notes; `docs/map.md` this file.
+- `docs/protocol.md` wire protocol; `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/map.md` this file.
+- `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
-- `index.html` app entry; `spike.html` Phase 0 trainer check page; `vite.config.ts` proxy, `@content` alias, two entry pages.
-- `src/main.ts` app bootstrap, wires home actions to drill and crew.
-- `src/spike.ts` Phase 0 trainer test UI.
-- `src/config.ts` all client tunables (caps, bands, sprint grades, curve defaults).
+- `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
+- `src/main.ts` bootstrap: login, shell, wiring to solo and bus.
+- `src/spike.ts` trainer test UI.
+- `src/sceneDev.ts` scene harness params and keys (see README).
+- `src/config.ts` client tunables (caps, bands, sprint grades, curve defaults).
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.
-- `src/style.css` styles.
-- `src/core/compliance.ts` rolling average and band scoring.
-- `src/core/curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion.
-- `src/core/effects.ts` resistance modifier bus with caps.
-- `src/core/plan.ts` plan parsing, flattening, frame lookup, session generator.
-- `src/core/profile.ts` local profile storage and server sync.
-- `src/core/ride.ts` per-ride recorder and summary.
-- `src/modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
-- `src/modes/drill/drill.ts` solo drill mode.
-- `src/modes/zombieBus/crew.ts` multiplayer lobby and room flow.
-- `src/modes/zombieBus/zombieBus.ts` in-ride bus mode (server ticks to scene/HUD).
-- `src/net/protocol.ts` message types mirroring docs/protocol.md.
-- `src/net/wsClient.ts` WebSocket with auto reconnect.
-- `src/scene/world.ts` Three.js world, camera, road, debug panel.
-- `src/scene/bus.ts` procedural bus and riders.
-- `src/scene/horde.ts` instanced zombie crowd.
-- `src/scene/params.ts` tunable visual parameters and moods.
-- `src/trainer/ftms.ts` Web Bluetooth FTMS driver.
-- `src/trainer/ergController.ts` only module writing to the trainer; cap, smoothing, failsafe.
-- `src/trainer/simTrainer.ts` simulated trainer and keyboard bindings.
-- `src/ui/dom.ts` tiny DOM helpers; `home.ts` home screen and trainer connect; `hud.ts` ride HUD; `results.ts` end-of-ride summary; `audio.ts` WebAudio beeps.
-- `tests/compliance.test.ts`, `curve.test.ts`, `erg.test.ts`, `plan.test.ts` vitest unit tests.
+- `src/style.css` design tokens and base; `ui.css` shell, login, modal, toasts; `screens.css` tabs and trainer modal; `setup.css` plan picker, solo setup, lobby, rider stats; `solo.css` workout player; `results.css` results.
+- `src/hud.css` HUD base; `hudBus.css` bus status and roster; `hudPanels.css` stats, shop, feed; `hudSplash.css` splashes, responsive.
+
+### core/
+- `api.ts` fetch with the login token; token and session storage.
+- `compliance.ts` rolling average and band scoring.
+- `cosmetics.ts` catalogue and purchase logic.
+- `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
+- `effects.ts` resistance modifier bus with caps.
+- `plan.ts` plan parsing, flattening, frame lookup, session generator.
+- `profile.ts` local profile cache and server sync.
+- `ride.ts` per-ride recorder, summary, NP/IF/TSS.
+
+### modes/, net/, trainer/
+- `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
+- `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
+- `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
+- `net/protocol.ts` message types mirroring docs/protocol.md; `wsClient.ts` WebSocket with reconnect (token in URL).
+- `trainer/ftms.ts` Web Bluetooth FTMS driver; `ergController.ts` only module writing to the trainer; `simTrainer.ts` simulated trainer and keys.
+
+### scene/ (no UI, three.js)
+- `world.ts` scene owner, render loop, `SceneState`, fx entry; `debug.ts` debug panel; `params.ts` tunable visuals (`VIS`); `util.ts` clamp, lerp, smooth.
+- `camRig.ts` chase camera; `moods.ts` mood colour blending; `sky.ts` sky and sun.
+- `ground.ts` terrain and road; `props.ts` roadside props loop; `propGeo.ts` prop and vehicle geometry; `landmarks.ts` billboards and Servo station.
+- `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
+- `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier.
+- `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
+
+### ui/
+- `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
+- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` curve chart, zone bar, ride list.
+- `trainer.ts` trainer pill and connect modal.
+- `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
+- `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
+- `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
+- `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
+
+### tests/ and assets
+- `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `public/assets/CREDITS.md` asset credits.
 
 ## server/ (FastAPI, uv)
-- `src/zombie_bus_server/app.py` FastAPI app: REST, WebSocket, static client.
-- `config.py` all server tunables and env vars.
-- `protocol.py` message schemas.
-- `plan.py` plan loading, validation, targets, generator.
-- `session.py` rooms, lobby, server clock and broadcast.
-- `store.py` SQLite profiles and rides.
-- `modes/zombie_bus.py` bus, horde, events, awards rules.
-- `tests/conftest.py` fixtures; `test_plan.py` plans; `test_zombie_bus.py` mode rules; `test_multiplayer.py` 4-bot headless ride.
-
-## content/
-- `workouts/*.json` workout plans (sweet spot, threshold, over-under, ramp, Z2, VO2, sprints, bus-crew sessions).
-- `schema/workout.schema.json` plan JSON schema.
+- `src/zombie_bus_server/app.py` REST (login, riders, rooms, profile), WebSocket, static client.
+- `config.py` tunables, env vars, `SEED_USERS`; `protocol.py` message schemas; `plan.py` plan loading, targets, generator.
+- `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides.
+- `modes/zombie_bus.py` bus, horde, events, shop, awards rules.
+- `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_multiplayer.py` 4-bot headless ride.

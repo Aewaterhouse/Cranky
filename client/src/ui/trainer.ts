@@ -85,7 +85,13 @@ async function connectBt() {
     set(t)
     return true
   } catch (e) {
-    toast(`Could not connect: ${(e as Error).message}`, 'bad')
+    const msg = (e as Error).message
+    if (/globally disabled/i.test(msg))
+      toast(
+        'Bluetooth is switched off in this browser. In Brave: open brave://flags/#brave-web-bluetooth-api, set Enabled, relaunch. Or use Chrome or Edge.',
+        'bad',
+      )
+    else if (!/cancel/i.test(msg)) toast(`Could not connect: ${msg}`, 'bad')
     return false
   }
 }

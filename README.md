@@ -1,6 +1,6 @@
 # Zombie Bus
 
-A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a structured workout runner (drill mode). Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
+A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in from name tiles; the server seeds Alex, Luke, Steve, Angus, Ali and Jack, and the password is the name (case-insensitive). Security is deliberately light: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
 
 See `PLAN.md` for the design, `docs/protocol.md` for the wire protocol, `docs/map.md` for a file-by-file map and `docs/testing.md` for manual test notes.
 
@@ -18,15 +18,15 @@ Client (TypeScript, Vite, Three.js, pnpm):
 cd client && pnpm install && pnpm dev
 ```
 
-`pnpm dev` proxies `/api` and `/ws` to `localhost:8000`, so run the server too.
+`pnpm dev` proxies `/api` and `/ws` to `localhost:8000` (override with `ZB_API=http://host:port`), so run the server too.
 
 Production: `cd client && pnpm build`, then the server serves `client/dist` itself at `:8000`. `scripts/run.sh` does both (build, then start the server; extra args go to uvicorn).
 
 ## Tests
 
 ```sh
-cd client && pnpm test      # vitest: plan, compliance, curve, ERG caps
-cd server && uv run pytest  # includes the 4-bot headless multiplayer test
+cd client && pnpm test      # vitest: plan, compliance, curve, ERG caps, cosmetics, load (NP/IF/TSS)
+cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless multiplayer test
 ```
 
 ## Server environment variables
@@ -50,61 +50,50 @@ On the home screen pick the simulated trainer (no hardware needed). Keys:
 | `S` | sprint: 300% FTP |
 | `A` | ease: 60% FTP |
 
+## Solo workout player
+
+Pick a plan and length on the Ride tab, then the solo setup screen. Controls (buttons or keys):
+
+| Key | Effect |
+| --- | --- |
+| Space or `P` | pause or resume (ERG drops to 40% FTP while paused) |
+| `N` or Right | skip to the next interval (Right is left to the simulated trainer) |
+| `+` / `-` | intensity +/- 1% (50 to 150%, scales every ERG target) |
+| Esc | end the ride (asks first) |
+
+Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes after 1.5 s of pedalling. Sprints never auto-pause. The results screen shows NP, IF and TSS.
+
 ## URL params
 
 - `?debug` shows the visual debug panel (colours, fog, camera). The backtick key toggles it too.
-- `?fast=N` speeds up the drill clock by N for dev (drill mode only; use `ZB_TIME_SCALE` for multiplayer).
-- `?join=CODE` prefills the room code on the home screen.
+- `?fast=N` speeds up the solo clock by N for dev (use `ZB_TIME_SCALE` for multiplayer).
+- `?join=CODE` prefills the room code when joining a bus.
+
+## Scene dev harness
+
+`pnpm dev` only: open `/scene-dev.html` to look at the 3D scene without a server or trainer. Params: `mood=drill|longhaul|surge|roadblock|servo|finish`, `gap=0..120|none`, `armour=0..100|none`, `speed=m/s`, `roadblock=0..1`, `paint=paint-rust`, `bullbar=1`, `spikes=1`, `riders=1..6`, `debug=1`, `hud=0`, `vis.<name>=n` (any numeric visual tunable, e.g. `vis.camHeight=5`), `fx=hit|shake|slowmo|smash` with `fxAt=ms`. Keys: 1-6 mood, `[` `]` gap, `\` horde on/off, `-` `=` armour, `,` `.` speed, `r` roadblock, `h` `j` `k` `m` fx, `b` bull bar, `n` spikes, `p` paint, `g` debug panel.
 
 ## HTTPS (important)
 
-Web Bluetooth only works in a secure context: `https://` or `http://localhost`. If you open the game from another machine over plain http, the Connect button will not work. Options:
+Web Bluetooth only works in a secure context: `https://` or `http://localhost`. Options:
 
-### a) VPS behind an HTTPS reverse proxy
+### a) Tailscale (the plan)
 
-Point the proxy at port 8000. WebSocket upgrade must pass through for `/ws`.
+Host the server on a machine on the tailnet, then:
 
-Caddy (handles upgrades automatically):
-
-```
-zombie.example.com {
-    reverse_proxy localhost:8000
-}
+```sh
+tailscale serve --bg 8000
 ```
 
-nginx:
+That gives an HTTPS URL on the tailnet (`https://<machine>.<tailnet>.ts.net`), which satisfies the secure-context requirement. Friends join the tailnet and open that URL. WebSockets pass through.
 
-```nginx
-location / {
-    proxy_pass http://127.0.0.1:8000;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-Proto $scheme;
-}
-location /ws {
-    proxy_pass http://127.0.0.1:8000;
-    proxy_http_version 1.1;
-    proxy_set_header Upgrade $http_upgrade;
-    proxy_set_header Connection "upgrade";
-    proxy_set_header Host $host;
-    proxy_read_timeout 3600s;
-}
-```
+### b) Reverse proxy or Railway
 
-### b) Railway
-
-Deploy from this repo; Railway uses the `Dockerfile` and gives you HTTPS. Add a volume mounted at `/data` if you want profiles to survive redeploys.
+Point an HTTPS proxy (Caddy: `reverse_proxy localhost:8000`) at port 8000, passing WebSocket upgrades on `/ws`. Or deploy this repo to Railway (uses the `Dockerfile`; add a volume at `/data`).
 
 ### c) LAN testing
 
-Either generate a self-signed cert and serve HTTPS directly:
-
-```sh
-scripts/selfsigned.sh   # writes certs/key.pem and certs/cert.pem (localhost + LAN IP), prints the command
-cd server && uv run uvicorn zombie_bus_server.app:app --host 0.0.0.0 --port 8443 \
-  --ssl-keyfile ../certs/key.pem --ssl-certfile ../certs/cert.pem
-```
-
-then accept the certificate warning on each device; or in Chrome open `chrome://flags/#unsafely-treat-insecure-origin-as-secure`, add `http://<lan-ip>:8000`, enable and relaunch.
+`scripts/selfsigned.sh` writes `certs/key.pem` and `certs/cert.pem` and prints the uvicorn `--ssl-keyfile/--ssl-certfile` command (port 8443); accept the warning on each device. Or in Chrome set `chrome://flags/#unsafely-treat-insecure-origin-as-secure` for `http://<lan-ip>:8000`.
 
 ## Browsers and hardware
 

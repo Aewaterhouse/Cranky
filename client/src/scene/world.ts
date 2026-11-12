@@ -133,6 +133,8 @@ export class World {
     const { clientWidth: w, clientHeight: h } = this.host
     this.renderer.setSize(w, h)
     this.camera.aspect = w / Math.max(1, h)
+    // Shift the picture up so the bus and horde clear the HUD cockpit at the bottom.
+    this.camera.setViewOffset(w, h, 0, h * VIS.viewShift, w, h)
     this.camera.updateProjectionMatrix()
   }
 

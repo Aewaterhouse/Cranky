@@ -1,14 +1,16 @@
 # Manual testing
 
+Log in first: tap your name tile and type your name as the password (Alex, Luke, Steve, Angus, Ali, Jack; case-insensitive). The app has Ride, Garage and Rider tabs; connect a trainer (or the simulated one) from the trainer pill at the top.
+
 Headless first (no hardware):
 
 ```sh
-cd client && pnpm test       # plan parsing, compliance, ERG caps, curve
-cd server && uv run pytest   # plan, Zombie Bus rules, 4-bot headless multiplayer
+cd client && pnpm test       # plan parsing, compliance, ERG caps, curve, cosmetics, load
+cd server && uv run pytest   # plan, accounts, Zombie Bus rules, 4-bot headless multiplayer
 cd client && pnpm build      # type check + build
 ```
 
-Use `?debug` for the visual panel and `?fast=N` (drill) or `ZB_TIME_SCALE` (server) to skip time. Needs https or localhost for Bluetooth; see README.
+Use `?debug` for the visual panel, `/scene-dev.html` (dev server) to inspect the scene, and `?fast=N` (solo) or `ZB_TIME_SCALE` (server) to skip time. Needs https or localhost for Bluetooth; see README.
 
 ## Phase 0: trainer spike (`/spike.html`)
 
@@ -27,20 +29,21 @@ Close MyWhoosh/Wahoo apps first.
 |  | iPad | Bluefy |  |  |  |  |  |  |  |
 |  |  |  |  |  |  |  |  |  |  |
 
-## Phase 1: solo drill, real trainer
+## Phase 1: solo workout, real trainer
 
-1. Set your FTP, pick `ss-2x15` (2x15 sweet spot) and start.
-2. Run start to finish. Each block's target watts match FTP x tier x block % (check the HUD against the trainer's display).
+1. Ride tab, Solo: pick `ss-2x15` and a length in the plan picker (every card scales to it), check the setup screen, set your FTP and start.
+2. Run start to finish. Each interval's target watts match FTP x tier x block % x intensity (check the HUD against the trainer's display).
 3. Targets change smoothly on block boundaries; ERG never exceeds 150% FTP.
-4. Sprint blocks: ERG is off, you control power, and a grade (FAIL/HIT/GREAT/MEGA) shows afterwards.
-5. Results screen shows distance/compliance/time in zone; profile (curve, ride count) updates after a reload.
-6. Pause/abort mid-ride: trainer releases and ERG eases to 50% FTP.
+4. Controls: Space pauses (ERG eases to 40% FTP), N skips, +/- change intensity, Esc asks to end. Stop pedalling for 3 s and it auto-pauses; resume pedalling and it carries on.
+5. Sprint blocks: ERG is off, you control power, and a grade (FAIL/HIT/GREAT/MEGA/LEGEND) shows afterwards. No auto-pause during a sprint.
+6. Results screen shows NP, IF, TSS, time in zone and compliance. The FTP suggestion only ever goes up. The Rider tab (curve, ride count) updates.
+7. End mid-ride: trainer releases and ERG eases to 50% FTP.
 
 ## Phase 2: multiplayer
 
-1. 4 riders, mixed devices (Mac, Windows, simulated, iPad display), one 45 min plan (`bus-crew-45`). Host creates, others join with the code or `?join=CODE`.
+1. 4 riders logged in as different names, mixed devices (Mac, Windows, simulated, iPad display), one 45 min plan (`bus-crew-45`). Host starts a bus from Ride; the others pick it from the open-bus list in Ride (or use the code or `?join=CODE`). Also check a bus of one rider.
 2. Lobby shows everyone, tiers and ready state; countdown starts together; all see the same event at the same time.
-3. Reconnect: close a rider's tab mid-ride and reopen it within 60 s in the same browser. It should rejoin the same seat (and ERG resume). After 60 s the rider is a spectator.
+3. Reconnect: close a rider's tab mid-ride and reopen it (logging in again if needed). It should rejoin the same seat (and ERG resume). While away the rider is a spectator.
 4. Host disconnect and room idle expiry behave sensibly.
 5. Note lag, desync or crashes below.
 
@@ -51,6 +54,7 @@ Close MyWhoosh/Wahoo apps first.
 - Horde surge: unders let zombies grab, clean overs shake them off.
 - Engine in tune: all riders within 5 rpm of each other for 8 s gives the x1.25 speed bonus and indicator.
 - Long haul: staying out of zone lets the horde close in; armour at zero means limp.
+- Servo Stop: the shop appears in the HUD; buy plating, repellent and sync with the tin's scrap and check the bus numbers change.
 - Awards at the end: Iron Lungs, Fell Off King, Roadblock MVP, Sync Master, PR Hunter.
 
 ## Results log
