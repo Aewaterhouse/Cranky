@@ -3,13 +3,16 @@ import { api } from '../core/api'
 import { generate, parsePlan } from '../core/plan'
 import { clearSnap, loadSnap, rememberedBus, soloKey, type SoloSnap } from '../core/snapshot'
 import type { Profile } from '../core/curve'
+import type { Route } from '../core/route'
 import type { Plan } from '../types'
 import { avatar, fmt, h } from './dom'
+import { freeRideSetup } from './freeRideSetup'
 import { soloSetup } from './solo'
 import { needTrainer } from './trainer'
 
 export interface HomeActions {
   drill(plan: Plan): void
+  freeRide(route: Route): void
   resume(snap: SoloSnap): void
   create(): void
   join(code: string): void
@@ -201,6 +204,22 @@ export function rideTab(p: Profile, act: HomeActions) {
         {},
         h('b', {}, 'Solo workout'),
         h('small', {}, 'Ride a workout on your own, no bus.'),
+      ),
+      h('span', { class: 'arrow' }, '→'),
+    ),
+    h(
+      'button',
+      {
+        class: 'solo',
+        onclick: () =>
+          wrap.replaceChildren(freeRideSetup(p, act, () => wrap.replaceChildren(main))),
+      },
+      h('span', { class: 'big-emoji' }, '🏔️'),
+      h(
+        'span',
+        {},
+        h('b', {}, 'Free ride'),
+        h('small', {}, 'Ride a real route. No ERG, the trainer follows the road.'),
       ),
       h('span', { class: 'arrow' }, '→'),
     ),

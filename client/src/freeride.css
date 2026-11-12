@@ -1,0 +1,98 @@
+/* Free ride player and setup */
+.fr {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100vh;
+  padding: 12px 16px 14px;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+.fr kbd {
+  font: 700 0.7em var(--ui);
+  padding: 1px 6px;
+  margin-left: 4px;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  color: var(--dim);
+}
+.fr .solo-head .ctl {
+  display: flex;
+  gap: 8px;
+}
+.fr .solo-head button {
+  padding: 9px 14px;
+  min-width: 96px;
+}
+.fr button.danger {
+  color: var(--bad);
+  border-color: color-mix(in srgb, var(--bad) 45%, var(--line));
+}
+.fr .diff {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fr .diff input {
+  width: 160px;
+  accent-color: var(--acc);
+}
+.fr .diff .pct {
+  min-width: 52px;
+  font: 400 1.25rem var(--display);
+  color: var(--acc);
+}
+.fr-main {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.frrow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.fr-bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.fr-bar i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+}
+.fr .overlay {
+  border-radius: var(--r);
+}
+
+.route-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.route-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+.route-card.on {
+  border-color: var(--acc);
+}
+.route-card .del {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 4px 10px;
+}

@@ -42,6 +42,9 @@ export class RideRecorder {
   hr: (number | null)[] = []
   private rows: { i: number; p: number; tgt: number | null; c: number | null; band: boolean }[] = []
   sprints: SprintResult[] = []
+  /** Free ride only: metres ridden and metres climbed. */
+  distance?: number
+  ascent?: number
   startedAt = new Date().toISOString()
   constructor(
     public plan: Plan,
@@ -129,6 +132,8 @@ export class RideRecorder {
       hr: [...this.hr],
       avgHr: hrs.length ? Math.round(mean(hrs)) : null,
       maxHr: hrs.length ? Math.max(...hrs) : null,
+      distance: this.distance,
+      ascent: this.ascent,
     }
   }
 }

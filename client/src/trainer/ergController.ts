@@ -43,10 +43,10 @@ export class ErgController {
     this.manual = { kind: 'res', v: Math.min(100, Math.max(0, Math.round(pct))) }
   }
 
-  /** ERG off: simulated gradient in %, within the configured range. */
-  setGrade(pct: number) {
-    const [lo, hi] = CFG.ride.grade
-    this.manual = { kind: 'slope', v: Math.min(hi, Math.max(lo, Math.round(pct))) }
+  /** ERG off: simulated gradient in % (to 0.1), within `range` (the solo slope mode's by default). */
+  setGrade(pct: number, range: readonly number[] = CFG.ride.grade) {
+    const [lo, hi] = range
+    this.manual = { kind: 'slope', v: Math.min(hi, Math.max(lo, Math.round(pct * 10) / 10)) }
   }
 
   /** Back to ERG: control is re-requested and the current target written again. */
