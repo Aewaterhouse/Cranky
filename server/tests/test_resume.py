@@ -29,7 +29,7 @@ async def ride(room, ws, rid, secs):
     end = room.el + secs
     while room.el < end and room.state == "running":
         for r in room.riders.values():
-            if r.connected:
+            if r.connected and not r.bot:
                 await room.handle(r.id, ws, {"t": "data", "p": 250, "w": 250, "cad": 90, "s": 0.95})
         await asyncio.sleep(0.01)
 

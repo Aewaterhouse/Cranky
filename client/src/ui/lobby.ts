@@ -15,6 +15,7 @@ export interface LobbyCtx {
   status: HTMLElement
   setup(plan: string, minutes: number): void
   tier(t: Tier): void
+  bots(n: number): void
   start(): void
   leave(): void
 }
@@ -39,6 +40,24 @@ export function lobbyView(c: LobbyCtx) {
     (t) => c.tier(t),
   )
   const tierNote = h('p', { class: 'dim' })
+  const botN = h('b', {}, '0')
+  const botBtn = (d: number, label: string) =>
+    h(
+      'button',
+      { class: 'ghost', 'aria-label': `${label} bot`, onclick: () => c.bots(bots + d) },
+      d < 0 ? '−' : '+',
+    )
+  const botLess = botBtn(-1, 'Fewer')
+  const botMore = botBtn(1, 'More')
+  const botRow = h(
+    'div',
+    { class: 'bot-row', hidden: true },
+    h('span', {}, '🤖 Bots'),
+    botLess,
+    botN,
+    botMore,
+  )
+  let bots = 0
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -58,6 +77,7 @@ export function lobbyView(c: LobbyCtx) {
           h('b', {}, r.name),
           h('span', { class: `tier-badge ${r.tier}` }, r.tier),
           h('small', {}, `${r.ftp} W`),
+          r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
           r.id === host ? h('span', { class: 'driver' }, 'Driver') : '',
         )
       : h(
@@ -74,6 +94,11 @@ export function lobbyView(c: LobbyCtx) {
     const tier = mine?.tier ?? me.tier
     const driver = l.riders.find((r) => r.id === l.host)?.name ?? 'the driver'
 
+    bots = l.riders.filter((r) => r.bot).length
+    botN.textContent = String(bots)
+    botRow.hidden = !isHost
+    botLess.disabled = bots === 0
+    botMore.disabled = l.riders.length >= SEATS
     seats.replaceChildren(...Array.from({ length: SEATS }, (_, i) => seat(l.riders[i], l.host)))
     link = `${location.origin}/?join=${l.code}`
     if (code.dataset.code !== l.code) {
@@ -141,6 +166,7 @@ export function lobbyView(c: LobbyCtx) {
           { class: 'bus' },
           h('div', { class: 'bus-roof' }, h('span', {}, 'ZOMBIE BUS')),
           seats,
+          botRow,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
         h(

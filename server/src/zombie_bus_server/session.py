@@ -9,10 +9,11 @@ from typing import TYPE_CHECKING
 
 from fastapi import WebSocket
 
+from . import bots
 from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
-from .protocol import Buy, ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
+from .protocol import Bots, Buy, ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
 
 if TYPE_CHECKING:
     from .store import Store
@@ -49,9 +50,12 @@ class Rider:
     sync_n: int = 0
     sprints: list[str] = field(default_factory=list)
     look: dict[str, str] = field(default_factory=dict)
+    bot: bool = False
 
     def reset_stats(self) -> None:
-        fresh = Rider(self.id, self.name, self.ftp, self.tier, self.ws, self.connected, look=self.look)
+        fresh = Rider(
+            self.id, self.name, self.ftp, self.tier, self.ws, self.connected, look=self.look, bot=self.bot
+        )
         self.__dict__.update(
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}
         )
@@ -77,6 +81,7 @@ class Room:
         self.store = store
         self.paused = False  # a restored running room waits for its first rider
         self.saved_at = 0.0
+        self.brains: dict[str, bots.Brain] = {}
         self.riders: dict[str, Rider] = {}
         self.host: str | None = None
         self.state = "lobby"
@@ -126,6 +131,8 @@ class Room:
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.mode = ZombieBus.from_dict(d["mode"])
         room.paused = room.state == "running"
+        for r in room.riders.values():
+            r.connected = r.bot
         return room
 
     def save(self) -> None:
@@ -154,10 +161,14 @@ class Room:
                     "ftp": r.ftp,
                     "connected": r.connected,
                     "look": r.look,
+                    "bot": r.bot,
                 }
                 for r in self.riders.values()
             ],
         }
+
+    def humans(self) -> list[Rider]:
+        return [r for r in self.riders.values() if not r.bot]
 
     async def connect(self, rid: str, ws: WebSocket) -> None:
         r = self.riders.get(rid)
@@ -169,8 +180,8 @@ class Room:
         if r and r.ws is ws:
             r.connected = False
             if self.host == rid:
-                self.host = next((x.id for x in self.riders.values() if x.connected), rid)
-            if not any(x.connected for x in self.riders.values()):
+                self.host = next((x.id for x in self.humans() if x.connected), rid)
+            if not any(x.connected for x in self.humans()):
                 self.idle_since = time.monotonic()
             await self.lobby()
 
@@ -183,12 +194,14 @@ class Room:
                 r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
                 if self.state != "running":
                     r.tier = msg.tier
-            elif len(self.riders) >= C.MAX_RIDERS:
+            elif len(self.humans()) >= C.MAX_RIDERS:
                 await ws.send_json(
                     {"t": "error", "msg": f"Bus full ({C.MAX_RIDERS} seats). Catch the next one."}
                 )
                 return
             else:
+                if len(self.riders) >= C.MAX_RIDERS:  # a bot gives up its seat
+                    bots.set_bots(self, len(self.riders) - len(self.humans()) - 1)
                 r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
             r.ws, r.connected, r.last_data = ws, True, time.monotonic()
             if self.paused:
@@ -219,6 +232,9 @@ class Room:
                 return
             self.plan_id, self.minutes, self.state = msg.plan, msg.minutes, "lobby"
             self.plan = generate(load_plans()[msg.plan], msg.minutes)
+            await self.lobby()
+        elif isinstance(msg, Bots) and self.state == "lobby":
+            bots.set_bots(self, msg.n)
             await self.lobby()
         elif isinstance(msg, Start) and self.state != "running":
             self.start()
@@ -263,6 +279,7 @@ class Room:
         loc = locate(blocks, self.el) if self.el >= 0 else None
         i, bel = loc if loc else (-1, 0.0)
         ev = event_for(blocks, i) if i >= 0 else "warmup"
+        bots.drive(self, dt, i, bel)
         self.update_states(dt)
         fx = self.mode.tick(self, dt, i, bel, ev) if i >= 0 else []
         riders = {

@@ -22,6 +22,11 @@ class Setup(BaseModel):
     minutes: int = Field(ge=0, le=120)
 
 
+class Bots(BaseModel):
+    t: Literal["bots"]
+    n: int = Field(ge=0, le=5)
+
+
 class Start(BaseModel):
     t: Literal["start"]
 
@@ -59,7 +64,7 @@ class Buy(BaseModel):
 
 
 ClientMsg = TypeAdapter(
-    Annotated[Join | Setup | Start | End | TierMsg | Data | Sprint | Buy, Field(discriminator="t")]
+    Annotated[Join | Setup | Bots | Start | End | TierMsg | Data | Sprint | Buy, Field(discriminator="t")]
 )
 
 

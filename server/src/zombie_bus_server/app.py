@@ -138,7 +138,7 @@ def plans() -> list[dict]:
 def create_room(u: User) -> dict:
     now = time.monotonic()
     for code, r in list(rooms.items()):
-        idle = not any(x.connected for x in r.riders.values()) and now - r.idle_since > config.ROOM_IDLE_S
+        idle = not any(x.connected for x in r.humans()) and now - r.idle_since > config.ROOM_IDLE_S
         if (r.state != "running" or r.paused) and idle:
             del rooms[code]
             store.delete_room(code)
@@ -158,10 +158,10 @@ def list_rooms(u: User) -> list[dict]:
             "state": r.state,
             "plan": r.plan["name"],
             "host": r.riders[r.host].name if r.host else None,
-            "riders": [x.name for x in r.riders.values() if x.connected],
+            "riders": [x.name for x in r.humans() if x.connected],
         }
         for r in rooms.values()
-        if any(x.connected for x in r.riders.values())
+        if any(x.connected for x in r.humans())
     ]
 
 
