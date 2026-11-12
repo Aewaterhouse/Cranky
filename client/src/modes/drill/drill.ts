@@ -1,3 +1,4 @@
+import { loadGhost } from './ghost'
 import '../../solo.css'
 import type { Profile } from '../../core/curve'
 import { recordFtp } from '../../core/curve'
@@ -84,6 +85,7 @@ export function runDrill(
     },
     profile.maxHr,
   )
+  if (!plan.test) void loadGhost(plan.name).then((g) => view.setGhost(g))
   show(view.root)
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 

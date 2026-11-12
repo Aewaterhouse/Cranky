@@ -10,6 +10,8 @@ export interface ChartData {
   cadence?: number[]
   hr?: (number | null)[]
   showHr?: boolean
+  /** Per-second power of an earlier attempt, drawn faintly behind this ride. */
+  ghost?: number[] | null
   /** Now-cursor in plan seconds; omit for a finished ride. */
   now?: number
   showCadence?: boolean
@@ -185,6 +187,24 @@ function paint(
     run.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py)))
   }
   const smooth = Math.max(1, Math.min(15, Math.round(((v1 - v0) / (R - L)) * 1.5)))
+  if (d.ghost?.length) {
+    const step = Math.max(1, smooth)
+    ctx.beginPath()
+    let started = false
+    for (let i = 0; i < d.ghost.length; i += step) {
+      if (i < v0 - 5 || i > v1 + 5) continue
+      const win = d.ghost.slice(Math.max(0, i - step + 1), i + 1)
+      const py = y(win.reduce((a, b) => a + b, 0) / win.length)
+      if (started) ctx.lineTo(x(i), py)
+      else ctx.moveTo(x(i), py)
+      started = true
+    }
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = 'rgba(120, 200, 255, 0.6)'
+    ctx.setLineDash([5, 4])
+    ctx.stroke()
+    ctx.setLineDash([])
+  }
   const power = runs(d.power, y, smooth)
   const g = ctx.createLinearGradient(0, T, 0, B)
   g.addColorStop(0, 'rgba(255,255,255,0.26)')

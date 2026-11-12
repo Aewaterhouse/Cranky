@@ -80,7 +80,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Coach text cues | Timed on-screen messages inside workouts | S |
 | ✅ Resistance and slope modes | Ride without ERG at a fixed resistance or gradient | S |
 | ✅ Cadence targets | Optional cadence band per interval, scored like power | S |
-| Ghost of last attempt | Overlay your previous trace on the same workout | M |
+| ✅ Ghost of last attempt | Your previous solo attempt at the same workout is drawn as a dashed line behind the live trace. Built and type-checked, but not yet seen with a real earlier ride | M |
 | ✅ Extend cool-down / add time | One-tap "+5 min" at the end | S |
 | ✅ Media corner | Space for a video or music player beside the chart | S |
 

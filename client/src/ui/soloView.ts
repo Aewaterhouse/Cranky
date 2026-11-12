@@ -84,6 +84,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   const zoom = workoutChart(ftp, 60)
   let showCad = false
   let showHr = false
+  let ghost: number[] | null = null
   const toggle = (label: string, on: (v: boolean) => void) => {
     let v = false
     const b = h(
@@ -239,6 +240,12 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         ),
       )
     },
+    /** Shows an earlier attempt behind the live trace. */
+    setGhost(g: number[] | null) {
+      ghost = g
+      if (g)
+        media.button.before(h('span', { class: 'dim ghost-note' }, 'Dashed blue: last attempt'))
+    },
     frame(s: ViewState) {
       const { f, live } = s
       acts.set(s.actions)
@@ -297,6 +304,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         now: f.el,
         showCadence: showCad,
         showHr,
+        ghost,
       }
       main.set(data)
       zoom.set(data)
