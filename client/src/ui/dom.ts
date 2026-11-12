@@ -39,3 +39,27 @@ export function avatar(name: string, size = '') {
     name.slice(0, 2).toUpperCase(),
   )
 }
+
+/** Segmented radio control. `set(v)` updates the highlight without firing `on`. */
+export function seg<T extends string>(
+  opts: [T, string | Node][],
+  value: T,
+  on: (v: T) => void,
+  cls = '',
+) {
+  const el = h(
+    'div',
+    { class: `seg ${cls}`, role: 'radiogroup' },
+    ...opts.map(([v, label]) =>
+      h('button', { role: 'radio', 'data-v': v, onclick: () => (set(v), on(v)) }, label),
+    ),
+  )
+  const set = (v: T) =>
+    el.querySelectorAll('button').forEach((b) => {
+      const o = b.dataset.v === v
+      b.classList.toggle('on', o)
+      b.setAttribute('aria-checked', String(o))
+    })
+  set(value)
+  return Object.assign(el, { set })
+}

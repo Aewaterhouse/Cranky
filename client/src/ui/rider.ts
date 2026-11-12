@@ -2,7 +2,8 @@ import { CFG } from '../config'
 import { curves, ftpSuggestion, type Point, type Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import { TIERS, type Tier } from '../types'
-import { h } from './dom'
+import { avatar, h, seg } from './dom'
+import { curveChart, dur, history, zoneBar } from './riderStats'
 import { setSimFtp } from './trainer'
 
 const TIER_HELP: Record<Tier, string> = {
@@ -10,7 +11,6 @@ const TIER_HELP: Record<Tier, string> = {
   medium: `Targets at ${CFG.tierFactor.medium * 100}%. Still a proper workout.`,
   easy: `Targets at ${CFG.tierFactor.easy * 100}%. Recovery day or new to the bike.`,
 }
-const dur = (s: number) => (s < 60 ? `${s} s` : `${s / 60} min`)
 const cell = (p: Point) =>
   h(
     'td',
@@ -52,25 +52,12 @@ export function riderTab(p: Profile) {
   ftp.addEventListener('change', setFtp)
   suggest()
   const help = h('p', { class: 'dim' })
-  const seg = h('div', { class: 'seg', role: 'radiogroup' })
-  const tiers = () => {
-    help.textContent = TIER_HELP[p.tier]
-    seg.replaceChildren(
-      ...TIERS.map((t) =>
-        h(
-          'button',
-          {
-            role: 'radio',
-            'aria-checked': String(t === p.tier),
-            class: t === p.tier ? 'on' : '',
-            onclick: () => ((p.tier = t), save(), tiers()),
-          },
-          t[0].toUpperCase() + t.slice(1),
-        ),
-      ),
-    )
-  }
-  tiers()
+  const tiers = seg(
+    TIERS.map((t) => [t, t[0].toUpperCase() + t.slice(1)]),
+    p.tier,
+    (t) => ((p.tier = t), save(), (help.textContent = TIER_HELP[t])),
+  )
+  help.textContent = TIER_HELP[p.tier]
   const s = p.stats
   const stat = (v: string | number, l: string) =>
     h('div', { class: 'stat' }, h('b', {}, String(v)), h('span', {}, l))
@@ -78,7 +65,25 @@ export function riderTab(p: Profile) {
   return h(
     'div',
     { class: 'rider' },
-    h('h1', {}, p.name),
+    h(
+      'header',
+      { class: 'rider-head' },
+      avatar(p.name, 'xl'),
+      h(
+        'div',
+        {},
+        h('h1', {}, p.name),
+        h('p', { class: 'dim' }, `FTP ${p.ftp} W · ${p.tier} tier`),
+      ),
+    ),
+    h(
+      'section',
+      { class: 'panel stats' },
+      stat(s.rides, 'rides'),
+      stat(Math.round(s.secs / 360) / 10, 'hours'),
+      stat(s.kj.toLocaleString('en-AU'), 'kJ'),
+      stat(s.streak, s.streak === 1 ? 'week streak' : 'weeks streak'),
+    ),
     h(
       'div',
       { class: 'cols' },
@@ -93,20 +98,27 @@ export function riderTab(p: Profile) {
           h('p', { class: 'dim' }, 'Every target is a percentage of this. Too hard? Lower it.'),
           tip,
         ),
-        h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Default tier'), seg, help),
+        h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Default tier'), tiers, help),
         h(
           'section',
-          { class: 'panel stats' },
-          stat(s.rides, 'rides'),
-          stat(Math.round(s.secs / 360) / 10, 'hours'),
-          stat(s.kj.toLocaleString('en-AU'), 'kJ'),
-          stat(s.streak, s.streak === 1 ? 'week streak' : 'weeks streak'),
+          { class: 'panel' },
+          h('h2', { class: 'label' }, 'Time in zone'),
+          zoneBar(s.zones),
         ),
       ),
       h(
         'section',
         { class: 'panel' },
         h('h2', { class: 'label' }, 'Power curve'),
+        curveChart(c.allTime, c.d90),
+        h(
+          'p',
+          { class: 'dim legend' },
+          h('i', { class: 'key all' }),
+          'All time ',
+          h('i', { class: 'key d90' }),
+          'Last 90 days',
+        ),
         h(
           'table',
           { class: 'curve' },
@@ -133,5 +145,6 @@ export function riderTab(p: Profile) {
         ),
       ),
     ),
+    h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Recent rides'), history(p)),
   )
 }

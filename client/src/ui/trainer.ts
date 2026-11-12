@@ -49,6 +49,26 @@ export function trainerPill() {
   })
 }
 
+/** Lobby readiness row: green with a live reading, or a warning with a way to fix it. */
+export function trainerCheck() {
+  const el = h('div', { class: 'tcheck' })
+  return live(el, () => {
+    el.classList.toggle('ok', !!trainer)
+    el.replaceChildren(
+      h('i', { class: `dot${trainer ? ' on' : ''}` }),
+      trainer
+        ? h('span', {}, h('b', {}, trainer.name), h('small', {}, reading()))
+        : h(
+            'span',
+            {},
+            h('b', {}, 'No trainer connected'),
+            h('small', {}, 'You will not be able to ride.'),
+          ),
+      h('button', { onclick: () => openTrainer() }, trainer ? 'Change' : 'Connect'),
+    )
+  })
+}
+
 async function connectBt() {
   if (!navigator.bluetooth) {
     toast('Web Bluetooth needs Chrome or Edge over HTTPS (or localhost).', 'bad')

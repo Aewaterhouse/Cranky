@@ -1,0 +1,143 @@
+import { PLANS } from '../content'
+import { blockTarget, parsePlan, planTotal } from '../core/plan'
+import type { Block, Plan, Tier } from '../types'
+import { h } from './dom'
+import { DURATIONS, planFor } from './home'
+import { planGraph, zoneColour } from './planGraph'
+
+export const isBusRun = (id: string) => id.startsWith('bus-')
+const mid = (b: Block, tier: Tier = 'hard') => blockTarget(b, tier, b.dur / 2)
+export const minsLabel = (blocks: Block[]) => `${Math.round(planTotal(blocks) / 60)} min`
+
+/** Small badges derived from the blocks: intensity first, then what is in the plan. */
+export function planTags(p: Plan): { t: string; c?: string }[] {
+  const bl = p.blocks
+  const work = bl.filter((b) => mid(b) != null)
+  const wsum = work.reduce((s, b) => s + b.dur, 0) || 1
+  const avg = work.reduce((s, b) => s + mid(b)! * b.dur, 0) / wsum
+  // Fourth-power mean (like normalised power) so hard efforts count for more than easy time.
+  const np = (work.reduce((s, b) => s + mid(b)! ** 4 * b.dur, 0) / wsum) ** 0.25
+  const score = np + (bl.filter((b) => b.type === 'sprint').length >= 5 ? 0.1 : 0)
+  const level = score < 0.7 ? 'Easy' : score < 0.85 ? 'Moderate' : score < 0.95 ? 'Hard' : 'Brutal'
+  const tags: { t: string; c?: string }[] = [{ t: level, c: zoneColour(score + 0.05) }]
+  const rb = bl.filter((b) => b.type === 'sprint').length
+  if (rb) tags.push({ t: `${rb} roadblock${rb > 1 ? 's' : ''}` })
+  const has = (lo: number, hi: number, dur: number) =>
+    bl.some((b) => {
+      const m = mid(b)
+      return b.type !== 'over-under' && b.dur >= dur && m != null && m >= lo && m < hi
+    })
+  if (bl.some((b) => b.type === 'over-under')) tags.push({ t: 'over-unders' })
+  if (has(0.84, 0.97, 300)) tags.push({ t: 'sweet spot' })
+  if (has(0.97, 1.1, 180)) tags.push({ t: 'threshold' })
+  if (has(1.1, 9, 60)) tags.push({ t: 'VO2' })
+  if (has(0.75, 0.84, 300)) tags.push({ t: 'tempo' })
+  if (avg < 0.7) tags.push({ t: 'endurance' })
+  if (bl.some((b) => b.type === 'free')) tags.push({ t: 'servo stop' })
+  return tags
+}
+
+export const tagEls = (p: Plan) =>
+  planTags(p).map((x, i) =>
+    h('span', { class: `tag${i ? '' : ' lvl'}`, style: x.c ? `--c:${x.c}` : undefined }, x.t),
+  )
+
+/** Watts for the plan's biggest block, e.g. "228–252 W". */
+export function mainWatts(p: Plan, tier: Tier, ftp: number) {
+  const long = p.blocks.filter((b) => mid(b) != null && b.dur >= 180)
+  const b = long.sort((x, y) => mid(y)! * y.dur - mid(x)! * x.dur)[0]
+  if (!b) return '–'
+  const at = b.type === 'ramp' ? [0, b.dur] : b.type === 'over-under' ? [0, b.step!] : [0]
+  const w = at.map((s) => Math.round(blockTarget(b, tier, s)! * ftp))
+  return w[1] && w[1] !== w[0] ? `${Math.min(...w)}–${Math.max(...w)} W` : `${w[0]} W`
+}
+
+export interface PickerOpts {
+  plan: string
+  minutes: number
+  /** Which group sits on top. */
+  first?: 'bus' | 'workout'
+  onChange(plan: string, minutes: number): void
+}
+
+/** Plan cards in two groups plus length chips. `set()` moves the selection without firing `onChange`. */
+export function planPicker(o: PickerOpts) {
+  let { plan, minutes } = o
+  const cards = new Map<string, { el: HTMLElement; gfx: HTMLElement; dur: HTMLElement }>()
+  const card = (id: string) => {
+    const raw = parsePlan(PLANS.find((p) => p.id === id))
+    const gfx = h('div', { class: 'pg' })
+    const dur = h('span', { class: 'dur' })
+    const el = h(
+      'button',
+      { class: 'plan-card', 'aria-pressed': 'false', onclick: () => pick(id, minutes) },
+      gfx,
+      h('div', { class: 'ttl' }, h('b', {}, raw.name), dur),
+      h('p', {}, raw.desc ?? ''),
+      h('div', { class: 'tags' }, ...tagEls(raw)),
+      h('span', { class: 'tick' }, '✓'),
+    )
+    cards.set(id, { el, gfx, dur })
+    return el
+  }
+  const paint = () => {
+    for (const [id, c] of cards) {
+      const on = id === plan
+      c.el.classList.toggle('on', on)
+      c.el.setAttribute('aria-pressed', String(on))
+      const p = planFor(id, on ? minutes : 0)
+      c.gfx.replaceChildren(planGraph(p.blocks))
+      c.dur.textContent = minsLabel(p.blocks)
+    }
+    chips.querySelectorAll('button').forEach((b) => {
+      b.classList.toggle('on', +b.dataset.m! === minutes)
+      b.setAttribute('aria-checked', String(+b.dataset.m! === minutes))
+    })
+  }
+  const pick = (id: string, m: number) => {
+    plan = id
+    minutes = m
+    paint()
+    o.onChange(id, m)
+  }
+  const chips = h(
+    'div',
+    { class: 'chips', role: 'radiogroup', 'aria-label': 'Length' },
+    ...DURATIONS.map((m) =>
+      h(
+        'button',
+        { class: 'chip-sel', role: 'radio', 'data-m': m, onclick: () => pick(plan, m) },
+        m ? `${m} min` : 'As written',
+      ),
+    ),
+  )
+  const group = (title: string, note: string, ids: string[]) =>
+    h(
+      'section',
+      { class: 'pp-group' },
+      h('h3', { class: 'label' }, title, h('small', {}, note)),
+      h('div', { class: 'pp-grid' }, ...ids.map(card)),
+    )
+  const ids = PLANS.map((p) => p.id)
+  const bus = group('Bus runs', 'built for the game', ids.filter(isBusRun))
+  const wk = group(
+    'Workouts',
+    'straight training',
+    ids.filter((i) => !isBusRun(i)),
+  )
+  const el = h(
+    'div',
+    { class: 'picker' },
+    h('div', { class: 'pp-len' }, h('span', { class: 'label' }, 'Length'), chips),
+    ...(o.first === 'workout' ? [wk, bus] : [bus, wk]),
+  )
+  paint()
+  return Object.assign(el, {
+    set(id: string, m: number) {
+      if (id === plan && m === minutes) return
+      plan = id
+      minutes = m
+      paint()
+    },
+  })
+}

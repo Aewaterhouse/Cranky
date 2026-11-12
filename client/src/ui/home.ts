@@ -1,9 +1,10 @@
 import { PLANS } from '../content'
 import { api } from '../core/api'
-import { generate, parsePlan, planTotal } from '../core/plan'
+import { generate, parsePlan } from '../core/plan'
+import type { Profile } from '../core/curve'
 import type { Plan } from '../types'
-import { avatar, fmt, h } from './dom'
-import { modal } from './toast'
+import { avatar, h } from './dom'
+import { soloSetup } from './solo'
 import { needTrainer } from './trainer'
 
 export interface HomeActions {
@@ -54,47 +55,8 @@ function busCard(r: Room, join: (code: string) => void) {
   )
 }
 
-function soloSetup(act: HomeActions) {
-  const plan = h(
-    'select',
-    {},
-    ...PLANS.map((p) =>
-      h('option', { value: p.id }, `${p.name} (${fmt(planTotal(parsePlan(p).blocks))})`),
-    ),
-  )
-  const mins = h(
-    'select',
-    {},
-    ...DURATIONS.map((m) => h('option', { value: m }, m ? `${m} min` : 'As written')),
-  )
-  const desc = h('p', { class: 'dim' })
-  const upd = () => (desc.textContent = PLANS.find((p) => p.id === plan.value)?.desc ?? '')
-  plan.addEventListener('change', upd)
-  upd()
-  const start = needTrainer(() => {
-    close()
-    act.drill(planFor(plan.value, +mins.value))
-  })
-  const close = modal(
-    'Solo drill',
-    h('p', {}, 'Just you and the plan, no bus. Good for testing your legs or a trainer.'),
-    h(
-      'div',
-      { class: 'grid2' },
-      h('label', { class: 'field' }, h('span', {}, 'Plan'), plan),
-      h('label', { class: 'field' }, h('span', {}, 'Length'), mins),
-    ),
-    desc,
-    h(
-      'div',
-      { class: 'actions' },
-      h('button', { class: 'primary', onclick: start }, 'Start drill'),
-    ),
-  )
-}
-
 /** Ride tab: open buses first, then a new bus, then solo. */
-export function rideTab(act: HomeActions) {
+export function rideTab(p: Profile, act: HomeActions) {
   const list = h('div', { class: 'buses' })
   let seen = ''
   const render = (rooms: Room[] | null) => {
@@ -140,7 +102,7 @@ export function rideTab(act: HomeActions) {
     if (c.length === 4) needTrainer(() => act.join(c))()
     else code.focus()
   }
-  return h(
+  const main = h(
     'div',
     { class: 'ride' },
     h(
@@ -178,15 +140,20 @@ export function rideTab(act: HomeActions) {
     ),
     h(
       'button',
-      { class: 'solo', onclick: () => soloSetup(act) },
+      {
+        class: 'solo',
+        onclick: () => wrap.replaceChildren(soloSetup(p, act, () => wrap.replaceChildren(main))),
+      },
       h('span', { class: 'big-emoji' }, '🚴'),
       h(
         'span',
         {},
-        h('b', {}, 'Solo drill'),
+        h('b', {}, 'Solo workout'),
         h('small', {}, 'Ride a workout on your own, no bus.'),
       ),
       h('span', { class: 'arrow' }, '→'),
     ),
   )
+  const wrap = h('div', {}, main)
+  return wrap
 }

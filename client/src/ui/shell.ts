@@ -54,7 +54,7 @@ export function showHome(p: Profile, act: HomeActions) {
     if (bar && !bar.isConnected) return
     const tab = current()
     const body =
-      tab === 'garage' ? garageTab(p, render) : tab === 'rider' ? riderTab(p) : rideTab(act)
+      tab === 'garage' ? garageTab(p, render) : tab === 'rider' ? riderTab(p) : rideTab(p, act)
     bar = h(
       'header',
       { class: 'top' },
