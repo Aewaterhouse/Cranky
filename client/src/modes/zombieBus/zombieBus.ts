@@ -69,6 +69,12 @@ export function startBusRide(
     hud.sprint(r)
     net.send({ t: 'sprint', ...r })
   }
+  ride.onTrainerStatus = (s) =>
+    hud.banner(
+      s === 'connected' ? 'Trainer reconnected' : 'Trainer disconnected, reconnecting…',
+      '',
+      4000,
+    )
   ride.start()
   const sender = setInterval(() => {
     const v = ride.live

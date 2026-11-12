@@ -1,5 +1,5 @@
 import { CFG } from '../config'
-import type { Trainer } from '../types'
+import type { Trainer, TrainerStatus } from '../types'
 
 export interface Bot {
   /** Called every step with seconds since start; return overrides. */
@@ -17,6 +17,9 @@ export class SimTrainer implements Trainer {
   t = 0
   log: string[] = []
   private dataCb: (d: { power: number; cadence: number }) => void = () => {}
+  /** True while a simulated dropout is in progress. */
+  down = false
+  private statusCbs: ((s: TrainerStatus) => void)[] = []
   private timer?: ReturnType<typeof setInterval>
 
   constructor(
@@ -28,25 +31,46 @@ export class SimTrainer implements Trainer {
   onData(cb: (d: { power: number; cadence: number }) => void) {
     this.dataCb = cb
   }
-  onDisconnect() {}
+  onStatus(cb: (s: TrainerStatus) => void) {
+    this.statusCbs.push(cb)
+  }
+  /** Test hook: no data and failing writes for `ms`, then control is lost and the link recovers. */
+  dropFor(ms: number) {
+    this.down = true
+    this.statusCbs.forEach((cb) => cb('reconnecting'))
+    setTimeout(() => {
+      this.down = false
+      this.erg = null
+      this.log.push('reconnected')
+      this.statusCbs.forEach((cb) => cb('connected'))
+    }, ms)
+  }
+  private live() {
+    if (this.down) throw new Error('Trainer disconnected')
+  }
   async requestControl() {
+    this.live()
     this.log.push('control')
   }
   async setPower(w: number) {
+    this.live()
     this.erg = w
     this.log.push(`erg ${w}`)
   }
   async setSim(g: number) {
+    this.live()
     this.erg = null
     this.log.push(`sim ${g}`)
   }
   async release() {
+    this.live()
     this.erg = null
     this.log.push('release')
   }
 
   step(dt: number) {
     this.t += dt
+    if (this.down) return
     this.bot?.(this.t, this)
     const noise = (this.rng() - 0.5) * 2 * CFG.sim.noiseW
     const base = this.erg !== null ? this.erg * this.effort : this.manual

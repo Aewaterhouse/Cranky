@@ -36,7 +36,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 
 | Item | What | Size |
 | --- | --- | --- |
-| Trainer auto-reconnect | If Bluetooth drops mid-ride, reconnect and resume ERG without leaving the ride | M |
+| ✅ Trainer auto-reconnect | If Bluetooth drops mid-ride, reconnect and resume ERG without leaving the ride | M |
 | ✅ FTMS response handling | Read control-point replies, retry rejected writes, show a clear error | S |
 | Heart-rate monitor | Pair a BLE HR strap; record and show HR everywhere | M |
 | Screen wake lock | Stop the laptop sleeping mid-ride | S |

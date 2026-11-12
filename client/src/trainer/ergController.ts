@@ -11,6 +11,7 @@ export class ErgController {
   private lastSent = -1
   private dead = false
   private fails = 0
+  private away = false
 
   constructor(
     private trainer: Trainer,
@@ -36,9 +37,18 @@ export class ErgController {
     }
   }
 
+  /** While the trainer is reconnecting nothing is written. On return control is re-requested and the target re-sent. */
+  setAway(away: boolean) {
+    this.away = away
+    if (away) return
+    this.mode = 'off'
+    this.lastSent = -1
+    this.fails = 0
+  }
+
   /** Call at about erg.writeHz. */
   async tick() {
-    if (this.dead) return
+    if (this.dead || this.away) return
     try {
       if (this.to === null) {
         if (this.mode !== 'sim') {

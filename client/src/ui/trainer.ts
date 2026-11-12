@@ -1,6 +1,6 @@
 import { FtmsTrainer } from '../trainer/ftms'
 import { bindKeys, SimTrainer } from '../trainer/simTrainer'
-import type { Trainer } from '../types'
+import type { Trainer, TrainerStatus } from '../types'
 import { h } from './dom'
 import { modal, toast } from './toast'
 
@@ -8,13 +8,28 @@ type Data = { power: number; cadence: number }
 let trainer: Trainer | null = null
 let sim: SimTrainer | null = null
 let last: Data | null = null
+let status: TrainerStatus = 'connected'
 const subs = new Set<() => void>()
 export const currentTrainer = () => trainer
 
 const notify = () => subs.forEach((f) => f())
 const set = (t: Trainer | null) => {
+  const same = trainer === t
+  if (trainer && !same) trainer.close?.()
   trainer = t
   last = null
+  status = 'connected'
+  if (!same)
+    t?.onStatus((s) => {
+      if (trainer !== t) return
+      status = s
+      last = null
+      toast(
+        s === 'connected' ? 'Trainer reconnected' : 'Trainer disconnected, reconnecting…',
+        s === 'connected' ? 'good' : 'bad',
+      )
+      notify()
+    })
   listen()
   notify()
 }
@@ -36,12 +51,17 @@ function live(el: HTMLElement, f: () => void) {
 }
 
 const reading = () =>
-  last ? `${last.power} W · ${Math.round(last.cadence)} rpm` : 'waiting for data…'
+  status === 'reconnecting'
+    ? 'Reconnecting…'
+    : last
+      ? `${last.power} W · ${Math.round(last.cadence)} rpm`
+      : 'waiting for data…'
 
 export function trainerPill() {
   const el = h('button', { class: 'pill', onclick: () => openTrainer() })
   return live(el, () => {
-    el.classList.toggle('ok', !!trainer)
+    el.classList.toggle('ok', !!trainer && status === 'connected')
+    el.classList.toggle('warn', status === 'reconnecting')
     el.replaceChildren(
       h('i', { class: 'dot' }),
       h('span', {}, trainer ? `${trainer.name} · ${reading()}` : 'No trainer'),
@@ -77,11 +97,6 @@ async function connectBt() {
   try {
     const t = new FtmsTrainer()
     await t.connect()
-    t.onDisconnect(() => {
-      if (trainer !== t) return
-      set(null)
-      toast('Trainer disconnected', 'bad')
-    })
     set(t)
     return true
   } catch (e) {

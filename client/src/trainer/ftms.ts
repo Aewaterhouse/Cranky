@@ -1,5 +1,5 @@
 import { CFG } from '../config'
-import type { Trainer } from '../types'
+import type { Trainer, TrainerStatus } from '../types'
 
 const FTMS = 0x1826
 const BIKE_DATA = 0x2ad2
@@ -11,16 +11,23 @@ export class FtmsTrainer implements Trainer {
   private ctrl?: BluetoothRemoteGATTCharacteristic
   private dev?: BluetoothDevice
   private dataCb: (d: { power: number; cadence: number }) => void = () => {}
-  private discCb: () => void = () => {}
+  private statusCbs: ((s: TrainerStatus) => void)[] = []
+  private closed = false
+  private reconnecting = false
   private queue: Promise<unknown> = Promise.resolve()
   private haveControl = false
-  private pending?: { op: number; resolve: (r: number) => void }
+  private pending?: { op: number; resolve: (r?: number) => void }
 
   async connect() {
     this.dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [FTMS] }] })
     this.name = this.dev.name ?? 'Trainer'
-    this.dev.addEventListener('gattserverdisconnected', () => this.discCb())
-    const server = await this.dev.gatt!.connect()
+    this.dev.addEventListener('gattserverdisconnected', () => void this.reconnect())
+    await this.attach()
+  }
+
+  /** (Re)connects GATT and re-acquires both characteristics: the old objects die with the link. */
+  private async attach() {
+    const server = await this.dev!.gatt!.connect()
     const svc = await server.getPrimaryService(FTMS)
     const data = await svc.getCharacteristic(BIKE_DATA)
     data.addEventListener('characteristicvaluechanged', (e) => {
@@ -28,20 +35,57 @@ export class FtmsTrainer implements Trainer {
       if (v) this.dataCb(parseBikeData(v))
     })
     await data.startNotifications()
-    this.ctrl = await svc.getCharacteristic(CONTROL)
-    this.ctrl.addEventListener('characteristicvaluechanged', (e) => {
+    const ctrl = await svc.getCharacteristic(CONTROL)
+    ctrl.addEventListener('characteristicvaluechanged', (e) => {
       const v = (e.target as BluetoothRemoteGATTCharacteristic).value
       const r = v && parseControlReply(v)
       if (r && r.op === this.pending?.op) this.pending.resolve(r.result)
     })
-    await this.ctrl.startNotifications().catch(() => {})
+    await ctrl.startNotifications().catch(() => {})
+    this.ctrl = ctrl
+    this.haveControl = false
+  }
+
+  /** Retries with backoff until the link is back or close() is called. */
+  private async reconnect() {
+    if (this.closed || this.reconnecting) return
+    this.reconnecting = true
+    this.haveControl = false
+    this.pending?.resolve()
+    this.emit('reconnecting')
+    for (let i = 0; !this.closed; i++) {
+      const wait = CFG.ftms.backoffMs
+      await new Promise((r) => setTimeout(r, wait[Math.min(i, wait.length - 1)]))
+      if (this.closed) break
+      try {
+        await this.attach()
+        this.reconnecting = false
+        return this.emit('connected')
+      } catch {
+        try {
+          this.dev?.gatt?.disconnect()
+        } catch {
+          /* already gone */
+        }
+      }
+    }
+    this.reconnecting = false
+  }
+
+  private emit(s: TrainerStatus) {
+    this.statusCbs.forEach((cb) => cb(s))
   }
 
   onData(cb: (d: { power: number; cadence: number }) => void) {
     this.dataCb = cb
   }
-  onDisconnect(cb: () => void) {
-    this.discCb = cb
+  onStatus(cb: (s: TrainerStatus) => void) {
+    this.statusCbs.push(cb)
+  }
+  /** Stops reconnecting and drops the link (used when the rider picks another trainer). */
+  close() {
+    this.closed = true
+    if (this.dev?.gatt?.connected) this.dev.gatt.disconnect()
   }
 
   /** Runs `fn` after every earlier operation has finished, so writes never overlap. */
@@ -78,7 +122,7 @@ export class FtmsTrainer implements Trainer {
       }, CFG.ftms.replyMs)
       this.pending = {
         op,
-        resolve: (r) => {
+        resolve: (r?: number) => {
           clearTimeout(timer)
           this.pending = undefined
           resolve(r)
