@@ -106,6 +106,7 @@ export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
     plan: id,
     minutes,
     first: 'workout',
+    mineFtp: p.ftp,
     onChange: (i, m) => ((id = i), (minutes = m), paint()),
   })
   paint()

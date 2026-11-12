@@ -702,3 +702,30 @@
     flex: none;
   }
 }
+.pp-import {
+  border-style: dashed;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 120px;
+  color: var(--dim);
+}
+.plan-card {
+  position: relative;
+}
+.pp-del {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.5);
+  color: var(--dim);
+  font-size: 0.7rem;
+}
+.pp-del:hover {
+  color: var(--bad);
+}

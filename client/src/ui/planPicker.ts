@@ -1,9 +1,11 @@
-import { PLANS } from '../content'
+import { isMine, myPlans, PLANS, removeMyPlan, saveMyPlan } from '../content'
+import { importWorkout } from '../core/workoutImport'
 import { blockTarget, parsePlan, planTotal } from '../core/plan'
 import type { Block, Plan, Tier } from '../types'
 import { h } from './dom'
 import { DURATIONS, planFor } from './home'
 import { planGraph, zoneColour } from './planGraph'
+import { toast } from './toast'
 
 export const isBusRun = (id: string) => id.startsWith('bus-')
 const mid = (b: Block, tier: Tier = 'hard') => blockTarget(b, tier, b.dur / 2)
@@ -57,6 +59,8 @@ export interface PickerOpts {
   minutes: number
   /** Which group sits on top. */
   first?: 'bus' | 'workout'
+  /** Show imported workouts and the import button (solo only). Needs the rider's FTP for .erg files. */
+  mineFtp?: number
   onChange(plan: string, minutes: number): void
 }
 
@@ -123,18 +127,67 @@ export function planPicker(o: PickerOpts) {
       h('h3', { class: 'label' }, title, h('small', {}, note)),
       h('div', { class: 'pp-grid' }, ...ids.map(card)),
     )
-  const ids = PLANS.map((p) => p.id)
+  const ids = PLANS.map((p) => p.id).filter((i) => !isMine(i))
   const bus = group('Bus runs', 'built for the game', ids.filter(isBusRun))
   const wk = group(
     'Workouts',
     'straight training',
     ids.filter((i) => !isBusRun(i)),
   )
+  const mineGrid = h('div', { class: 'pp-grid' })
+  const file = h('input', { type: 'file', accept: '.zwo,.erg,.mrc', hidden: true })
+  file.addEventListener('change', async () => {
+    const f = file.files?.[0]
+    file.value = ''
+    if (!f) return
+    try {
+      const p = importWorkout(f.name, await f.text(), o.mineFtp ?? 200)
+      saveMyPlan(p)
+      fillMine()
+      pick(p.id, 0)
+      toast(`Imported ${p.name}`, 'good')
+    } catch (e) {
+      toast((e as Error).message, 'bad')
+    }
+  })
+  const fillMine = () => {
+    for (const id of [...cards.keys()].filter(isMine)) cards.delete(id)
+    mineGrid.replaceChildren(
+      ...myPlans().map((p) => {
+        const c = card(p.id)
+        const x = h('span', { class: 'pp-del', title: 'Remove', role: 'button' }, '✕')
+        x.addEventListener('click', (e) => {
+          e.stopPropagation()
+          removeMyPlan(p.id)
+          fillMine()
+          if (plan === p.id) pick(ids[0], minutes)
+          else paint()
+        })
+        c.append(x)
+        return c
+      }),
+      h(
+        'button',
+        { class: 'plan-card pp-import', onclick: () => file.click() },
+        h('b', {}, '+ Import workout'),
+        h('p', {}, '.zwo, .erg or .mrc file'),
+      ),
+    )
+  }
+  const mine = h(
+    'section',
+    { class: 'pp-group' },
+    h('h3', { class: 'label' }, 'My workouts', h('small', {}, 'imported, solo only')),
+    mineGrid,
+    file,
+  )
+  if (o.mineFtp) fillMine()
   const el = h(
     'div',
     { class: 'picker' },
     h('div', { class: 'pp-len' }, h('span', { class: 'label' }, 'Length'), chips),
     ...(o.first === 'workout' ? [wk, bus] : [bus, wk]),
+    ...(o.mineFtp ? [mine] : []),
   )
   paint()
   return Object.assign(el, {
