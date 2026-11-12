@@ -1,0 +1,261 @@
+/* HUD: centre splashes and responsive tweaks. */
+/* Centre splashes */
+.hud-splash {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  right: 0;
+  display: grid;
+  place-items: center;
+}
+.sp {
+  position: relative;
+  text-align: center;
+  max-width: 90vw;
+  font-family: var(--display);
+  animation: sp-life var(--ms, 2s) both;
+}
+.sp-big {
+  position: relative;
+  z-index: 1;
+  line-height: 1;
+  text-shadow:
+    0 4px 0 rgb(0 0 0 / 0.5),
+    0 0 40px currentcolor;
+}
+.sp-sub {
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+  padding: 4px 16px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.5);
+  font: 800 0.95rem var(--ui);
+  letter-spacing: 0.08em;
+  color: var(--fg);
+}
+.sp-title .sp-big {
+  font-size: 3.4rem;
+  color: var(--ev);
+}
+.sp-go .sp-big {
+  font-size: 7rem;
+  color: #ff7bff;
+  animation: sp-shake 0.12s 5;
+}
+.sp-count .sp-big {
+  font-size: 11rem;
+  color: #fff;
+}
+.sp-count:not(.sp-pre) .sp-big {
+  color: #ff7bff;
+}
+.sp-pre {
+  order: 2;
+}
+.sp-pre .sp-sub {
+  order: -1;
+  margin: 0 0 4px;
+  background: transparent;
+  font-size: 1.1rem;
+  letter-spacing: 0.3em;
+}
+.sp-pre {
+  display: flex;
+  flex-direction: column;
+}
+.sp-pre .sp-big {
+  font-size: 9rem;
+  color: var(--acc);
+}
+.sp-fell .sp-big {
+  font-size: 3.6rem;
+  color: var(--bad);
+  animation: sp-shake 0.1s 8;
+}
+.sp-smash .sp-big {
+  font-size: 4.6rem;
+  color: #ffb020;
+  animation: sp-shake 0.1s 6;
+}
+.sp-FAIL .sp-big {
+  font-size: 4.5rem;
+  color: #ff5a4e;
+  animation: sp-drop 0.6s;
+}
+.sp-HIT .sp-big {
+  font-size: 5.5rem;
+  color: #fff;
+}
+.sp-GREAT .sp-big {
+  font-size: 7.5rem;
+  color: #7fd13b;
+}
+.sp-MEGA .sp-big {
+  font-size: 9.5rem;
+  color: #e040fb;
+  -webkit-text-stroke: 3px #fff;
+  paint-order: stroke fill;
+  animation: sp-shake 0.08s 12;
+}
+.sp-LEGEND .sp-big {
+  font-size: 12rem;
+  background: linear-gradient(180deg, #fff6b0, #ffd54a 40%, #ff8f00 60%, #ffe082);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  filter: drop-shadow(0 0 30px #ffb300) drop-shadow(0 6px 0 rgb(0 0 0 / 0.6));
+  animation:
+    sp-shake 0.07s 30,
+    sp-hue 0.8s ease-in-out infinite alternate;
+}
+.sp-LEGEND .sp-sub {
+  font-size: 1.3rem;
+  background: rgb(80 40 0 / 0.7);
+  color: #ffe082;
+}
+.sp-rays {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1500px;
+  height: 1500px;
+  margin: -750px;
+  background: repeating-conic-gradient(rgb(255 213 74 / 0.24) 0 8deg, transparent 8deg 20deg);
+  mask: radial-gradient(circle, #000 0 20%, transparent 62%);
+  -webkit-mask: radial-gradient(circle, #000 0 20%, transparent 62%);
+  animation: sp-spin 6s linear infinite;
+}
+.sp-conf {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  font-style: normal;
+  font-size: 1.6rem;
+  background: hsl(var(--h) 100% 60%);
+  border-radius: 3px;
+  animation: sp-conf 2.4s var(--d) cubic-bezier(0.2, 0.8, 0.4, 1) both;
+}
+.sp-conf:not(:empty) {
+  background: none;
+}
+.hud-flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle, transparent 35%, rgb(224 64 251 / 0.55));
+}
+.hud-flash[data-g='LEGEND'] {
+  background: radial-gradient(circle, rgb(255 240 150 / 0.4), rgb(255 160 0 / 0.55));
+}
+.hud-flash.on {
+  animation: sp-flash 0.9s;
+}
+@keyframes sp-life {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  8% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  14% {
+    transform: scale(1);
+  }
+  82% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+@keyframes sp-shake {
+  25% {
+    translate: -8px 4px;
+  }
+  75% {
+    translate: 8px -4px;
+  }
+}
+@keyframes sp-drop {
+  from {
+    translate: 0 -40px;
+  }
+}
+@keyframes sp-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes sp-hue {
+  from {
+    filter: drop-shadow(0 0 30px #ffb300) drop-shadow(0 6px 0 rgb(0 0 0 / 0.6)) hue-rotate(-20deg);
+  }
+  to {
+    filter: drop-shadow(0 0 40px #ff6d00) drop-shadow(0 6px 0 rgb(0 0 0 / 0.6)) hue-rotate(15deg)
+      brightness(1.15);
+  }
+}
+@keyframes sp-conf {
+  from {
+    transform: translate(0, 0);
+  }
+  35% {
+    transform: translate(calc(var(--x) * 0.6), var(--y)) rotate(calc(var(--r) * 0.5));
+  }
+  to {
+    transform: translate(var(--x), 55vh) rotate(var(--r));
+    opacity: 0;
+  }
+}
+@keyframes sp-flash {
+  0% {
+    opacity: 1;
+  }
+}
+@keyframes sp-rise {
+  from {
+    opacity: 0;
+    translate: -50% 20px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .st-strip kbd {
+    display: none;
+  }
+  .hud-left,
+  .hud-right,
+  .hud-bl {
+    width: 214px;
+  }
+  .eh {
+    width: min(440px, 40vw);
+  }
+  .cp {
+    width: min(500px, 46vw);
+  }
+  .cp-pow {
+    font-size: 3.4rem;
+  }
+  .sp-MEGA .sp-big,
+  .sp-LEGEND .sp-big {
+    font-size: 7rem;
+  }
+}
+@media (min-width: 1700px) and (min-height: 950px) {
+  .hud {
+    zoom: 1.3;
+  }
+}
+@media (max-height: 740px) {
+  .bs-pips {
+    display: none;
+  }
+}
