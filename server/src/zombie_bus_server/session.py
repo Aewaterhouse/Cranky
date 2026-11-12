@@ -11,7 +11,7 @@ from fastapi import WebSocket
 
 from . import bots, discord
 from . import config as C
-from .modes.zombie_bus import ZombieBus
+from .modes.zombie_bus import ZombieBus, weekly_mutator
 from .plan import block_target, event_for, generate, load_plans, locate, total
 from .protocol import Bots, Buy, ClientMsg, Data, Difficulty, End, Join, Setup, Sprint, Start, Tick, TierMsg
 
@@ -156,6 +156,7 @@ class Room:
             "state": self.state,
             "plan": self.plan,
             "minutes": self.minutes,
+            "mutator": weekly_mutator() if self.difficulty != "easy" else None,
             "difficulty": self.difficulty,
             "riders": [
                 {

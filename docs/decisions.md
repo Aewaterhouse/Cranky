@@ -126,3 +126,4 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Earned badges are saved on the profile (`badges`, id to date) when the Overview opens, so they stay earned after old rides drop off the 200-ride list. A LEGEND sprint is flagged on the ride record (`legend`) and saved by `applyRide`. Dates come from the kept rides where possible.
 - The PR timeline replays the kept rides in date order and adds any all-time best older than them.
 - Season ladder: seasons are calendar quarters, named by the Australian season they start in. Every finished bus ride is stored; the ladder shows the top 20 runs by score, riders ranked by their best score, and one title per award type for whoever won it most. Bots never appear.
+- Weekly mutator: chosen by ISO week number, shown in the lobby, applied automatically to normal and harder rides. No host toggle; easy difficulty is the opt-out.

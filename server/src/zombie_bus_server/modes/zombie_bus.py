@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import random
 import statistics
+from datetime import date
 from typing import TYPE_CHECKING
 
 from .. import config as C
@@ -14,18 +15,25 @@ if TYPE_CHECKING:
     from ..session import Rider, Room
 
 
+def weekly_mutator(today: date | None = None) -> dict:
+    """This ISO week's mutator."""
+    week = (today or date.today()).isocalendar().week
+    return C.MUTATORS[week % len(C.MUTATORS)]
+
+
 class ZombieBus:
     """Bus state for one ride. `tick` runs at TICK_HZ; `on_sprint` applies sprint grades."""
 
-    def __init__(self, level: str = "normal") -> None:
+    def __init__(self, level: str = "normal", mutator: dict | None = None) -> None:
         self.level = level
+        self.mut = (mutator or {}) if level != "easy" else {}
         self.speed = 0.0
         self.nitro = 0.0
         self.challenge: dict | None = None
         self.next_challenge = float(random.randint(*C.CHALLENGE_EVERY_S))
         self.nitro_until = -1.0
         self.dist = 0.0
-        self.armour = 100.0
+        self.armour = float(self.mut.get("armour", 100))
         self.gap = float(C.GAP_START)
         self.scrap = 0.0
         self.sync = False
@@ -88,7 +96,7 @@ class ZombieBus:
         self.gap += C.NITRO_GAP * dt if boost else 0
         self.speed *= C.LIMP_MULT if self.armour <= 0 else 1
         self.dist += self.speed * dt
-        self.scrap += self.speed * dt * C.SCRAP_PER_M
+        self.scrap += self.speed * dt * C.SCRAP_PER_M * self.mut.get("scrap", 1)
         neutral = C.NEUTRAL[ev]
         if ev == "longhaul":
             neutral += min(C.LONGHAUL_CREEP_MAX, C.LONGHAUL_CREEP * bel / 60)
@@ -140,7 +148,7 @@ class ZombieBus:
         if room.el < self.nitro_until:
             return True
         if riding and ev in C.NITRO_EVENTS and comp >= C.NITRO_MIN:
-            self.nitro += dt / C.NITRO_CHARGE_S
+            self.nitro += dt / C.NITRO_CHARGE_S * self.mut.get("nitro", 1)
         else:
             self.nitro = max(0.0, self.nitro - dt / C.NITRO_DECAY_S)
         if self.nitro >= 1:
@@ -181,7 +189,9 @@ class ZombieBus:
             self.repel -= 1
             self.emit("repel", "Horde repellent! Zombies sprayed off, no damage.")
             return
-        self.armour = max(0.0, self.armour - n * C.DIFFICULTY[self.level]["damage"])
+        self.armour = max(
+            0.0, self.armour - n * C.DIFFICULTY[self.level]["damage"] * self.mut.get("damage", 1)
+        )
         self.emit("hit", text if self.armour > 0 else "Armour gone! Limping on...")
 
     def surge(self, b: dict, bel: float, comp: float, neutral: float) -> float:
@@ -257,7 +267,7 @@ class ZombieBus:
     def buy(self, r: Rider, item: str) -> None:
         """Servo Stop shop: session-only upgrades paid from the bus scrap tin."""
         cost = C.SHOP[item]
-        if self.ev != "servo" or self.scrap < cost:
+        if self.ev != "servo" or self.scrap < cost or self.mut.get("no_shop"):
             return
         self.scrap -= cost
         if item == "plating":
@@ -323,7 +333,7 @@ class ZombieBus:
             "combo": self.combo,
             "nitro": round(self.nitro, 2),
             "boost": room.el < self.nitro_until,
-            "shop": self.ev == "servo",
+            "shop": self.ev == "servo" and not self.mut.get("no_shop"),
             "repel": self.repel,
             "syncw": self.syncw,
         }

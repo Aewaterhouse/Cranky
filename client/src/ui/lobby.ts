@@ -68,6 +68,7 @@ export function lobbyView(c: LobbyCtx) {
   const diffSeg = seg(DIFF, 'normal', (v) => c.difficulty(v), 'diff')
   const diffNote = h('span', { class: 'dim' })
   const diffRow = h('div', { class: 'bot-row' }, h('span', {}, '💀 Horde'), diffSeg, diffNote)
+  const mutRow = h('div', { class: 'bot-row mut-row' })
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -108,6 +109,13 @@ export function lobbyView(c: LobbyCtx) {
     botN.textContent = String(bots)
     botRow.hidden = !isHost
     diffSeg.set(l.difficulty)
+    mutRow.hidden = !l.mutator
+    if (l.mutator)
+      mutRow.replaceChildren(
+        h('span', {}, '🎲 This week'),
+        h('b', {}, l.mutator.name),
+        h('span', { class: 'dim' }, l.mutator.desc),
+      )
     diffSeg.hidden = !isHost
     diffNote.textContent = isHost ? '' : DIFF.find(([d]) => d === l.difficulty)![1]
     botLess.disabled = bots === 0
@@ -181,6 +189,7 @@ export function lobbyView(c: LobbyCtx) {
           seats,
           botRow,
           diffRow,
+          mutRow,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
         h(

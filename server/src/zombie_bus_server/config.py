@@ -93,6 +93,21 @@ CHALLENGE_SCRAP = 12
 CHALLENGES = {"spin": (105, "spin it up! 105+ rpm"), "grind": (65, "big gear! 65 rpm or lower")}
 CHALLENGE_EVENTS = ("longhaul", "rampup")
 
+# Weekly mutator: one twist per ISO week, applied to every bus ride above easy difficulty.
+# Keys: damage (x), scrap (x distance scrap), armour (starting armour), nitro (x charge rate), no_shop.
+MUTATORS = [
+    {
+        "id": "hungry",
+        "name": "Hungry Horde",
+        "desc": "Every hit takes half as much armour again.",
+        "damage": 1.5,
+    },
+    {"id": "closed", "name": "Closed Servos", "desc": "The servo shop stays shut all ride.", "no_shop": True},
+    {"id": "rush", "name": "Scrap Rush", "desc": "Double scrap for distance.", "scrap": 2.0},
+    {"id": "bolts", "name": "Loose Bolts", "desc": "The bus starts on 70 armour.", "armour": 70},
+    {"id": "tailwind", "name": "Tailwind", "desc": "Nitro charges twice as fast.", "nitro": 2.0},
+]
+
 # Roadblock
 RB_HP_PER_RIDER = 40
 RB_DAMAGE = {"FAIL": 0, "HIT": 40, "GREAT": 80, "MEGA": 100, "LEGEND": 120}

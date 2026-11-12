@@ -35,6 +35,7 @@ export interface Lobby {
   plan: Plan
   minutes: number
   difficulty: Difficulty
+  mutator: { id: string; name: string; desc: string } | null
   riders: LobbyRider[]
 }
 export interface RiderTick {

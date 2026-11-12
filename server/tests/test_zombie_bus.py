@@ -199,3 +199,22 @@ def test_personal_challenge_pays_when_held():
         assert ("challenge_won" in kinds) == won and ("challenge_lost" in kinds) != won
         assert (bus.scrap - scrap > C.CHALLENGE_SCRAP - 1) == won
         assert bus.challenge is None and bus.next_challenge > room.el
+
+
+def test_weekly_mutators_apply_above_easy():
+    from datetime import date, timedelta
+
+    from zombie_bus_server.modes.zombie_bus import weekly_mutator
+
+    assert weekly_mutator(date(2026, 11, 12)) in C.MUTATORS
+    weeks = {weekly_mutator(date(2026, 1, 5) + timedelta(weeks=i))["id"] for i in range(len(C.MUTATORS))}
+    assert weeks == {m["id"] for m in C.MUTATORS}
+    bolts = next(m for m in C.MUTATORS if m["id"] == "bolts")
+    assert ZombieBus("normal", bolts).armour == 70 and ZombieBus("easy", bolts).armour == 100
+    closed = next(m for m in C.MUTATORS if m["id"] == "closed")
+    room, bus = FakeRoom(STEADY), ZombieBus("normal", closed)
+    set_all(room, 1.0)
+    run(room, bus, 1, ev="servo")
+    bus.scrap, bus.armour = 500, 50
+    bus.buy(room.riders["r0"], "plating")
+    assert bus.armour == 50 and not bus.state(room, 1, 0)["shop"]
