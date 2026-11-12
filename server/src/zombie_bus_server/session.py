@@ -172,7 +172,7 @@ class Room:
     def update_states(self, dt: float) -> None:
         now = time.monotonic()
         for r in self.riders.values():
-            if now - r.last_data > 3 / C.TIME_SCALE:
+            if now - r.last_data > C.STALE_DATA_S:
                 r.p = r.w = r.cad = 0.0
                 r.s = None
             r.zero_s = r.zero_s + dt if r.p < 1 else 0.0

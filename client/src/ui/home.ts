@@ -46,7 +46,7 @@ export function showHome(profile: Profile, act: HomeActions) {
   const upd = () => (desc.textContent = PLANS.find((p) => p.id === plan.value)?.desc ?? '')
   plan.addEventListener('change', upd)
   upd()
-  const code = h('input', { placeholder: 'CODE', maxLength: 4, style: 'width:6em;text-transform:uppercase' })
+  const code = h('input', { placeholder: 'CODE', maxLength: 4, value: new URLSearchParams(location.search).get('join') ?? sessionStorage.getItem('zombiebus.code') ?? '', style: 'width:6em;text-transform:uppercase' })
   const need = (fn: () => void) => () => {
     save()
     if (!trainer) return alert('Connect a trainer or use the simulated trainer first.')

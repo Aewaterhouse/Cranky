@@ -64,8 +64,19 @@ async def rider(port, code, n, results, drop=False):
             await ws.send(json.dumps({"t": "data", "p": w, "w": w, "cad": 90 + n, "s": 1.0 if tgt else None}))
             if msg["i"] == 4 and not sprinted:
                 sprinted = True
-                await ws.send(json.dumps({"t": "sprint", "blk": 3, "dur": 10, "avg": 700, "pct": 0.97,
-                                          "grade": "GREAT", "combo": 1}))
+                await ws.send(
+                    json.dumps(
+                        {
+                            "t": "sprint",
+                            "blk": 3,
+                            "dur": 10,
+                            "avg": 700,
+                            "pct": 0.97,
+                            "grade": "GREAT",
+                            "combo": 1,
+                        }
+                    )
+                )
             if drop and msg["el"] > 100:
                 break
     if drop:
