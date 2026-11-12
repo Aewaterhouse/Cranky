@@ -47,6 +47,7 @@ let drone: { o: OscillatorNode; g: GainNode } | null = null
 const MOOD_HZ: Record<string, number> = {
   drill: 0,
   longhaul: 55,
+  rampup: 62,
   surge: 73,
   roadblock: 49,
   servo: 0,

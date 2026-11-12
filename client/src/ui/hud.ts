@@ -22,7 +22,7 @@ export interface HudOpts {
   onBuy?: (item: ShopItem) => void
 }
 /** Events whose title card replaces a feed line. */
-const CARD_FX = new Set(['surge', 'longhaul', 'roadblock', 'servo'])
+const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 
 /** Ride overlay: event header, cockpit, bus status, roster, stats, splashes, feed and shop. */
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {

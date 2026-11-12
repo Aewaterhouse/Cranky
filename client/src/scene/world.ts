@@ -76,6 +76,7 @@ export class World {
   private t = 0
   private prevSpeed = 0
   private pitch = 0
+  private climb = 0
   private brake = 0
   private hit = 0
   private flash = 0
@@ -232,6 +233,7 @@ export class World {
       gap: g,
       hit: this.hit,
       slow: sm < 1,
+      climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)

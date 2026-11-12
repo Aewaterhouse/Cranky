@@ -76,6 +76,8 @@ def event_for(blocks: list[Block], i: int) -> str:
         return "surge"
     if b["type"] == "free" or (b["type"] == "steady" and pct_for(b["pct"], "hard") < 0.6):
         return "servo"
+    if b["type"] == "ramp":
+        return "rampup"
     return "longhaul"
 
 

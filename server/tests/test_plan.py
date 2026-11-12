@@ -44,3 +44,9 @@ def test_events_mapping():
     evs = [event_for(blocks, i) for i in range(len(blocks))]
     assert evs[0] == "warmup" and evs[-1] == "cooldown"
     assert {"roadblock", "surge", "servo", "longhaul"} <= set(evs)
+
+
+def test_ramp_blocks_become_rampup():
+    blocks = flatten(load_plans()["bus-valley-climb"]["blocks"])
+    evs = [event_for(blocks, i) for i in range(len(blocks))]
+    assert evs.count("rampup") == 3 and evs[0] == "warmup" and evs[-1] == "cooldown"

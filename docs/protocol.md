@@ -53,7 +53,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 | `error` | `msg` |
 
 `tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
-`st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `surge`, `roadblock`,
+`st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.
 
 `bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), scrap, sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open), repel (repellent charges), syncw (extra sync window, rpm)}`.

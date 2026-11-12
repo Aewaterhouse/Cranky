@@ -44,7 +44,15 @@ V_MIN = 6.0
 V_MAX = 20.0
 LIMP_MULT = 0.6
 GAP_K = 15.0
-NEUTRAL = {"warmup": 0.5, "cooldown": 0.5, "servo": 0.3, "longhaul": 0.8, "surge": 0.85, "roadblock": None}
+NEUTRAL = {
+    "warmup": 0.5,
+    "cooldown": 0.5,
+    "servo": 0.3,
+    "longhaul": 0.8,
+    "rampup": 0.82,
+    "surge": 0.85,
+    "roadblock": None,
+}
 LONGHAUL_CREEP = 0.02  # neutral rises per minute into a long haul
 LONGHAUL_CREEP_MAX = 0.1
 SURGE_UNDER_NEUTRAL = 0.95

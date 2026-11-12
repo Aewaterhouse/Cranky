@@ -120,6 +120,8 @@ class ZombieBus:
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
         elif ev == "longhaul":
             self.emit("longhaul", "Long haul. Hold your zone.")
+        elif ev == "rampup":
+            self.emit("rampup", "Ramp-up! Climb out of the valley, it only gets harder.")
 
     def damage(self, n: float, text: str) -> None:
         if self.repel > 0:

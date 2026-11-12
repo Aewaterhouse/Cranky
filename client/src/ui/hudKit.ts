@@ -8,6 +8,7 @@ export interface EventStyle {
 export const EVENTS: Record<string, EventStyle> = {
   warmup: { name: 'Warm-up', icon: '☀️', col: '#5aa9e6' },
   longhaul: { name: 'Long Haul', icon: '🛣️', col: '#f2b705' },
+  rampup: { name: 'Ramp-up', icon: '⛰️', col: '#8ecf6a' },
   surge: { name: 'Horde Surge', icon: '🧟', col: '#ff5a4e' },
   roadblock: { name: 'Roadblock', icon: '🚧', col: '#e040fb' },
   servo: { name: 'Servo Stop', icon: '⛽', col: '#7fd13b' },

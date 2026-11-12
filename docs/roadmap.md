@@ -105,7 +105,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Pick-one upgrades | Roguelike choice of three random upgrades at each stop instead of a fixed shop | M |
 | Zombie types | Runners punish slow cadence, brutes need sustained power, spitters need a sprint; each maps to a workout demand | L |
 | Boss fights | A final event per ride: a giant, a chasing road train, a collapsing bridge | L |
-| Ramp-up hill | The planned ramp event: the bus climbs out of a valley | S |
+| ✅ Ramp-up hill | The planned ramp event: the bus climbs out of a valley | S |
 | Crew roles | Driver, gunner, mechanic, lookout: small abilities on a cooldown, fired by a cadence or power cue | L |
 | Personal mini-challenges | "Spin 110 rpm for 20 s", "hold exactly 200 W": quick prompts for bonus scrap | M |
 | Team moves | Synchronised sprint fires the harpoon; rolling turns on the front like a chaingang | M |
