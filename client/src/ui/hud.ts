@@ -130,6 +130,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
             3200,
             2,
           )
+        else if (fx.k === 'challenge' && fx.id === meId)
+          sp.splash('sp-smash', 'YOUR CHALLENGE!', text.replace(/^[^:]*: /, ''), 4000, 2)
         else if (fx.k === 'smash')
           sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
         if (fx.k === 'buy') shop.bought(text)

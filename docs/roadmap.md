@@ -107,7 +107,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Boss fights | A final event per ride: a giant, a chasing road train, a collapsing bridge | L |
 | ✅ Ramp-up hill | The planned ramp event: the bus climbs out of a valley | S |
 | Crew roles | Driver, gunner, mechanic, lookout: small abilities on a cooldown, fired by a cadence or power cue | L |
-| Personal mini-challenges | "Spin 110 rpm for 20 s", "hold exactly 200 W": quick prompts for bonus scrap | M |
+| ✅ Personal mini-challenges | "Spin 110 rpm for 20 s", "hold exactly 200 W": quick prompts for bonus scrap | M |
 | Team moves | Synchronised sprint fires the harpoon; rolling turns on the front like a chaingang | M |
 | ✅ Streak power-ups | Near-perfect group riding charges a nitro meter; when full it fires a 15 s boost by itself (no button to press mid-effort) | S |
 | Weather and night | Rain, dust storms, night driving with headlights; visibility as a mechanic | M |

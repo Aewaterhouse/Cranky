@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import random
 import statistics
 from typing import TYPE_CHECKING
 
@@ -20,6 +21,8 @@ class ZombieBus:
         self.level = level
         self.speed = 0.0
         self.nitro = 0.0
+        self.challenge: dict | None = None
+        self.next_challenge = float(random.randint(*C.CHALLENGE_EVERY_S))
         self.nitro_until = -1.0
         self.dist = 0.0
         self.armour = 100.0
@@ -78,6 +81,7 @@ class ZombieBus:
         self.hauling(room, active, dt)
         self.cadence_sync(active, dt)
 
+        self.run_challenge(room, active, ev)
         boost = self.charge_nitro(room, comp, ev, dt, bool(active))
         self.speed = (C.V_MIN + (C.V_MAX - C.V_MIN) * comp) * (C.TUNE_MULT if self.tune else 1)
         self.speed *= C.NITRO_SPEED if boost else 1
@@ -103,6 +107,33 @@ class ZombieBus:
             self.resolve_roadblock()
         fx, self.fx = self.fx, []
         return fx
+
+    def run_challenge(self, room: Room, active: list[Rider], ev: str) -> None:
+        """Hands one human rider a 20 s cadence drill now and then; pays scrap if they hold it."""
+        ch = self.challenge
+        if ch:
+            r = room.riders.get(ch["id"])
+            limit = C.CHALLENGES[ch["kind"]][0]
+            cad = r.cad if r and r.st == "riding" else 0
+            ch["ok"] += (cad >= limit) if ch["kind"] == "spin" else (0 < cad <= limit)
+            ch["n"] += 1
+            if room.el < ch["until"]:
+                return
+            self.challenge = None
+            self.next_challenge = room.el + random.randint(*C.CHALLENGE_EVERY_S)
+            name = r.name if r else "Someone"
+            if ch["ok"] / ch["n"] >= C.CHALLENGE_PASS:
+                self.scrap += C.CHALLENGE_SCRAP
+                self.emit("challenge_won", f"{name} nailed it! +{C.CHALLENGE_SCRAP} scrap", ch["id"])
+            else:
+                self.emit("challenge_lost", f"{name} fluffed the challenge.", ch["id"])
+            return
+        humans = [r for r in active if not r.bot and r.cad > 0]
+        if room.el < self.next_challenge or ev not in C.CHALLENGE_EVENTS or not humans:
+            return
+        r, kind = random.choice(humans), random.choice(list(C.CHALLENGES))
+        self.challenge = {"id": r.id, "kind": kind, "until": room.el + C.CHALLENGE_S, "ok": 0, "n": 0}
+        self.emit("challenge", f"{r.name}: {C.CHALLENGES[kind][1]} for {C.CHALLENGE_S} s", r.id)
 
     def charge_nitro(self, room: Room, comp: float, ev: str, dt: float, riding: bool) -> bool:
         """Charges or drains the nitro and fires it when full. Returns True while boosting."""

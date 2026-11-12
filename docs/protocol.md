@@ -60,4 +60,4 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 `bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), scrap, sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open), repel (repellent charges), syncw, nitro (0..1 charge), boost (bool) (extra sync window, rpm)}`.
 
 `fx`: list of `{k, text?, id?}`, one-shot effects since the last tick. `k` is one of
-`nitro, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.
+`nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.

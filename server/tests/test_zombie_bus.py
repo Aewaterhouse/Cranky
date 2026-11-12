@@ -182,3 +182,20 @@ def test_nitro_charges_on_clean_riding_and_fires():
     fast = bus.speed
     run(room, bus, C.NITRO_S + 1)
     assert not bus.state(room, 1, 0)["boost"] and bus.speed < fast
+
+
+def test_personal_challenge_pays_when_held():
+    for cad, won in ((112, True), (88, False)):
+        room, bus = FakeRoom(STEADY, n=2), ZombieBus()
+        set_all(room, 0.9, cad=cad)
+        bus.next_challenge = 0
+        fx = run(room, bus, 1)
+        start = [f for f in fx if f["k"] == "challenge"]
+        assert len(start) == 1 and bus.challenge
+        bus.challenge["kind"] = "spin"
+        scrap = bus.scrap
+        fx = run(room, bus, C.CHALLENGE_S + 1)
+        kinds = {f["k"] for f in fx}
+        assert ("challenge_won" in kinds) == won and ("challenge_lost" in kinds) != won
+        assert (bus.scrap - scrap > C.CHALLENGE_SCRAP - 1) == won
+        assert bus.challenge is None and bus.next_challenge > room.el

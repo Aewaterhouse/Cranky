@@ -85,6 +85,14 @@ NITRO_GAP = 2.5  # extra m/s of gap while boosting
 NITRO_SCRAP = 15
 NITRO_EVENTS = ("longhaul", "rampup", "surge")
 
+# Personal challenges: a quick cadence drill for one human rider during long hauls and ramp-ups.
+CHALLENGE_EVERY_S = (150, 240)  # random wait between challenges
+CHALLENGE_S = 20
+CHALLENGE_PASS = 0.7  # fraction of the window that must be on the cadence target
+CHALLENGE_SCRAP = 12
+CHALLENGES = {"spin": (105, "spin it up! 105+ rpm"), "grind": (65, "big gear! 65 rpm or lower")}
+CHALLENGE_EVENTS = ("longhaul", "rampup")
+
 # Roadblock
 RB_HP_PER_RIDER = 40
 RB_DAMAGE = {"FAIL": 0, "HIT": 40, "GREAT": 80, "MEGA": 100, "LEGEND": 120}
