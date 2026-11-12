@@ -1,159 +1,217 @@
 import * as THREE from 'three'
 import { cosmetic, type Look } from '../core/cosmetics'
+import {
+  EXHAUST,
+  HOOD,
+  WHEELS,
+  bullbarGeo,
+  damageGroups,
+  glassGeo,
+  paintGeo,
+  plateGroups,
+  spikesGeo,
+  trimGeo,
+} from './busParts'
 import { VIS } from './params'
+import { Mesher, VC, box, canvasTex, clamp, cyl } from './util'
 
-/** Procedural low-poly bus. Front faces -z; origin at road level, centre of the bus. */
+const TIERS = 6
+const SOOT = 3
+
+function wheelGeo() {
+  const m = new Mesher(0.08)
+  const x = Math.PI / 2
+  m.add(cyl(0.62, 0.62, 0.46, 14), '#19191b', [0, 0, 0], [0, 0, x])
+  m.add(cyl(0.4, 0.4, 0.5, 10), '#9aa0a8', [0, 0, 0], [0, 0, x])
+  m.add(cyl(0.18, 0.18, 0.56, 6), '#4a4d54', [0, 0, 0], [0, 0, x])
+  for (let i = 0; i < 5; i++) {
+    const a = (i / 5) * Math.PI * 2
+    m.add(
+      box(0.06, 0.34, 0.08),
+      '#2a2c30',
+      [0.25, Math.sin(a) * 0.25, Math.cos(a) * 0.25],
+      [-a, 0, 0],
+    )
+  }
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2
+    m.add(box(0.5, 0.1, 0.1), '#0f0f10', [0, Math.sin(a) * 0.62, Math.cos(a) * 0.62], [-a, 0, 0])
+  }
+  return m.build()
+}
+
+const basic = (c: string) => new THREE.MeshBasicMaterial({ color: c })
+
+/** Procedural low-poly school bus. Front faces -z; origin at road level. */
 export function makeBus() {
   const g = new THREE.Group()
-  const mat = (c: string) => new THREE.MeshLambertMaterial({ color: c })
-  const body = new THREE.MeshLambertMaterial({ color: VIS.busColour })
-  const box = (
-    w: number,
-    h: number,
-    d: number,
-    m: THREE.Material,
+  const paint = new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    flatShading: true,
+    color: VIS.busColour,
+  })
+  const glass = new THREE.MeshLambertMaterial({
+    vertexColors: true,
+    flatShading: true,
+    emissive: '#ffb860',
+    emissiveIntensity: 0,
+  })
+  const shell = new THREE.Group()
+  g.add(shell)
+  const add = (geo: THREE.BufferGeometry, mat: THREE.Material, parent: THREE.Object3D = shell) => {
+    const m = new THREE.Mesh(geo, mat)
+    m.castShadow = true
+    parent.add(m)
+    return m
+  }
+  add(paintGeo(), paint)
+  add(glassGeo(), glass)
+  add(trimGeo(), VC)
+  const wg = wheelGeo()
+  const wheels = WHEELS.map(([x, z]) => {
+    const w = new THREE.Group()
+    w.position.set(x, 0.62, z)
+    const m = new THREE.Mesh(wg, VC)
+    m.castShadow = true
+    if (x < 0) m.rotation.y = Math.PI
+    w.add(m)
+    g.add(w)
+    return { g: w, m }
+  })
+  const bullbar = add(bullbarGeo(), VC)
+  const spikes = add(spikesGeo(), VC)
+  const plates = plateGroups(TIERS).map((geo) => add(geo, VC))
+  const soot = damageGroups(SOOT).map((geo) => add(geo, VC))
+
+  const decal = new THREE.Mesh(
+    new THREE.PlaneGeometry(2.3, 0.55),
+    new THREE.MeshBasicMaterial({
+      transparent: true,
+      map: canvasTex(512, 128, (c) => {
+        c.fillStyle = '#16120c'
+        c.textAlign = 'center'
+        c.font = '900 64px system-ui, sans-serif'
+        c.fillText('ZOMBIE BUS', 256, 66)
+        c.font = '700 26px system-ui, sans-serif'
+        c.fillText("HONK IF YOU'RE NOT DEAD", 256, 108)
+      }),
+    }),
+  )
+  decal.position.set(-0.3, 1.7, 5.02)
+  decal.rotation.y = 0
+  shell.add(decal)
+  const headMat = basic('#fff6d0')
+  const brakeMat = basic('#aa1a1a')
+  const amberA = basic('#ffa020')
+  const amberB = basic('#ffa020')
+  const lens = (
+    geo: THREE.BufferGeometry,
+    mat: THREE.Material,
     x: number,
     y: number,
     z: number,
   ) => {
-    const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m)
-    b.position.set(x, y, z)
-    g.add(b)
-    return b
+    const m = new THREE.Mesh(geo, mat)
+    m.position.set(x, y, z)
+    shell.add(m)
   }
-  box(3, 2.6, 10, body, 0, 2, 0)
-  box(3.05, 0.9, 8.6, mat('#223040'), 0, 2.5, 0.4)
-  box(2.6, 0.9, 0.1, mat('#223040'), 0, 2.5, -5.01)
-  box(3.2, 0.4, 0.4, mat('#555'), 0, 0.9, -5.1)
-  box(3.1, 0.15, 9, mat('#333'), 0, 3.4, 0)
-  for (const x of [-1.2, 1.2]) box(0.3, 0.3, 0.1, mat('#fff8c0'), x, 1.3, -5.05)
-  const wheels: THREE.Mesh[] = []
-  const wg = new THREE.CylinderGeometry(0.6, 0.6, 0.4, 12).rotateZ(Math.PI / 2)
-  for (const [x, z] of [
-    [-1.45, -3.2],
-    [1.45, -3.2],
-    [-1.45, 3.2],
-    [1.45, 3.2],
-  ]) {
-    const w = new THREE.Mesh(wg, mat('#1a1a1a'))
-    w.position.set(x, 0.6, z)
-    g.add(w)
-    wheels.push(w)
+  const hl = cyl(0.2, 0.2, 0.08, 8).rotateX(Math.PI / 2)
+  for (const x of [-0.88, 0.88]) lens(hl, headMat, x, 1.55, -5.46)
+  for (const x of [-1.25, 1.25]) lens(box(0.4, 0.2, 0.06), brakeMat, x, 1.45, 5.04)
+  const amber = cyl(0.14, 0.14, 0.12, 8)
+  for (const [x, z, m] of [
+    [-1.1, -3.1, amberA],
+    [1.1, -3.1, amberB],
+    [-1.1, 4.7, amberB],
+    [1.1, 4.7, amberA],
+  ] as [number, number, THREE.Material][])
+    lens(amber, m, x, 3.42, z)
+
+  const spot = (x: number) => {
+    const s = new THREE.SpotLight('#fff2c8', 0, 110, 0.5, 0.7, 1)
+    s.position.set(x, 1.6, -5.4)
+    s.target.position.set(x * 0.6, 0, -40)
+    g.add(s, s.target)
+    return s
   }
-  const part = (build: (p: THREE.Group) => void) => {
-    const p = new THREE.Group()
-    build(p)
-    p.visible = false
-    g.add(p)
-    return p
-  }
-  const steel = mat('#8a8f98')
-  const bullbar = part((p) => {
-    for (const [w, h, d, x, y] of [
-      [3.4, 0.2, 0.2, 0, 1.6],
-      [3.4, 0.2, 0.2, 0, 0.9],
-      [0.2, 1.2, 0.2, -1.1, 1.25],
-      [0.2, 1.2, 0.2, 1.1, 1.25],
-      [0.2, 1.2, 0.2, 0, 1.25],
-    ]) {
-      const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), steel)
-      b.position.set(x, y, -5.5)
-      p.add(b)
-    }
+  const spots = [spot(-0.88), spot(0.88)]
+  const bg = new THREE.ConeGeometry(5, 42, 12, 1, true).rotateX(-Math.PI / 2).translate(0, 0, -21)
+  const cols = new Float32Array(bg.attributes.position.count * 3)
+  for (let i = 0; i < bg.attributes.position.count; i++)
+    cols.fill(Math.max(0, 1 + bg.attributes.position.getZ(i) / 42), i * 3, i * 3 + 3)
+  bg.setAttribute('color', new THREE.BufferAttribute(cols, 3))
+  const beamMat = new THREE.MeshBasicMaterial({
+    vertexColors: true,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    side: THREE.DoubleSide,
+    color: '#fff0c0',
+    opacity: 0,
   })
-  const spikes = part((p) => {
-    const cone = new THREE.ConeGeometry(0.15, 0.7, 6)
-    for (let z = -4.2; z <= 4.2; z += 1.4)
-      for (const x of [-1.4, 1.4]) {
-        const c = new THREE.Mesh(cone, steel)
-        c.position.set(x, 3.75, z)
-        p.add(c)
-      }
-  })
-  const setLook = (look: Look) => {
-    body.userData.colour = cosmetic(look.paint)?.colour ?? VIS.busColour
+  const beam = new THREE.Mesh(bg, beamMat)
+  beam.position.set(0, 1.6, -5.5)
+  beam.scale.set(0.5, 0.4, 1)
+  g.add(beam)
+
+  let lookKey = ''
+  let baseCol = new THREE.Color(VIS.busColour)
+  const setLook = (look: Look = {}) => {
+    const key = `${look.paint}|${look.bullbar}|${look.spikes}`
+    if (key === lookKey) return
+    lookKey = key
+    baseCol = new THREE.Color(cosmetic(look.paint)?.colour ?? VIS.busColour)
     bullbar.visible = !!look.bullbar
     spikes.visible = !!look.spikes
   }
   setLook({})
-  return { group: g, body, wheels, setLook }
-}
 
-function makeHat(id: string | undefined): THREE.Object3D | null {
-  const c = cosmetic(id)
-  if (!c) return null
-  const m = new THREE.MeshLambertMaterial({ color: c.colour })
-  const g = new THREE.Group()
-  const add = (geo: THREE.BufferGeometry, y: number, mm = m) => {
-    const x = new THREE.Mesh(geo, mm)
-    x.position.y = y
-    g.add(x)
-    return x
+  const tmp = new THREE.Color()
+  const update = (p: {
+    t: number
+    speed: number
+    armour: number | null
+    head: number
+    brake: number
+    hit: number
+    pitch: number
+    dz: number
+  }) => {
+    const { t, speed } = p
+    const sp = clamp(speed / 12)
+    const kick = p.hit
+    g.position.y =
+      Math.abs(Math.sin(t * 9)) * 0.05 * sp + Math.abs(Math.sin(t * 17)) * 0.02 * sp + kick * 0.18
+    shell.rotation.z = (Math.sin(t * 1.3) * 0.012 + Math.sin(t * 7.1) * 0.004 * sp) * VIS.sway
+    shell.rotation.x = p.pitch - kick * 0.05
+    shell.position.z = kick * 0.35
+    wheels.forEach((w) => (w.m.rotation.x -= p.dz / 0.62))
+    const armour = p.armour
+    const a = armour ?? 100
+    const wob = armour !== null && armour <= 2
+    wheels[2].g.rotation.z = wob ? Math.sin(t * 15) * 0.2 : 0
+    wheels[2].g.position.x = -1.4 + (wob ? Math.sin(t * 15) * 0.07 : 0)
+    const count = armour === null ? 0 : Math.ceil((a / 100) * TIERS)
+    plates.forEach((m, i) => (m.visible = i < count))
+    soot.forEach((m, i) => (m.visible = a < [75, 50, 25][i]))
+    paint.color
+      .copy(baseCol)
+      .lerp(tmp.set('#5a4a3c'), (1 - a / 100) * 0.3)
+      .lerp(tmp.set('#ff2a1a'), p.hit * 0.5)
+    const on = p.head
+    headMat.color.set('#a09880').lerp(tmp.set('#fffbe0'), 0.5 + on * 0.5)
+    brakeMat.color.set('#661414').lerp(tmp.set('#ff2a20'), clamp(p.brake + on * 0.3))
+    const ph = t % 0.9 < 0.45
+    amberA.color.set(ph ? '#ffb020' : '#503010')
+    amberB.color.set(ph ? '#503010' : '#ffb020')
+    glass.emissiveIntensity = on * 0.2
+    spots.forEach((s) => (s.intensity = on * 900))
+    beamMat.opacity = on * 0.16
+    beam.visible = on > 0.02
   }
-  if (id === 'hat-cap') {
-    add(new THREE.SphereGeometry(0.3, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), 0)
-    add(new THREE.BoxGeometry(0.4, 0.04, 0.35), 0.02).position.z = -0.3
-  } else if (id === 'hat-cone') add(new THREE.ConeGeometry(0.22, 0.6, 10), 0.3)
-  else if (id === 'hat-viking') {
-    add(new THREE.SphereGeometry(0.31, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), 0)
-    const horn = new THREE.MeshLambertMaterial({ color: '#f5ecd0' })
-    for (const s of [-1, 1]) {
-      const h = add(new THREE.ConeGeometry(0.07, 0.4, 6), 0.2, horn)
-      h.position.x = s * 0.32
-      h.rotation.z = -s * 0.6
-    }
-  } else add(new THREE.CylinderGeometry(0.26, 0.22, 0.25, 5, 1, true), 0.12)
-  g.position.y = 1.35
-  return g
-}
 
-/** A rider figure with a canvas name tag. */
-export function makeRider(colour: string) {
-  const g = new THREE.Group()
-  const m = new THREE.MeshLambertMaterial({ color: colour, transparent: true })
-  const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.5, 4, 8), m)
-  torso.position.y = 0.6
-  const head = new THREE.Mesh(
-    new THREE.SphereGeometry(0.28, 10, 8),
-    new THREE.MeshLambertMaterial({ color: '#f0c8a0', transparent: true }),
-  )
-  head.position.y = 1.25
-  const canvas = document.createElement('canvas')
-  canvas.width = 256
-  canvas.height = 64
-  const tex = new THREE.CanvasTexture(canvas)
-  const tag = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false }))
-  tag.scale.set(2.4, 0.6, 1)
-  tag.position.y = 2
-  g.add(torso, head, tag)
-  let last = ''
-  const label = (name: string, c: number | null) => {
-    const col = c == null ? '#ccc' : c > 0.85 ? '#5f5' : c > 0.6 ? '#fc4' : '#f55'
-    const key = name + col
-    if (key === last) return
-    last = key
-    const x = canvas.getContext('2d')!
-    x.clearRect(0, 0, 256, 64)
-    x.fillStyle = 'rgba(0,0,0,0.55)'
-    x.roundRect(4, 8, 248, 48, 12)
-    x.fill()
-    x.fillStyle = col
-    x.font = 'bold 30px system-ui'
-    x.textAlign = 'center'
-    x.fillText(name.slice(0, 12), 128, 43)
-    tex.needsUpdate = true
-  }
-  const fade = (o: number) => [m, head.material as THREE.Material].forEach((x) => (x.opacity = o))
-  let hat: THREE.Object3D | null = null
-  let lookKey = ''
-  const setLook = (look: Look = {}) => {
-    const key = `${look.hat}|${look.outfit}`
-    if (key === lookKey) return
-    lookKey = key
-    m.color.set(cosmetic(look.outfit)?.colour ?? colour)
-    if (hat) g.remove(hat)
-    hat = makeHat(look.hat)
-    if (hat) g.add(hat)
-  }
-  return { group: g, torso, label, fade, setLook }
+  /** Where the hood, exhaust and body are in the bus group, for effects. */
+  const hood = new THREE.Vector3(...HOOD)
+  const exhaust = new THREE.Vector3(...EXHAUST)
+  return { group: g, setLook, update, hood, exhaust, wheels: wheels.map((w) => w.g), shell }
 }
