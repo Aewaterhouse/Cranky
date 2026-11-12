@@ -160,7 +160,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Proper icons | SVG icon set in place of emoji so every device looks the same | S |
 | Rider avatars | Body, face and bike customisation beyond hats and kit | M |
 | More cosmetics | Paint patterns, decals, horns, exhaust flames, rider celebrations | M |
-| Installable app | Add-to-home-screen with offline solo mode | S |
+| ✅ Installable app | Add-to-home-screen with offline solo mode | S |
 | Logo and domain | A proper Cranky logo, favicon, share image and domain | S |
 
 ## 9. Social and scheduling

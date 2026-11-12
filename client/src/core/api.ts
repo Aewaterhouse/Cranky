@@ -35,5 +35,19 @@ export async function login(name: string, password: string): Promise<Me> {
 }
 
 export const logout = () => localStorage.removeItem(TOKEN)
-export const me = () => api<Me>('/api/me')
+const ME = 'cranky.me'
+
+/** Who is logged in. Offline, falls back to the last rider seen on this device so solo rides still work. */
+export async function me(): Promise<Me> {
+  try {
+    const m = await api<Me>('/api/me')
+    localStorage.setItem(ME, JSON.stringify(m))
+    return m
+  } catch (e) {
+    const cached = localStorage.getItem(ME)
+    if ((e as { status?: number }).status === undefined && cached && token())
+      return JSON.parse(cached)
+    throw e
+  }
+}
 export const riders = () => api<Me[]>('/api/riders')
