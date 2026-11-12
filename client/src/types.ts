@@ -50,6 +50,8 @@ export interface Trainer {
   requestControl(): Promise<void>
   setPower(watts: number): Promise<void>
   setSim(gradePct: number): Promise<void>
+  /** Fixed resistance level, 0-100% of the trainer's range. */
+  setResistance(pct: number): Promise<void>
   release(): Promise<void>
 }
 

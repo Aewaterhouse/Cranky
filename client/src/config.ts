@@ -3,7 +3,7 @@ import type { Tier } from './types'
 export const CFG = {
   tierFactor: { hard: 1, medium: 0.9, easy: 0.8 } as Record<Tier, number>,
   erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1, maxFails: 5 },
-  ftms: { replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
+  ftms: { resMax: 100, replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
   clock: { hz: 4, snapS: 1, gain: 0.2, windowS: 4, rateMin: 0.5, rateMax: 30, staleS: 3 },
   recovery: { saveMs: 5000, maxAgeMs: 30 * 60 * 1000 },
@@ -37,6 +37,16 @@ export const CFG = {
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
   recordHz: 1,
   localStorageKey: 'zombiebus.profile',
-  sim: { baseWatts: 150, baseCadence: 90, noiseW: 4 },
+  sim: {
+    baseWatts: 150,
+    baseCadence: 90,
+    noiseW: 4,
+    mass: 80,
+    crr: 0.005,
+    cda: 0.32,
+    mPerRev: 0.075,
+    resWatts: 1 / 30,
+  },
+  ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
   scene: { speedMax: 22 },
 }

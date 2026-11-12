@@ -6,10 +6,25 @@ export interface Bot {
   (t: number, s: SimTrainer): void
 }
 
+const { mass, crr, cda, mPerRev, resWatts } = CFG.sim
+
+/** Power needed to turn the pedals at `cadence` in a fixed gear on a `gradePct` slope. */
+export function slopePower(gradePct: number, cadence: number): number {
+  const v = cadence * mPerRev
+  const th = Math.atan(gradePct / 100)
+  const force = mass * 9.81 * (Math.sin(th) + crr * Math.cos(th)) + 0.5 * 1.2 * cda * v * v
+  return Math.max(0, force * v)
+}
+
+/** Fixed resistance: power is proportional to level and cadence. */
+export const resistancePower = (levelPct: number, cadence: number) => levelPct * cadence * resWatts
+
 /** Fake trainer: ERG mode forces target * effort; sim mode uses `manual` watts. */
 export class SimTrainer implements Trainer {
   name = 'Simulated trainer'
   erg: number | null = null
+  resistance: number | null = null
+  grade = 0
   manual = CFG.sim.baseWatts
   effort = 1
   cadence = CFG.sim.baseCadence
@@ -41,6 +56,7 @@ export class SimTrainer implements Trainer {
     setTimeout(() => {
       this.down = false
       this.erg = null
+      this.resistance = null
       this.log.push('reconnected')
       this.statusCbs.forEach((cb) => cb('connected'))
     }, ms)
@@ -55,16 +71,26 @@ export class SimTrainer implements Trainer {
   async setPower(w: number) {
     this.live()
     this.erg = w
+    this.resistance = null
     this.log.push(`erg ${w}`)
   }
   async setSim(g: number) {
     this.live()
     this.erg = null
+    this.resistance = null
+    this.grade = g
     this.log.push(`sim ${g}`)
+  }
+  async setResistance(pct: number) {
+    this.live()
+    this.erg = null
+    this.resistance = pct
+    this.log.push(`res ${pct}`)
   }
   async release() {
     this.live()
     this.erg = null
+    this.resistance = null
     this.log.push('release')
   }
 
@@ -73,7 +99,15 @@ export class SimTrainer implements Trainer {
     if (this.down) return
     this.bot?.(this.t, this)
     const noise = (this.rng() - 0.5) * 2 * CFG.sim.noiseW
-    const base = this.erg !== null ? this.erg * this.effort : this.manual
+    const c = this.cadence
+    const base =
+      this.erg !== null
+        ? this.erg * this.effort
+        : this.resistance !== null
+          ? resistancePower(this.resistance, c) * this.effort
+          : this.grade !== 0
+            ? slopePower(this.grade, c) * this.effort
+            : this.manual
     this.power = Math.max(0, Math.round(base + noise))
     this.dataCb({ power: this.power, cadence: Math.round(this.cadence + (this.rng() - 0.5) * 2) })
   }

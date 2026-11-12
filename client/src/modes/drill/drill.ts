@@ -8,6 +8,7 @@ import { CFG } from '../../config'
 import { SFX } from '../../ui/audio'
 import { fmt, show } from '../../ui/dom'
 import { finishRide } from '../../ui/results'
+import { stepMode, type ModeState, type RideMode } from '../../ui/soloMode'
 import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
@@ -45,6 +46,7 @@ export function runDrill(
   let count = START_S
   let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
   let below = 0
+  let mode: ModeState = { kind: 'erg', level: CFG.ride.resStart, grade: CFG.ride.gradeStart }
   let manual = false
   let auto = false
   let finished = false
@@ -74,6 +76,8 @@ export function runDrill(
       end: () => end(),
       intensity: (d) =>
         !plan.test && (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
+      mode: (k) => setMode(k),
+      nudge: (d) => setMode(mode.kind, stepMode(mode, d)),
       tier: (t) => !plan.test && ((profile.tier = t), saveProfile(profile)),
     },
     profile.maxHr,
@@ -91,6 +95,14 @@ export function runDrill(
     )
   }
 
+  /** Switch ride mode (or change its level) and tell the ERG controller; ERG power is only ever sent in ERG mode. */
+  function setMode(kind: RideMode, next: ModeState = { ...mode, kind }) {
+    if (plan.test) return
+    mode = next
+    if (kind === 'erg') ride.erg.setErg()
+    else if (kind === 'res') ride.erg.setResistance(mode.level)
+    else ride.erg.setGrade(mode.grade)
+  }
   const inRamp = (i: number | undefined) =>
     spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
   function rampDone() {
@@ -114,20 +126,27 @@ export function runDrill(
     const tag = (e.target as HTMLElement)?.tagName
     if (tag === 'INPUT' || tag === 'SELECT' || e.ctrlKey || e.metaKey) return
     const k = e.key
-    const used =
+    const bump = (d: number) =>
+      !plan.test && (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2))))
+    const kind = { e: 'erg', r: 'res', g: 'slope' }[k.toLowerCase()] as RideMode | undefined
+    const act: (() => unknown) | undefined =
       k === ' ' || k === 'p' || k === 'P'
-        ? (togglePause(), true)
+        ? togglePause
         : k === 'n' || k === 'N' || (k === 'ArrowRight' && !isSim)
-          ? (skip(), true)
-          : plan.test
-            ? false
-            : k === '+' || k === '='
-              ? ((intensity = Math.min(1.5, +(intensity + 0.01).toFixed(2))), true)
-              : k === '-' || k === '_'
-                ? ((intensity = Math.max(0.5, +(intensity - 0.01).toFixed(2))), true)
-                : k === 'Escape'
-                  ? (view.confirmEnd(), true)
-                  : false
+          ? skip
+          : k === '+' || k === '='
+            ? () => bump(0.01)
+            : k === '-' || k === '_'
+              ? () => bump(-0.01)
+              : k === 'Escape'
+                ? view.confirmEnd
+                : k === ',' || k === '.'
+                  ? () => setMode(mode.kind, stepMode(mode, k === '.' ? 1 : -1))
+                  : kind
+                    ? () => setMode(kind)
+                    : undefined
+    const used = !!act
+    act?.()
     if (used) e.preventDefault()
   }
   addEventListener('keydown', onKey)
@@ -195,7 +214,7 @@ export function runDrill(
         overlay = [
           'PAUSED',
           manual
-            ? 'Press Space to resume. ERG is easing off.'
+            ? `Press Space to resume.${mode.kind === 'erg' ? ' ERG is easing off.' : ''}`
             : 'Auto-paused. Start pedalling to carry on.',
           'pause',
         ]
@@ -234,6 +253,7 @@ export function runDrill(
       xs,
       cadence: ride.rec.cadence,
       hr: ride.rec.hr,
+      mode,
       actions: inRamp(f.i)
         ? [{ id: 'done', label: "I'm done", cls: 'primary', run: rampDone }]
         : [],

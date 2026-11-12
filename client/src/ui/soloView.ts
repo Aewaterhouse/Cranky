@@ -4,6 +4,7 @@ import type { Frame, Plan, Tier } from '../types'
 import { fmt, h } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { soloActions, type SoloAction } from './soloExtras'
+import { modeSwitch, modeText, type ModeState, type RideMode } from './soloMode'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
@@ -14,6 +15,8 @@ export interface SoloHandlers {
   end: () => void
   intensity: (d: number) => void
   tier: (t: Tier) => void
+  mode: (k: RideMode) => void
+  nudge: (dir: number) => void
 }
 
 export interface ViewState {
@@ -29,6 +32,7 @@ export interface ViewState {
   cadence: number[]
   hr: (number | null)[]
   actions: SoloAction[]
+  mode: ModeState
 }
 
 const TIERS: Tier[] = ['hard', 'medium', 'easy']
@@ -100,6 +104,8 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   const ov = h('div', { class: 'overlay' })
   const panel = soloPanel(plan, () => tierSel.value as Tier, ftp)
   const acts = soloActions()
+  const modes = modeSwitch({ set: on.mode, nudge: on.nudge })
+  const tgtLabel = tgt.el.firstElementChild as HTMLElement
   const kbd = (t: string) => h('kbd', {}, t)
 
   const root = h(
@@ -109,6 +115,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       'header',
       { class: 'solo-head' },
       h('h1', {}, plan.name),
+      modes.root,
       h('label', { class: 'field' }, 'Tier', tierSel),
       h(
         'div',
@@ -218,6 +225,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     frame(s: ViewState) {
       const { f, live } = s
       acts.set(s.actions)
+      modes.set(s.mode)
+      const noErg = s.mode.kind !== 'erg'
+      root.classList.toggle('noerg', noErg)
+      tgtLabel.textContent = noErg ? 'Aim for · ERG off' : 'Target'
+      tgtLabel.title = noErg
+        ? `${modeText(s.mode)}. You set the effort; the plan is only scored.`
+        : ''
       const t = f.tgt
       tgt.v.textContent = t == null ? (f.type === 'sprint' ? 'ALL OUT' : 'FREE') : String(t)
       tgt.el.classList.toggle('word', t == null)
