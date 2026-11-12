@@ -17,7 +17,9 @@ app = FastAPI(title="Zombie Bus")
 store = Store()
 for _name in config.SEED_USERS:
     store.add_user(_name, _name)
-rooms: dict[str, Room] = {}
+rooms: dict[str, Room] = {
+    d["code"]: Room.from_dict(d, store) for d in store.load_rooms(config.ROOM_RESUME_MAX_AGE_S)
+}
 LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ"
 
 
@@ -26,7 +28,7 @@ def user(authorization: str = Header(default="")) -> dict:
     me = store.whoami(authorization.removeprefix("Bearer ").strip())
     if not me:
         raise HTTPException(401, "Log in first")
-    return me
+    return {**me, "admin": me["id"] in config.ADMINS}
 
 
 User = Annotated[dict, Depends(user)]
@@ -34,6 +36,15 @@ User = Annotated[dict, Depends(user)]
 
 class Login(BaseModel):
     name: str
+    password: str
+
+
+class NewRider(BaseModel):
+    name: str
+    password: str | None = None
+
+
+class Password(BaseModel):
     password: str
 
 
@@ -53,6 +64,40 @@ def login(body: Login) -> dict:
     if not res:
         raise HTTPException(401, "Wrong name or password")
     return res
+
+
+@app.post("/api/riders")
+def add_rider(body: NewRider, u: User) -> dict:
+    if not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    name = body.name.strip()
+    if not name or len(name) > config.NAME_MAX or not name.isprintable():
+        raise HTTPException(400, f"Name must be 1 to {config.NAME_MAX} characters")
+    if not store.add_user(name, body.password or name):
+        raise HTTPException(409, f"{name} already exists")
+    return {"id": name.lower(), "name": name}
+
+
+@app.post("/api/riders/{rid}/password")
+def set_password(rid: str, body: Password, u: User) -> dict:
+    if rid != u["id"] and not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    if not body.password.strip():
+        raise HTTPException(400, "Password can't be empty")
+    if not store.set_password(rid, body.password):
+        raise HTTPException(404)
+    return {"ok": True}
+
+
+@app.delete("/api/riders/{rid}")
+def delete_rider(rid: str, u: User) -> dict:
+    if not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    if rid == u["id"]:
+        raise HTTPException(400, "You can't remove yourself")
+    if not store.delete_user(rid):
+        raise HTTPException(404)
+    return {"ok": True}
 
 
 @app.get("/api/me")
@@ -93,13 +138,14 @@ def plans() -> list[dict]:
 def create_room(u: User) -> dict:
     now = time.monotonic()
     for code, r in list(rooms.items()):
-        idle = not any(x.connected for x in r.riders.values()) and now - r.idle_since > config.ROOM_IDLE_S
-        if r.state != "running" and idle:
+        idle = not any(x.connected for x in r.humans()) and now - r.idle_since > config.ROOM_IDLE_S
+        if (r.state != "running" or r.paused) and idle:
             del rooms[code]
+            store.delete_room(code)
     code = "".join(random.choices(LETTERS, k=4))
     while code in rooms:
         code = "".join(random.choices(LETTERS, k=4))
-    rooms[code] = Room(code)
+    rooms[code] = Room(code, store)
     return {"code": code}
 
 
@@ -112,10 +158,10 @@ def list_rooms(u: User) -> list[dict]:
             "state": r.state,
             "plan": r.plan["name"],
             "host": r.riders[r.host].name if r.host else None,
-            "riders": [x.name for x in r.riders.values() if x.connected],
+            "riders": [x.name for x in r.humans() if x.connected],
         }
         for r in rooms.values()
-        if any(x.connected for x in r.riders.values())
+        if any(x.connected for x in r.humans())
     ]
 
 

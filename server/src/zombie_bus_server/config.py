@@ -13,6 +13,8 @@ TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5
 MAX_RIDERS = 6
 ROOM_IDLE_S = 600
+ROOM_RESUME_MAX_AGE_S = 900  # a snapshot older than this is dropped at startup
+SNAPSHOT_S = 5  # real seconds between snapshots of a running room
 STALE_DATA_S = 3.0  # real seconds without data before a rider reads as zero power
 
 TIER_FACTOR = {"hard": 1.0, "medium": 0.9, "easy": 0.8}
@@ -72,3 +74,24 @@ SYNC_WIDEN_RPM = 3
 
 # Accounts seeded at startup. Password is the name (case-insensitive) — friends-only hobby server.
 SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack", "Kat"]
+ADMINS = ["alex"]  # rider ids who can add, remove and reset riders
+NAME_MAX = 20
+
+# Bots: NPC riders that fill empty seats. Seeded per bot from the room code and bot id.
+BOT_NAMES = ["Dazza", "Shazza", "Bluey", "Robbo", "Kev"]
+BOT_FTP = (200, 260)
+BOT_LOOKS = {
+    "hat": ["hat-cap", "hat-cone", "hat-viking"],
+    "outfit": ["outfit-hivis", "outfit-purple", "outfit-black"],
+}
+BOT_COMP = (0.85, 1.0)  # compliance wanders slowly inside this band
+BOT_COMP_WALK = 0.01  # std dev of the random walk per tick
+BOT_BAD_PER_S = 1 / 600  # chance per second of starting a bad patch
+BOT_BAD_COMP = (0.4, 0.58)  # compliance in a bad patch (under FELL_COMPLIANCE, so they can fall off)
+BOT_BAD_S = (30, 50)  # bad patch length in session seconds
+BOT_POWER_JITTER = 0.03  # power is target x (1 +/- this)
+BOT_CAD_DEFAULT = 88
+BOT_CAD_JITTER = 3  # rpm either side of the human median
+BOT_SPRINT_X = (2.5, 3.5)  # sprint power as a multiple of FTP
+BOT_IDLE_X = 0.5  # power as a fraction of FTP when ERG is off outside a sprint
+BOT_GRADES = {"FAIL": 10, "HIT": 45, "GREAT": 35, "MEGA": 9, "LEGEND": 1}

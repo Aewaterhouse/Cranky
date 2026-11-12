@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import statistics
 from typing import TYPE_CHECKING
 
@@ -35,6 +36,23 @@ class ZombieBus:
         self.ev = ""
         self.repel = 0
         self.syncw = 0
+
+    def to_dict(self) -> dict:
+        """JSON-safe copy of all state (the roadblock's rider sets become sorted lists)."""
+        d = copy.deepcopy(vars(self))
+        for k in ("expect", "reported"):
+            if d["rb"]:
+                d["rb"][k] = sorted(d["rb"][k])
+        return d
+
+    @classmethod
+    def from_dict(cls, d: dict) -> ZombieBus:
+        bus = cls()
+        vars(bus).update(copy.deepcopy(d))
+        for k in ("expect", "reported"):
+            if bus.rb:
+                bus.rb[k] = set(bus.rb[k])
+        return bus
 
     def emit(self, k: str, text: str | None = None, rid: str | None = None) -> None:
         self.fx.append({"k": k, "text": text, "id": rid})

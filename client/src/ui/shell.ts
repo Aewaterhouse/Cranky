@@ -1,4 +1,6 @@
+import { me } from '../core/api'
 import type { Profile } from '../core/curve'
+import { adminTab, changeMyPassword } from './admin'
 import { avatar, h, show } from './dom'
 import { garageTab, scrapIcon } from './garage'
 import { rideTab, type HomeActions } from './home'
@@ -8,16 +10,22 @@ import { listen, setSimFtp, trainerPill } from './trainer'
 
 const TABS = { ride: 'Ride', garage: 'Garage', rider: 'Rider' }
 type Tab = keyof typeof TABS
-const current = (): Tab => {
+const current = (): Tab | 'admin' => {
   const t = location.hash.slice(1)
-  return t in TABS ? (t as Tab) : 'ride'
+  return t in TABS || t === 'admin' ? (t as Tab) : 'ride'
 }
 
-function riderChip(p: Profile, act: HomeActions) {
+function riderChip(p: Profile, act: HomeActions, admin: boolean) {
   const menu = h(
     'div',
     { class: 'menu', hidden: true },
     h('a', { href: '#rider' }, 'Rider profile'),
+    admin ? h('a', { href: '#admin' }, 'Admin') : '',
+    h(
+      'button',
+      { onclick: () => ((menu.hidden = true), changeMyPassword(p.id)) },
+      'Change my password',
+    ),
     h('button', { onclick: act.logout }, 'Log out'),
   )
   const close = (e: Event) => {
@@ -50,11 +58,18 @@ export function showHome(p: Profile, act: HomeActions) {
   setSimFtp(p.ftp)
   listen()
   let bar: HTMLElement | undefined
+  let admin = false
   const render = () => {
     if (bar && !bar.isConnected) return
     const tab = current()
     const body =
-      tab === 'garage' ? garageTab(p, render) : tab === 'rider' ? riderTab(p) : rideTab(p, act)
+      tab === 'admin' && admin
+        ? adminTab(p.id)
+        : tab === 'garage'
+          ? garageTab(p, render)
+          : tab === 'rider'
+            ? riderTab(p)
+            : rideTab(p, act)
     bar = h(
       'header',
       { class: 'top' },
@@ -66,10 +81,14 @@ export function showHome(p: Profile, act: HomeActions) {
           h('a', { href: `#${k}`, class: k === tab ? 'on' : '' }, v),
         ),
       ),
-      h('div', { class: 'right' }, trainerPill(), riderChip(p, act)),
+      h('div', { class: 'right' }, trainerPill(), riderChip(p, act, admin)),
     )
     show(bar, h('main', { class: 'page' }, body))
   }
   render()
+  me().then(
+    (m) => m.admin && ((admin = true), render()),
+    () => {},
+  )
   onhashchange = render
 }

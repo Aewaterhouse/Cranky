@@ -10,7 +10,10 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/health` | → `{ok: true}` (no auth) |
 | GET | `/api/riders` | → seeded riders `[{id, name}]` for the login tiles (no auth) |
 | POST | `/api/login` | `{name, password}` → `{token, id, name}`; 401 if wrong. Password is the name, case-insensitive. |
-| GET | `/api/me` | → `{id, name}` |
+| GET | `/api/me` | → `{id, name, admin}`; `admin` is true for ids in `config.ADMINS` |
+| POST | `/api/riders` | `{name, password?}` → `{id, name}`; admin only. Password defaults to the name. 409 if the name exists. |
+| POST | `/api/riders/{id}/password` | `{password}`; admin, or the rider themselves |
+| DELETE | `/api/riders/{id}` | Admin only; not yourself. Removes the login and tokens; the profile and rides stay. |
 | GET | `/api/profile/{id}` | Profile JSON, 404 if unknown |
 | PUT | `/api/profile/{id}` | Profile JSON (newer `updated` wins); 403 unless `id` is your own |
 | POST | `/api/rides` | `{summary}`: ride summary from the client, stored for the logged-in rider |
@@ -32,6 +35,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 | --- | --- | --- |
 | `join` | `name, ftp, tier, look` | First message. `look` is the cosmetics map (e.g. `{hat, outfit, paint, bullbar, spikes}`). Same `id` reconnecting reclaims the slot. |
 | `setup` | `plan, minutes` | Host only, lobby only. `minutes` 0 = as written. |
+| `bots` | `n` | Host only, lobby only. Sets the number of bot riders (0..5), capped so humans + bots fit the 6 seats. A human joining a full bus takes a bot's seat. |
 | `start` | | Host only. 5 s countdown (negative `el`). |
 | `tier` | `tier` | Rider changes own tier. |
 | `data` | `p, w, cad, s` | 2 Hz. Instant power, 3 s power, cadence, compliance (0..1 or null). |
@@ -43,7 +47,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 | t | Fields |
 | --- | --- |
-| `lobby` | `code, host, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look}]` |
+| `lobby` | `code, host, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot}]`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`) |
 | `tick` | `el, i, bel, ev, riders: {id: {name, tier, tgt, w, cad, s, st}}, bus, fx` |
 | `end` | `summary` (GroupSummary, see `client/src/ui/results.ts`) |
 | `error` | `msg` |

@@ -22,6 +22,7 @@ export async function api<T = unknown>(path: string, init: RequestInit = {}): Pr
 export interface Me {
   id: string
   name: string
+  admin?: boolean
 }
 
 export async function login(name: string, password: string): Promise<Me> {

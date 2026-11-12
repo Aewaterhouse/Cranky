@@ -6,6 +6,7 @@ import type { Grade, Plan, Tier } from '../types'
 export type ClientMsg =
   | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look }
   | { t: 'setup'; plan: string; minutes: number }
+  | { t: 'bots'; n: number }
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
@@ -21,6 +22,7 @@ export interface LobbyRider {
   ftp: number
   connected: boolean
   look: Look
+  bot?: boolean
 }
 export interface Lobby {
   t: 'lobby'

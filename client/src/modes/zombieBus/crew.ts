@@ -55,6 +55,7 @@ export async function crew(
       saveProfile(profile)
       net.send({ t: 'tier', tier })
     },
+    bots: (n) => net.send({ t: 'bots', n }),
     start: () => net.send({ t: 'start' }),
     leave,
   })
