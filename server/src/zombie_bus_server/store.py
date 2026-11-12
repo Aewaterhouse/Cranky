@@ -57,14 +57,31 @@ class Store:
     def _hash(password: str, salt: str) -> str:
         return hashlib.pbkdf2_hmac("sha256", password.lower().encode(), salt.encode(), 100_000).hex()
 
-    def add_user(self, name: str, password: str) -> None:
-        """Creates the account if it doesn't exist. Ids are lower-case names."""
+    def add_user(self, name: str, password: str) -> bool:
+        """Creates the account if it doesn't exist. Ids are lower-case names. Returns True if created."""
         salt = secrets.token_hex(8)
         with self.lock, self.db:
-            self.db.execute(
+            cur = self.db.execute(
                 "INSERT OR IGNORE INTO users VALUES (?, ?, ?, ?)",
                 (name.lower(), name, salt, self._hash(password, salt)),
             )
+        return cur.rowcount > 0
+
+    def set_password(self, rid: str, password: str) -> bool:
+        """Sets a new password (existing tokens stay valid). Returns False if there is no such rider."""
+        salt = secrets.token_hex(8)
+        with self.lock, self.db:
+            cur = self.db.execute(
+                "UPDATE users SET salt = ?, hash = ? WHERE id = ?", (salt, self._hash(password, salt), rid)
+            )
+        return cur.rowcount > 0
+
+    def delete_user(self, rid: str) -> bool:
+        """Removes the account and its tokens; the profile and rides stay. Returns False if unknown."""
+        with self.lock, self.db:
+            self.db.execute("DELETE FROM tokens WHERE id = ?", (rid,))
+            cur = self.db.execute("DELETE FROM users WHERE id = ?", (rid,))
+        return cur.rowcount > 0
 
     def users(self) -> list[dict]:
         with self.lock:

@@ -72,3 +72,5 @@ SYNC_WIDEN_RPM = 3
 
 # Accounts seeded at startup. Password is the name (case-insensitive) — friends-only hobby server.
 SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack", "Kat"]
+ADMINS = ["alex"]  # rider ids who can add, remove and reset riders
+NAME_MAX = 20

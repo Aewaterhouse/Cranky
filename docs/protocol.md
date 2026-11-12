@@ -10,7 +10,10 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/health` | → `{ok: true}` (no auth) |
 | GET | `/api/riders` | → seeded riders `[{id, name}]` for the login tiles (no auth) |
 | POST | `/api/login` | `{name, password}` → `{token, id, name}`; 401 if wrong. Password is the name, case-insensitive. |
-| GET | `/api/me` | → `{id, name}` |
+| GET | `/api/me` | → `{id, name, admin}`; `admin` is true for ids in `config.ADMINS` |
+| POST | `/api/riders` | `{name, password?}` → `{id, name}`; admin only. Password defaults to the name. 409 if the name exists. |
+| POST | `/api/riders/{id}/password` | `{password}`; admin, or the rider themselves |
+| DELETE | `/api/riders/{id}` | Admin only; not yourself. Removes the login and tokens; the profile and rides stay. |
 | GET | `/api/profile/{id}` | Profile JSON, 404 if unknown |
 | PUT | `/api/profile/{id}` | Profile JSON (newer `updated` wins); 403 unless `id` is your own |
 | POST | `/api/rides` | `{summary}`: ride summary from the client, stored for the logged-in rider |

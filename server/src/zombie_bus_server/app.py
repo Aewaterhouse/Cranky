@@ -26,7 +26,7 @@ def user(authorization: str = Header(default="")) -> dict:
     me = store.whoami(authorization.removeprefix("Bearer ").strip())
     if not me:
         raise HTTPException(401, "Log in first")
-    return me
+    return {**me, "admin": me["id"] in config.ADMINS}
 
 
 User = Annotated[dict, Depends(user)]
@@ -34,6 +34,15 @@ User = Annotated[dict, Depends(user)]
 
 class Login(BaseModel):
     name: str
+    password: str
+
+
+class NewRider(BaseModel):
+    name: str
+    password: str | None = None
+
+
+class Password(BaseModel):
     password: str
 
 
@@ -53,6 +62,40 @@ def login(body: Login) -> dict:
     if not res:
         raise HTTPException(401, "Wrong name or password")
     return res
+
+
+@app.post("/api/riders")
+def add_rider(body: NewRider, u: User) -> dict:
+    if not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    name = body.name.strip()
+    if not name or len(name) > config.NAME_MAX or not name.isprintable():
+        raise HTTPException(400, f"Name must be 1 to {config.NAME_MAX} characters")
+    if not store.add_user(name, body.password or name):
+        raise HTTPException(409, f"{name} already exists")
+    return {"id": name.lower(), "name": name}
+
+
+@app.post("/api/riders/{rid}/password")
+def set_password(rid: str, body: Password, u: User) -> dict:
+    if rid != u["id"] and not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    if not body.password.strip():
+        raise HTTPException(400, "Password can't be empty")
+    if not store.set_password(rid, body.password):
+        raise HTTPException(404)
+    return {"ok": True}
+
+
+@app.delete("/api/riders/{rid}")
+def delete_rider(rid: str, u: User) -> dict:
+    if not u["admin"]:
+        raise HTTPException(403, "Admins only")
+    if rid == u["id"]:
+        raise HTTPException(400, "You can't remove yourself")
+    if not store.delete_user(rid):
+        raise HTTPException(404)
+    return {"ok": True}
 
 
 @app.get("/api/me")
