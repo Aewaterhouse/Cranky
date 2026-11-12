@@ -50,7 +50,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | TV / second-screen mode | Pair on the laptop, watch on a TV or iPad (spectator view by code) | M |
 | iPad and phone layout pass | Test Bluefy on iPad; fix HUD and solo layouts for touch | M |
 | Number tuning | Tune horde, damage, fell-off and scrap after the first real ride | S |
-| Automated end-to-end test | Put the Playwright ride test in the repo so regressions are caught | S |
+| ✅ Automated end-to-end test | Put the Playwright ride test in the repo so regressions are caught | S |
 
 ## 2. Data, graphs and export
 

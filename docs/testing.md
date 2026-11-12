@@ -62,3 +62,7 @@ Close MyWhoosh/Wahoo apps first.
 | Date | Phase | Who / devices | Result | Issues |
 | --- | --- | --- | --- | --- |
 |  |  |  |  |  |
+
+## Headless end-to-end ride
+
+`scripts/e2e.sh` builds the client, starts a 20× server on port 8199 with a throwaway database, and drives a solo workout plus a two-rider Zombie Bus ride in headless Chromium (`client/e2e/ride.cjs`). It takes about two minutes and fails on any page error. Run it before merging anything that touches the ride flow.
