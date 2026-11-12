@@ -14,7 +14,14 @@ export type ClientMsg =
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
 export type ShopItem = 'plating' | 'repellent' | 'sync'
-export interface LobbyRider { id: string; name: string; tier: Tier; ftp: number; connected: boolean; look: Look }
+export interface LobbyRider {
+  id: string
+  name: string
+  tier: Tier
+  ftp: number
+  connected: boolean
+  look: Look
+}
 export interface Lobby {
   t: 'lobby'
   code: string
@@ -24,8 +31,46 @@ export interface Lobby {
   minutes: number
   riders: LobbyRider[]
 }
-export interface RiderTick { name: string; tier: Tier; tgt: number | null; w: number; cad: number; s: number | null; st: 'riding' | 'fell' | 'spectator' }
-export interface BusState { speed: number; dist: number; armour: number; gap: number; scrap: number; sync: boolean; tune: boolean; rb: number | null; combo: number; shop: boolean; repel: number; syncw: number }
-export interface Fx { k: string; text?: string | null; id?: string | null }
-export interface Tick { t: 'tick'; el: number; i: number; bel: number; ev: string; riders: Record<string, RiderTick>; bus: BusState; fx: Fx[] }
-export type ServerMsg = Lobby | Tick | { t: 'end'; summary: GroupSummary & { score: number } } | { t: 'error'; msg: string }
+export interface RiderTick {
+  name: string
+  tier: Tier
+  tgt: number | null
+  w: number
+  cad: number
+  s: number | null
+  st: 'riding' | 'fell' | 'spectator'
+}
+export interface BusState {
+  speed: number
+  dist: number
+  armour: number
+  gap: number
+  scrap: number
+  sync: boolean
+  tune: boolean
+  rb: number | null
+  combo: number
+  shop: boolean
+  repel: number
+  syncw: number
+}
+export interface Fx {
+  k: string
+  text?: string | null
+  id?: string | null
+}
+export interface Tick {
+  t: 'tick'
+  el: number
+  i: number
+  bel: number
+  ev: string
+  riders: Record<string, RiderTick>
+  bus: BusState
+  fx: Fx[]
+}
+export type ServerMsg =
+  | Lobby
+  | Tick
+  | { t: 'end'; summary: GroupSummary & { score: number } }
+  | { t: 'error'; msg: string }

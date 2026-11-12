@@ -11,7 +11,12 @@ import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 
 /** Solo plan runner: local clock, minimal road scene, no horde. */
-export function runDrill(plan: Plan, profile: Profile, trainer: Trainer, done: (p: Profile) => void) {
+export function runDrill(
+  plan: Plan,
+  profile: Profile,
+  trainer: Trainer,
+  done: (p: Profile) => void,
+) {
   const stage = h('div', { class: 'stage' })
   show(stage)
   const world = new World(stage)
@@ -24,13 +29,20 @@ export function runDrill(plan: Plan, profile: Profile, trainer: Trainer, done: (
   let lastCount = 0
   let speed = 0
   let finished = false
-  const hud = makeHud((t) => {
-    profile.tier = t
-    saveProfile(profile)
-  }, () => end())
+  const hud = makeHud(
+    (t) => {
+      profile.tier = t
+      saveProfile(profile)
+    },
+    () => end(),
+  )
   hud.setTier(profile.tier)
   stage.append(hud.root)
-  ride.onSprint = (r) => (SFX[r.grade](), hud.sprint(r), r.grade !== 'FAIL' && r.grade !== 'HIT' && world.fx(r.grade === 'GREAT' ? 'shake' : 'slowmo'))
+  ride.onSprint = (r) => (
+    SFX[r.grade](),
+    hud.sprint(r),
+    r.grade !== 'FAIL' && r.grade !== 'HIT' && world.fx(r.grade === 'GREAT' ? 'shake' : 'slowmo')
+  )
   ride.start()
 
   const timer = setInterval(() => {
@@ -53,7 +65,22 @@ export function runDrill(plan: Plan, profile: Profile, trainer: Trainer, done: (
     const live = ride.live
     const c = f.tgt ? (live.c ?? 0) : Math.min(1, live.avg / profile.ftp)
     speed += (4 + c * (CFG.scene.speedMax - 4) - speed) * 0.15
-    world.state = { ...world.state, speed, mood: 'drill', busLook: profile.look, riders: [{ id: profile.id, name: profile.name, c: live.c, st: 'riding', cadence: live.cadence, look: profile.look }] }
+    world.state = {
+      ...world.state,
+      speed,
+      mood: 'drill',
+      busLook: profile.look,
+      riders: [
+        {
+          id: profile.id,
+          name: profile.name,
+          c: live.c,
+          st: 'riding',
+          cadence: live.cadence,
+          look: profile.look,
+        },
+      ],
+    }
     hud.frame(f, live, total)
   }, 250)
 

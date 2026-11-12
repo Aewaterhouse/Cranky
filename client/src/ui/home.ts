@@ -27,13 +27,25 @@ export function planFor(id: string, minutes: number): Plan {
 
 /** Garage: profile, trainer pairing, solo and crew entry points. */
 export function showHome(profile: Profile, act: HomeActions) {
-  const live = h('div', { class: 'live' }, trainer ? `${trainer.name} connected` : 'No trainer connected')
-  const watch = () => trainer?.onData((d) => (live.textContent = `${trainer!.name}: ${d.power} W · ${Math.round(d.cadence)} rpm`))
+  const live = h(
+    'div',
+    { class: 'live' },
+    trainer ? `${trainer.name} connected` : 'No trainer connected',
+  )
+  const watch = () =>
+    trainer?.onData(
+      (d) => (live.textContent = `${trainer!.name}: ${d.power} W · ${Math.round(d.cadence)} rpm`),
+    )
   watch()
-  const field = (label: string, input: HTMLElement) => h('label', { class: 'field' }, h('span', {}, label), input)
+  const field = (label: string, input: HTMLElement) =>
+    h('label', { class: 'field' }, h('span', {}, label), input)
   const name = h('input', { value: profile.name, placeholder: 'Your name', maxLength: 16 })
   const ftp = h('input', { type: 'number', value: profile.ftp, min: 50, max: 600 })
-  const tier = h('select', {}, ...TIERS.map((t) => h('option', { value: t, selected: t === profile.tier }, t)))
+  const tier = h(
+    'select',
+    {},
+    ...TIERS.map((t) => h('option', { value: t, selected: t === profile.tier }, t)),
+  )
   const save = () => {
     profile.name = name.value.trim() || 'Rider'
     profile.ftp = Math.max(50, Math.min(600, +ftp.value || 200))
@@ -41,13 +53,31 @@ export function showHome(profile: Profile, act: HomeActions) {
     saveProfile(profile)
   }
   for (const i of [name, ftp, tier]) i.addEventListener('change', save)
-  const plan = h('select', {}, ...PLANS.map((p) => h('option', { value: p.id }, `${p.name} (${fmt(planTotal(parsePlan(p).blocks))})`)))
-  const mins = h('select', {}, ...DURATIONS.map((m) => h('option', { value: m }, m ? `${m} min` : 'As written')))
+  const plan = h(
+    'select',
+    {},
+    ...PLANS.map((p) =>
+      h('option', { value: p.id }, `${p.name} (${fmt(planTotal(parsePlan(p).blocks))})`),
+    ),
+  )
+  const mins = h(
+    'select',
+    {},
+    ...DURATIONS.map((m) => h('option', { value: m }, m ? `${m} min` : 'As written')),
+  )
   const desc = h('p', { class: 'dim' })
   const upd = () => (desc.textContent = PLANS.find((p) => p.id === plan.value)?.desc ?? '')
   plan.addEventListener('change', upd)
   upd()
-  const code = h('input', { placeholder: 'CODE', maxLength: 4, value: new URLSearchParams(location.search).get('join') ?? sessionStorage.getItem('zombiebus.code') ?? '', style: 'width:6em;text-transform:uppercase' })
+  const code = h('input', {
+    placeholder: 'CODE',
+    maxLength: 4,
+    value:
+      new URLSearchParams(location.search).get('join') ??
+      sessionStorage.getItem('zombiebus.code') ??
+      '',
+    style: 'width:6em;text-transform:uppercase',
+  })
   const need = (fn: () => void) => () => {
     save()
     if (!trainer) return alert('Connect a trainer or use the simulated trainer first.')
@@ -55,7 +85,8 @@ export function showHome(profile: Profile, act: HomeActions) {
     fn()
   }
   const connectBt = async () => {
-    if (!navigator.bluetooth) return alert('Web Bluetooth is not available. Use Chrome or Edge over HTTPS (or localhost).')
+    if (!navigator.bluetooth)
+      return alert('Web Bluetooth is not available. Use Chrome or Edge over HTTPS (or localhost).')
     try {
       const t = new FtmsTrainer()
       await t.connect()
@@ -76,36 +107,113 @@ export function showHome(profile: Profile, act: HomeActions) {
   }
   const shop = h('div', { class: 'card' })
   const renderShop = () => {
-    shop.replaceChildren(h('h2', {}, `Garage shop · ${profile.scrap} scrap`),
-      h('p', { class: 'dim' }, 'Earn scrap on crew rides. Paint and parts show on the bus when you drive (host).'),
-      h('div', { class: 'shopgrid' }, ...COSMETICS.map((c) => {
-        const owned = profile.owned.includes(c.id)
-        const on = profile.look[c.slot] === c.id
-        const act = () => {
-          const r = owned ? equip(profile, c.id) : buy(profile, c.id)
-          if (typeof r === 'string') return alert(r)
-          Object.assign(profile, r)
-          saveProfile(profile)
-          renderShop()
-        }
-        return h('div', { class: `item${on ? ' on' : ''}` },
-          h('div', {}, c.colour ? h('span', { class: 'swatch', style: `background:${c.colour}` }) : '', h('b', {}, c.name)),
-          h('div', { class: 'dim' }, `${SLOT_NAMES[c.slot]}${owned ? '' : ` · ${c.price} scrap`}`),
-          h('button', { class: owned ? 'ghost' : '', disabled: !owned && profile.scrap < c.price, onclick: act }, owned ? (on ? 'Unequip' : 'Equip') : 'Buy'))
-      })))
+    shop.replaceChildren(
+      h('h2', {}, `Garage shop · ${profile.scrap} scrap`),
+      h(
+        'p',
+        { class: 'dim' },
+        'Earn scrap on crew rides. Paint and parts show on the bus when you drive (host).',
+      ),
+      h(
+        'div',
+        { class: 'shopgrid' },
+        ...COSMETICS.map((c) => {
+          const owned = profile.owned.includes(c.id)
+          const on = profile.look[c.slot] === c.id
+          const act = () => {
+            const r = owned ? equip(profile, c.id) : buy(profile, c.id)
+            if (typeof r === 'string') return alert(r)
+            Object.assign(profile, r)
+            saveProfile(profile)
+            renderShop()
+          }
+          return h(
+            'div',
+            { class: `item${on ? ' on' : ''}` },
+            h(
+              'div',
+              {},
+              c.colour ? h('span', { class: 'swatch', style: `background:${c.colour}` }) : '',
+              h('b', {}, c.name),
+            ),
+            h(
+              'div',
+              { class: 'dim' },
+              `${SLOT_NAMES[c.slot]}${owned ? '' : ` · ${c.price} scrap`}`,
+            ),
+            h(
+              'button',
+              {
+                class: owned ? 'ghost' : '',
+                disabled: !owned && profile.scrap < c.price,
+                onclick: act,
+              },
+              owned ? (on ? 'Unequip' : 'Equip') : 'Buy',
+            ),
+          )
+        }),
+      ),
+    )
   }
   renderShop()
-  show(h('div', { class: 'page' },
-    h('h1', {}, '🧟 Zombie Bus'),
-    h('div', { class: 'card' }, h('h2', {}, 'Rider'), h('div', { class: 'row' }, field('Name', name), field('FTP (W)', ftp), field('Tier', tier)),
-      h('p', { class: 'dim' }, `${profile.stats.rides} rides · ${Math.round(profile.stats.secs / 3600)} h · ${profile.stats.kj} kJ · ${profile.stats.streak} week streak`)),
-    h('div', { class: 'card' }, h('h2', {}, 'Trainer'), live,
-      h('div', { class: 'row' }, h('button', { onclick: connectBt }, 'Connect trainer (Bluetooth)'), h('button', { class: 'ghost', onclick: useSim }, 'Use simulated trainer')),
-      h('p', { class: 'dim' }, 'Close MyWhoosh/Wahoo apps first. Sim keys: ↑↓ free-ride watts, ←→ cadence, [ ] ERG effort, S sprint power, A easy power.')),
-    h('div', { class: 'card' }, h('h2', {}, 'Ride with the crew'),
-      h('div', { class: 'row' }, h('button', { class: 'primary', onclick: need(act.create) }, 'Start a bus'), code, h('button', { onclick: need(() => act.join(code.value.toUpperCase())) }, 'Join'))),
-    h('div', { class: 'card' }, h('h2', {}, 'Solo drill'), h('div', { class: 'row' }, field('Plan', plan), field('Length', mins)), desc,
-      h('button', { onclick: need(() => act.drill(planFor(plan.value, +mins.value))) }, 'Start drill')),
-    shop,
-  ))
+  show(
+    h(
+      'div',
+      { class: 'page' },
+      h('h1', {}, '🧟 Zombie Bus'),
+      h(
+        'div',
+        { class: 'card' },
+        h('h2', {}, 'Rider'),
+        h('div', { class: 'row' }, field('Name', name), field('FTP (W)', ftp), field('Tier', tier)),
+        h(
+          'p',
+          { class: 'dim' },
+          `${profile.stats.rides} rides · ${Math.round(profile.stats.secs / 3600)} h · ${profile.stats.kj} kJ · ${profile.stats.streak} week streak`,
+        ),
+      ),
+      h(
+        'div',
+        { class: 'card' },
+        h('h2', {}, 'Trainer'),
+        live,
+        h(
+          'div',
+          { class: 'row' },
+          h('button', { onclick: connectBt }, 'Connect trainer (Bluetooth)'),
+          h('button', { class: 'ghost', onclick: useSim }, 'Use simulated trainer'),
+        ),
+        h(
+          'p',
+          { class: 'dim' },
+          'Close MyWhoosh/Wahoo apps first. Sim keys: ↑↓ free-ride watts, ←→ cadence, [ ] ERG effort, S sprint power, A easy power.',
+        ),
+      ),
+      h(
+        'div',
+        { class: 'card' },
+        h('h2', {}, 'Ride with the crew'),
+        h(
+          'div',
+          { class: 'row' },
+          h('button', { class: 'primary', onclick: need(act.create) }, 'Start a bus'),
+          code,
+          h('button', { onclick: need(() => act.join(code.value.toUpperCase())) }, 'Join'),
+        ),
+      ),
+      h(
+        'div',
+        { class: 'card' },
+        h('h2', {}, 'Solo drill'),
+        h('div', { class: 'row' }, field('Plan', plan), field('Length', mins)),
+        desc,
+        h(
+          'button',
+          { onclick: need(() => act.drill(planFor(plan.value, +mins.value))) },
+          'Start drill',
+        ),
+      ),
+      shop,
+    ),
+  )
 }

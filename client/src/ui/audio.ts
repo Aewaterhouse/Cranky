@@ -1,7 +1,13 @@
 let ctx: AudioContext | null = null
 const ac = () => (ctx ??= new AudioContext())
 
-export function beep(freq: number, dur = 0.12, type: OscillatorType = 'square', gain = 0.08, at = 0) {
+export function beep(
+  freq: number,
+  dur = 0.12,
+  type: OscillatorType = 'square',
+  gain = 0.08,
+  at = 0,
+) {
   try {
     const c = ac()
     const o = c.createOscillator()
@@ -18,7 +24,8 @@ export function beep(freq: number, dur = 0.12, type: OscillatorType = 'square', 
     /* no audio */
   }
 }
-const seq = (notes: number[], step = 0.1, type: OscillatorType = 'square') => notes.forEach((n, i) => beep(n, step * 1.4, type, 0.08, i * step))
+const seq = (notes: number[], step = 0.1, type: OscillatorType = 'square') =>
+  notes.forEach((n, i) => beep(n, step * 1.4, type, 0.08, i * step))
 
 export const SFX = {
   block: () => seq([660, 880], 0.08),
@@ -37,7 +44,14 @@ export const SFX = {
 
 /** Low drone that shifts with the event mood. */
 let drone: { o: OscillatorNode; g: GainNode } | null = null
-const MOOD_HZ: Record<string, number> = { drill: 0, longhaul: 55, surge: 73, roadblock: 49, servo: 0, finish: 0 }
+const MOOD_HZ: Record<string, number> = {
+  drill: 0,
+  longhaul: 55,
+  surge: 73,
+  roadblock: 49,
+  servo: 0,
+  finish: 0,
+}
 export function mood(m: string) {
   try {
     const c = ac()

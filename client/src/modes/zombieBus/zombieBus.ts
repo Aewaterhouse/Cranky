@@ -12,10 +12,27 @@ import { makeHud } from '../../ui/hud'
 import type { Trainer } from '../../types'
 import { RideController } from '../rideController'
 
-const FX_SOUND: Record<string, () => void> = { buy: SFX.scrap, repel: SFX.shake, hit: SFX.hit, grab: SFX.grab, shake: SFX.shake, smash: SFX.MEGA, crash: SFX.hit, hauled: SFX.scrap, tune: SFX.GREAT, fell: SFX.FAIL }
+const FX_SOUND: Record<string, () => void> = {
+  buy: SFX.scrap,
+  repel: SFX.shake,
+  hit: SFX.hit,
+  grab: SFX.grab,
+  shake: SFX.shake,
+  smash: SFX.MEGA,
+  crash: SFX.hit,
+  hauled: SFX.scrap,
+  tune: SFX.GREAT,
+  fell: SFX.FAIL,
+}
 
 /** Zombie Bus ride view driven by server ticks. */
-export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, net: WsClient, leave: () => void) {
+export function startBusRide(
+  lobby0: Lobby,
+  profile: Profile,
+  trainer: Trainer,
+  net: WsClient,
+  leave: () => void,
+) {
   const stage = h('div', { class: 'stage' })
   show(stage)
   const world = new World(stage)
@@ -27,14 +44,17 @@ export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, 
   const isHost = () => l.host === profile.id
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
-  const hud = makeHud((t) => {
-    profile.tier = t
-    saveProfile(profile)
-    net.send({ t: 'tier', tier: t })
-  }, () => {
-    if (isHost() && confirm('End the ride for everyone?')) net.send({ t: 'end' })
-    else if (!isHost() && confirm('Leave the bus?')) leave()
-  })
+  const hud = makeHud(
+    (t) => {
+      profile.tier = t
+      saveProfile(profile)
+      net.send({ t: 'tier', tier: t })
+    },
+    () => {
+      if (isHost() && confirm('End the ride for everyone?')) net.send({ t: 'end' })
+      else if (!isHost() && confirm('Leave the bus?')) leave()
+    },
+  )
   hud.setTier(profile.tier)
   stage.append(hud.root)
   ride.onSprint = (r) => {
@@ -45,7 +65,13 @@ export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, 
   ride.start()
   const sender = setInterval(() => {
     const v = ride.live
-    net.send({ t: 'data', p: v.power, w: Math.round(v.avg), cad: v.cadence, s: ride.frame?.tgt ? v.c : null })
+    net.send({
+      t: 'data',
+      p: v.power,
+      w: Math.round(v.avg),
+      cad: v.cadence,
+      s: ride.frame?.tgt ? v.c : null,
+    })
   }, 1000 / CFG.net.sendHz)
   let lastI = -2
   let lastEv = ''
@@ -73,7 +99,8 @@ export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, 
       }
       if (m.i !== lastI) {
         SFX.block()
-        if (plan.blocks[m.i]?.type === 'sprint') hud.banner('ROADBLOCK! ERG off. Sprint!', 'grade-MEGA')
+        if (plan.blocks[m.i]?.type === 'sprint')
+          hud.banner('ROADBLOCK! ERG off. Sprint!', 'grade-MEGA')
       }
     }
     lastI = m.i
@@ -83,23 +110,48 @@ export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, 
       if (fx.k === 'hit' || fx.k === 'crash') world.fx('hit')
       if (fx.k === 'smash' || fx.k === 'crash') world.fx('smash')
       if (fx.k === 'shake') world.fx('shake')
-      if (fx.k === 'slowmo') (world.fx('slowmo'), world.fx('shake'))
+      if (fx.k === 'slowmo') {
+        world.fx('slowmo')
+        world.fx('shake')
+      }
       if (fx.text) hud.toast(fx.text)
     }
     const b = m.bus
     world.state = {
-      speed: b.speed, gap: b.gap, armour: b.armour, mood: (m.i < 0 ? 'drill' : m.ev in { warmup: 1, cooldown: 1 } ? 'drill' : m.ev) as Mood,
+      speed: b.speed,
+      gap: b.gap,
+      armour: b.armour,
+      mood: (m.i < 0 ? 'drill' : m.ev in { warmup: 1, cooldown: 1 } ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
-      riders: Object.entries(m.riders).map(([id, r]) => ({ id, name: r.name, c: r.s, st: r.st, cadence: r.cad, look: lk[id] })),
+      riders: Object.entries(m.riders).map(([id, r]) => ({
+        id,
+        name: r.name,
+        c: r.s,
+        st: r.st,
+        cadence: r.cad,
+        look: lk[id],
+      })),
     }
     hud.bus([
-      ['Armour', `${Math.round(b.armour)}`], ['Horde gap', `${Math.round(b.gap)} m`], ['Speed', `${Math.round(b.speed * 3.6)} km/h`],
-      ['Distance', `${(b.dist / 1000).toFixed(2)} km`], ['Scrap', `${b.scrap}`], ['Engine', b.tune ? 'IN TUNE x1.25' : b.sync ? 'syncing…' : 'out of sync'],
+      ['Armour', `${Math.round(b.armour)}`],
+      ['Horde gap', `${Math.round(b.gap)} m`],
+      ['Speed', `${Math.round(b.speed * 3.6)} km/h`],
+      ['Distance', `${(b.dist / 1000).toFixed(2)} km`],
+      ['Scrap', `${b.scrap}`],
+      ['Engine', b.tune ? 'IN TUNE x1.25' : b.sync ? 'syncing…' : 'out of sync'],
       ...(b.repel ? [['Repellent', `${b.repel}`] as [string, string]] : []),
     ])
     hud.shop(b.shop, b.scrap, (item) => net.send({ t: 'buy', item }))
-    hud.roster(Object.values(m.riders).map((r) => ({ name: r.name, c: r.s, st: r.st, tier: r.tier, p: r.w })))
+    hud.roster(
+      Object.values(m.riders).map((r) => ({
+        name: r.name,
+        c: r.s,
+        st: r.st,
+        tier: r.tier,
+        p: r.w,
+      })),
+    )
   }
 
   const cleanup = async () => {

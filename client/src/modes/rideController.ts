@@ -27,7 +27,12 @@ export class RideController {
   private sprint: { i: number; dur: number; samples: number[] } | null = null
   private timers: ReturnType<typeof setInterval>[] = []
 
-  constructor(public trainer: Trainer, public profile: Profile, plan: Plan, private now = () => performance.now() / 1000) {
+  constructor(
+    public trainer: Trainer,
+    public profile: Profile,
+    plan: Plan,
+    private now = () => performance.now() / 1000,
+  ) {
     this.erg = new ErgController(trainer, profile.ftp, now)
     this.rec = new RideRecorder(plan, profile.ftp)
     trainer.onData((d) => this.data(d.power, d.cadence))
@@ -61,8 +66,17 @@ export class RideController {
     this.sprint = null
     const avg = Math.round(s.samples.reduce((a, b) => a + b, 0) / (s.samples.length || 1))
     const { grade, pct } = gradeSprint(avg, s.dur, this.profile)
-    this.combo = ['GREAT', 'MEGA', 'LEGEND'].includes(grade) ? Math.min(CFG.sprint.comboCap, this.combo + 1) : 0
-    const r: SprintResult = { blk: s.i, dur: s.dur, avg, pct: +pct.toFixed(3), grade, combo: this.combo }
+    this.combo = ['GREAT', 'MEGA', 'LEGEND'].includes(grade)
+      ? Math.min(CFG.sprint.comboCap, this.combo + 1)
+      : 0
+    const r: SprintResult = {
+      blk: s.i,
+      dur: s.dur,
+      avg,
+      pct: +pct.toFixed(3),
+      grade,
+      combo: this.combo,
+    }
     this.rec.sprints.push(r)
     this.onSprint(r)
   }

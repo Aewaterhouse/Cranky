@@ -19,7 +19,10 @@ export class SimTrainer implements Trainer {
   private dataCb: (d: { power: number; cadence: number }) => void = () => {}
   private timer?: ReturnType<typeof setInterval>
 
-  constructor(private bot?: Bot, private rng: () => number = Math.random) {}
+  constructor(
+    private bot?: Bot,
+    private rng: () => number = Math.random,
+  ) {}
 
   async connect() {}
   onData(cb: (d: { power: number; cadence: number }) => void) {

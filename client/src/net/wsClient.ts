@@ -9,13 +9,18 @@ export class WsClient {
   private ws?: WebSocket
   private closed = false
 
-  constructor(private code: string, private id: string) {
+  constructor(
+    private code: string,
+    private id: string,
+  ) {
     this.open()
   }
 
   private open() {
     const proto = location.protocol === 'https:' ? 'wss' : 'ws'
-    this.ws = new WebSocket(`${proto}://${location.host}/ws/${this.code}?id=${encodeURIComponent(this.id)}`)
+    this.ws = new WebSocket(
+      `${proto}://${location.host}/ws/${this.code}?id=${encodeURIComponent(this.id)}`,
+    )
     this.ws.onopen = () => (this.onStatus(true), this.onOpen())
     this.ws.onmessage = (e) => this.onMsg(JSON.parse(e.data))
     this.ws.onclose = () => {

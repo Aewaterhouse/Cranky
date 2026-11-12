@@ -15,7 +15,11 @@ export function loadProfile(): Profile {
 export function saveProfile(p: Profile) {
   p.updated = Date.now()
   localStorage.setItem(CFG.localStorageKey, JSON.stringify(p))
-  fetch(`/api/profile/${p.id}`, { method: 'PUT', headers: { 'content-type': 'application/json' }, body: JSON.stringify(p) }).catch(() => {})
+  fetch(`/api/profile/${p.id}`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(p),
+  }).catch(() => {})
 }
 
 /** Pulls the server copy; newer wins. Works offline (static hosting) by returning the local copy. */
@@ -37,5 +41,9 @@ export async function syncProfile(p: Profile): Promise<Profile> {
 }
 
 export function postRide(id: string, summary: unknown) {
-  fetch('/api/rides', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id, summary }) }).catch(() => {})
+  fetch('/api/rides', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ id, summary }),
+  }).catch(() => {})
 }

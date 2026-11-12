@@ -25,4 +25,5 @@ export function score(avg: number, target: number | null): number | null {
   return dev <= band ? 1 : Math.max(0, (zeroAt - dev) / (zeroAt - band))
 }
 
-export const inBand = (avg: number, target: number | null) => !!target && Math.abs(avg - target) / target <= CFG.compliance.band
+export const inBand = (avg: number, target: number | null) =>
+  !!target && Math.abs(avg - target) / target <= CFG.compliance.band

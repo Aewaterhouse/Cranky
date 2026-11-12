@@ -8,16 +8,23 @@ const setup = () => {
   const erg = new ErgController(sim, 200, () => t)
   return { sim, erg, adv: (s: number) => (t += s) }
 }
-const ergWrites = (s: SimTrainer) => s.log.filter((l) => l.startsWith('erg')).map((l) => +l.split(' ')[1])
+const ergWrites = (s: SimTrainer) =>
+  s.log.filter((l) => l.startsWith('erg')).map((l) => +l.split(' ')[1])
 
 describe('erg controller', () => {
   it('never exceeds 150% FTP', async () => {
     const { sim, erg, adv } = setup()
     erg.setTarget(10000)
-    for (let i = 0; i < 20; i++) (adv(0.25), await erg.tick())
+    for (let i = 0; i < 20; i++) {
+      adv(0.25)
+      await erg.tick()
+    }
     expect(Math.max(...ergWrites(sim))).toBe(300)
     erg.setTarget(250, 2)
-    for (let i = 0; i < 20; i++) (adv(0.25), await erg.tick())
+    for (let i = 0; i < 20; i++) {
+      adv(0.25)
+      await erg.tick()
+    }
     expect(Math.max(...ergWrites(sim))).toBe(300)
   })
   it('ramps over 2 s', async () => {
@@ -38,7 +45,10 @@ describe('erg controller', () => {
     await erg.tick()
     const before = sim.log.length
     erg.setTarget(null)
-    for (let i = 0; i < 40; i++) (adv(0.25), await erg.tick())
+    for (let i = 0; i < 40; i++) {
+      adv(0.25)
+      await erg.tick()
+    }
     const during = sim.log.slice(before)
     expect(during).toEqual(['sim 0'])
     expect(sim.erg).toBeNull()

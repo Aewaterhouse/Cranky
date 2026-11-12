@@ -7,7 +7,15 @@ export function makeBus() {
   const g = new THREE.Group()
   const mat = (c: string) => new THREE.MeshLambertMaterial({ color: c })
   const body = new THREE.MeshLambertMaterial({ color: VIS.busColour })
-  const box = (w: number, h: number, d: number, m: THREE.Material, x: number, y: number, z: number) => {
+  const box = (
+    w: number,
+    h: number,
+    d: number,
+    m: THREE.Material,
+    x: number,
+    y: number,
+    z: number,
+  ) => {
     const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m)
     b.position.set(x, y, z)
     g.add(b)
@@ -21,7 +29,12 @@ export function makeBus() {
   for (const x of [-1.2, 1.2]) box(0.3, 0.3, 0.1, mat('#fff8c0'), x, 1.3, -5.05)
   const wheels: THREE.Mesh[] = []
   const wg = new THREE.CylinderGeometry(0.6, 0.6, 0.4, 12).rotateZ(Math.PI / 2)
-  for (const [x, z] of [[-1.45, -3.2], [1.45, -3.2], [-1.45, 3.2], [1.45, 3.2]]) {
+  for (const [x, z] of [
+    [-1.45, -3.2],
+    [1.45, -3.2],
+    [-1.45, 3.2],
+    [1.45, 3.2],
+  ]) {
     const w = new THREE.Mesh(wg, mat('#1a1a1a'))
     w.position.set(x, 0.6, z)
     g.add(w)
@@ -36,7 +49,13 @@ export function makeBus() {
   }
   const steel = mat('#8a8f98')
   const bullbar = part((p) => {
-    for (const [w, h, d, x, y] of [[3.4, 0.2, 0.2, 0, 1.6], [3.4, 0.2, 0.2, 0, 0.9], [0.2, 1.2, 0.2, -1.1, 1.25], [0.2, 1.2, 0.2, 1.1, 1.25], [0.2, 1.2, 0.2, 0, 1.25]]) {
+    for (const [w, h, d, x, y] of [
+      [3.4, 0.2, 0.2, 0, 1.6],
+      [3.4, 0.2, 0.2, 0, 0.9],
+      [0.2, 1.2, 0.2, -1.1, 1.25],
+      [0.2, 1.2, 0.2, 1.1, 1.25],
+      [0.2, 1.2, 0.2, 0, 1.25],
+    ]) {
       const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), steel)
       b.position.set(x, y, -5.5)
       p.add(b)
@@ -94,7 +113,10 @@ export function makeRider(colour: string) {
   const m = new THREE.MeshLambertMaterial({ color: colour, transparent: true })
   const torso = new THREE.Mesh(new THREE.CapsuleGeometry(0.3, 0.5, 4, 8), m)
   torso.position.y = 0.6
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.28, 10, 8), new THREE.MeshLambertMaterial({ color: '#f0c8a0', transparent: true }))
+  const head = new THREE.Mesh(
+    new THREE.SphereGeometry(0.28, 10, 8),
+    new THREE.MeshLambertMaterial({ color: '#f0c8a0', transparent: true }),
+  )
   head.position.y = 1.25
   const canvas = document.createElement('canvas')
   canvas.width = 256

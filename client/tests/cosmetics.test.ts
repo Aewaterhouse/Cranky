@@ -5,7 +5,9 @@ import { newProfile, type Profile } from '../src/core/curve'
 describe('cosmetics', () => {
   it('catalogue has unique ids and every slot', () => {
     expect(new Set(COSMETICS.map((c) => c.id)).size).toBe(COSMETICS.length)
-    expect(new Set(COSMETICS.map((c) => c.slot))).toEqual(new Set(['paint', 'bullbar', 'spikes', 'hat', 'outfit']))
+    expect(new Set(COSMETICS.map((c) => c.slot))).toEqual(
+      new Set(['paint', 'bullbar', 'spikes', 'hat', 'outfit']),
+    )
   })
   it('buys, spends scrap and equips', () => {
     const p = { ...newProfile('a'), scrap: 100 }

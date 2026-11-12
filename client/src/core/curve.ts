@@ -17,7 +17,14 @@ export interface Profile {
   /** All-time real bests by duration. */
   allTime: Record<number, { w: number; date: string }>
   rides: RideRecord[]
-  stats: { rides: number; secs: number; kj: number; zones: number[]; streak: number; lastWeek: number }
+  stats: {
+    rides: number
+    secs: number
+    kj: number
+    zones: number[]
+    streak: number
+    lastWeek: number
+  }
   updated: number
   scrap: number
   owned: string[]
@@ -25,7 +32,16 @@ export interface Profile {
 }
 
 export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'): Profile => ({
-  id, name, ftp, tier, allTime: {}, rides: [], updated: 0, scrap: 0, owned: [], look: {},
+  id,
+  name,
+  ftp,
+  tier,
+  allTime: {},
+  rides: [],
+  updated: 0,
+  scrap: 0,
+  owned: [],
+  look: {},
   stats: { rides: 0, secs: 0, kj: 0, zones: Array(7).fill(0), streak: 0, lastWeek: 0 },
 })
 
@@ -49,8 +65,14 @@ export function bestEfforts(power: number[]): Record<number, number> {
   return out
 }
 
-export interface Point { w: number; real: boolean }
-export interface Curve { allTime: Record<number, Point>; d90: Record<number, Point> }
+export interface Point {
+  w: number
+  real: boolean
+}
+export interface Curve {
+  allTime: Record<number, Point>
+  d90: Record<number, Point>
+}
 
 export function curves(p: Profile, now = Date.now()): Curve {
   const def = defaultCurve(p.ftp)
@@ -59,8 +81,14 @@ export function curves(p: Profile, now = Date.now()): Curve {
   for (const d of D) {
     const a = p.allTime[d]
     out.allTime[d] = a ? { w: a.w, real: true } : { w: def[d], real: false }
-    const recent = p.rides.filter((r) => Date.parse(r.date) >= cutoff && r.best[d]).map((r) => r.best[d])
-    out.d90[d] = recent.length ? { w: Math.max(...recent), real: true } : a ? { w: a.w, real: true } : { w: def[d], real: false }
+    const recent = p.rides
+      .filter((r) => Date.parse(r.date) >= cutoff && r.best[d])
+      .map((r) => r.best[d])
+    out.d90[d] = recent.length
+      ? { w: Math.max(...recent), real: true }
+      : a
+        ? { w: a.w, real: true }
+        : { w: def[d], real: false }
   }
   return out
 }
@@ -71,10 +99,18 @@ export function at(c: Record<number, Point>, dur: number): Point {
   const hi = D.find((d) => d > dur) ?? D[D.length - 1]
   const lo = [...D].reverse().find((d) => d < dur) ?? D[0]
   const f = Math.log(dur / lo) / Math.log(hi / lo)
-  return { w: c[lo].w + (c[hi].w - c[lo].w) * Math.min(1, Math.max(0, f)), real: c[lo].real && c[hi].real }
+  return {
+    w: c[lo].w + (c[hi].w - c[lo].w) * Math.min(1, Math.max(0, f)),
+    real: c[lo].real && c[hi].real,
+  }
 }
 
-export function gradeSprint(avg: number, dur: number, p: Profile, now = Date.now()): { grade: Grade; pct: number } {
+export function gradeSprint(
+  avg: number,
+  dur: number,
+  p: Profile,
+  now = Date.now(),
+): { grade: Grade; pct: number } {
   const c = curves(p, now)
   const b90 = at(c.d90, dur)
   const pct = avg / b90.w

@@ -20,16 +20,33 @@ describe('plans', () => {
     expect(planTotal(p.blocks)).toBe(600 + 2 * (900 + 300) + 300)
   })
   it('rejects bad plans', () => {
-    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'sprint', dur: 60 }] })).toThrow(/sprint/)
-    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'steady', dur: 60 }] })).toThrow(/pct/)
-    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'nope', dur: 60 }] })).toThrow(/type/)
+    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'sprint', dur: 60 }] })).toThrow(
+      /sprint/,
+    )
+    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'steady', dur: 60 }] })).toThrow(
+      /pct/,
+    )
+    expect(() => parsePlan({ id: 'x', name: 'x', blocks: [{ type: 'nope', dur: 60 }] })).toThrow(
+      /type/,
+    )
   })
   it('targets per tier, ramp and over-under', () => {
     expect(blockTarget({ type: 'steady', dur: 10, pct: 90 }, 'hard', 0)).toBeCloseTo(0.9)
     expect(blockTarget({ type: 'steady', dur: 10, pct: 90 }, 'easy', 0)).toBeCloseTo(0.72)
-    expect(blockTarget({ type: 'steady', dur: 10, pct: { hard: 90, medium: 85, easy: 70 } }, 'medium', 0)).toBeCloseTo(0.85)
+    expect(
+      blockTarget(
+        { type: 'steady', dur: 10, pct: { hard: 90, medium: 85, easy: 70 } },
+        'medium',
+        0,
+      ),
+    ).toBeCloseTo(0.85)
     expect(blockTarget({ type: 'ramp', dur: 100, pct: [50, 70] }, 'hard', 50)).toBeCloseTo(0.6)
-    const o = { type: 'over-under' as const, dur: 240, pct: [95, 105] as [number, number], step: 60 }
+    const o = {
+      type: 'over-under' as const,
+      dur: 240,
+      pct: [95, 105] as [number, number],
+      step: 60,
+    }
     expect(blockTarget(o, 'hard', 30)).toBeCloseTo(0.95)
     expect(blockTarget(o, 'hard', 90)).toBeCloseTo(1.05)
     expect(blockTarget({ type: 'sprint', dur: 10 }, 'hard', 0)).toBeNull()

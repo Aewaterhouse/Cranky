@@ -32,7 +32,14 @@ export class World {
   renderer: THREE.WebGLRenderer
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(VIS.fov, 1, 0.1, 600)
-  state: SceneState = { speed: 0, gap: null, armour: null, mood: 'drill', riders: [], roadblock: null }
+  state: SceneState = {
+    speed: 0,
+    gap: null,
+    armour: null,
+    mood: 'drill',
+    riders: [],
+    roadblock: null,
+  }
   private bus = makeBus()
   private horde = new Horde()
   private hordeZ = 60
@@ -58,7 +65,10 @@ export class World {
     this.sun.position.set(-30, 50, 20)
     this.scene.add(this.sun, this.hemi, this.bus.group, this.horde.group, this.block)
     const plane = (w: number, d: number, c: string, y: number) => {
-      const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2), new THREE.MeshLambertMaterial({ color: c }))
+      const p = new THREE.Mesh(
+        new THREE.PlaneGeometry(w, d).rotateX(-Math.PI / 2),
+        new THREE.MeshLambertMaterial({ color: c }),
+      )
       p.position.set(0, y, -150)
       this.scene.add(p)
     }
@@ -68,12 +78,31 @@ export class World {
     const tree = new THREE.ConeGeometry(1.6, 5, 6).translate(0, 3.2, 0).toNonIndexed()
     const rock = new THREE.DodecahedronGeometry(1.2).translate(0, 0.5, 0)
     const car = new THREE.BoxGeometry(2, 1.4, 4.2).translate(0, 0.7, 0)
-    this.addMover(dash, '#ddd', 40, () => 0, (i) => (i * LOOP) / 40)
-    this.addMover(tree, '#2f5a2a', 90, () => (Math.random() < 0.5 ? -1 : 1) * (9 + Math.random() * 40))
+    this.addMover(
+      dash,
+      '#ddd',
+      40,
+      () => 0,
+      (i) => (i * LOOP) / 40,
+    )
+    this.addMover(
+      tree,
+      '#2f5a2a',
+      90,
+      () => (Math.random() < 0.5 ? -1 : 1) * (9 + Math.random() * 40),
+    )
     this.addMover(rock, '#777', 30, () => (Math.random() < 0.5 ? -1 : 1) * (7 + Math.random() * 30))
-    this.addMover(car, '#6a4a3a', 10, () => (Math.random() < 0.5 ? -1 : 1) * (7 + Math.random() * 4))
+    this.addMover(
+      car,
+      '#6a4a3a',
+      10,
+      () => (Math.random() < 0.5 ? -1 : 1) * (7 + Math.random() * 4),
+    )
     for (let i = 0; i < 14; i++) {
-      const c = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.4, 1.4), new THREE.MeshLambertMaterial({ color: i % 2 ? '#c33' : '#eee' }))
+      const c = new THREE.Mesh(
+        new THREE.BoxGeometry(1.4, 1.4, 1.4),
+        new THREE.MeshLambertMaterial({ color: i % 2 ? '#c33' : '#eee' }),
+      )
       c.position.set(-4.5 + (i % 7) * 1.5, 0.7 + Math.floor(i / 7) * 1.4, 0)
       this.block.add(c)
     }
@@ -83,7 +112,13 @@ export class World {
     this.loop()
   }
 
-  private addMover(geo: THREE.BufferGeometry, colour: string, n: number, x: () => number, z: (i: number) => number = () => Math.random() * LOOP) {
+  private addMover(
+    geo: THREE.BufferGeometry,
+    colour: string,
+    n: number,
+    x: () => number,
+    z: (i: number) => number = () => Math.random() * LOOP,
+  ) {
     const m = new THREE.InstancedMesh(geo, new THREE.MeshLambertMaterial({ color: colour }), n)
     const zs: number[] = []
     const mat = new THREE.Matrix4()
@@ -106,7 +141,10 @@ export class World {
   }
 
   fx(kind: 'hit' | 'shake' | 'slowmo' | 'smash') {
-    if (kind === 'hit') (this.flash = 1), (this.shakeAmt = 0.8)
+    if (kind === 'hit') {
+      this.flash = 1
+      this.shakeAmt = 0.8
+    }
     if (kind === 'shake') this.shakeAmt = 1.5
     if (kind === 'slowmo') this.slowUntil = performance.now() + 1800
     if (kind === 'smash') this.smash()
@@ -117,7 +155,14 @@ export class World {
       const m = (c as THREE.Mesh).clone()
       m.position.copy(c.getWorldPosition(new THREE.Vector3()))
       this.scene.add(m)
-      this.debris.push({ m, v: new THREE.Vector3((Math.random() - 0.5) * 14, 6 + Math.random() * 8, 4 + Math.random() * 10) })
+      this.debris.push({
+        m,
+        v: new THREE.Vector3(
+          (Math.random() - 0.5) * 14,
+          6 + Math.random() * 8,
+          4 + Math.random() * 10,
+        ),
+      })
     })
     this.block.visible = false
     this.shakeAmt = 1.2
@@ -137,7 +182,8 @@ export class World {
   private step(dt: number) {
     const s = this.state
     const mood = VIS.moods[s.mood] ?? VIS.moods.drill
-    const lerpCol = (c: THREE.Color, to: string) => c.lerp(new THREE.Color(to), Math.min(1, dt * 1.5))
+    const lerpCol = (c: THREE.Color, to: string) =>
+      c.lerp(new THREE.Color(to), Math.min(1, dt * 1.5))
     this.scene.background ??= new THREE.Color(mood.sky)
     lerpCol(this.scene.background as THREE.Color, mood.sky)
     const fog = this.scene.fog as THREE.Fog
@@ -165,7 +211,10 @@ export class World {
     const armour = s.armour ?? 100
     this.flash = Math.max(0, this.flash - dt * 2)
     this.bus.setLook(s.busLook ?? {})
-    this.bus.body.color.set(this.bus.body.userData.colour).lerp(new THREE.Color('#6a5a4a'), (1 - armour / 100) * 0.7).lerp(new THREE.Color('#f00'), this.flash)
+    this.bus.body.color
+      .set(this.bus.body.userData.colour)
+      .lerp(new THREE.Color('#6a5a4a'), (1 - armour / 100) * 0.7)
+      .lerp(new THREE.Color('#f00'), this.flash)
 
     this.horde.group.visible = s.gap !== null
     if (s.gap !== null) {
@@ -197,7 +246,11 @@ export class World {
 
   private updateRiders(dt: number) {
     const live = new Set(this.state.riders.map((r) => r.id))
-    for (const [id, r] of this.riders) if (!live.has(id)) (this.scene.remove(r.group), this.riders.delete(id))
+    for (const [id, r] of this.riders)
+      if (!live.has(id)) {
+        this.scene.remove(r.group)
+        this.riders.delete(id)
+      }
     this.state.riders.forEach((sr, i) => {
       let r = this.riders.get(sr.id)
       if (!r) {
@@ -210,8 +263,16 @@ export class World {
       const ph = this.t * (sr.cadence / 60) * Math.PI * 2
       const target =
         sr.st === 'fell'
-          ? new THREE.Vector3((i % 2 ? 1.5 : -1.5), 0.3 + Math.abs(Math.sin(ph)) * 0.3, 6.5 + (this.hordeZ - 6.5) * 0.4)
-          : new THREE.Vector3((i % 2 ? 0.7 : -0.7), 3.5 + Math.abs(Math.sin(ph)) * 0.12, -3 + Math.floor(i / 2) * 2.4)
+          ? new THREE.Vector3(
+              i % 2 ? 1.5 : -1.5,
+              0.3 + Math.abs(Math.sin(ph)) * 0.3,
+              6.5 + (this.hordeZ - 6.5) * 0.4,
+            )
+          : new THREE.Vector3(
+              i % 2 ? 0.7 : -0.7,
+              3.5 + Math.abs(Math.sin(ph)) * 0.12,
+              -3 + Math.floor(i / 2) * 2.4,
+            )
       r.group.position.lerp(target, Math.min(1, dt * 4))
       r.torso.rotation.z = Math.sin(ph) * 0.15
       r.fade(sr.st === 'spectator' ? 0.3 : 1)

@@ -1,7 +1,21 @@
 import { describe, expect, it } from 'vitest'
-import { applyRide, bestEfforts, curves, defaultCurve, ftpSuggestion, gradeSprint, newProfile } from '../src/core/curve'
+import {
+  applyRide,
+  bestEfforts,
+  curves,
+  defaultCurve,
+  ftpSuggestion,
+  gradeSprint,
+  newProfile,
+} from '../src/core/curve'
 
-const ride = (date: string, best: Record<number, number>) => ({ date, secs: 60, kj: 10, best, zones: [] })
+const ride = (date: string, best: Record<number, number>) => ({
+  date,
+  secs: 60,
+  kj: 10,
+  best,
+  zones: [],
+})
 
 describe('power curve and sprint grading', () => {
   it('default curve from FTP', () => {
@@ -42,7 +56,8 @@ describe('power curve and sprint grading', () => {
   })
   it('weekly streak', () => {
     let p = newProfile('a', 'A', 200)
-    for (const d of ['2026-05-04', '2026-05-06', '2026-05-12', '2026-05-19']) p = applyRide(p, ride(d, {}))
+    for (const d of ['2026-05-04', '2026-05-06', '2026-05-12', '2026-05-19'])
+      p = applyRide(p, ride(d, {}))
     expect(p.stats.streak).toBe(3)
     p = applyRide(p, ride('2026-06-15', {}))
     expect(p.stats.streak).toBe(1)
