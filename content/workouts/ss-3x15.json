@@ -1,0 +1,44 @@
+{
+ "id": "ss-3x15",
+ "name": "Sweet Spot 3x15",
+ "goal": "sweet-spot",
+ "desc": "Three 15 minute sweet spot blocks.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 900,
+     "pct": 90,
+     "label": "Sweet spot"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

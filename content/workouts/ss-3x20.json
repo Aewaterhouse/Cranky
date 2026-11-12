@@ -1,0 +1,44 @@
+{
+ "id": "ss-3x20",
+ "name": "Sweet Spot 3x20",
+ "goal": "sweet-spot",
+ "desc": "The big one: an hour of sweet spot.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 1200,
+     "pct": 89,
+     "label": "Sweet spot"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "id": "ss-over-unders",
+ "name": "Sweet Spot Wobble",
+ "goal": "sweet-spot",
+ "desc": "Gentle over-unders either side of sweet spot.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 720,
+     "pct": [
+      95,
+      85
+     ],
+     "step": 120,
+     "label": "Wobble"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

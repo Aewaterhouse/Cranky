@@ -1,0 +1,56 @@
+{
+ "id": "endurance-pyramid",
+ "name": "Aerobic Pyramid",
+ "goal": "endurance",
+ "desc": "Up through the aerobic zones and back down.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    60
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 62,
+   "label": "Low Z2"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 68,
+   "label": "Mid Z2"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 74,
+   "label": "High Z2"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 68,
+   "label": "Mid Z2"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 62,
+   "label": "Low Z2"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

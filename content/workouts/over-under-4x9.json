@@ -1,0 +1,48 @@
+{
+ "id": "over-under-4x9",
+ "name": "Over-Unders 4x9",
+ "goal": "threshold",
+ "desc": "One minute over, two under, three times a block.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 540,
+     "pct": [
+      95,
+      108
+     ],
+     "step": 90,
+     "label": "Over-under"
+    },
+    {
+     "type": "steady",
+     "dur": 270,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

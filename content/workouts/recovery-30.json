@@ -1,0 +1,32 @@
+{
+ "id": "recovery-30",
+ "name": "Recovery Spin",
+ "goal": "recovery",
+ "desc": "Thirty easy minutes to flush the legs.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    55
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 1200,
+   "pct": 55,
+   "label": "Easy spin"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

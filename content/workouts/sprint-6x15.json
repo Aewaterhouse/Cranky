@@ -1,0 +1,43 @@
+{
+ "id": "sprint-6x15",
+ "name": "Sprints 6x15",
+ "goal": "sprint",
+ "desc": "Six 15 second all-out sprints with full recovery.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 6,
+   "blocks": [
+    {
+     "type": "sprint",
+     "dur": 15,
+     "label": "Sprint"
+    },
+    {
+     "type": "steady",
+     "dur": 225,
+     "pct": 50,
+     "label": "Spin"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

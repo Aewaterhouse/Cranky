@@ -1,0 +1,60 @@
+{
+ "id": "bus-long-haul-75",
+ "name": "The Nullarbor",
+ "goal": "bus",
+ "desc": "A long steady crossing with a roadblock every quarter hour.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "sprint",
+   "dur": 5,
+   "label": "Opener"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Easy"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 780,
+     "pct": 84,
+     "label": "Long haul"
+    },
+    {
+     "type": "sprint",
+     "dur": 10,
+     "label": "Roadblock"
+    },
+    {
+     "type": "steady",
+     "dur": 170,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

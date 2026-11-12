@@ -1,6 +1,7 @@
 {
  "id": "bus-crew-60",
  "name": "Bus Crew 60",
+ "goal": "bus",
  "desc": "A full hour with three roadblocks.",
  "blocks": [
   {

@@ -1,0 +1,43 @@
+{
+ "id": "sprint-12x6",
+ "name": "Jumps 12x6",
+ "goal": "sprint",
+ "desc": "Twelve 6 second standing starts.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 12,
+   "blocks": [
+    {
+     "type": "sprint",
+     "dur": 6,
+     "label": "Jump"
+    },
+    {
+     "type": "steady",
+     "dur": 114,
+     "pct": 50,
+     "label": "Spin"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

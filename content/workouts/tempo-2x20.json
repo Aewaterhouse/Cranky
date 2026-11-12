@@ -1,0 +1,44 @@
+{
+ "id": "tempo-2x20",
+ "name": "Tempo 2x20",
+ "goal": "tempo",
+ "desc": "Two 20 minute tempo blocks.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 1200,
+     "pct": 80,
+     "label": "Tempo"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,48 @@
+{
+ "id": "criss-cross",
+ "name": "Criss-Cross",
+ "goal": "threshold",
+ "desc": "Tempo to threshold and back every minute for 20 minutes, twice.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 1200,
+     "pct": [
+      100,
+      80
+     ],
+     "step": 60,
+     "label": "Criss-cross"
+    },
+    {
+     "type": "steady",
+     "dur": 360,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

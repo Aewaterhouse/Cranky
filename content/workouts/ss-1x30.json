@@ -1,0 +1,32 @@
+{
+ "id": "ss-1x30",
+ "name": "Sweet Spot 30",
+ "goal": "sweet-spot",
+ "desc": "Half an hour locked in.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 1800,
+   "pct": 88,
+   "label": "Sweet spot"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

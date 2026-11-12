@@ -17,6 +17,7 @@ export interface Plan {
   id: string
   name: string
   desc?: string
+  goal?: string
   blocks: Block[]
 }
 

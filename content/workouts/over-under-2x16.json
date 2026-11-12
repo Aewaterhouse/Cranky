@@ -1,0 +1,48 @@
+{
+ "id": "over-under-2x16",
+ "name": "Over-Unders 2x16",
+ "goal": "threshold",
+ "desc": "Long over-under blocks, switching every two minutes.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 960,
+     "pct": [
+      92,
+      104
+     ],
+     "step": 120,
+     "label": "Over-under"
+    },
+    {
+     "type": "steady",
+     "dur": 360,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

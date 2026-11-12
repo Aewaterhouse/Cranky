@@ -1,0 +1,32 @@
+{
+ "id": "tempo-1x45",
+ "name": "Tempo 45",
+ "goal": "tempo",
+ "desc": "One long unbroken tempo effort.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 2700,
+   "pct": 78,
+   "label": "Tempo"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "id": "thr-2x15",
+ "name": "Threshold 2x15",
+ "goal": "threshold",
+ "desc": "Two 15 minute blocks at FTP.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 900,
+     "pct": 98,
+     "label": "Threshold"
+    },
+    {
+     "type": "steady",
+     "dur": 420,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

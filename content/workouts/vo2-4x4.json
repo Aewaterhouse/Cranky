@@ -1,0 +1,44 @@
+{
+ "id": "vo2-4x4",
+ "name": "VO2 4x4",
+ "goal": "vo2",
+ "desc": "The Norwegian classic: four by four.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 112,
+     "label": "VO2"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

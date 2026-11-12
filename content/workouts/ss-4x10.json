@@ -1,0 +1,44 @@
+{
+ "id": "ss-4x10",
+ "name": "Sweet Spot 4x10",
+ "goal": "sweet-spot",
+ "desc": "Four 10 minute blocks with short rests.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 600,
+     "pct": 92,
+     "label": "Sweet spot"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

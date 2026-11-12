@@ -1,0 +1,48 @@
+{
+ "id": "microbursts",
+ "name": "Microbursts",
+ "goal": "sprint",
+ "desc": "Three 8 minute blocks of 15 seconds on, 15 off.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 480,
+     "pct": [
+      150,
+      50
+     ],
+     "step": 15,
+     "label": "Microbursts"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,44 @@
+{
+ "id": "anaerobic-8x45",
+ "name": "Anaerobic 8x45",
+ "goal": "sprint",
+ "desc": "Eight 45 second efforts at 135%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 8,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 45,
+     "pct": 135,
+     "label": "Anaerobic"
+    },
+    {
+     "type": "steady",
+     "dur": 195,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

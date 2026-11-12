@@ -54,6 +54,18 @@ export function mainWatts(p: Plan, tier: Tier, ftp: number) {
   return w[1] && w[1] !== w[0] ? `${Math.min(...w)}–${Math.max(...w)} W` : `${w[0]} W`
 }
 
+/** Goal groups in display order: [goal, title, note]. */
+const GOALS = [
+  ['bus', 'Bus runs', 'built for the game'],
+  ['sweet-spot', 'Sweet spot', 'the bread and butter'],
+  ['threshold', 'Threshold', 'at and around FTP'],
+  ['vo2', 'VO2 max', 'short and savage'],
+  ['sprint', 'Sprint', 'all-out and anaerobic'],
+  ['tempo', 'Tempo', 'comfortably hard'],
+  ['endurance', 'Endurance', 'long and steady'],
+  ['recovery', 'Recovery', 'easy days'],
+] as const
+
 export interface PickerOpts {
   plan: string
   minutes: number
@@ -128,12 +140,46 @@ export function planPicker(o: PickerOpts) {
       h('div', { class: 'pp-grid' }, ...ids.map(card)),
     )
   const ids = PLANS.map((p) => p.id).filter((i) => !isMine(i))
-  const bus = group('Bus runs', 'built for the game', ids.filter(isBusRun))
-  const wk = group(
-    'Workouts',
-    'straight training',
-    ids.filter((i) => !isBusRun(i)),
+  const goalOf = (id: string) =>
+    isMine(id) ? 'mine' : (PLANS.find((p) => p.id === id)?.goal ?? 'endurance')
+  const order = o.first === 'workout' ? [...GOALS.slice(1), GOALS[0]] : GOALS
+  const groups = new Map(
+    order.map(
+      ([g, title, note]) =>
+        [
+          g,
+          group(
+            title,
+            note,
+            ids.filter((i) => goalOf(i) === g),
+          ),
+        ] as const,
+    ),
   )
+  let filter = goalOf(plan) === 'mine' ? 'all' : goalOf(plan)
+  const filterChips = h(
+    'div',
+    { class: 'chips', role: 'radiogroup', 'aria-label': 'Goal' },
+    ...[['all', 'All'] as const, ...order].map(([g, title]) =>
+      h(
+        'button',
+        {
+          class: 'chip-sel',
+          role: 'radio',
+          'data-g': g,
+          onclick: () => ((filter = g), showGroups()),
+        },
+        title,
+      ),
+    ),
+  )
+  const showGroups = () => {
+    for (const [g, sec] of groups) sec.hidden = filter !== 'all' && filter !== g
+    filterChips
+      .querySelectorAll('button')
+      .forEach((b) => b.classList.toggle('on', b.dataset.g === filter))
+  }
+  showGroups()
   const mineGrid = h('div', { class: 'pp-grid' })
   const file = h('input', { type: 'file', accept: '.zwo,.erg,.mrc', hidden: true })
   file.addEventListener('change', async () => {
@@ -186,15 +232,18 @@ export function planPicker(o: PickerOpts) {
     'div',
     { class: 'picker' },
     h('div', { class: 'pp-len' }, h('span', { class: 'label' }, 'Length'), chips),
-    ...(o.first === 'workout' ? [wk, bus] : [bus, wk]),
+    h('div', { class: 'pp-len' }, h('span', { class: 'label' }, 'Goal'), filterChips),
+    ...groups.values(),
     ...(o.mineFtp ? [mine] : []),
   )
   paint()
   return Object.assign(el, {
     set(id: string, m: number) {
       if (id === plan && m === minutes) return
+      if (id !== plan && goalOf(id) !== 'mine' && filter !== 'all') filter = goalOf(id)
       plan = id
       minutes = m
+      showGroups()
       paint()
     },
   })

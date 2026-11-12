@@ -1,0 +1,76 @@
+{
+ "id": "bus-vo2-raid",
+ "name": "Supply Raid",
+ "goal": "bus",
+ "desc": "Short savage efforts between servo stops.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    50,
+    72
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "sprint",
+   "dur": 5,
+   "label": "Opener"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Easy"
+  },
+  {
+   "type": "set",
+   "rep": 5,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 112,
+     "label": "Long haul"
+    },
+    {
+     "type": "steady",
+     "dur": 150,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "over-under",
+   "dur": 240,
+   "pct": [
+    90,
+    108
+   ],
+   "step": 30,
+   "label": "Horde surge"
+  },
+  {
+   "type": "sprint",
+   "dur": 12,
+   "label": "Roadblock"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Servo stop"
+  },
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

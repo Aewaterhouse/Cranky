@@ -1,6 +1,7 @@
 {
  "id": "z2-60",
  "name": "Zone 2 Endurance",
+ "goal": "endurance",
  "desc": "Steady endurance riding.",
  "blocks": [
   {

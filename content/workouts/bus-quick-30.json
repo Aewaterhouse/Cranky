@@ -1,6 +1,7 @@
 {
  "id": "bus-quick-30",
  "name": "Bus Quick 30",
+ "goal": "bus",
  "desc": "A short sharp zombie run.",
  "blocks": [
   {

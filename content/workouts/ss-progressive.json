@@ -1,0 +1,47 @@
+{
+ "id": "ss-progressive",
+ "name": "Sweet Spot Builder",
+ "goal": "sweet-spot",
+ "desc": "Three blocks that each creep from 85% to 95%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "ramp",
+     "dur": 720,
+     "pct": [
+      85,
+      95
+     ],
+     "label": "Build"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

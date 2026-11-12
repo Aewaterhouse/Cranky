@@ -1,0 +1,55 @@
+{
+ "id": "bus-easy-rider",
+ "name": "Sunday Drive",
+ "goal": "bus",
+ "desc": "A gentle run for recovery days. The zombies are slow too.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 480,
+     "pct": 70,
+     "label": "Long haul"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "sprint",
+   "dur": 6,
+   "label": "Roadblock"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Servo stop"
+  },
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

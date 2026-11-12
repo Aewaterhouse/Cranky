@@ -1,0 +1,56 @@
+{
+ "id": "vo2-40-20",
+ "name": "40/20s",
+ "goal": "vo2",
+ "desc": "Three sets of eight 40 seconds on, 20 off.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "set",
+     "rep": 8,
+     "blocks": [
+      {
+       "type": "steady",
+       "dur": 40,
+       "pct": 122,
+       "label": "On"
+      },
+      {
+       "type": "steady",
+       "dur": 20,
+       "pct": 50,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

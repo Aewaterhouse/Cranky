@@ -1,0 +1,44 @@
+{
+ "id": "thr-2x20",
+ "name": "Threshold 2x20",
+ "goal": "threshold",
+ "desc": "The classic. Two 20 minute blocks at FTP.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 1200,
+     "pct": 97,
+     "label": "Threshold"
+    },
+    {
+     "type": "steady",
+     "dur": 480,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

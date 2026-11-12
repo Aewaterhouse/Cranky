@@ -1,0 +1,60 @@
+{
+ "id": "bus-sprint-fest",
+ "name": "Roadblock Rampage",
+ "goal": "bus",
+ "desc": "Six roadblocks. The horde barely matters.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "sprint",
+   "dur": 5,
+   "label": "Opener"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Easy"
+  },
+  {
+   "type": "set",
+   "rep": 6,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 85,
+     "label": "Long haul"
+    },
+    {
+     "type": "sprint",
+     "dur": 10,
+     "label": "Roadblock"
+    },
+    {
+     "type": "steady",
+     "dur": 110,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

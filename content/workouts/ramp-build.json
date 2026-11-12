@@ -1,6 +1,7 @@
 {
  "id": "ramp-build",
  "name": "Ramp Build",
+ "goal": "threshold",
  "desc": "Three ramps climbing from tempo to threshold.",
  "blocks": [
   {

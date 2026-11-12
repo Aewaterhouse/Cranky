@@ -1,6 +1,7 @@
 {
  "id": "tempo-3x15",
  "name": "Tempo 3x15",
+ "goal": "tempo",
  "desc": "Three 15 minute tempo blocks.",
  "blocks": [
   {

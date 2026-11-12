@@ -1,6 +1,7 @@
 {
  "id": "ss-2x20",
  "name": "Sweet Spot 2x20",
+ "goal": "sweet-spot",
  "desc": "Two 20 minute sweet spot blocks.",
  "blocks": [
   {

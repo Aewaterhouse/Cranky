@@ -1,6 +1,7 @@
 {
  "id": "thr-3x10",
  "name": "Threshold 3x10",
+ "goal": "threshold",
  "desc": "Three 10 minute threshold blocks.",
  "blocks": [
   {

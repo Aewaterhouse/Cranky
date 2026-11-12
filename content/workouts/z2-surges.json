@@ -1,0 +1,49 @@
+{
+ "id": "z2-surges",
+ "name": "Endurance with Surges",
+ "goal": "endurance",
+ "desc": "Zone 2 with a 10 second kick every five minutes.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 8,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 290,
+     "pct": 66,
+     "label": "Zone 2"
+    },
+    {
+     "type": "sprint",
+     "dur": 10,
+     "label": "Surge"
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 300,
+   "pct": 62,
+   "label": "Zone 2"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

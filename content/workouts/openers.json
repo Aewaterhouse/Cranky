@@ -1,0 +1,61 @@
+{
+ "id": "openers",
+ "name": "Race Openers",
+ "goal": "recovery",
+ "desc": "Wake the legs up the day before something big.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 110,
+     "label": "Opener"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 50,
+     "label": "Easy"
+    }
+   ]
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "sprint",
+     "dur": 8,
+     "label": "Sprint"
+    },
+    {
+     "type": "steady",
+     "dur": 150,
+     "pct": 50,
+     "label": "Easy"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

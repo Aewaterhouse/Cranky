@@ -1,0 +1,110 @@
+{
+ "id": "vo2-pyramid",
+ "name": "VO2 Pyramid",
+ "goal": "vo2",
+ "desc": "1, 2, 3, 4, 3, 2, 1 minutes at 118% with equal rest.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 240,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 240,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 118,
+   "label": "VO2"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

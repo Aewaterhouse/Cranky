@@ -1,6 +1,7 @@
 {
  "id": "vo2-5x3",
  "name": "VO2 5x3",
+ "goal": "vo2",
  "desc": "Five 3 minute efforts at 115%.",
  "blocks": [
   {

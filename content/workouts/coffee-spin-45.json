@@ -1,0 +1,32 @@
+{
+ "id": "coffee-spin-45",
+ "name": "Coffee Spin",
+ "goal": "recovery",
+ "desc": "Chatty pace. Barely a workout.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    58
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 2100,
+   "pct": 60,
+   "label": "Coffee pace"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

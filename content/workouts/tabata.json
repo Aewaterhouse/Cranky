@@ -1,0 +1,56 @@
+{
+ "id": "tabata",
+ "name": "Tabata",
+ "goal": "sprint",
+ "desc": "Two rounds of eight 20 seconds on, 10 off.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 720,
+   "pct": [
+    50,
+    80
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "set",
+     "rep": 8,
+     "blocks": [
+      {
+       "type": "steady",
+       "dur": 20,
+       "pct": 150,
+       "label": "On"
+      },
+      {
+       "type": "steady",
+       "dur": 10,
+       "pct": 40,
+       "label": "Off"
+      }
+     ]
+    },
+    {
+     "type": "steady",
+     "dur": 480,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

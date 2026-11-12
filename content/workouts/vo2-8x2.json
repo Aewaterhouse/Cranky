@@ -1,0 +1,44 @@
+{
+ "id": "vo2-8x2",
+ "name": "VO2 8x2",
+ "goal": "vo2",
+ "desc": "Eight 2 minute efforts at 120%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 8,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 120,
+     "label": "VO2"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

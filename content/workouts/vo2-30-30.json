@@ -1,0 +1,48 @@
+{
+ "id": "vo2-30-30",
+ "name": "30/30s",
+ "goal": "vo2",
+ "desc": "Two sets of ten 30 seconds on, 30 off.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 2,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 600,
+     "pct": [
+      125,
+      50
+     ],
+     "step": 30,
+     "label": "30/30s"
+    },
+    {
+     "type": "steady",
+     "dur": 300,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

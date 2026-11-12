@@ -1,6 +1,7 @@
 {
  "id": "bus-crew-45",
  "name": "Bus Crew 45",
+ "goal": "bus",
  "desc": "Zombie Bus favourite: sweet spot, over-unders, a roadblock and a servo stop.",
  "blocks": [
   {

@@ -1,0 +1,44 @@
+{
+ "id": "vo2-6x3",
+ "name": "VO2 6x3",
+ "goal": "vo2",
+ "desc": "Six 3 minute efforts at 115%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 6,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 115,
+     "label": "VO2"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,43 @@
+{
+ "id": "sprint-4x30",
+ "name": "Sprints 4x30",
+ "goal": "sprint",
+ "desc": "Four 30 second all-out efforts. Horrible.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "sprint",
+     "dur": 30,
+     "label": "Sprint"
+    },
+    {
+     "type": "steady",
+     "dur": 270,
+     "pct": 50,
+     "label": "Spin"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

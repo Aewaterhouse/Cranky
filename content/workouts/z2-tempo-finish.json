@@ -1,0 +1,38 @@
+{
+ "id": "z2-tempo-finish",
+ "name": "Fast Finish",
+ "goal": "endurance",
+ "desc": "Easy hour that ends with 15 minutes of tempo.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 2400,
+   "pct": 65,
+   "label": "Zone 2"
+  },
+  {
+   "type": "steady",
+   "dur": 900,
+   "pct": 82,
+   "label": "Tempo finish"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "id": "z2-45",
+ "name": "Zone 2 Short",
+ "goal": "endurance",
+ "desc": "A tidy aerobic 45.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 2100,
+   "pct": 65,
+   "label": "Zone 2"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

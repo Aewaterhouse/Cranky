@@ -1,0 +1,44 @@
+{
+ "id": "thr-4x8",
+ "name": "Threshold 4x8",
+ "goal": "threshold",
+ "desc": "Four 8 minute blocks just over FTP.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 480,
+     "pct": 102,
+     "label": "Threshold"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

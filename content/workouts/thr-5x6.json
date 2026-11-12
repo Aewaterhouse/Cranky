@@ -1,0 +1,44 @@
+{
+ "id": "thr-5x6",
+ "name": "Threshold 5x6",
+ "goal": "threshold",
+ "desc": "Five 6 minute blocks at 104%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 5,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 360,
+     "pct": 104,
+     "label": "Threshold"
+    },
+    {
+     "type": "steady",
+     "dur": 180,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

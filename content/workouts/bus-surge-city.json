@@ -1,0 +1,59 @@
+{
+ "id": "bus-surge-city",
+ "name": "Surge City",
+ "goal": "bus",
+ "desc": "Horde surge after horde surge. Hold your overs.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    50,
+    70
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 4,
+   "blocks": [
+    {
+     "type": "over-under",
+     "dur": 360,
+     "pct": [
+      90,
+      106
+     ],
+     "step": 60,
+     "label": "Horde surge"
+    },
+    {
+     "type": "steady",
+     "dur": 150,
+     "pct": 50,
+     "label": "Servo stop"
+    }
+   ]
+  },
+  {
+   "type": "sprint",
+   "dur": 15,
+   "label": "Roadblock"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Servo stop"
+  },
+  {
+   "type": "ramp",
+   "dur": 240,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

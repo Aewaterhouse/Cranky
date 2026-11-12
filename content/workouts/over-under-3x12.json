@@ -1,6 +1,7 @@
 {
  "id": "over-under-3x12",
  "name": "Over-Unders 3x12",
+ "goal": "threshold",
  "desc": "Alternating 95% and 105% every 2 minutes.",
  "blocks": [
   {

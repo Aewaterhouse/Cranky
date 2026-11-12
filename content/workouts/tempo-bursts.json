@@ -1,0 +1,56 @@
+{
+ "id": "tempo-bursts",
+ "name": "Tempo with Bursts",
+ "goal": "tempo",
+ "desc": "Tempo blocks with a short kick every three minutes.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "set",
+     "rep": 4,
+     "blocks": [
+      {
+       "type": "steady",
+       "dur": 170,
+       "pct": 80,
+       "label": "Tempo"
+      },
+      {
+       "type": "steady",
+       "dur": 10,
+       "pct": 130,
+       "label": "Burst"
+      }
+     ]
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

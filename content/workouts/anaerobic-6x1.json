@@ -1,0 +1,44 @@
+{
+ "id": "anaerobic-6x1",
+ "name": "Anaerobic 6x1",
+ "goal": "sprint",
+ "desc": "Six 1 minute efforts at 130%.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 6,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 130,
+     "label": "Anaerobic"
+    },
+    {
+     "type": "steady",
+     "dur": 240,
+     "pct": 50,
+     "label": "Recover"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

@@ -1,0 +1,80 @@
+{
+ "id": "tempo-pyramid",
+ "name": "Tempo Pyramid",
+ "goal": "tempo",
+ "desc": "5, 10, 15, 10, 5 minutes of tempo.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 300,
+   "pct": 82,
+   "label": "Tempo"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 80,
+   "label": "Tempo"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 900,
+   "pct": 78,
+   "label": "Tempo"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 80,
+   "label": "Tempo"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 50,
+   "label": "Recover"
+  },
+  {
+   "type": "steady",
+   "dur": 300,
+   "pct": 82,
+   "label": "Tempo"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

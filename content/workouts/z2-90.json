@@ -1,0 +1,32 @@
+{
+ "id": "z2-90",
+ "name": "Zone 2 Long",
+ "goal": "endurance",
+ "desc": "Ninety steady minutes. Bring snacks.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    45,
+    62
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 4800,
+   "pct": 66,
+   "label": "Zone 2"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}
