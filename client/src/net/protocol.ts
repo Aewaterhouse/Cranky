@@ -7,6 +7,7 @@ export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
 
 export type ClientMsg =
   | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look }
+  | { t: 'watch' }
   | { t: 'setup'; plan: string; minutes: number }
   | { t: 'bots'; n: number }
   | { t: 'difficulty'; level: Difficulty }

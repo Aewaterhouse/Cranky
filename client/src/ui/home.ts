@@ -13,6 +13,7 @@ export interface HomeActions {
   resume(snap: SoloSnap): void
   create(): void
   join(code: string): void
+  watch(code: string): void
   logout(): void
 }
 interface Room {
@@ -41,7 +42,9 @@ function rejoinCard(r: Room, join: (code: string) => void) {
   )
 }
 
-function busCard(r: Room, join: (code: string) => void) {
+function busCard(r: Room, act: HomeActions) {
+  const { join, watch } = act
+  const full = r.riders.length >= 6
   const running = r.state === 'running'
   return h(
     'article',
@@ -60,13 +63,24 @@ function busCard(r: Room, join: (code: string) => void) {
       h('span', { class: 'dim' }, `${r.riders.length}/6 on board`),
     ),
     h(
-      'button',
-      {
-        class: 'primary',
-        disabled: r.riders.length >= 6,
-        onclick: needTrainer(() => join(r.code)),
-      },
-      r.riders.length >= 6 ? 'Bus full' : running ? 'Jump on' : 'Join',
+      'div',
+      { class: 'card-btns' },
+      full
+        ? ''
+        : h(
+            'button',
+            { class: 'primary', onclick: needTrainer(() => join(r.code)) },
+            running ? 'Jump on' : 'Join',
+          ),
+      h(
+        'button',
+        {
+          class: full ? 'primary' : 'ghost',
+          title: 'Watch on this screen',
+          onclick: () => watch(r.code),
+        },
+        full ? 'Bus full · Watch' : '📺 Watch',
+      ),
     ),
   )
 }
@@ -114,7 +128,7 @@ export function rideTab(p: Profile, act: HomeActions) {
     if (!rooms) return list.replaceChildren(h('p', { class: 'dim' }, 'Looking for buses…'))
     list.replaceChildren(
       ...(rooms.length
-        ? rooms.map((r) => busCard(r, act.join))
+        ? rooms.map((r) => busCard(r, act))
         : [
             h(
               'div',
@@ -144,12 +158,13 @@ export function rideTab(p: Profile, act: HomeActions) {
       sessionStorage.getItem('zombiebus.code') ??
       '',
   })
-  const joinCode = (e: Event) => {
+  const withCode = (go: (c: string) => void) => (e: Event) => {
     e.preventDefault()
     const c = code.value.trim().toUpperCase()
-    if (c.length === 4) needTrainer(() => act.join(c))()
+    if (c.length === 4) go(c)
     else code.focus()
   }
+  const joinCode = withCode((c) => needTrainer(() => act.join(c))())
   const main = h(
     'div',
     { class: 'ride' },
@@ -185,6 +200,11 @@ export function rideTab(p: Profile, act: HomeActions) {
             h('span', {}, 'Got a code?'),
             code,
             h('button', {}, 'Join'),
+            h(
+              'button',
+              { type: 'button', class: 'ghost', onclick: withCode(act.watch) },
+              '📺 Watch',
+            ),
           ),
         ),
       ),

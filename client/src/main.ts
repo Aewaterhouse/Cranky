@@ -14,6 +14,7 @@ import { loadProfile, syncProfile } from './core/profile'
 import { runDrill } from './modes/drill/drill'
 import { keepAwake } from './ui/wakeLock'
 import { crew } from './modes/zombieBus/crew'
+import { spectate } from './modes/zombieBus/spectate'
 import { showLogin } from './ui/login'
 import { showHome } from './ui/shell'
 import { currentTrainer } from './ui/trainer'
@@ -28,6 +29,7 @@ function home(p: Profile = profile) {
     resume: (s) => (keepAwake(true), runDrill(s.plan, profile, currentTrainer()!, home, s)),
     create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
     join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),
+    watch: (code) => spectate(code, () => home()),
     logout: () => {
       logout()
       showLogin(enter)
@@ -37,6 +39,8 @@ function home(p: Profile = profile) {
 
 async function enter(u: Me) {
   profile = loadProfile(u)
+  const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
+  if (watch?.length === 4) return spectate(watch, () => home())
   home()
   const p = await syncProfile(profile)
   if (p !== profile) home(p)

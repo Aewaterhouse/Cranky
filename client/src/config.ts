@@ -52,4 +52,6 @@ export const CFG = {
   extend: { minuteS: 60, easyS: 300, easyPct: 50, graceS: 20 },
   ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
   scene: { speedMax: 22 },
+  /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
+  tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
 }

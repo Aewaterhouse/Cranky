@@ -162,3 +162,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Code split to keep drill.ts under 300 lines: `liveTally.ts` (incremental stats), `overlays.ts` (centre message choice), `keys.ts` (key map), `extend.ts`.
 - Media corner: a floating panel in the solo player that embeds a pasted YouTube video or playlist (via youtube-nocookie) or a Twitch channel. Videos whose owners block embedding will not play; Netflix and similar cannot be embedded at all.
 - Ghost: the most recent solo ride of the same workout name longer than 5 minutes, fetched from the server at the start. It is plotted by elapsed second, so a ghost with pauses or skips drifts against the plan.
+## TV spectator mode (2026-11-12)
+- A spectator is a WebSocket that sends `watch` first. The room keeps them in `Room.watchers`, separate from seats, so the same account can ride on a laptop and watch on a TV. Spectators are never counted as riders or for idle and pause logic, and anything but `watch` from their socket is ignored. The old pre-`join` `connect()` hook was removed because it would have hijacked a seated rider's socket.
+- Auth is kept: the TV logs in as any rider. `/?watch=CODE` goes straight to the view after login; no trainer is needed.
+- Ticks carry no sprint history, so the TV board builds each rider's sprint grades from `sprint` fx lines since it joined (a late joiner misses earlier grades).
+- The TV HUD reuses the header, bus panel and splash pieces, laid out 600 px tall and CSS-zoomed to the screen (`CFG.tv`). The end summary is a plain full-screen group view, never `finishRide`, so nothing touches a profile.
+- A full bus on the home screen shows "Bus full · Watch" (the seventh rider spectates).
