@@ -14,6 +14,7 @@ import { Props } from './props'
 import { Horde } from './horde'
 import { Roadblock } from './roadblock'
 import { Sky } from './sky'
+import { Quality } from './quality'
 import { clamp } from './util'
 
 export { debugPanel } from './debug'
@@ -76,6 +77,7 @@ export class World {
   private t = 0
   private prevSpeed = 0
   private pitch = 0
+  quality?: Quality
   private climb = 0
   private brake = 0
   private hit = 0
@@ -87,7 +89,6 @@ export class World {
 
   constructor(private host: HTMLElement) {
     this.renderer = new THREE.WebGLRenderer({ antialias: true })
-    this.renderer.setPixelRatio(Math.min(2, devicePixelRatio))
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowMap
     host.prepend(this.renderer.domElement)
@@ -126,6 +127,7 @@ export class World {
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
     addEventListener('resize', this.resize)
+    this.quality = new Quality(this.renderer, () => this.resize())
     this.resize()
     this.loop()
   }
@@ -161,6 +163,7 @@ export class World {
     this.raf = requestAnimationFrame(this.loop)
     const now = performance.now()
     let dt = Math.min(0.1, (now - this.last) / 1000)
+    this.quality?.frame(dt)
     this.last = now
     this.slow = Math.max(0, this.slow - dt)
     const sm = this.slow > 0 ? 0.28 : 1

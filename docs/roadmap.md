@@ -156,7 +156,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Announcer | A dry Aussie voice calling events and sprint grades | M |
 | Onboarding | First-run tutorial: pair the trainer, set FTP, what compliance means | M |
 | Settings | Units, volumes, graphics quality, colour-blind zone colours, HUD scale | M |
-| Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |
+| ✅ Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |
 | Proper icons | SVG icon set in place of emoji so every device looks the same | S |
 | Rider avatars | Body, face and bike customisation beyond hats and kit | M |
 | More cosmetics | Done: 20 more items (6 paints, zombie plough, pirate flags, roof esky and surfboard, 6 hats, 5 kits). Still to do: paint patterns, decals, horns, exhaust flames, rider celebrations | M |
