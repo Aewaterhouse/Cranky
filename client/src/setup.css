@@ -728,6 +728,7 @@
 }
 .pp-del:hover {
   color: var(--bad);
+}
 .bot-row {
   display: flex;
   align-items: center;
