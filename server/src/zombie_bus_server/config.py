@@ -63,3 +63,8 @@ RB_SMASH_GAP = 20
 RB_CRASH_ARMOUR = 10
 RB_GRACE_S = 4
 COMBO_STEP = 0.25
+
+# Servo Stop session shop (costs in bus scrap)
+SHOP = {"plating": 40, "repellent": 60, "sync": 50}
+PLATING_ARMOUR = 25
+SYNC_WIDEN_RPM = 3

@@ -93,5 +93,27 @@ def test_summary_awards():
     room.riders["r2"].s = 1.0
     run(room, bus, 10)
     s = bus.summary(room)
-    assert s["awards"][0] == {"award": "Iron Lungs", "name": "R2", "why": "100% compliance"}
+    assert s["awards"][0] == {"award": "Iron Lungs", "id": "r2", "name": "R2", "why": "100% compliance"}
     assert s["distance"] > 0 and len(s["riders"]) == 4
+
+
+def test_servo_shop_upgrades():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    r0 = room.riders["r0"]
+    run(room, bus, 1, ev="longhaul")
+    bus.scrap, bus.armour = 500, 50
+    bus.buy(r0, "plating")
+    assert bus.armour == 50, "shop is closed outside servo stops"
+    run(room, bus, 1, ev="servo")
+    bus.scrap = 500
+    bus.buy(r0, "plating")
+    bus.buy(r0, "repellent")
+    bus.buy(r0, "sync")
+    assert bus.armour == 75 and bus.repel == 1 and bus.syncw == 3
+    assert bus.scrap == 500 - 40 - 60 - 50
+    bus.damage(10, "x")
+    assert bus.armour == 75 and bus.repel == 0
+    bus.scrap = 10
+    bus.buy(r0, "plating")
+    assert bus.armour == 75

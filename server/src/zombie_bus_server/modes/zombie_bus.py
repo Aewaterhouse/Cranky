@@ -32,6 +32,9 @@ class ZombieBus:
         self.over: dict | None = None
         self.hauls: dict[str, dict] = {}
         self.fx: list[dict] = []
+        self.ev = ""
+        self.repel = 0
+        self.syncw = 0
 
     def emit(self, k: str, text: str | None = None, rid: str | None = None) -> None:
         self.fx.append({"k": k, "text": text, "id": rid})
@@ -39,6 +42,7 @@ class ZombieBus:
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
         """Advances the bus by `dt` seconds in block `i` (event `ev`). Returns fx since the last tick."""
         b = room.plan["blocks"][i]
+        self.ev = ev
         if i != self.last_i:
             self.block_change(room, i, b, ev)
         active = [r for r in room.riders.values() if r.st == "riding"]
@@ -93,13 +97,17 @@ class ZombieBus:
             }
             self.emit("roadblock", "ROADBLOCK! Sprint to smash it!")
         elif ev == "servo":
-            self.emit("servo", f"Servo stop. {int(self.scrap)} scrap in the tin.")
+            self.emit("servo", f"Servo stop! {int(self.scrap)} scrap in the tin. Shop's open.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
         elif ev == "longhaul":
             self.emit("longhaul", "Long haul. Hold your zone.")
 
     def damage(self, n: float, text: str) -> None:
+        if self.repel > 0:
+            self.repel -= 1
+            self.emit("repel", "Horde repellent! Zombies sprayed off, no damage.")
+            return
         self.armour = max(0.0, self.armour - n)
         self.emit("hit", text if self.armour > 0 else "Armour gone! Limping on...")
 
@@ -164,14 +172,31 @@ class ZombieBus:
             med = statistics.median(cads)
             for r in active:
                 r.sync_n += 1
-                r.sync_hits += abs(r.cad - med) <= C.SYNC_RPM
-            self.sync = all(abs(c - med) <= C.SYNC_RPM for c in cads)
+                r.sync_hits += abs(r.cad - med) <= C.SYNC_RPM + self.syncw
+            self.sync = all(abs(c - med) <= C.SYNC_RPM + self.syncw for c in cads)
         self.sync_ticks += self.sync
         self.sync_s = self.sync_s + dt if self.sync else 0.0
         tune = self.sync_s >= C.SYNC_HOLD_S
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
+
+    def buy(self, r: Rider, item: str) -> None:
+        """Servo Stop shop: session-only upgrades paid from the bus scrap tin."""
+        cost = C.SHOP[item]
+        if self.ev != "servo" or self.scrap < cost:
+            return
+        self.scrap -= cost
+        if item == "plating":
+            self.armour = min(100.0, self.armour + C.PLATING_ARMOUR)
+            text = f"{r.name} bolted on armour plating (+{C.PLATING_ARMOUR})"
+        elif item == "repellent":
+            self.repel += 1
+            text = f"{r.name} bought horde repellent (one free fail)"
+        else:
+            self.syncw += C.SYNC_WIDEN_RPM
+            text = f"{r.name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"
+        self.emit("buy", text, r.id)
 
     def on_sprint(self, r: Rider, blk: int, grade: str, combo: int) -> None:
         """Applies one rider's sprint grade to the current roadblock."""
@@ -223,6 +248,9 @@ class ZombieBus:
             "tune": self.tune,
             "rb": self.rb_progress(room, i, bel),
             "combo": self.combo,
+            "shop": self.ev == "servo",
+            "repel": self.repel,
+            "syncw": self.syncw,
         }
 
     def summary(self, room: Room) -> dict:
@@ -233,7 +261,7 @@ class ZombieBus:
         def award(name: str, key, why, need=lambda v: v > 0) -> None:
             best = max(rs, key=key, default=None)
             if best and need(key(best)):
-                awards.append({"award": name, "name": best.name, "why": why(best)})
+                awards.append({"award": name, "id": best.id, "name": best.name, "why": why(best)})
 
         award("Iron Lungs", lambda r: comp[r.id], lambda r: f"{comp[r.id]:.0%} compliance")
         award("Fell Off King", lambda r: r.falls, lambda r: f"fell off {r.falls}x")

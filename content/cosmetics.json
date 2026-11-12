@@ -1,0 +1,17 @@
+[
+  { "id": "paint-rust", "slot": "paint", "name": "Rust Bucket Red", "price": 40, "colour": "#a8382a" },
+  { "id": "paint-teal", "slot": "paint", "name": "Servo Teal", "price": 40, "colour": "#2a9d8f" },
+  { "id": "paint-camo", "slot": "paint", "name": "Bush Camo", "price": 60, "colour": "#5b6b3a" },
+  { "id": "paint-black", "slot": "paint", "name": "Midnight Run", "price": 80, "colour": "#22232a" },
+  { "id": "paint-pink", "slot": "paint", "name": "Party Bus Pink", "price": 100, "colour": "#e85d9c" },
+  { "id": "bullbar", "slot": "bullbar", "name": "Roo Bar", "price": 120 },
+  { "id": "spikes", "slot": "spikes", "name": "Roof Spikes", "price": 150 },
+  { "id": "hat-cap", "slot": "hat", "name": "Servo Cap", "price": 30, "colour": "#d62828" },
+  { "id": "hat-cone", "slot": "hat", "name": "Party Hat", "price": 40, "colour": "#f6ae2d" },
+  { "id": "hat-viking", "slot": "hat", "name": "Viking Helmet", "price": 120, "colour": "#9a9a9a" },
+  { "id": "hat-crown", "slot": "hat", "name": "Crown of the Horde", "price": 300, "colour": "#ffd700" },
+  { "id": "outfit-hivis", "slot": "outfit", "name": "Hi-Vis Vest", "price": 30, "colour": "#d7ff2a" },
+  { "id": "outfit-purple", "slot": "outfit", "name": "Purple Kit", "price": 30, "colour": "#7b2cbf" },
+  { "id": "outfit-black", "slot": "outfit", "name": "Stealth Kit", "price": 50, "colour": "#1a1a1a" },
+  { "id": "outfit-gold", "slot": "outfit", "name": "Gold Kit", "price": 250, "colour": "#d4a017" }
+]

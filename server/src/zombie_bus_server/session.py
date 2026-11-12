@@ -11,7 +11,7 @@ from fastapi import WebSocket
 from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
-from .protocol import ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
+from .protocol import Buy, ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
 
 
 @dataclass
@@ -42,9 +42,10 @@ class Rider:
     sync_hits: int = 0
     sync_n: int = 0
     sprints: list[str] = field(default_factory=list)
+    look: dict[str, str] = field(default_factory=dict)
 
     def reset_stats(self) -> None:
-        fresh = Rider(self.id, self.name, self.ftp, self.tier, self.ws, self.connected)
+        fresh = Rider(self.id, self.name, self.ftp, self.tier, self.ws, self.connected, look=self.look)
         self.__dict__.update(
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}
         )
@@ -90,7 +91,14 @@ class Room:
             "plan": self.plan,
             "minutes": self.minutes,
             "riders": [
-                {"id": r.id, "name": r.name, "tier": r.tier, "ftp": r.ftp, "connected": r.connected}
+                {
+                    "id": r.id,
+                    "name": r.name,
+                    "tier": r.tier,
+                    "ftp": r.ftp,
+                    "connected": r.connected,
+                    "look": r.look,
+                }
                 for r in self.riders.values()
             ],
         }
@@ -116,11 +124,11 @@ class Room:
         r = self.riders.get(rid)
         if isinstance(msg, Join):
             if r:
-                r.name, r.ftp = msg.name, msg.ftp
+                r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
                 if self.state != "running":
                     r.tier = msg.tier
             else:
-                r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier)
+                r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
             r.ws, r.connected, r.last_data = ws, True, time.monotonic()
             if self.host is None or not self.riders[self.host].connected:
                 self.host = rid
@@ -134,6 +142,8 @@ class Room:
             r.p, r.w, r.cad, r.s, r.last_data = msg.p, msg.w, msg.cad, msg.s, time.monotonic()
         elif isinstance(msg, Sprint):
             self.mode.on_sprint(r, msg.blk, msg.grade, msg.combo)
+        elif isinstance(msg, Buy) and self.state == "running":
+            self.mode.buy(r, msg.item)
         elif isinstance(msg, TierMsg):
             r.tier = msg.tier
             await self.broadcast(self.lobby_msg())

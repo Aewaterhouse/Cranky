@@ -13,6 +13,7 @@ class Join(BaseModel):
     name: str = Field(max_length=24)
     ftp: int = Field(ge=50, le=600)
     tier: Tier
+    look: dict[str, str] = Field(default_factory=dict)
 
 
 class Setup(BaseModel):
@@ -52,8 +53,13 @@ class Sprint(BaseModel):
     combo: int = 0
 
 
+class Buy(BaseModel):
+    t: Literal["buy"]
+    item: Literal["plating", "repellent", "sync"]
+
+
 ClientMsg = TypeAdapter(
-    Annotated[Join | Setup | Start | End | TierMsg | Data | Sprint, Field(discriminator="t")]
+    Annotated[Join | Setup | Start | End | TierMsg | Data | Sprint | Buy, Field(discriminator="t")]
 )
 
 
@@ -77,6 +83,9 @@ class Bus(BaseModel):
     tune: bool
     rb: float | None
     combo: int
+    shop: bool
+    repel: int
+    syncw: int
 
 
 class Fx(BaseModel):

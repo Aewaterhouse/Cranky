@@ -1,5 +1,6 @@
 import { CFG } from '../config'
 import type { Grade, Tier } from '../types'
+import type { Look } from './cosmetics'
 
 export interface RideRecord {
   date: string
@@ -18,10 +19,13 @@ export interface Profile {
   rides: RideRecord[]
   stats: { rides: number; secs: number; kj: number; zones: number[]; streak: number; lastWeek: number }
   updated: number
+  scrap: number
+  owned: string[]
+  look: Look
 }
 
 export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'): Profile => ({
-  id, name, ftp, tier, allTime: {}, rides: [], updated: 0,
+  id, name, ftp, tier, allTime: {}, rides: [], updated: 0, scrap: 0, owned: [], look: {},
   stats: { rides: 0, secs: 0, kj: 0, zones: Array(7).fill(0), streak: 0, lastWeek: 0 },
 })
 
