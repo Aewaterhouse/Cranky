@@ -45,12 +45,16 @@ function busCard(r: Room, join: (code: string) => void) {
       'div',
       { class: 'aboard' },
       ...r.riders.map((n) => avatar(n, 'sm')),
-      h('span', { class: 'dim' }, `${r.riders.length} on board`),
+      h('span', { class: 'dim' }, `${r.riders.length}/6 on board`),
     ),
     h(
       'button',
-      { class: 'primary', onclick: needTrainer(() => join(r.code)) },
-      running ? 'Jump on' : 'Join',
+      {
+        class: 'primary',
+        disabled: r.riders.length >= 6,
+        onclick: needTrainer(() => join(r.code)),
+      },
+      r.riders.length >= 6 ? 'Bus full' : running ? 'Jump on' : 'Join',
     ),
   )
 }

@@ -127,6 +127,11 @@ class Room:
                 r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
                 if self.state != "running":
                     r.tier = msg.tier
+            elif len(self.riders) >= C.MAX_RIDERS:
+                await ws.send_json(
+                    {"t": "error", "msg": f"Bus full ({C.MAX_RIDERS} seats). Catch the next one."}
+                )
+                return
             else:
                 r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
             r.ws, r.connected, r.last_data = ws, True, time.monotonic()

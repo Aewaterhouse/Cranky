@@ -11,6 +11,7 @@ DB_PATH = Path(os.environ.get("ZB_DB", ROOT / "server" / "zombie_bus.db"))
 TICK_HZ = 2
 TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5
+MAX_RIDERS = 6
 ROOM_IDLE_S = 600
 STALE_DATA_S = 3.0  # real seconds without data before a rider reads as zero power
 

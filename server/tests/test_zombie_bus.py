@@ -117,3 +117,28 @@ def test_servo_shop_upgrades():
     bus.scrap = 10
     bus.buy(r0, "plating")
     assert bus.armour == 75
+
+
+def test_bus_is_full_at_six():
+    import asyncio
+
+    from zombie_bus_server.session import Room
+
+    class Ws:
+        def __init__(self):
+            self.sent = []
+
+        async def send_json(self, m):
+            self.sent.append(m)
+
+    async def go():
+        room = Room("TEST")
+        socks = [Ws() for _ in range(7)]
+        for i, ws in enumerate(socks):
+            await room.handle(f"r{i}", ws, {"t": "join", "name": f"R{i}", "ftp": 200, "tier": "hard"})
+        assert len(room.riders) == C.MAX_RIDERS
+        assert "Bus full" in socks[6].sent[-1]["msg"]
+        await room.handle("r0", socks[0], {"t": "join", "name": "R0", "ftp": 210, "tier": "hard"})
+        assert room.riders["r0"].ftp == 210
+
+    asyncio.run(go())

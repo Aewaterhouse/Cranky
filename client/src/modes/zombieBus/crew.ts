@@ -91,7 +91,7 @@ export async function crew(
         ),
       )
     } else if (m.t === 'error') {
-      if (/No bus/.test(m.msg)) {
+      if (/No bus|Bus full/.test(m.msg)) {
         toast(m.msg, 'bad')
         leave()
       } else ride ? ride.toast(m.msg) : toast(m.msg, 'bad')
