@@ -5,6 +5,7 @@ export const CFG = {
   erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1, maxFails: 5 },
   ftms: { replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
+  clock: { hz: 4, snapS: 1, gain: 0.2, windowS: 4, rateMin: 0.5, rateMax: 30, staleS: 3 },
   recovery: { saveMs: 5000, maxAgeMs: 30 * 60 * 1000 },
   compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },
   sprint: { hit: 0.75, great: 0.95, mega: 1.0, comboCap: 8 },

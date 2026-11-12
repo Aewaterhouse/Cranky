@@ -14,7 +14,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The 2 s smoothing restarts a linear ramp from the current value whenever the target moves by more than 1 W. On a steady ramp block that gives roughly a 2 s lag, which is fine.
 - The server also caps targets at 150% FTP, as belt and braces.
 - At the end of every ride the ERG failsafe runs: 50% FTP, then release.
-- ERG changes are not pre-scheduled from the server clock. Targets come from each 2 Hz tick, so they can be up to about 0.5 s plus latency late.
+- ERG targets in the crew game are pre-scheduled from a local estimate of the server clock (`net/clockSync.ts`): a 4 Hz timer computes the frame for the estimated session time, so block and over-under changes land on time instead of waiting for the next 2 Hz tick. The estimate runs about one network delay behind the server (latency is not measured). The tick stays authoritative for tier, targets within a block, and the HUD.
 
 ## Power curve and sprints
 - Default curve points not listed in the plan: 1 s 400%, 2 min 130%, 10 min 110%, 60 min 100% of FTP.
@@ -78,4 +78,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Crew: `cranky.bus.<riderId>.<code>` holds the rider's recorder only (plus plan id); the server still owns the clock. `startBusRide` restores it when the code and plan id match and it is under 30 min old. It is cleared on finish or leave.
 - The last bus code is also kept in `localStorage["cranky.buscode.<riderId>"]` so a closed tab can find its way back. The Ride tab shows "Rejoin bus ABCD" only when `/api/rooms` lists that code. The server lists a room only while someone is connected, so a rider who was alone on the bus will not get the card after a refresh (the code field is still prefilled from sessionStorage). Listing rooms that are running but empty would fix it; left for a server change.
 - Sprint combo is not restored (it restarts at 0).
+
+## ERG pre-scheduling (2026-11-12)
+- `ClockSync` keeps (el, arrival time) for each tick, measures the rate over the last 4 s (1 normally, so a time-scaled test server works), clamps it to 0.5-30, eases small errors out at 20% per tick, snaps when more than 1 s out, never runs backwards except on a snap, and goes quiet after 3 s without a tick.
+- Nothing is scheduled during the countdown (tick `i < 0`) or after the last tick. The ErgController's 2 s ramp is unchanged. Within the same block the server's own `tgt` still wins; across a block boundary the local frame wins until the server tick catches up.
 
