@@ -12,10 +12,33 @@ export interface BlockStat {
   inBandSecs: number
 }
 
+const mean = (a: number[]) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0)
+
+/** Normalised power: 4th-root mean of the 30 s rolling average to the 4th power (plain mean under 30 s). */
+export function normalisedPower(power: number[]): number {
+  if (power.length < 30) return mean(power)
+  let sum = 0
+  let acc = 0
+  for (let i = 0; i < power.length; i++) {
+    sum += power[i]
+    if (i >= 30) sum -= power[i - 30]
+    if (i >= 29) acc += (sum / 30) ** 4
+  }
+  return (acc / (power.length - 29)) ** 0.25
+}
+
+/** Normalised power, intensity factor and training stress score for a ride at `ftp`. */
+export function loadStats(power: number[], ftp: number) {
+  const np = normalisedPower(power)
+  const iff = ftp ? np / ftp : 0
+  return { np, if: iff, tss: ftp ? ((power.length * np * iff) / (ftp * 3600)) * 100 : 0 }
+}
+
 /** Collects 1 Hz samples during a ride and builds the summary. */
 export class RideRecorder {
   power: number[] = []
   cadence: number[] = []
+  target: (number | null)[] = []
   private rows: { i: number; p: number; tgt: number | null; c: number | null; band: boolean }[] = []
   sprints: SprintResult[] = []
   readonly startedAt = new Date().toISOString()
@@ -27,6 +50,7 @@ export class RideRecorder {
   sample(i: number, p: number, cad: number, tgt: number | null, c: number | null, band: boolean) {
     this.power.push(p)
     this.cadence.push(cad)
+    this.target.push(tgt)
     this.rows.push({ i, p, tgt, c, band })
   }
 
@@ -35,7 +59,6 @@ export class RideRecorder {
       .map((b, i) => {
         const r = this.rows.filter((x) => x.i === i)
         const scored = r.filter((x) => x.c !== null)
-        const mean = (a: number[]) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0)
         return {
           i,
           label: b.label ?? b.type,
@@ -58,6 +81,7 @@ export class RideRecorder {
       best: bestEfforts(this.power),
       zones,
     }
+    const load = loadStats(this.power, this.ftp)
     return {
       plan: this.plan.id,
       planName: this.plan.name,
@@ -72,6 +96,12 @@ export class RideRecorder {
         ? Math.round(this.power.reduce((a, b) => a + b, 0) / this.power.length)
         : 0,
       zones,
+      np: Math.round(load.np),
+      if: +load.if.toFixed(2),
+      tss: Math.round(load.tss),
+      avgCadence: Math.round(mean(this.cadence)),
+      power: [...this.power],
+      target: [...this.target],
     }
   }
 }

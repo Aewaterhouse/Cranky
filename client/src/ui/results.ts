@@ -1,8 +1,13 @@
+import '../results.css'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, type Profile } from '../core/curve'
 import { postRide, saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
+import { ZONE_COLOURS } from './planGraph'
+import { groupSection, postcard } from './resultsGroup'
+import { segsFromSeries } from './soloSegs'
+import { workoutChart } from './workoutChart'
 
 export interface GroupSummary {
   distance: number
@@ -34,6 +39,16 @@ const DUR_LABEL: Record<string, string> = {
   1200: '20 min',
   3600: '60 min',
 }
+const ZONE_NAMES = ['Recovery', 'Endurance', 'Tempo', 'Threshold', 'VO2 max', 'Anaerobic', 'Sprint']
+
+const tile = (label: string, value: string, sub = '', cls = '') =>
+  h(
+    'div',
+    { class: `res-tile ${cls}` },
+    h('span', {}, label),
+    h('b', {}, value),
+    sub ? h('small', {}, sub) : '',
+  )
 
 /** Applies the ride to the profile, saves it and shows the summary screen. */
 export function finishRide(
@@ -64,23 +79,23 @@ export function finishRide(
     })
     a.click()
   }
-  const table = (head: string[], rows: (string | number)[][]) =>
-    h(
-      'table',
-      {},
-      h('tr', {}, ...head.map((x) => h('th', {}, x))),
-      ...rows.map((r) => h('tr', {}, ...r.map((x) => h('td', {}, String(x))))),
-    )
   const ftpBox = h('div')
   if (sug)
     ftpBox.append(
       h(
         'div',
-        { class: 'card hl' },
-        `Your 20 min best suggests an FTP of ${sug} W (currently ${p.ftp} W). `,
+        { class: 'card hl res-ftp' },
+        h(
+          'span',
+          {},
+          `Your 20 min best suggests an FTP of `,
+          h('b', {}, `${sug} W`),
+          ` (currently ${p.ftp} W). `,
+        ),
         h(
           'button',
           {
+            class: 'primary',
             onclick: () => {
               p = { ...p, ftp: sug }
               saveProfile(p)
@@ -91,157 +106,179 @@ export function finishRide(
         ),
       ),
     )
+
+  const when = new Date(s.record.date).toLocaleDateString('en-AU', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+  const zoneRow = (secs: number, i: number) =>
+    h(
+      'div',
+      { class: 'res-zrow' },
+      h('span', {}, `Z${i + 1}`, h('small', {}, ZONE_NAMES[i])),
+      h(
+        'div',
+        { class: 'res-zbar' },
+        h('i', {
+          style: `width:${(secs / Math.max(1, ...s.zones)) * 100}%;background:${ZONE_COLOURS[i]}`,
+        }),
+      ),
+      h('em', {}, fmt(secs)),
+      h('small', {}, `${Math.round((secs / Math.max(1, s.record.secs)) * 100)}%`),
+    )
+  const types = s.blocks.flatMap((b) => Array<string>(b.secs).fill(b.type))
+  const chart = workoutChart(s.ftp)
+  const chartBox = h('div', { class: 'res-chart' }, chart.el)
+  if (s.power.length > 1)
+    chart.set({
+      segs: segsFromSeries(s.target, types, s.ftp),
+      total: s.power.length,
+      power: s.power,
+      cadence: [],
+    })
+  else chartBox.hidden = true
+
   show(
     h(
       'div',
-      { class: 'page' },
-      h('h1', {}, group ? 'Made it!' : 'Ride done'),
+      { class: 'page res' },
       h(
-        'p',
-        {},
-        `${s.planName} · ${fmt(s.record.secs)} · ${s.avgPower} W avg · ${s.record.kj} kJ · compliance ${pctStr(s.compliance)}`,
+        'div',
+        { class: 'res-hero' },
+        h('h1', {}, group ? 'Made it!' : 'Ride done'),
+        h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
-      ...(group
-        ? [
-            h(
-              'div',
-              { class: 'card' },
-              h('h2', {}, 'The bus'),
-              `Score ${group.score} · Distance ${(group.distance / 1000).toFixed(1)} km · Armour ${Math.round(group.armour)} · Sync ${Math.round(group.syncPct)}% · Scrap ${group.scrap}`,
-            ),
-            h(
-              'div',
-              { class: 'card' },
-              h('h2', {}, 'Awards'),
-              ...group.awards.map((a) =>
-                h(
-                  'div',
-                  { class: 'award' },
-                  h('b', {}, a.award),
-                  ` ${a.name} `,
-                  h('span', { class: 'dim' }, a.why),
-                ),
-              ),
-            ),
-            h(
-              'div',
-              { class: 'card' },
-              h('h2', {}, 'Crew'),
-              table(
-                ['Rider', 'Compliance', 'Time in zone', 'Falls', 'Sprints'],
-                group.riders.map((r) => [
-                  r.name,
-                  pctStr(r.compliance),
-                  fmt(r.inBandSecs),
-                  r.falls,
-                  r.sprints.join(' ') || '–',
-                ]),
-              ),
-            ),
-          ]
-        : []),
-      banked
-        ? h(
-            'div',
-            { class: 'card hl' },
-            `+${banked} scrap banked${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. Balance: ${p.scrap}. Spend it in the garage.`,
-          )
-        : '',
-      ftpBox,
+      h(
+        'div',
+        { class: 'res-tiles' },
+        tile('Duration', fmt(s.record.secs), '', 'wide'),
+        tile('Avg power', `${s.avgPower} W`),
+        tile('Normalised', `${s.np} W`, 'weighted average'),
+        tile('Intensity', s.if.toFixed(2), 'IF'),
+        tile('TSS', String(s.tss), 'training stress'),
+        tile('Energy', `${s.record.kj} kJ`),
+        tile('Avg cadence', `${s.avgCadence} rpm`),
+        tile(
+          'Compliance',
+          pctStr(s.compliance),
+          `FTP ${s.ftp} W`,
+          s.compliance >= 0.9 ? 'good' : '',
+        ),
+      ),
       prs.length
         ? h(
             'div',
-            { class: 'card hl' },
-            h('h2', {}, 'New PRs'),
-            ...prs.map(([d, w]) =>
-              h(
-                'div',
-                {},
-                `${DUR_LABEL[d]}: ${w} W${before[+d] ? ` (was ${before[+d].w} W)` : ''}`,
+            { class: 'card hl res-prs' },
+            h('h2', {}, 'New power bests'),
+            h(
+              'div',
+              { class: 'res-prlist' },
+              ...prs.map(([d, w]) =>
+                h(
+                  'div',
+                  { class: 'res-pr' },
+                  h('span', { class: 'flag' }, 'PR'),
+                  h('b', {}, `${w} W`),
+                  h('span', {}, DUR_LABEL[d]),
+                  before[+d]
+                    ? h('small', {}, `was ${before[+d].w} W`)
+                    : h('small', {}, 'first time'),
+                ),
               ),
             ),
           )
         : '',
-      s.sprints.length
+      group ? groupSection(group, profile.id) : '',
+      ftpBox,
+      h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
+      h(
+        'div',
+        { class: 'res-two' },
+        h(
+          'div',
+          { class: 'card' },
+          h('h2', {}, 'Time in zone'),
+          ...s.zones.map((z, i) => zoneRow(z, i)),
+        ),
+        s.sprints.length
+          ? h(
+              'div',
+              { class: 'card' },
+              h('h2', {}, 'Sprints'),
+              h(
+                'div',
+                { class: 'res-sprints' },
+                ...s.sprints.map((x, i) =>
+                  h(
+                    'div',
+                    { class: `res-spr grade-${x.grade}` },
+                    h('small', {}, `#${i + 1}`),
+                    h('b', {}, x.grade),
+                    h('span', {}, `${x.avg} W`),
+                    h('small', {}, pctStr(x.pct)),
+                  ),
+                ),
+              ),
+              h('p', { class: 'dim' }, 'Percent is of your 90-day best for that length.'),
+            )
+          : '',
+      ),
+      banked
         ? h(
             'div',
-            { class: 'card' },
-            h('h2', {}, 'Sprints'),
-            table(
-              ['#', 'Grade', 'Avg', '% of 90-day best'],
-              s.sprints.map((x, i) => [i + 1, x.grade, `${x.avg} W`, pctStr(x.pct)]),
-            ),
+            { class: 'card hl res-scrap' },
+            h('b', {}, `+${banked} scrap`),
+            ` banked${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. Balance: ${p.scrap}. Spend it in the garage.`,
           )
         : '',
       h(
         'div',
         { class: 'card' },
         h('h2', {}, 'Blocks'),
-        table(
-          ['Block', 'Time', 'Target', 'Avg', 'Compliance', 'In zone'],
-          s.blocks.map((b) => [
-            b.label,
-            fmt(b.secs),
-            b.avgTarget ? `${b.avgTarget} W` : '–',
-            `${b.avgPower} W`,
-            b.type === 'sprint' || b.type === 'free' ? '–' : pctStr(b.compliance),
-            fmt(b.inBandSecs),
-          ]),
+        h(
+          'table',
+          {},
+          h(
+            'tr',
+            {},
+            ...['Block', 'Time', 'Target', 'Avg', 'Compliance', 'In zone'].map((x) =>
+              h('th', {}, x),
+            ),
+          ),
+          ...s.blocks.map((b) => {
+            const scored = b.type !== 'sprint' && b.type !== 'free'
+            return h(
+              'tr',
+              {},
+              h('td', {}, b.label),
+              h('td', {}, fmt(b.secs)),
+              h('td', {}, b.avgTarget ? `${b.avgTarget} W` : '–'),
+              h('td', {}, `${b.avgPower} W`),
+              h(
+                'td',
+                {},
+                scored
+                  ? h(
+                      'span',
+                      { class: `res-comp ${b.compliance >= 0.85 ? 'good' : 'miss'}` },
+                      h('i', { style: `width:${b.compliance * 100}%` }),
+                      pctStr(b.compliance),
+                    )
+                  : '–',
+              ),
+              h('td', {}, fmt(b.inBandSecs)),
+            )
+          }),
         ),
       ),
       h(
         'div',
-        { class: 'row' },
+        { class: 'row res-actions' },
         h('button', { onclick: exportJson }, 'Export JSON'),
         group ? h('button', { onclick: () => postcard(group, s.planName) }, 'Postcard') : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),
     ),
   )
-}
-
-/** Composes the end-of-ride scene snapshot with the crew's numbers and downloads a PNG for the group chat. */
-async function postcard(g: GroupSummary, planName: string) {
-  const c = document.createElement('canvas')
-  c.width = 1200
-  c.height = 800
-  const x = c.getContext('2d')!
-  x.fillStyle = '#15161a'
-  x.fillRect(0, 0, 1200, 800)
-  if (g.postcard) {
-    const img = new Image()
-    img.src = g.postcard
-    await img.decode().catch(() => {})
-    const s = Math.max(1200 / img.width, 520 / img.height)
-    x.drawImage(img, (1200 - img.width * s) / 2, 0, img.width * s, img.height * s)
-  }
-  x.fillStyle = 'rgba(0,0,0,0.75)'
-  x.fillRect(0, 470, 1200, 330)
-  x.fillStyle = '#f2b705'
-  x.font = '900 64px system-ui'
-  x.fillText('ZOMBIE BUS', 40, 80)
-  x.font = 'bold 40px system-ui'
-  x.fillText(`Score ${g.score}`, 40, 530)
-  x.fillStyle = '#eee'
-  x.font = '28px system-ui'
-  x.fillText(
-    `${planName} · ${(g.distance / 1000).toFixed(1)} km · armour ${Math.round(g.armour)} · sync ${Math.round(g.syncPct)}% · ${g.scrap} scrap`,
-    40,
-    580,
-  )
-  x.fillText(`Crew: ${g.riders.map((r) => r.name).join(', ')}`, 40, 625)
-  x.font = '24px system-ui'
-  g.awards
-    .slice(0, 5)
-    .forEach((a, i) =>
-      x.fillText(
-        `🏆 ${a.award}: ${a.name} (${a.why})`,
-        40 + (i % 2) * 580,
-        680 + Math.floor(i / 2) * 36,
-      ),
-    )
-  const a = document.createElement('a')
-  a.href = c.toDataURL('image/png')
-  a.download = `zombie-bus-${new Date().toISOString().slice(0, 10)}.png`
-  a.click()
 }

@@ -1,96 +1,215 @@
-import { CFG } from '../../config'
-import type { Profile } from '../../core/curve'
-import { frameAt, planTotal } from '../../core/plan'
+import '../../solo.css'
+import { zoneOf, type Profile } from '../../core/curve'
+import { frameAt, planTotal, startOf } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
-import { World, debugPanel } from '../../scene/world'
+import { loadStats } from '../../core/ride'
 import { SFX } from '../../ui/audio'
-import { h, show } from '../../ui/dom'
-import { makeHud } from '../../ui/hud'
+import { fmt, show } from '../../ui/dom'
 import { finishRide } from '../../ui/results'
-import type { Plan, Trainer } from '../../types'
+import { soloView } from '../../ui/soloView'
+import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 
-/** Solo plan runner: local clock, minimal road scene, no horde. */
+const START_S = 5
+const PAUSE_ERG = 0.4
+const STOP_S = 3
+const GO_S = 1.5
+
+/** Solo ERG workout player: local clock, no scene. Owns pause, skip, intensity and the sprint flow. */
 export function runDrill(
   plan: Plan,
   profile: Profile,
   trainer: Trainer,
   done: (p: Profile) => void,
 ) {
-  const stage = h('div', { class: 'stage' })
-  show(stage)
-  const world = new World(stage)
-  if (location.search.includes('debug')) debugPanel()
-  const ride = new RideController(trainer, profile, plan)
   const total = planTotal(plan.blocks)
   const fast = +(new URLSearchParams(location.search).get('fast') ?? 1)
-  let t0 = performance.now() + 5000
+  const ride = new RideController(trainer, profile, plan)
+  const isSim = trainer.name.toLowerCase().includes('sim')
+  let el = 0
+  let count = START_S
+  let intensity = 1
+  let manual = false
+  let auto = false
+  let finished = false
+  let last = performance.now()
+  let idleFor = 0
+  let activeFor = 0
   let lastI = -1
   let lastCount = 0
-  let speed = 0
-  let finished = false
-  const hud = makeHud(
-    (t) => {
-      profile.tier = t
-      saveProfile(profile)
-    },
-    () => end(),
-  )
-  hud.setTier(profile.tier)
-  stage.append(hud.root)
-  ride.onSprint = (r) => (
-    SFX[r.grade](),
-    hud.sprint(r),
-    r.grade !== 'FAIL' && r.grade !== 'HIT' && world.fx(r.grade === 'GREAT' ? 'shake' : 'slowmo')
-  )
+  let splashUntil = 0
+  // incremental stats: one entry per recorded second
+  const xs: number[] = []
+  const zones = Array(7).fill(0)
+  let cSum = 0
+  let cN = 0
+  let load = loadStats([], profile.ftp)
+  let loadN = 0
+  let cadAvg = 0
+
+  const view = soloView(plan, profile.ftp, profile.tier, {
+    pause: () => togglePause(),
+    skip: () => skip(),
+    end: () => end(),
+    intensity: (d) => (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
+    tier: (t) => ((profile.tier = t), saveProfile(profile)),
+  })
+  show(view.root)
+  view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
+
+  ride.onSprint = (r) => {
+    SFX[r.grade]()
+    splashUntil = performance.now() + 2800
+    view.overlay(
+      `${r.grade}!`,
+      `${r.avg} W · ${Math.round(r.pct * 100)}% of your best`,
+      `grade-${r.grade}`,
+    )
+  }
+
+  const sprinting = () => ride.frame?.type === 'sprint'
+  function togglePause() {
+    if (count > 0 || sprinting()) return
+    manual = !manual
+    if (!manual) auto = false
+  }
+  function skip() {
+    if (count > 0) return (count = 0)
+    const i = ride.frame?.i ?? frameAt(plan.blocks, el, profile.tier, profile.ftp)?.i ?? 0
+    el = startOf(plan.blocks, i + 1)
+  }
+  const onKey = (e: KeyboardEvent) => {
+    const tag = (e.target as HTMLElement)?.tagName
+    if (tag === 'INPUT' || tag === 'SELECT' || e.ctrlKey || e.metaKey) return
+    const k = e.key
+    const used =
+      k === ' ' || k === 'p' || k === 'P'
+        ? (togglePause(), true)
+        : k === 'n' || k === 'N' || (k === 'ArrowRight' && !isSim)
+          ? (skip(), true)
+          : k === '+' || k === '='
+            ? ((intensity = Math.min(1.5, +(intensity + 0.01).toFixed(2))), true)
+            : k === '-' || k === '_'
+              ? ((intensity = Math.max(0.5, +(intensity - 0.01).toFixed(2))), true)
+              : k === 'Escape'
+                ? (view.confirmEnd(), true)
+                : false
+    if (used) e.preventDefault()
+  }
+  addEventListener('keydown', onKey)
   ride.start()
 
-  const timer = setInterval(() => {
-    const el = ((performance.now() - t0) / 1000) * fast
-    if (el < 0) {
-      hud.banner(`Starting in ${Math.ceil(-el)}`, '', 1100)
-      return
+  const scaled = (f: Frame, k: number): Frame => ({
+    ...f,
+    tgt: f.tgt == null ? null : Math.round(f.tgt * k),
+    next: f.next && { ...f.next, tgt: f.next.tgt == null ? null : Math.round(f.next.tgt * k) },
+  })
+
+  function record(live = ride.live) {
+    const p = ride.rec.power
+    for (; xs.length < p.length; xs.push(el)) {
+      const n = xs.length
+      zones[zoneOf(p[n], profile.ftp)]++
+      if (live.c !== null) {
+        cSum += live.c
+        cN++
+      }
     }
-    const f = frameAt(plan.blocks, el, profile.tier, profile.ftp)
-    if (!f) return end()
-    ride.setFrame(f)
-    if (f.i !== lastI) {
-      lastI = f.i
-      SFX.block()
-      if (f.type === 'sprint') hud.banner('SPRINT! ERG off, go all out!', 'grade-MEGA')
-    }
-    const count = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
-    if (count !== lastCount && count > 0 && count <= 3) SFX.countdown()
-    lastCount = count
+  }
+  const tick = () => {
+    const now = performance.now()
+    const dt = Math.min(1, (now - last) / 1000)
+    last = now
     const live = ride.live
-    const c = f.tgt ? (live.c ?? 0) : Math.min(1, live.avg / profile.ftp)
-    speed += (4 + c * (CFG.scene.speedMax - 4) - speed) * 0.15
-    world.state = {
-      ...world.state,
-      speed,
-      mood: 'drill',
-      busLook: profile.look,
-      riders: [
-        {
-          id: profile.id,
-          name: profile.name,
-          c: live.c,
-          st: 'riding',
-          cadence: live.cadence,
-          look: profile.look,
-        },
-      ],
+    let overlay: [string | null, string?, string?] = [null]
+    if (count > 0) {
+      const before = Math.ceil(count)
+      count -= dt
+      if (count <= 0) SFX.go()
+      else if (Math.ceil(count) !== before) SFX.countdown()
+      overlay = count > 0 ? [String(Math.ceil(count)), 'Get ready to ride', 'count'] : [null]
+    } else {
+      const stopped = live.power === 0 || live.cadence === 0
+      idleFor = stopped ? idleFor + dt : 0
+      activeFor = stopped ? 0 : activeFor + dt
+      if (!manual && !auto && !sprinting() && idleFor >= STOP_S) auto = true
+      else if (auto && activeFor >= GO_S) auto = false
+      if (!manual && !auto) el += dt * fast
     }
-    hud.frame(f, live, total)
-  }, 250)
+    const paused = count <= 0 && (manual || auto)
+    ride.paused = paused
+    const base = frameAt(plan.blocks, el, profile.tier, profile.ftp)
+    if (!base) return void end()
+    const f = scaled(base, intensity)
+    if (count <= 0) {
+      ride.setFrame(paused ? { ...f, type: 'steady', tgt: Math.round(profile.ftp * PAUSE_ERG) } : f)
+      if (f.i !== lastI) {
+        if (lastI >= 0) SFX.block()
+        lastI = f.i
+        view.panel.done(ride.rec.summary().blocks, ride.rec.sprints, f.i)
+      }
+      const n = f.type !== 'sprint' && f.next?.type === 'sprint' ? Math.ceil(f.next.in / fast) : 0
+      if (n !== lastCount && n > 0 && n <= 3) SFX.countdown()
+      lastCount = n
+      if (paused)
+        overlay = [
+          'PAUSED',
+          manual
+            ? 'Press Space to resume. ERG is easing off.'
+            : 'Auto-paused. Start pedalling to carry on.',
+          'pause',
+        ]
+      else if (f.type === 'sprint')
+        overlay = [
+          'SPRINT!',
+          `ERG OFF · ${Math.round(live.power)} W · ${fmt(f.dur - f.bel)}`,
+          'sprint',
+        ]
+      else if (n > 0 && n <= 3) overlay = [String(n), 'Sprint next. ERG switches off', 'count']
+    }
+    record(live)
+    if (now >= splashUntil || overlay[0] === 'PAUSED') {
+      view.overlay(...overlay)
+    }
+    const p = ride.rec.power
+    if (p.length !== loadN) {
+      load = loadStats(p, profile.ftp)
+      loadN = p.length
+      cadAvg = ride.rec.cadence.reduce((a, b) => a + b, 0) / (p.length || 1)
+    }
+    view.frame({
+      f,
+      live,
+      fast,
+      total,
+      intensity,
+      paused: paused ? (manual ? 'manual' : 'auto') : null,
+      power: p,
+      xs,
+      cadence: ride.rec.cadence,
+      stats: {
+        elapsed: el,
+        remaining: total - el,
+        avg: p.length ? p.reduce((a, b) => a + b, 0) / p.length : 0,
+        np: load.np,
+        if: load.if,
+        tss: load.tss,
+        kj: p.reduce((a, b) => a + b, 0) / 1000,
+        cadence: cadAvg,
+        compliance: cN ? cSum / cN : null,
+        zones,
+      },
+    })
+  }
+  const timer = setInterval(tick, 200)
+  tick()
 
   async function end() {
     if (finished) return
     finished = true
     clearInterval(timer)
-    t0 = 0
+    removeEventListener('keydown', onKey)
     await ride.stop()
-    world.dispose()
     finishRide(profile, ride.rec.summary(), done)
   }
 }
