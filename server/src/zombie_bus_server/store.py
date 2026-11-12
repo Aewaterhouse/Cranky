@@ -44,6 +44,26 @@ class Store:
                 )
         return True
 
+    def crew_curves(self) -> list[dict]:
+        """Every rider's name, weight and all-time best power by duration, for crew comparisons."""
+        with self.lock:
+            rows = self.db.execute(
+                "SELECT u.id, u.name, p.json FROM users u JOIN profiles p ON p.id = u.id ORDER BY u.name"
+            ).fetchall()
+        out = []
+        for rid, name, raw in rows:
+            p = json.loads(raw)
+            kg = p.get("weightKg")
+            out.append(
+                {
+                    "id": rid,
+                    "name": name,
+                    "weightKg": kg if isinstance(kg, (int, float)) and kg > 0 else None,
+                    "best": p.get("allTime") or {},
+                }
+            )
+        return out
+
     def add_ride(self, rid: str, summary: dict) -> None:
         date = summary.get("record", {}).get("date", "")
         with self.lock, self.db:

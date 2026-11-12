@@ -1,8 +1,11 @@
 import { CFG } from '../config'
+import { api } from '../core/api'
+import { mateLine, type CrewRider } from '../core/crewCurve'
 import { type Profile } from '../core/curve'
 import {
   curveLines,
   fmtDur,
+  lineKg,
   nearestDur,
   xFrac,
   yTop,
@@ -11,20 +14,30 @@ import {
   type CurvePt,
 } from '../core/powerCurve'
 import { h, seg } from './dom'
+import { crewBoard } from './riderCrew'
 import { chartBox, niceTicks, svgEl } from './svg'
 
 const COLOUR: Record<CurveLine['key'], string> = {
   all: 'var(--acc)',
   d90: 'var(--tox)',
   last: '#3bb2d1',
+  mate: 'var(--dim)',
 }
 const when = (iso: string) =>
   new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
 
 /** Interactive log-time power curve. Hover or tap for the values at a duration; toggle W and W/kg. */
-export function curveChart(p: Profile) {
-  const lines = curveLines(p).filter((l) => l.pts.length)
+export function curveChart(p: Profile, mates: CrewRider[] = []) {
+  const own = curveLines(p).filter((l) => l.pts.length)
+  const picked = new Set<string>()
+  let lines = own
   let kg: number | undefined
+  const colour = (l: CurveLine) => l.colour ?? COLOUR[l.key]
+  const rebuild = () => {
+    lines = [...own, ...mates.flatMap((m, i) => (picked.has(m.id) ? [mateLine(m, i)] : []))].filter(
+      (l) => l.pts.length && !(kg && l.key === 'mate' && !l.kg),
+    )
+  }
   const narrow = innerWidth < 600
   const c = chartBox(narrow ? 340 : 640, narrow ? 300 : 320, { l: 44, r: 10, t: 14, b: 30 })
   const tip = h('div', { class: 'ctip', hidden: true })
@@ -35,7 +48,6 @@ export function curveChart(p: Profile) {
   const x = (d: number) => c.l + xFrac(d) * c.pw
   const draw = () => {
     const top = yTop(lines, kg)
-    const y = (w: number) => c.t + (1 - yValue(w, kg) / top) * c.ph
     plot.replaceChildren()
     for (const v of niceTicks(top, 5))
       plot.append(
@@ -59,7 +71,8 @@ export function curveChart(p: Profile) {
         svgEl('text', { x: x(d), y: c.H - 9, class: 'ax', 'text-anchor': 'middle' }, fmtDur(d)),
       )
     for (const l of lines) {
-      const col = COLOUR[l.key]
+      const col = colour(l)
+      const y = (w: number) => c.t + (1 - yValue(w, lineKg(l, kg)) / top) * c.ph
       const pt = (q: CurvePt) => `${x(q.d).toFixed(1)},${y(q.w).toFixed(1)}`
       plot.append(
         svgEl('polyline', { points: l.pts.map(pt).join(' '), class: 'cline faint', stroke: col }),
@@ -98,22 +111,21 @@ export function curveChart(p: Profile) {
     const px = ((e.clientX - r.left) / r.width) * c.W
     const d = nearestDur(Math.min(1, Math.max(0, (px - c.l) / c.pw)))
     const top = yTop(lines, kg)
-    const y = (w: number) => c.t + (1 - yValue(w, kg) / top) * c.ph
     guide.replaceChildren(
       svgEl('line', { x1: x(d), x2: x(d), y1: c.t, y2: c.H - c.b, class: 'gline' }),
     )
     const rows = lines.flatMap((l) => {
       const q = l.pts.find((z) => z.d === d)
       if (!q) return []
-      guide.append(
-        svgEl('circle', { cx: x(d), cy: y(q.w), r: 5.5, fill: COLOUR[l.key], class: 'ghalo' }),
-      )
-      const wk = p.weightKg ? ` · ${(q.w / p.weightKg).toFixed(2)} W/kg` : ''
+      const y = c.t + (1 - yValue(q.w, lineKg(l, kg)) / top) * c.ph
+      guide.append(svgEl('circle', { cx: x(d), cy: y, r: 5.5, fill: colour(l), class: 'ghalo' }))
+      const lk = l.key === 'mate' ? l.kg : p.weightKg
+      const wk = lk ? ` · ${(q.w / lk).toFixed(2)} W/kg` : ''
       return [
         h(
           'div',
           { class: q.real ? '' : 'est' },
-          h('i', { style: `background:${COLOUR[l.key]}` }),
+          h('i', { style: `background:${colour(l)}` }),
           h('span', {}, l.label),
           h('b', {}, `${q.w} W${wk}`),
           h('small', {}, q.date ? when(q.date) : 'estimate'),
@@ -136,18 +148,39 @@ export function curveChart(p: Profile) {
       ['kg', 'W/kg'],
     ],
     'w',
-    (v) => ((kg = v === 'kg' ? p.weightKg : undefined), draw()),
+    (v) => ((kg = v === 'kg' ? p.weightKg : undefined), rebuild(), draw()),
     'unit',
   )
   if (!p.weightKg) unit.querySelector<HTMLButtonElement>('[data-v=kg]')!.disabled = true
   const legend = h(
     'p',
     { class: 'dim legend' },
-    ...lines.flatMap((l) => [
-      h('i', { class: 'lkey', style: `background:${COLOUR[l.key]}` }),
+    ...own.flatMap((l) => [
+      h('i', { class: 'lkey', style: `background:${colour(l)}` }),
       `${l.label}  `,
     ]),
     h('span', {}, ' Solid is a real effort, faint and hollow is estimated from FTP.'),
+  )
+  const chips = h(
+    'div',
+    { class: 'row chips' },
+    ...mates.map((m, i) =>
+      h(
+        'button',
+        {
+          class: 'chip',
+          style: `--c:${mateLine(m, i).colour}`,
+          title: m.weightKg ? '' : 'No weight set, so hidden in W/kg',
+          onclick: (e: Event) => {
+            const on = !picked.delete(m.id) && !!picked.add(m.id)
+            ;(e.currentTarget as HTMLElement).classList.toggle('on', on)
+            rebuild()
+            draw()
+          },
+        },
+        m.name,
+      ),
+    ),
   )
   return h(
     'div',
@@ -164,6 +197,7 @@ export function curveChart(p: Profile) {
       ),
       unit,
     ),
+    mates.length ? chips : '',
     wrap,
     legend,
   )
@@ -171,6 +205,15 @@ export function curveChart(p: Profile) {
 
 /** Power tab: the curve chart and the best-effort table. */
 export function powerTab(p: Profile) {
+  const chart = h('div', {}, curveChart(p))
+  const board = h('div', {})
+  api<CrewRider[]>('/api/crew/curves')
+    .then((all) => {
+      const mates = all.filter((m) => m.id !== p.id && Object.keys(m.best).length)
+      if (mates.length) chart.replaceChildren(curveChart(p, mates))
+      board.replaceChildren(crewBoard(all, p.id))
+    })
+    .catch(() => {})
   const [all, d90, last] = curveLines(p)
   const cell = (q?: CurvePt) =>
     h(
@@ -182,7 +225,8 @@ export function powerTab(p: Profile) {
   return h(
     'div',
     {},
-    h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Power curve'), curveChart(p)),
+    h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Power curve'), chart),
+    board,
     h(
       'section',
       { class: 'panel' },

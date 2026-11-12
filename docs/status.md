@@ -11,6 +11,7 @@
 - Rider data: deeper profile, power curve chart, ride history, fitness trends, PR timeline and badges.
 - Solo extras: FTP tests, resistance and slope modes, cadence targets, coach cues, add-time buttons, media corner, ghost of the last attempt.
 - Game extras: personal mini-challenges, nitro, weekly mutators, season ladder, TV spectator mode.
+- Compare with mates: crew curves overlay on the power curve chart and a W / W/kg leaderboard (not yet looked at in a browser).
 - Free ride: ride physics, GPX routes, elevation profiles and an OpenStreetMap map (not yet looked at in a browser).
 
 ## In progress

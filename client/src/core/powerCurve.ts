@@ -14,8 +14,11 @@ export interface CurvePt {
   date: string | null
 }
 export interface CurveLine {
-  key: 'all' | 'd90' | 'last'
+  key: 'all' | 'd90' | 'last' | 'mate'
   label: string
+  /** Crewmates only: their colour and weight (no weight, no W/kg). */
+  colour?: string
+  kg?: number
   pts: CurvePt[]
 }
 
@@ -71,9 +74,12 @@ export const fmtDur = (s: number) =>
 /** Y value for the chart: watts, or W/kg (rounded to two places) when a weight is given. */
 export const yValue = (w: number, kg?: number) => (kg ? Math.round((w / kg) * 100) / 100 : w)
 
+/** The weight to divide a line by: the chosen mode's weight, or the crewmate's own. */
+export const lineKg = (l: CurveLine, kg?: number) => (kg && l.key === 'mate' ? l.kg : kg)
+
 /** Top of the y axis: the highest point plus 8%, rounded up to a step of 100 W (or 1 W/kg). */
 export function yTop(lines: CurveLine[], kg?: number) {
   const step = kg ? 1 : 100
-  const hi = Math.max(...lines.flatMap((l) => l.pts.map((q) => yValue(q.w, kg))))
+  const hi = Math.max(1, ...lines.flatMap((l) => l.pts.map((q) => yValue(q.w, lineKg(l, kg)))))
   return Math.ceil((hi * 1.08) / step) * step
 }

@@ -140,6 +140,12 @@ def put_profile(rid: str, profile: dict, u: User) -> dict:
     return {"saved": store.put_profile(rid, profile)}
 
 
+@app.get("/api/crew/curves")
+def crew_curves(u: User) -> list[dict]:
+    """All riders' all-time power curves and weights (any logged-in rider may see them)."""
+    return store.crew_curves()
+
+
 @app.post("/api/rides")
 def post_ride(body: dict, u: User) -> dict:
     store.add_ride(u["id"], body.get("summary") or {})

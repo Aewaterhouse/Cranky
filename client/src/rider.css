@@ -415,3 +415,22 @@ button.danger {
     gap: 0;
   }
 }
+.chips {
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0;
+}
+.chip {
+  padding: 3px 10px;
+  color: var(--dim);
+  background: none;
+  border: 1px solid var(--c);
+  border-radius: 999px;
+}
+.chip.on {
+  color: #111;
+  background: var(--c);
+}
+.board tr.me {
+  color: var(--acc);
+}

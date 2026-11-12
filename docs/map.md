@@ -22,7 +22,7 @@
 - `compliance.ts` rolling average and band scoring.
 - `cosmetics.ts` catalogue and purchase logic.
 - `badges.ts` milestone badges, PR timeline.
-- `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths.
+- `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
 - `physics.ts` free-ride speed from power, gradient and mass; `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
@@ -50,7 +50,7 @@
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
-- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `svg.ts` SVG helpers.
+- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve with crew overlay chips; `riderCrew.ts` crew leaderboard; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `svg.ts` SVG helpers.
 - `trainer.ts` trainer pill and connect modal.
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.

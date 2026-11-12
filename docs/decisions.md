@@ -188,3 +188,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The map is Leaflet 1.9.4 (new dependency, BSD-2-Clause) with standard OpenStreetMap tiles and attribution. It is loaded lazily and only when the route has coordinates and the browser is online; any failure just hides the panel, so offline rides and tests never depend on it.
 - The player now also shows climbed / climb to go, ETA at the average speed so far (with a clock time), average power, NP and W/kg.
 - This item was finished from uncommitted work left when the PC was switched off mid-session. It passes type-check, lint, unit tests and build but nobody has looked at it in a browser yet.
+
+## Compare with mates (2026-11-13)
+- `GET /api/crew/curves` returns every rider's name, weight and all-time bests (from stored profiles). Any logged-in rider may see it; it is a crew of friends, and profiles were already readable by id.
+- Overlay shows crewmates' real all-time bests only (no FTP estimates), as coloured chips above the chart. In W/kg mode each mate is divided by their own weight; mates with no weight are hidden there, and left out of the W/kg leaderboard.
+- Leaderboard is all-time bests at 5 s, 1 min, 5 min and 20 min (`CFG.crewDurations`), including the viewer, who is highlighted. Mate colours are in `CFG.crewColours`.
+- Bests are as last synced to the server, so a mate's newest ride shows once their profile has synced.
