@@ -1,5 +1,5 @@
 import type { Profile } from '../core/curve'
-import type { Lobby } from '../net/protocol'
+import type { Difficulty, Lobby } from '../net/protocol'
 import { TIERS, type Tier } from '../types'
 import { avatar, h, seg } from './dom'
 import { planGraph } from './planGraph'
@@ -16,6 +16,7 @@ export interface LobbyCtx {
   setup(plan: string, minutes: number): void
   tier(t: Tier): void
   bots(n: number): void
+  difficulty(level: Difficulty): void
   start(): void
   leave(): void
 }
@@ -58,6 +59,15 @@ export function lobbyView(c: LobbyCtx) {
     botMore,
   )
   let bots = 0
+  const DIFF: [Difficulty, string][] = [
+    ['easy', 'Easy'],
+    ['normal', 'Normal'],
+    ['hard', 'Hard'],
+    ['nightmare', 'Nightmare'],
+  ]
+  const diffSeg = seg(DIFF, 'normal', (v) => c.difficulty(v), 'diff')
+  const diffNote = h('span', { class: 'dim' })
+  const diffRow = h('div', { class: 'bot-row' }, h('span', {}, '💀 Horde'), diffSeg, diffNote)
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -97,6 +107,9 @@ export function lobbyView(c: LobbyCtx) {
     bots = l.riders.filter((r) => r.bot).length
     botN.textContent = String(bots)
     botRow.hidden = !isHost
+    diffSeg.set(l.difficulty)
+    diffSeg.hidden = !isHost
+    diffNote.textContent = isHost ? '' : DIFF.find(([d]) => d === l.difficulty)![1]
     botLess.disabled = bots === 0
     botMore.disabled = l.riders.length >= SEATS
     seats.replaceChildren(...Array.from({ length: SEATS }, (_, i) => seat(l.riders[i], l.host)))
@@ -167,6 +180,7 @@ export function lobbyView(c: LobbyCtx) {
           h('div', { class: 'bus-roof' }, h('span', {}, 'ZOMBIE BUS')),
           seats,
           botRow,
+          diffRow,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
         h(

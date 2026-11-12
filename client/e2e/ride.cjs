@@ -26,8 +26,9 @@ async function useSim(page) {
 
 async function solo(page) {
   await page.click('text=Solo workout')
+  await page.click('.chip-sel[data-g="sprint"]')
   await page.click('.plan-card:has-text("Sprints 8×10"), .plan-card:has-text("Sprints 8x10")')
-  await page.click('button:has-text("Start")')
+  await page.click('button:text-is("Start")')
   await useSim(page)
   await page.waitForSelector('text=Ride done', { timeout: 120000 })
   const text = await page.innerText('body')
@@ -44,6 +45,7 @@ async function crew(host, guest) {
   await guest.keyboard.press('Enter')
   await useSim(guest)
   await host.waitForSelector('text=Luke')
+  await host.click('.seg.diff >> text=Hard')
   await host.click('.plan-card:has-text("Bus Quick 30")')
   await host.waitForTimeout(500)
   await host.click('text=Start the bus')

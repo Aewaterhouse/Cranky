@@ -153,3 +153,17 @@ def test_discord_summary_text():
     text = format_summary("Bus Quick 30", bus.summary(room))
     assert "Bus Quick 30" in text and "Iron Lungs" in text and "Crew: R0 90%" in text
     post(text)  # no webhook configured: a silent no-op
+
+
+def test_difficulty_scales_gap_damage_and_score():
+    gaps, scores = {}, {}
+    for level in ("easy", "normal", "nightmare"):
+        room, bus = FakeRoom(STEADY), ZombieBus(level)
+        set_all(room, 0.85)
+        room.riders["r0"].cad = 120
+        run(room, bus, 20)
+        gaps[level], scores[level] = bus.gap, bus.summary(room)["score"]
+        bus.damage(10, "x")
+        assert bus.armour == 100 - 10 * C.DIFFICULTY[level]["damage"]
+    assert gaps["easy"] > gaps["normal"] > gaps["nightmare"]
+    assert scores["nightmare"] > scores["normal"] > scores["easy"]

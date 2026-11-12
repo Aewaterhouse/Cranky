@@ -13,7 +13,7 @@ from . import bots, discord
 from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
-from .protocol import Bots, Buy, ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
+from .protocol import Bots, Buy, ClientMsg, Data, Difficulty, End, Join, Setup, Sprint, Start, Tick, TierMsg
 
 if TYPE_CHECKING:
     from .store import Store
@@ -87,6 +87,7 @@ class Room:
         self.state = "lobby"
         self.plan_id = "bus-crew-45"
         self.minutes = 0
+        self.difficulty = "normal"
         self.plan = generate(load_plans()[self.plan_id], 0)
         self.el = 0.0
         self.mode = ZombieBus()
@@ -116,6 +117,7 @@ class Room:
             "state": self.state,
             "plan_id": self.plan_id,
             "minutes": self.minutes,
+            "difficulty": self.difficulty,
             "plan": self.plan,
             "el": self.el,
             "riders": [r.to_dict() for r in self.riders.values()],
@@ -128,6 +130,7 @@ class Room:
         room = cls(d["code"], store)
         room.host, room.state, room.plan_id = d["host"], d["state"], d["plan_id"]
         room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
+        room.difficulty = d.get("difficulty", "normal")
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.mode = ZombieBus.from_dict(d["mode"])
         room.paused = room.state == "running"
@@ -153,6 +156,7 @@ class Room:
             "state": self.state,
             "plan": self.plan,
             "minutes": self.minutes,
+            "difficulty": self.difficulty,
             "riders": [
                 {
                     "id": r.id,
@@ -233,6 +237,9 @@ class Room:
             self.plan_id, self.minutes, self.state = msg.plan, msg.minutes, "lobby"
             self.plan = generate(load_plans()[msg.plan], msg.minutes)
             await self.lobby()
+        elif isinstance(msg, Difficulty) and self.state != "running":
+            self.difficulty = msg.level
+            await self.lobby()
         elif isinstance(msg, Bots) and self.state == "lobby":
             bots.set_bots(self, msg.n)
             await self.lobby()
@@ -243,7 +250,12 @@ class Room:
             await self.finish()
 
     def start(self) -> None:
-        self.state, self.el, self.mode, self.summary = "running", -float(C.COUNTDOWN_S), ZombieBus(), None
+        self.state, self.el, self.mode, self.summary = (
+            "running",
+            -float(C.COUNTDOWN_S),
+            ZombieBus(self.difficulty),
+            None,
+        )
         for r in self.riders.values():
             r.reset_stats()
         self.task = asyncio.create_task(self.run())

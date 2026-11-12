@@ -751,3 +751,7 @@
   top: 5px;
   right: 8px;
 }
+.seg.diff button {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}

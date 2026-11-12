@@ -16,7 +16,8 @@ if TYPE_CHECKING:
 class ZombieBus:
     """Bus state for one ride. `tick` runs at TICK_HZ; `on_sprint` applies sprint grades."""
 
-    def __init__(self) -> None:
+    def __init__(self, level: str = "normal") -> None:
+        self.level = level
         self.speed = 0.0
         self.dist = 0.0
         self.armour = 100.0
@@ -85,6 +86,7 @@ class ZombieBus:
         if ev == "surge":
             neutral = self.surge(b, bel, comp, neutral)
         if neutral is not None and active:
+            neutral += C.DIFFICULTY[self.level]["neutral"]
             self.gap += (C.GAP_K * (comp - neutral) + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
         self.gap = min(C.GAP_MAX, self.gap)
         if self.gap <= 0:
@@ -128,7 +130,7 @@ class ZombieBus:
             self.repel -= 1
             self.emit("repel", "Horde repellent! Zombies sprayed off, no damage.")
             return
-        self.armour = max(0.0, self.armour - n)
+        self.armour = max(0.0, self.armour - n * C.DIFFICULTY[self.level]["damage"])
         self.emit("hit", text if self.armour > 0 else "Armour gone! Limping on...")
 
     def surge(self, b: dict, bel: float, comp: float, neutral: float) -> float:
@@ -292,12 +294,15 @@ class ZombieBus:
             lambda r: f"{r.sync_hits / r.sync_n:.0%} in sync",
         )
         award("PR Hunter", lambda r: r.mega, lambda r: f"{r.mega} MEGA+ sprints")
-        score = round(self.dist / 10 * (0.5 + self.armour / 200) + self.scrap)
+        score = round(
+            (self.dist / 10 * (0.5 + self.armour / 200) + self.scrap) * C.DIFFICULTY[self.level]["score"]
+        )
         return {
             "distance": round(self.dist),
             "armour": round(self.armour),
             "scrap": int(self.scrap),
             "score": score,
+            "difficulty": self.level,
             "syncPct": round(100 * self.sync_ticks / self.ticks) if self.ticks else 0,
             "riders": [
                 {

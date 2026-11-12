@@ -67,6 +67,14 @@ HIT_DAMAGE = 5
 HIT_KNOCKBACK = 25
 SCRAP_PER_M = 1 / 100
 
+# Difficulty: shifts every event's neutral compliance, scales armour damage and the final score.
+DIFFICULTY = {
+    "easy": {"neutral": -0.08, "damage": 0.6, "score": 0.8},
+    "normal": {"neutral": 0.0, "damage": 1.0, "score": 1.0},
+    "hard": {"neutral": 0.05, "damage": 1.3, "score": 1.25},
+    "nightmare": {"neutral": 0.1, "damage": 1.7, "score": 1.6},
+}
+
 # Roadblock
 RB_HP_PER_RIDER = 40
 RB_DAMAGE = {"FAIL": 0, "HIT": 40, "GREAT": 80, "MEGA": 100, "LEGEND": 120}

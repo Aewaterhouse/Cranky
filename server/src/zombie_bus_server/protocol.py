@@ -27,6 +27,11 @@ class Bots(BaseModel):
     n: int = Field(ge=0, le=5)
 
 
+class Difficulty(BaseModel):
+    t: Literal["difficulty"]
+    level: Literal["easy", "normal", "hard", "nightmare"]
+
+
 class Start(BaseModel):
     t: Literal["start"]
 
@@ -64,7 +69,10 @@ class Buy(BaseModel):
 
 
 ClientMsg = TypeAdapter(
-    Annotated[Join | Setup | Bots | Start | End | TierMsg | Data | Sprint | Buy, Field(discriminator="t")]
+    Annotated[
+        Join | Setup | Bots | Difficulty | Start | End | TierMsg | Data | Sprint | Buy,
+        Field(discriminator="t"),
+    ]
 )
 
 

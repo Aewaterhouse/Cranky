@@ -3,10 +3,13 @@ import type { GroupSummary } from '../ui/results'
 import type { Look } from '../core/cosmetics'
 import type { Grade, Plan, Tier } from '../types'
 
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
+
 export type ClientMsg =
   | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look }
   | { t: 'setup'; plan: string; minutes: number }
   | { t: 'bots'; n: number }
+  | { t: 'difficulty'; level: Difficulty }
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
@@ -31,6 +34,7 @@ export interface Lobby {
   state: 'lobby' | 'running' | 'done'
   plan: Plan
   minutes: number
+  difficulty: Difficulty
   riders: LobbyRider[]
 }
 export interface RiderTick {
