@@ -1,7 +1,9 @@
 """FastAPI app: accounts, profiles, rides, rooms, WebSocket sessions, and the static client build."""
 
+import asyncio
 import random
 import time
+from contextlib import asynccontextmanager
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
@@ -13,8 +15,24 @@ from .plan import flatten, load_plans, total
 from .session import Room
 from .store import Store
 
-app = FastAPI(title="Zombie Bus")
 store = Store()
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Backs the database up at startup and then daily."""
+
+    async def loop() -> None:
+        while True:
+            await asyncio.to_thread(store.backup, config.BACKUP_DIR, config.BACKUP_KEEP)
+            await asyncio.sleep(config.BACKUP_EVERY_S)
+
+    task = asyncio.create_task(loop())
+    yield
+    task.cancel()
+
+
+app = FastAPI(title="Cranky", lifespan=lifespan)
 for _name in config.SEED_USERS:
     store.add_user(_name, _name)
 rooms: dict[str, Room] = {

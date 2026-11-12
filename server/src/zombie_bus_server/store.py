@@ -128,3 +128,15 @@ class Store:
             self.db.execute("DELETE FROM rooms WHERE saved_at < ?", (time.time() - max_age_s,))
             rows = self.db.execute("SELECT json FROM rooms").fetchall()
         return [json.loads(r[0]) for r in rows]
+
+    def backup(self, folder: Path, keep: int) -> Path:
+        """Writes a dated copy of the database into `folder` and prunes all but the newest `keep`."""
+        folder.mkdir(parents=True, exist_ok=True)
+        dest = folder / f"cranky-{time.strftime('%Y%m%d-%H%M%S')}.db"
+        with self.lock:
+            copy = sqlite3.connect(dest)
+            self.db.backup(copy)
+            copy.close()
+        for old in sorted(folder.glob("cranky-*.db"))[:-keep]:
+            old.unlink()
+        return dest

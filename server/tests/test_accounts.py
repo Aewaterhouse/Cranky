@@ -65,3 +65,18 @@ def test_non_admins_are_limited_and_nobody_removes_themselves():
     assert client.post("/api/riders/pat/password", json={"password": "new"}, headers=ph).status_code == 200
     assert auth("pat", "new")[0].status_code == 200
     assert client.delete("/api/riders/alex", headers=h).status_code == 400
+
+
+def test_backup_copies_and_prunes(tmp_path):
+    import sqlite3
+    import time
+
+    from zombie_bus_server.app import store
+
+    for _ in range(3):
+        dest = store.backup(tmp_path, keep=2)
+        time.sleep(1.05)
+    files = sorted(tmp_path.glob("cranky-*.db"))
+    assert len(files) == 2 and files[-1] == dest
+    names = {r[0] for r in sqlite3.connect(dest).execute("SELECT name FROM users")}
+    assert "Alex" in names
