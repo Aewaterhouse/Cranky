@@ -1,9 +1,12 @@
 import type { Profile } from '../core/curve'
+import { stickBadges } from '../core/badges'
+import { saveProfile } from '../core/profile'
 import { wkgStr } from '../core/riderMetrics'
 import '../rider.css'
 import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
 import { historyTab } from './historyList'
+import { badgeGrid, prTimelinePanel } from './riderBadges'
 import { powerTab } from './riderPower'
 import { trendsTab } from './riderTrends'
 import { history, zoneBar } from './riderStats'
@@ -22,6 +25,7 @@ const panel = (title: string, ...kids: (Node | string)[]) =>
   h('section', { class: 'panel' }, h('h2', { class: 'label' }, title), ...kids)
 
 function overview(p: Profile) {
+  if (stickBadges(p)) saveProfile(p)
   const s = p.stats
   const stat = (v: string | number, l: string) =>
     h('div', { class: 'stat' }, h('b', {}, String(v)), h('span', {}, l))
@@ -42,6 +46,7 @@ function overview(p: Profile) {
       panel('Time in zone', zoneBar(s.zones)),
       panel('Recent rides', history(p)),
     ),
+    badgeGrid(p),
   )
 }
 
@@ -78,7 +83,7 @@ export function riderTab(p: Profile) {
     )
     const views: Record<Sub, () => Node> = {
       overview: () => overview(p),
-      power: () => powerTab(p),
+      power: () => h('div', {}, powerTab(p), prTimelinePanel(p)),
       trends: () => trendsTab(p),
       history: () => historyTab(p),
       settings: () => riderSettings(p, () => root.firstElementChild!.replaceWith(head())),

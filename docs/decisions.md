@@ -115,3 +115,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Days are local calendar days; weeks start on Monday.
 - Streaks and the heatmap use the last 200 rides kept on the profile, so a best streak older than that is not counted.
 - Heatmap shades: under 40, 80, 130 and over TSS.
+
+## Rider data: badges and PR timeline (2026-11-12)
+- "100/500/1000 km-equivalent kJ" was read as lifetime energy: 5,000 kJ (Pie Burner, about a dozen meat pies), 25,000 kJ and 100,000 kJ. Other badges: 1, 10, 50 and 100 rides; 300, 400 and 500 W for a minute; four weeks in a row; 1,000 kJ in one ride; a LEGEND sprint.
+- Earned badges are saved on the profile (`badges`, id to date) when the Overview opens, so they stay earned after old rides drop off the 200-ride list. A LEGEND sprint is flagged on the ride record (`legend`) and saved by `applyRide`. Dates come from the kept rides where possible.
+- The PR timeline replays the kept rides in date order and adds any all-time best older than them.

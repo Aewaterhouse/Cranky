@@ -11,6 +11,8 @@ export interface RideRecord {
   /** Training stress and normalised power; missing on rides recorded before they were kept. */
   tss?: number
   np?: number
+  /** True when the ride had a LEGEND sprint. */
+  legend?: boolean
 }
 export interface Profile {
   id: string
@@ -23,6 +25,8 @@ export interface Profile {
   weightKg?: number
   /** Six upper bounds of power zones 1..6 as a fraction of FTP; defaults to `CFG.zones`. */
   zoneBounds?: number[]
+  /** Badges earned so far, id to the date they were earned (kept even after old rides drop off the list). */
+  badges?: Record<string, string>
   /** Every FTP change, oldest first. */
   ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */
@@ -132,7 +136,7 @@ export function gradeSprint(
   return { grade, pct }
 }
 
-const isoWeek = (t: number) => Math.floor((t - 3 * DAY) / (7 * DAY))
+export const isoWeek = (t: number) => Math.floor((t - 3 * DAY) / (7 * DAY))
 
 export function applyRide(p: Profile, r: RideRecord): Profile {
   const next: Profile = JSON.parse(JSON.stringify(p))
@@ -141,6 +145,7 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
     if (!cur || w > cur.w) next.allTime[+d] = { w, date: r.date }
   }
   next.rides = [...next.rides, { ...r }].slice(-200)
+  if (r.legend) next.badges = { ...next.badges, legend: next.badges?.legend ?? r.date }
   const s = next.stats
   const wk = isoWeek(Date.parse(r.date))
   s.streak = wk === s.lastWeek ? s.streak : wk === s.lastWeek + 1 ? s.streak + 1 : 1
@@ -152,11 +157,17 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   return next
 }
 
-/** The profile record for a finished ride: the recorder's record plus TSS and NP. */
-export const rideRecord = (s: { record: RideRecord; tss: number; np: number }): RideRecord => ({
+/** The profile record for a finished ride: the recorder's record plus TSS, NP and whether it had a LEGEND sprint. */
+export const rideRecord = (s: {
+  record: RideRecord
+  tss: number
+  np: number
+  sprints: { grade: string }[]
+}): RideRecord => ({
   ...s.record,
   tss: s.tss,
   np: s.np,
+  ...(s.sprints.some((x) => x.grade === 'LEGEND') ? { legend: true } : {}),
 })
 
 /** Drops a deleted ride from the profile's list and lifetime totals. All-time bests stay. */
