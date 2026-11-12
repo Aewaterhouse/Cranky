@@ -55,6 +55,33 @@ class Store:
             rows = self.db.execute("SELECT json FROM rides WHERE rider = ? ORDER BY n", (rid,)).fetchall()
         return [json.loads(r[0]) for r in rows]
 
+    def ride_rows(self, rid: str) -> list[dict]:
+        """Lightweight list rows for a rider's rides, newest first (skips the per-second arrays)."""
+        with self.lock:
+            rows = self.db.execute(
+                """SELECT n, date, json_extract(json, '$.planName'), json_extract(json, '$.record.secs'),
+                          json_extract(json, '$.avgPower'), json_extract(json, '$.np'),
+                          json_extract(json, '$.tss'),
+                          json_extract(json, '$.record.kj'), json_extract(json, '$.compliance'),
+                          json_extract(json, '$.crew')
+                   FROM rides WHERE rider = ? ORDER BY date DESC, n DESC""",
+                (rid,),
+            ).fetchall()
+        keys = ("id", "date", "plan", "secs", "avgPower", "np", "tss", "kj", "compliance")
+        return [{**dict(zip(keys, r, strict=False)), "crew": bool(r[9])} for r in rows]
+
+    def ride(self, rid: str, n: int) -> dict | None:
+        """The full summary of one of the rider's rides, or None."""
+        with self.lock:
+            row = self.db.execute("SELECT json FROM rides WHERE n = ? AND rider = ?", (n, rid)).fetchone()
+        return json.loads(row[0]) if row else None
+
+    def delete_ride(self, rid: str, n: int) -> bool:
+        """Deletes one of the rider's rides. Returns False if it is not theirs or does not exist."""
+        with self.lock, self.db:
+            cur = self.db.execute("DELETE FROM rides WHERE n = ? AND rider = ?", (n, rid))
+        return cur.rowcount > 0
+
     @staticmethod
     def _hash(password: str, salt: str) -> str:
         return hashlib.pbkdf2_hmac("sha256", password.lower().encode(), salt.encode(), 100_000).hex()

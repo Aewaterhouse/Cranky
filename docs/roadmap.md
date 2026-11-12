@@ -57,12 +57,12 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ FIT file export (download button on the results screen; past rides get it with the ride history item) | Download any ride as a .fit file for Garmin, intervals.icu, TrainingPeaks, or a manual Strava upload | M |
-| ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
+| ✅ ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
 | Compare with mates | Overlay crew power curves; leaderboards per duration in W and W/kg | M |
-| Ride history and detail | Every past ride with its full chart, laps, zones and PRs; rename and delete | M |
-| ★ Deeper profile | Weight, W/kg, HR zones, max HR, custom power zones, FTP history chart | M |
-| Fitness trends | Weekly TSS, fitness / fatigue / form (CTL, ATL, TSB), calendar heatmap, streaks | M |
-| PR timeline and badges | When each best was set; badges for milestones (first 300 W minute, 100 rides) | S |
+| ✅ Ride history and detail | Every past ride with its full chart, laps, zones and PRs; rename and delete | M |
+| ✅ ★ Deeper profile | Weight, W/kg, HR zones, max HR, custom power zones, FTP history chart | M |
+| ✅ Fitness trends | Weekly TSS, fitness / fatigue / form (CTL, ATL, TSB), calendar heatmap, streaks | M |
+| ✅ PR timeline and badges | When each best was set; badges for milestones (first 300 W minute, 100 rides) | S |
 | Extra ride metrics | HR drift, efficiency factor, variability index, cadence histogram, W′ balance | M |
 | intervals.icu sync | Push rides and pull planned workouts | M |
 | ✅ Discord post | The server posts each finished bus ride's summary to a channel webhook. **Needs the owner:** set `ZB_DISCORD_WEBHOOK` to the channel's webhook URL and restart; not yet tried against a real Discord channel. The postcard image is not attached (it is drawn in the browser) | S |

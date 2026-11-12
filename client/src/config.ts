@@ -26,6 +26,7 @@ export const CFG = {
   } as Record<number, number>,
   bestWindowDays: 90,
   ftpSuggestThreshold: 0.03,
+  trends: { ctlDays: 42, atlDays: 7, fitnessDays: 90, weeks: 12, heatWeeks: 26 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
   recordHz: 1,
   localStorageKey: 'zombiebus.profile',

@@ -8,6 +8,11 @@ export interface RideRecord {
   kj: number
   best: Record<number, number>
   zones: number[]
+  /** Training stress and normalised power; missing on rides recorded before they were kept. */
+  tss?: number
+  np?: number
+  /** True when the ride had a LEGEND sprint. */
+  legend?: boolean
 }
 export interface Profile {
   id: string
@@ -16,6 +21,14 @@ export interface Profile {
   tier: Tier
   /** Optional max heart rate (bpm) for HR zones. */
   maxHr?: number
+  restHr?: number
+  weightKg?: number
+  /** Six upper bounds of power zones 1..6 as a fraction of FTP; defaults to `CFG.zones`. */
+  zoneBounds?: number[]
+  /** Badges earned so far, id to the date they were earned (kept even after old rides drop off the list). */
+  badges?: Record<string, string>
+  /** Every FTP change, oldest first. */
+  ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */
   allTime: Record<number, { w: number; date: string }>
   rides: RideRecord[]
@@ -38,6 +51,7 @@ export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'
   name,
   ftp,
   tier,
+  ftpHistory: [],
   allTime: {},
   rides: [],
   updated: 0,
@@ -122,7 +136,7 @@ export function gradeSprint(
   return { grade, pct }
 }
 
-const isoWeek = (t: number) => Math.floor((t - 3 * DAY) / (7 * DAY))
+export const isoWeek = (t: number) => Math.floor((t - 3 * DAY) / (7 * DAY))
 
 export function applyRide(p: Profile, r: RideRecord): Profile {
   const next: Profile = JSON.parse(JSON.stringify(p))
@@ -131,6 +145,7 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
     if (!cur || w > cur.w) next.allTime[+d] = { w, date: r.date }
   }
   next.rides = [...next.rides, { ...r }].slice(-200)
+  if (r.legend) next.badges = { ...next.badges, legend: next.badges?.legend ?? r.date }
   const s = next.stats
   const wk = isoWeek(Date.parse(r.date))
   s.streak = wk === s.lastWeek ? s.streak : wk === s.lastWeek + 1 ? s.streak + 1 : 1
@@ -140,6 +155,44 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   s.kj += r.kj
   s.zones = s.zones.map((z, i) => z + (r.zones[i] ?? 0))
   return next
+}
+
+/** The profile record for a finished ride: the recorder's record plus TSS, NP and whether it had a LEGEND sprint. */
+export const rideRecord = (s: {
+  record: RideRecord
+  tss: number
+  np: number
+  sprints: { grade: string }[]
+}): RideRecord => ({
+  ...s.record,
+  tss: s.tss,
+  np: s.np,
+  ...(s.sprints.some((x) => x.grade === 'LEGEND') ? { legend: true } : {}),
+})
+
+/** Drops a deleted ride from the profile's list and lifetime totals. All-time bests stay. */
+export function removeRide(p: Profile, date: string): Profile {
+  const r = p.rides.find((x) => x.date === date)
+  if (!r) return p
+  const s = p.stats
+  return {
+    ...p,
+    rides: p.rides.filter((x) => x !== r),
+    stats: {
+      ...s,
+      rides: Math.max(0, s.rides - 1),
+      secs: Math.max(0, s.secs - r.secs),
+      kj: Math.max(0, s.kj - r.kj),
+      zones: s.zones.map((z, i) => Math.max(0, z - (r.zones[i] ?? 0))),
+    },
+  }
+}
+
+/** Sets the FTP and logs the change in the history (no-op if unchanged). Replaces the history array, so copies stay safe. */
+export function recordFtp(p: Profile, ftp: number, now = Date.now()) {
+  if (ftp === p.ftp) return
+  p.ftp = ftp
+  p.ftpHistory = [...(p.ftpHistory ?? []), { date: new Date(now).toISOString(), ftp }]
 }
 
 /** Suggested FTP when 95% of the 20 min best beats FTP by more than the threshold (never suggests a drop). */

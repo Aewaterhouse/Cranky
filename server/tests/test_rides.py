@@ -1,0 +1,61 @@
+from test_accounts import auth, client
+
+
+def summary(date: str, **extra) -> dict:
+    return {
+        "planName": "Sweet Spot",
+        "record": {"date": date, "secs": 1800, "kj": 300},
+        "avgPower": 160,
+        "np": 180,
+        "tss": 40,
+        "compliance": 0.9,
+        "power": [100] * 10,
+        **extra,
+    }
+
+
+def test_ride_list_detail_and_delete():
+    _, h = auth("luke", "Luke")
+    for s in (summary("2026-01-01T08:00:00Z"), summary("2026-02-01T08:00:00Z", crew=True)):
+        assert client.post("/api/rides", json={"summary": s}, headers=h).status_code == 200
+    rows = client.get("/api/rides", headers=h).json()
+    assert [r["date"][:10] for r in rows] == ["2026-02-01", "2026-01-01"]
+    assert rows[0] == {
+        "id": rows[0]["id"],
+        "date": "2026-02-01T08:00:00Z",
+        "plan": "Sweet Spot",
+        "secs": 1800,
+        "avgPower": 160,
+        "np": 180,
+        "tss": 40,
+        "kj": 300,
+        "compliance": 0.9,
+        "crew": True,
+    }
+    assert rows[1]["crew"] is False
+    detail = client.get(f"/api/rides/{rows[0]['id']}", headers=h).json()
+    assert detail["power"] == [100] * 10
+    assert client.delete(f"/api/rides/{rows[0]['id']}", headers=h).json() == {"ok": True}
+    assert len(client.get("/api/rides", headers=h).json()) == 1
+    assert client.get(f"/api/rides/{rows[0]['id']}", headers=h).status_code == 404
+
+
+def test_rides_are_private_and_need_login():
+    _, steve = auth("steve", "Steve")
+    _, angus = auth("angus", "Angus")
+    client.post("/api/rides", json={"summary": summary("2026-03-01T08:00:00Z")}, headers=steve)
+    mine = client.get("/api/rides", headers=steve).json()
+    assert len(mine) == 1 and client.get("/api/rides", headers=angus).json() == []
+    n = mine[0]["id"]
+    assert client.get(f"/api/rides/{n}", headers=angus).status_code == 404
+    assert client.delete(f"/api/rides/{n}", headers=angus).status_code == 404
+    assert len(client.get("/api/rides", headers=steve).json()) == 1
+    assert client.get("/api/rides").status_code == 401
+    assert client.delete(f"/api/rides/{n}").status_code == 401
+
+
+def test_old_rides_with_missing_fields_still_list():
+    _, h = auth("jack", "Jack")
+    client.post("/api/rides", json={"summary": {"record": {"date": "2025-01-01T00:00:00Z"}}}, headers=h)
+    row = client.get("/api/rides", headers=h).json()[0]
+    assert row["plan"] is None and row["tss"] is None and row["crew"] is False

@@ -96,3 +96,32 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Announcer: browser speech synthesis, en-AU voice if installed, else en-GB, else any English. At most one line every 3.5 s; roadblocks, falls and MEGA/LEGEND sprints interrupt. Off switch in Settings.
 - Nitro: group compliance of 0.95 or better during long hauls, ramp-ups and surges fills the meter in 75 s; below that it drains over 150 s. Full fires automatically: 15 s at 1.3x speed, +2.5 m/s of gap and 15 scrap. It fires by itself so nobody has to reach for a key mid-effort.
 - Personal challenges: every 150 to 240 s during a long haul or ramp-up, one human rider gets a 20 s cadence drill (105+ rpm, or 65 rpm and under). Holding it for 70% of the window pays 12 scrap. Cadence only, because ERG holds the power; a "hold exact watts" challenge would be meaningless in ERG.
+
+## Rider data: deeper profile (2026-11-12)
+- The Rider tab has sub-tabs (Overview, Power, Settings, later History and Trends). The chosen sub-tab is remembered until reload.
+- `ftpHistory` logs only changes (via `recordFtp`). Rides before this change have no history, so the chart ends with today's FTP as its last point.
+- Custom power zone bounds change the zone table and watt ranges only. Recorded time in zone keeps the standard bounds (`CFG.zones`) so rides stay comparable.
+- HR zones use the existing 60/70/80/90% of max boundaries. A resting HR switches the bpm to heart-rate reserve (Karvonen).
+
+## Rider data: power curve chart (2026-11-12)
+- Hover and tap snap to the ten stored durations (no interpolated durations), so every value shown is a real best or an honest estimate.
+- "Last ride" is the newest ride in the profile and shows only real points. The 90-day line falls back to the all-time point when nothing in the window beats it, as `curves()` does.
+- W/kg mode needs a weight in Settings; the toggle is disabled without one.
+
+## Rider data: ride history (2026-11-12)
+- Rides are private: another rider's ride id gets a 404, not a 403.
+- The "crew" flag is added by the client when it posts a bus ride (`finishRide`); older rides read as solo.
+- Deleting a ride removes it from the server and from the profile list and lifetime totals (rides, time, kJ, zones). All-time bests and the weekly streak are left alone because they cannot be unwound.
+- The list comes from the server (all rides), so it can show more rides than the profile's last 200.
+
+## Rider data: fitness trends (2026-11-12)
+- CTL and ATL are exponentially weighted averages with a 42 and 7 day time constant (`1 - exp(-1/n)` per day), started from zero at the first ride. TSB on a day is the previous day's CTL minus ATL (morning form).
+- Rides without a recorded TSS are estimated from time in each zone at a typical IF per zone (0.45, 0.65, 0.83, 0.98, 1.12, 1.35, 1.8), or at IF 0.65 with no zones. New rides store `tss` and `np` on the profile record via `rideRecord()` in `results.ts`.
+- Days are local calendar days; weeks start on Monday.
+- Streaks and the heatmap use the last 200 rides kept on the profile, so a best streak older than that is not counted.
+- Heatmap shades: under 40, 80, 130 and over TSS.
+
+## Rider data: badges and PR timeline (2026-11-12)
+- "100/500/1000 km-equivalent kJ" was read as lifetime energy: 5,000 kJ (Pie Burner, about a dozen meat pies), 25,000 kJ and 100,000 kJ. Other badges: 1, 10, 50 and 100 rides; 300, 400 and 500 W for a minute; four weeks in a row; 1,000 kJ in one ride; a LEGEND sprint.
+- Earned badges are saved on the profile (`badges`, id to date) when the Overview opens, so they stay earned after old rides drop off the 200-ride list. A LEGEND sprint is flagged on the ride record (`legend`) and saved by `applyRide`. Dates come from the kept rides where possible.
+- The PR timeline replays the kept rides in date order and adds any all-time best older than them.

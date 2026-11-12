@@ -1,7 +1,7 @@
 import { encodeFit } from '../core/fit'
 import '../results.css'
 import { bankScrap } from '../core/cosmetics'
-import { applyRide, ftpSuggestion, type Profile } from '../core/curve'
+import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { postRide, saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
@@ -60,12 +60,12 @@ export function finishRide(
   doneLabel = 'Done',
 ) {
   const before = profile.allTime
-  let p = s.record.secs >= 30 ? applyRide(profile, s.record) : profile
+  let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
   const banked = group ? bankScrap(group.scrap, myAwards) : 0
   if (banked) p = { ...p, scrap: p.scrap + banked }
   saveProfile(p)
-  if (s.record.secs >= 30) postRide(s)
+  if (s.record.secs >= 30) postRide({ ...s, crew: !!group })
   const prs =
     p === profile
       ? []
@@ -116,7 +116,8 @@ export function finishRide(
           {
             class: 'primary',
             onclick: () => {
-              p = { ...p, ftp: sug }
+              p = { ...p }
+              recordFtp(p, sug)
               saveProfile(p)
               ftpBox.replaceChildren(h('div', { class: 'card' }, `FTP updated to ${sug} W.`))
             },
