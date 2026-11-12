@@ -10,6 +10,7 @@ export class ErgController {
   private mode: 'erg' | 'sim' | 'off' = 'off'
   private lastSent = -1
   private dead = false
+  private fails = 0
 
   constructor(
     private trainer: Trainer,
@@ -59,8 +60,12 @@ export class ErgController {
         this.lastSent = w
         await this.trainer.setPower(w)
       }
+      this.fails = 0
     } catch {
-      await this.failsafe()
+      // One rejected write is retried from scratch on the next tick; only a run of them is fatal.
+      this.mode = 'off'
+      this.lastSent = -1
+      if (++this.fails >= CFG.erg.maxFails) await this.failsafe()
     }
   }
 

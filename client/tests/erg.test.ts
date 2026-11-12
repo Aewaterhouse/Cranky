@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { CFG } from '../src/config'
 import { ErgController } from '../src/trainer/ergController'
 import { SimTrainer } from '../src/trainer/simTrainer'
 
@@ -53,14 +54,41 @@ describe('erg controller', () => {
     expect(during).toEqual(['sim 0'])
     expect(sim.erg).toBeNull()
   })
-  it('fails safe to 50% FTP then releases', async () => {
-    const { sim, erg } = setup()
+  it('fails safe to 50% FTP then releases after repeated failures', async () => {
+    const { sim, erg, adv } = setup()
     sim.setPower = async (w) => {
       sim.log.push(`erg ${w}`)
       if (w !== 100) throw new Error('gone')
     }
     erg.setTarget(180)
+    for (let i = 0; i < CFG.erg.maxFails - 1; i++) {
+      adv(0.25)
+      await erg.tick()
+    }
+    expect(sim.log).not.toContain('release')
+    adv(0.25)
     await erg.tick()
     expect(sim.log.slice(-2)).toEqual(['erg 100', 'release'])
+    const n = sim.log.length
+    await erg.tick()
+    expect(sim.log).toHaveLength(n)
+  })
+  it('retries a single failed write on the next tick', async () => {
+    const { sim, erg, adv } = setup()
+    const ok = sim.setPower.bind(sim)
+    let fail = true
+    sim.setPower = async (w) => (fail ? ((fail = false), Promise.reject(new Error('x'))) : ok(w))
+    erg.setTarget(180)
+    await erg.tick()
+    expect(sim.erg).toBeNull()
+    adv(0.25)
+    await erg.tick()
+    expect(sim.erg).toBeGreaterThan(0)
+    expect(sim.log).not.toContain('release')
+    for (let i = 0; i < 20; i++) {
+      adv(0.25)
+      await erg.tick()
+    }
+    expect(sim.erg).toBe(180)
   })
 })
