@@ -3,7 +3,7 @@ import type { Tier } from './types'
 export const CFG = {
   tierFactor: { hard: 1, medium: 0.9, easy: 0.8 } as Record<Tier, number>,
   erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1, maxFails: 5 },
-  ftms: { replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000] },
+  ftms: { replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },
   sprint: { hit: 0.75, great: 0.95, mega: 1.0, comboCap: 8 },
   sprintDur: { min: 5, max: 30 },

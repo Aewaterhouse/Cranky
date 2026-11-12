@@ -96,6 +96,8 @@ export class FtmsTrainer implements Trainer {
   }
 
   /** Writes one control point command and waits (up to replyMs) for its reply. No reply is fine. */
+  private silent = 0
+
   private async send(bytes: number[], what: string, retry = true): Promise<void> {
     const reply = this.expect(bytes[0])
     try {
@@ -116,14 +118,21 @@ export class FtmsTrainer implements Trainer {
 
   private expect(op: number) {
     return new Promise<number | undefined>((resolve) => {
-      const timer = setTimeout(() => {
-        this.pending = undefined
-        resolve(undefined)
-      }, CFG.ftms.replyMs)
+      // A trainer that never replies must not add replyMs to every write: after two silent
+      // writes in a row, only wait briefly (a reply that does arrive resets this).
+      const timer = setTimeout(
+        () => {
+          this.silent++
+          this.pending = undefined
+          resolve(undefined)
+        },
+        this.silent >= 2 ? CFG.ftms.silentMs : CFG.ftms.replyMs,
+      )
       this.pending = {
         op,
         resolve: (r?: number) => {
           clearTimeout(timer)
+          this.silent = 0
           this.pending = undefined
           resolve(r)
         },
