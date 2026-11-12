@@ -57,7 +57,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ FIT file export (download button on the results screen; past rides get it with the ride history item) | Download any ride as a .fit file for Garmin, intervals.icu, TrainingPeaks, or a manual Strava upload | M |
-| ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
+| ✅ ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
 | Compare with mates | Overlay crew power curves; leaderboards per duration in W and W/kg | M |
 | Ride history and detail | Every past ride with its full chart, laps, zones and PRs; rename and delete | M |
 | ✅ ★ Deeper profile | Weight, W/kg, HR zones, max HR, custom power zones, FTP history chart | M |

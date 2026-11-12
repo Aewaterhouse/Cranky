@@ -1,22 +1,15 @@
-import { CFG } from '../config'
-import { curves, type Point, type Profile } from '../core/curve'
-import { wkg, wkgStr } from '../core/riderMetrics'
+import type { Profile } from '../core/curve'
+import { wkgStr } from '../core/riderMetrics'
 import '../rider.css'
 import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
-import { curveChart, dur, history, zoneBar } from './riderStats'
+import { powerTab } from './riderPower'
+import { history, zoneBar } from './riderStats'
 
 const SUBS = { overview: 'Overview', power: 'Power', settings: 'Settings' }
 type Sub = keyof typeof SUBS
 let sub: Sub = 'overview'
 
-const cell = (p: Point, kg?: number) =>
-  h(
-    'td',
-    { class: p.real ? 'real' : 'est', title: p.real ? 'From your rides' : 'Estimated from FTP' },
-    `${p.w} W`,
-    kg ? h('small', {}, ` ${wkg(p.w, kg)}`) : '',
-  )
 const panel = (title: string, ...kids: (Node | string)[]) =>
   h('section', { class: 'panel' }, h('h2', { class: 'label' }, title), ...kids)
 
@@ -40,44 +33,6 @@ function overview(p: Profile) {
       { class: 'cols' },
       panel('Time in zone', zoneBar(s.zones)),
       panel('Recent rides', history(p)),
-    ),
-  )
-}
-
-function power(p: Profile) {
-  const c = curves(p)
-  return panel(
-    'Power curve',
-    curveChart(c.allTime, c.d90),
-    h(
-      'p',
-      { class: 'dim legend' },
-      h('i', { class: 'key all' }),
-      'All time ',
-      h('i', { class: 'key d90' }),
-      'Last 90 days',
-    ),
-    h(
-      'table',
-      { class: 'curve' },
-      h(
-        'thead',
-        {},
-        h('tr', {}, h('th', {}, 'Best'), h('th', {}, 'All time'), h('th', {}, 'Last 90 days')),
-      ),
-      h(
-        'tbody',
-        {},
-        ...CFG.curveDurations.map((d) =>
-          h(
-            'tr',
-            {},
-            h('th', {}, dur(d)),
-            cell(c.allTime[d], p.weightKg),
-            cell(c.d90[d], p.weightKg),
-          ),
-        ),
-      ),
     ),
   )
 }
@@ -115,7 +70,7 @@ export function riderTab(p: Profile) {
     )
     body.replaceChildren(
       sub === 'power'
-        ? power(p)
+        ? powerTab(p)
         : sub === 'settings'
           ? riderSettings(p, () => root.firstElementChild!.replaceWith(head()))
           : overview(p),

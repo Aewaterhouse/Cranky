@@ -97,3 +97,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `ftpHistory` logs only changes (via `recordFtp`). Rides before this change have no history, so the chart ends with today's FTP as its last point.
 - Custom power zone bounds change the zone table and watt ranges only. Recorded time in zone keeps the standard bounds (`CFG.zones`) so rides stay comparable.
 - HR zones use the existing 60/70/80/90% of max boundaries. A resting HR switches the bpm to heart-rate reserve (Karvonen).
+
+## Rider data: power curve chart (2026-11-12)
+- Hover and tap snap to the ten stored durations (no interpolated durations), so every value shown is a real best or an honest estimate.
+- "Last ride" is the newest ride in the profile and shows only real points. The 90-day line falls back to the all-time point when nothing in the window beats it, as `curves()` does.
+- W/kg mode needs a weight in Settings; the toggle is disabled without one.

@@ -73,3 +73,99 @@
 .row .dim {
   align-self: center;
 }
+.seg.unit {
+  grid-template-columns: repeat(2, 5.5em);
+}
+.chead {
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.cwrap {
+  position: relative;
+  touch-action: pan-y;
+}
+.cline {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.cline.faint {
+  stroke-width: 2;
+  stroke-dasharray: 4 5;
+  opacity: 0.45;
+}
+.cdot {
+  stroke-width: 2;
+}
+.gline {
+  stroke: var(--dim);
+  stroke-dasharray: 3 3;
+}
+.ghalo {
+  stroke: var(--card);
+  stroke-width: 2;
+}
+.ctip {
+  position: absolute;
+  top: 8px;
+  z-index: 2;
+  min-width: 220px;
+  padding: 10px 12px;
+  transform: translateX(14px);
+  pointer-events: none;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  font-size: 0.85rem;
+}
+.ctip.flip {
+  transform: translateX(calc(-100% - 14px));
+}
+.ctip strong {
+  display: block;
+  margin-bottom: 4px;
+  font: 1rem var(--display);
+  color: var(--acc);
+}
+.ctip div {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  gap: 2px 8px;
+  align-items: baseline;
+  padding: 3px 0;
+}
+.ctip div.est {
+  opacity: 0.6;
+}
+.ctip i {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.ctip small {
+  grid-column: 2 / 4;
+  color: var(--dim);
+}
+.lkey {
+  display: inline-block;
+  width: 14px;
+  height: 4px;
+  margin: 0 6px 3px 10px;
+  border-radius: 2px;
+}
+.legend .lkey:first-child {
+  margin-left: 0;
+}
+svg .cline.all {
+  stroke-width: 5;
+}
+@media (max-width: 600px) {
+  .ctip {
+    position: static;
+    margin-top: 8px;
+    transform: none !important;
+  }
+}

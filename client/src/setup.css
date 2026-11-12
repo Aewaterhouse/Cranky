@@ -540,55 +540,6 @@
 .stat b {
   color: var(--acc);
 }
-.curve-chart {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.curve-chart .grid {
-  stroke: var(--line);
-}
-.curve-chart .ax {
-  fill: var(--dim);
-  font: 11px var(--ui);
-}
-.curve-chart polyline {
-  fill: none;
-  stroke-width: 2.5;
-  stroke-linejoin: round;
-}
-.l90 {
-  stroke: var(--tox);
-  stroke-dasharray: 5 4;
-}
-.lall {
-  stroke: var(--acc);
-}
-.l90-dot {
-  fill: var(--tox);
-  stroke: var(--tox);
-}
-.lall-dot {
-  fill: var(--acc);
-  stroke: var(--acc);
-}
-.curve-chart circle.est {
-  fill: var(--card);
-  stroke-width: 2;
-}
-.key {
-  display: inline-block;
-  width: 18px;
-  height: 0;
-  margin: 0 6px 3px 10px;
-  border-top: 3px solid var(--acc);
-}
-.key:first-child {
-  margin-left: 0;
-}
-.key.d90 {
-  border-top: 3px dashed var(--tox);
-}
 .curve {
   margin-top: 6px;
 }
