@@ -102,3 +102,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Hover and tap snap to the ten stored durations (no interpolated durations), so every value shown is a real best or an honest estimate.
 - "Last ride" is the newest ride in the profile and shows only real points. The 90-day line falls back to the all-time point when nothing in the window beats it, as `curves()` does.
 - W/kg mode needs a weight in Settings; the toggle is disabled without one.
+
+## Rider data: ride history (2026-11-12)
+- Rides are private: another rider's ride id gets a 404, not a 403.
+- The "crew" flag is added by the client when it posts a bus ride (`finishRide`); older rides read as solo.
+- Deleting a ride removes it from the server and from the profile list and lifetime totals (rides, time, kJ, zones). All-time bests and the weekly streak are left alone because they cannot be unwound.
+- The list comes from the server (all rides), so it can show more rides than the profile's last 200.

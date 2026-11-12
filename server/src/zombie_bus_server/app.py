@@ -144,6 +144,27 @@ def post_ride(body: dict, u: User) -> dict:
     return {"ok": True}
 
 
+@app.get("/api/rides")
+def list_rides(u: User) -> list[dict]:
+    """The caller's rides as list rows, newest first."""
+    return store.ride_rows(u["id"])
+
+
+@app.get("/api/rides/{n}")
+def get_ride(n: int, u: User) -> dict:
+    ride = store.ride(u["id"], n)
+    if not ride:
+        raise HTTPException(404)
+    return ride
+
+
+@app.delete("/api/rides/{n}")
+def delete_ride(n: int, u: User) -> dict:
+    if not store.delete_ride(u["id"], n):
+        raise HTTPException(404)
+    return {"ok": True}
+
+
 @app.get("/api/plans")
 def plans() -> list[dict]:
     return [

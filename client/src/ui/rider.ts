@@ -3,10 +3,11 @@ import { wkgStr } from '../core/riderMetrics'
 import '../rider.css'
 import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
+import { historyTab } from './historyList'
 import { powerTab } from './riderPower'
 import { history, zoneBar } from './riderStats'
 
-const SUBS = { overview: 'Overview', power: 'Power', settings: 'Settings' }
+const SUBS = { overview: 'Overview', power: 'Power', history: 'History', settings: 'Settings' }
 type Sub = keyof typeof SUBS
 let sub: Sub = 'overview'
 
@@ -71,9 +72,11 @@ export function riderTab(p: Profile) {
     body.replaceChildren(
       sub === 'power'
         ? powerTab(p)
-        : sub === 'settings'
-          ? riderSettings(p, () => root.firstElementChild!.replaceWith(head()))
-          : overview(p),
+        : sub === 'history'
+          ? historyTab(p)
+          : sub === 'settings'
+            ? riderSettings(p, () => root.firstElementChild!.replaceWith(head()))
+            : overview(p),
     )
   }
   draw()

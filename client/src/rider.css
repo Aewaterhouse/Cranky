@@ -169,3 +169,93 @@ svg .cline.all {
     transform: none !important;
   }
 }
+
+/* History */
+.hlist {
+  display: grid;
+}
+.hl-row {
+  display: grid;
+  grid-template-columns: 7.5em 1fr 4.5em 4em 3.5em 3.5em 3.5em 4.5em;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  padding: 10px 6px;
+  text-align: left;
+  font-weight: 400;
+  background: none;
+  border: 0;
+  border-top: 1px solid var(--line);
+  border-radius: 0;
+  font-variant-numeric: tabular-nums;
+}
+.hl-row.head {
+  padding: 4px 6px;
+  border: 0;
+  color: var(--dim);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.hl-row > :nth-child(n + 3) {
+  text-align: right;
+}
+button.hl-row:hover {
+  background: var(--card2);
+}
+.hl-row .plan {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.crew-tag {
+  margin-left: 8px;
+  padding: 1px 7px;
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--acc-ink);
+  background: var(--tox);
+  border-radius: 99px;
+}
+.rd-head button {
+  white-space: nowrap;
+}
+.ride-detail .res-two > * {
+  min-width: 0;
+}
+@media (max-width: 700px) {
+  .subtabs button {
+    padding: 10px 8px;
+  }
+  .ride-detail .res-two {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.rd-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.rd-head h2,
+.rd-head p {
+  margin: 0;
+}
+.ride-detail .res-actions {
+  margin-top: 16px;
+}
+button.danger {
+  color: var(--bad);
+  border-color: var(--bad);
+}
+@media (max-width: 700px) {
+  .hl-row {
+    grid-template-columns: 5.5em 1fr 4em 3.5em 3.5em;
+  }
+  .hl-row > :nth-child(5),
+  .hl-row > :nth-child(7),
+  .hl-row > :nth-child(8) {
+    display: none;
+  }
+}

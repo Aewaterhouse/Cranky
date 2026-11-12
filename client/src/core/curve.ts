@@ -149,6 +149,24 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   return next
 }
 
+/** Drops a deleted ride from the profile's list and lifetime totals. All-time bests stay. */
+export function removeRide(p: Profile, date: string): Profile {
+  const r = p.rides.find((x) => x.date === date)
+  if (!r) return p
+  const s = p.stats
+  return {
+    ...p,
+    rides: p.rides.filter((x) => x !== r),
+    stats: {
+      ...s,
+      rides: Math.max(0, s.rides - 1),
+      secs: Math.max(0, s.secs - r.secs),
+      kj: Math.max(0, s.kj - r.kj),
+      zones: s.zones.map((z, i) => Math.max(0, z - (r.zones[i] ?? 0))),
+    },
+  }
+}
+
 /** Sets the FTP and logs the change in the history (no-op if unchanged). Replaces the history array, so copies stay safe. */
 export function recordFtp(p: Profile, ftp: number, now = Date.now()) {
   if (ftp === p.ftp) return

@@ -45,7 +45,7 @@
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
-- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `svg.ts` SVG helpers.
+- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `svg.ts` SVG helpers.
 - `trainer.ts` trainer pill and connect modal.
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
@@ -59,6 +59,6 @@
 ## server/ (FastAPI, uv)
 - `src/zombie_bus_server/app.py` REST (login, riders, rooms, profile), WebSocket, static client.
 - `config.py` tunables, env vars, `SEED_USERS`; `protocol.py` message schemas; `plan.py` plan loading, targets, generator.
-- `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides.
+- `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete).
 - `modes/zombie_bus.py` bus, horde, events, shop, awards rules.
-- `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_multiplayer.py` 4-bot headless ride.
+- `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_rides.py` ride history endpoints; `test_multiplayer.py` 4-bot headless ride.

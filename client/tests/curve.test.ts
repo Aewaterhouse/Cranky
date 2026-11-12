@@ -7,6 +7,7 @@ import {
   ftpSuggestion,
   gradeSprint,
   newProfile,
+  removeRide,
 } from '../src/core/curve'
 
 const ride = (date: string, best: Record<number, number>) => ({
@@ -61,5 +62,17 @@ describe('power curve and sprint grading', () => {
     expect(p.stats.streak).toBe(3)
     p = applyRide(p, ride('2026-06-15', {}))
     expect(p.stats.streak).toBe(1)
+  })
+})
+
+describe('removeRide', () => {
+  it('drops the ride and its totals but keeps the bests', () => {
+    const r = { date: '2026-01-01T00:00:00Z', secs: 100, kj: 20, best: { 5: 500 }, zones: [100] }
+    const p = applyRide(newProfile('a'), r)
+    const q = removeRide(p, r.date)
+    expect(q.rides).toHaveLength(0)
+    expect([q.stats.rides, q.stats.secs, q.stats.kj, q.stats.zones[0]]).toEqual([0, 0, 0, 0])
+    expect(q.allTime[5].w).toBe(500)
+    expect(removeRide(p, 'nope')).toBe(p)
   })
 })
