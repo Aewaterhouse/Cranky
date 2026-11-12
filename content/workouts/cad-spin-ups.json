@@ -1,0 +1,52 @@
+{
+ "id": "cad-spin-ups",
+ "name": "Cadence Spin-ups",
+ "goal": "endurance",
+ "desc": "Eight one-minute spin-ups at 110 to 120 rpm, each followed by two easy minutes at a normal cadence. Stay smooth and keep your hips still.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    45,
+    65
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "set",
+   "rep": 8,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 60,
+     "cad": [
+      110,
+      120
+     ],
+     "label": "Spin-up"
+    },
+    {
+     "type": "steady",
+     "dur": 120,
+     "pct": 55,
+     "cad": [
+      85,
+      95
+     ],
+     "label": "Easy"
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

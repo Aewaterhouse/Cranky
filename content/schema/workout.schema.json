@@ -7,7 +7,8 @@
     "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
     "name": { "type": "string" },
     "desc": { "type": "string" },
-    "goal": { "enum": ["bus", "recovery", "endurance", "tempo", "sweet-spot", "threshold", "vo2", "sprint"] },
+    "goal": { "enum": ["test", "bus", "recovery", "endurance", "tempo", "sweet-spot", "threshold", "vo2", "sprint"] },
+    "test": { "enum": ["ramp", "ftp20"] },
     "blocks": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/block" } }
   },
   "definitions": {
@@ -34,6 +35,15 @@
         "label": { "type": "string" },
         "step": { "type": "number", "exclusiveMinimum": 0 },
         "rep": { "type": "integer", "minimum": 1 },
+        "cues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["at", "text"],
+            "properties": { "at": { "type": "number", "minimum": 0 }, "text": { "type": "string", "minLength": 1 } }
+          }
+        },
+        "cad": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number", "exclusiveMinimum": 0 } },
         "pct": {
           "oneOf": [
             { "$ref": "#/definitions/pctOne" },

@@ -1,0 +1,168 @@
+{
+ "id": "ftp-ramp-test",
+ "name": "FTP Ramp Test",
+ "goal": "test",
+ "test": "ramp",
+ "desc": "Five easy minutes, then one-minute steps from 46% rising 6% each minute. Ride until you cannot hold the target (or press I'm done). Your FTP is 75% of your best minute.",
+ "blocks": [
+  {
+   "type": "steady",
+   "dur": 300,
+   "pct": 50,
+   "label": "Warm-up",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Easy start. Save it for the ramp."
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 46,
+   "label": "Ramp 46%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Ramp begins. Every minute gets a bit harder."
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 52,
+   "label": "Ramp 52%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 58,
+   "label": "Ramp 58%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 64,
+   "label": "Ramp 64%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 70,
+   "label": "Ramp 70%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 76,
+   "label": "Ramp 76%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 82,
+   "label": "Ramp 82%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 88,
+   "label": "Ramp 88%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 94,
+   "label": "Ramp 94%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 100,
+   "label": "Ramp 100%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "FTP territory. This is where it gets honest."
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 106,
+   "label": "Ramp 106%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 112,
+   "label": "Ramp 112%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 118,
+   "label": "Ramp 118%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 124,
+   "label": "Ramp 124%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 130,
+   "label": "Ramp 130%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Past FTP. Hold on as long as you can."
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 136,
+   "label": "Ramp 136%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 142,
+   "label": "Ramp 142%"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 148,
+   "label": "Ramp 148%",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Top step. Absolute legend."
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Test done. Spin the legs out, you weapon."
+    }
+   ]
+  }
+ ]
+}

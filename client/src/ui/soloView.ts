@@ -1,8 +1,12 @@
+import { CFG } from '../config'
 import { hrZone } from '../core/curve'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
+import { inCadBand } from '../modes/drill/cadence'
 import { fmt, h } from './dom'
 import { ZONE_COLOURS } from './planGraph'
+import { soloActions, type SoloAction } from './soloExtras'
+import { modeSwitch, modeText, type ModeState, type RideMode } from './soloMode'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
@@ -13,6 +17,8 @@ export interface SoloHandlers {
   end: () => void
   intensity: (d: number) => void
   tier: (t: Tier) => void
+  mode: (k: RideMode) => void
+  nudge: (dir: number) => void
 }
 
 export interface ViewState {
@@ -27,6 +33,9 @@ export interface ViewState {
   xs: number[]
   cadence: number[]
   hr: (number | null)[]
+  actions: SoloAction[]
+  cadPct: (number | null)[]
+  mode: ModeState
 }
 
 const TIERS: Tier[] = ['hard', 'medium', 'easy']
@@ -48,6 +57,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   unit(tgt, 'W')
   unit(pow, 'W')
   unit(cad, 'rpm')
+  const cadUnit = cad.el.lastElementChild!
   unit(hr, 'bpm')
   const blockName = h('div', { class: 'blockname' })
   const next = h('div', { class: 'next' })
@@ -96,16 +106,22 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   )
   tierSel.value = tier
   const ov = h('div', { class: 'overlay' })
+  const cueEl = h('div', { class: 'cue' })
+  let cueTimer: ReturnType<typeof setTimeout> | undefined
   const panel = soloPanel(plan, () => tierSel.value as Tier, ftp)
+  const acts = soloActions()
+  const modes = modeSwitch({ set: on.mode, nudge: on.nudge })
+  const tgtLabel = tgt.el.firstElementChild as HTMLElement
   const kbd = (t: string) => h('kbd', {}, t)
 
   const root = h(
     'div',
-    { class: 'erg' },
+    { class: `erg${plan.test ? ' testing' : ''}` },
     h(
       'header',
       { class: 'solo-head' },
       h('h1', {}, plan.name),
+      modes.root,
       h('label', { class: 'field' }, 'Tier', tierSel),
       h(
         'div',
@@ -128,13 +144,14 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         h('button', { onclick: on.skip, title: 'Skip interval (→ or N)' }, 'Skip ', kbd('N')),
         h('button', { class: 'danger', onclick: () => confirmEnd() }, 'End ride'),
       ),
+      acts.root,
     ),
     h(
       'section',
       { class: 'solo-main' },
       h('div', { class: 'bigrow' }, tgt.el, pow.el, cad.el, hr.el, left.el),
       h('div', { class: 'gwrap' }, gauge, dev),
-      h('div', { class: 'chartbox main' }, main.el, ov),
+      h('div', { class: 'chartbox main' }, main.el, ov, cueEl),
       h(
         'div',
         { class: 'chartbox zoom' },
@@ -188,13 +205,58 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       key = k
     },
     confirmEnd,
+    /** Non-blocking coach banner, gone after CFG.cueS seconds. */
+    cue(text: string) {
+      clearTimeout(cueTimer)
+      cueEl.textContent = text
+      cueEl.classList.add('show')
+      cueTimer = setTimeout(() => cueEl.classList.remove('show'), CFG.cueS * 1000)
+    },
+    /** Modal question over the chart; resolves with the index of the button pressed. */
+    prompt(title: string, lines: string[], buttons: string[]) {
+      return new Promise<number>((res) =>
+        say(
+          [
+            h(
+              'div',
+              { class: 'dlg' },
+              h('h2', {}, title),
+              ...lines.map((l) => h('p', { class: 'dim' }, l)),
+              h(
+                'div',
+                { class: 'row' },
+                ...buttons.map((b, n) =>
+                  h('button', { class: n === 0 ? 'primary' : '', onclick: () => res(n) }, b),
+                ),
+              ),
+            ),
+          ],
+          'dialog',
+        ),
+      )
+    },
     frame(s: ViewState) {
       const { f, live } = s
+      acts.set(s.actions)
+      modes.set(s.mode)
+      const noErg = s.mode.kind !== 'erg'
+      root.classList.toggle('noerg', noErg)
+      tgtLabel.textContent = noErg ? 'Aim for · ERG off' : 'Target'
+      tgtLabel.title = noErg
+        ? `${modeText(s.mode)}. You set the effort; the plan is only scored.`
+        : ''
       const t = f.tgt
       tgt.v.textContent = t == null ? (f.type === 'sprint' ? 'ALL OUT' : 'FREE') : String(t)
       tgt.el.classList.toggle('word', t == null)
       pow.v.textContent = String(Math.round(f.type === 'sprint' ? live.power : live.avg))
       cad.v.textContent = String(Math.round(live.cadence))
+      cadUnit.textContent = f.cad ? `${f.cad[0]}–${f.cad[1]} rpm` : 'rpm'
+      cad.v.style.color = f.cad
+        ? inCadBand(f.cad, live.cadence)
+          ? 'var(--tox)'
+          : 'var(--acc)'
+        : ''
+      panel.cadence(s.cadPct)
       hr.v.textContent = live.hr ? String(live.hr) : '–'
       hr.v.style.color = live.hr && maxHr ? (ZONE_COLOURS[hrZone(live.hr, maxHr)] ?? '') : ''
       left.v.textContent = fmt(f.dur - f.bel)

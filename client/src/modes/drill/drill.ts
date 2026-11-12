@@ -1,16 +1,24 @@
 import '../../solo.css'
-import { zoneOf, type Profile } from '../../core/curve'
+import type { Profile } from '../../core/curve'
 import { frameAt, planTotal, startOf } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
-import { loadStats, RideRecorder } from '../../core/ride'
+import { RideRecorder } from '../../core/ride'
 import { clearSnap, saveSnap, soloKey, type SoloSnap } from '../../core/snapshot'
 import { CFG } from '../../config'
 import { SFX } from '../../ui/audio'
-import { fmt, show } from '../../ui/dom'
+import type { SoloAction } from '../../ui/soloExtras'
+import { show } from '../../ui/dom'
 import { finishRide } from '../../ui/results'
+import { stepMode, type ModeState, type RideMode } from '../../ui/soloMode'
 import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { addEasy, addMinute, ownPlan } from './extend'
+import { CueTracker } from './cues'
+import { soloKeys } from './keys'
+import { LiveTally } from './liveTally'
+import { pickOverlay, type Overlay } from './overlays'
+import { coolStart, ftpResult, testSpec } from './ftpTest'
 
 const START_S = 5
 const PAUSE_ERG = 0.4
@@ -19,15 +27,21 @@ const GO_S = 1.5
 
 /** Solo ERG workout player: local clock, no scene. Owns pause, skip, intensity and the sprint flow. */
 export function runDrill(
-  plan: Plan,
+  rawPlan: Plan,
   profile: Profile,
   trainer: Trainer,
   done: (p: Profile) => void,
   resume?: SoloSnap,
 ) {
-  const total = planTotal(plan.blocks)
+  const plan = ownPlan(rawPlan)
+  let total = planTotal(plan.blocks)
+  let completing = false
+  let grace = 0
   const fast = +(new URLSearchParams(location.search).get('fast') ?? 1)
+  const origTier = profile.tier
+  const spec = testSpec(plan)
   if (resume) profile.tier = resume.tier
+  if (plan.test) profile.tier = 'hard'
   const ride = new RideController(
     trainer,
     profile,
@@ -39,7 +53,9 @@ export function runDrill(
   const isSim = trainer.name.toLowerCase().includes('sim')
   let el = resume?.el ?? 0
   let count = START_S
-  let intensity = resume?.intensity ?? 1
+  let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
+  let below = 0
+  let mode: ModeState = { kind: 'erg', level: CFG.ride.resStart, grade: CFG.ride.gradeStart }
   let manual = false
   let auto = false
   let finished = false
@@ -49,15 +65,8 @@ export function runDrill(
   let lastI = -1
   let lastCount = 0
   let splashUntil = 0
-  // incremental stats: one entry per recorded second
-  const xs: number[] = resume?.xs ?? []
-  const zones = Array(7).fill(0)
-  resume?.rec.power.forEach((w) => zones[zoneOf(w, profile.ftp)]++)
-  let cSum = resume?.cSum ?? 0
-  let cN = resume?.cN ?? 0
-  let load = loadStats([], profile.ftp)
-  let loadN = 0
-  let cadAvg = 0
+  const tally = new LiveTally(plan, profile.ftp, resume)
+  const cues = new CueTracker(plan.blocks, el)
 
   const view = soloView(
     plan,
@@ -67,8 +76,10 @@ export function runDrill(
       pause: () => togglePause(),
       skip: () => skip(),
       end: () => end(),
-      intensity: (d) => (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
-      tier: (t) => ((profile.tier = t), saveProfile(profile)),
+      intensity: (d) => bump(d),
+      mode: (k) => setMode(k),
+      nudge: (d) => setMode(mode.kind, stepMode(mode, d)),
+      tier: (t) => !plan.test && ((profile.tier = t), saveProfile(profile)),
     },
     profile.maxHr,
   )
@@ -85,6 +96,45 @@ export function runDrill(
     )
   }
 
+  /** Switch ride mode (or change its level) and tell the ERG controller; ERG power is only ever sent in ERG mode. */
+  function setMode(kind: RideMode, next: ModeState = { ...mode, kind }) {
+    if (plan.test) return
+    mode = next
+    if (kind === 'erg') ride.erg.setErg()
+    else if (kind === 'res') ride.erg.setResistance(mode.level)
+    else ride.erg.setGrade(mode.grade)
+  }
+  const inRamp = (i: number | undefined) =>
+    spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
+  function rampDone() {
+    el = coolStart(plan) ?? el
+    below = 0
+    splashUntil = performance.now() + 2800
+    view.overlay('Ramp over', 'Well ridden. Easy spin now.', 'count')
+  }
+  const extend = () => {
+    addEasy(plan)
+    completing = false
+  }
+  const actions = (f: Frame): SoloAction[] => [
+    ...(inRamp(f.i) ? [{ id: 'done', label: "I'm done", cls: 'primary', run: rampDone }] : []),
+    ...(f.type === 'steady' && !plan.test && !completing
+      ? [
+          {
+            id: 'm1',
+            label: '+1 min',
+            title: 'Make this interval a minute longer',
+            run: () => addMinute(plan, f.i),
+          },
+        ]
+      : []),
+    ...(f.i === plan.blocks.length - 1 || completing
+      ? [
+          { id: 'p5', label: '+5 min', title: 'Five more easy minutes at 50% FTP', run: extend },
+          { id: 'fin', label: 'Finish now', cls: 'danger', run: end },
+        ]
+      : []),
+  ]
   const sprinting = () => ride.frame?.type === 'sprint'
   function togglePause() {
     if (count > 0 || sprinting()) return
@@ -96,24 +146,19 @@ export function runDrill(
     const i = ride.frame?.i ?? frameAt(plan.blocks, el, profile.tier, profile.ftp)?.i ?? 0
     el = startOf(plan.blocks, i + 1)
   }
-  const onKey = (e: KeyboardEvent) => {
-    const tag = (e.target as HTMLElement)?.tagName
-    if (tag === 'INPUT' || tag === 'SELECT' || e.ctrlKey || e.metaKey) return
-    const k = e.key
-    const used =
-      k === ' ' || k === 'p' || k === 'P'
-        ? (togglePause(), true)
-        : k === 'n' || k === 'N' || (k === 'ArrowRight' && !isSim)
-          ? (skip(), true)
-          : k === '+' || k === '='
-            ? ((intensity = Math.min(1.5, +(intensity + 0.01).toFixed(2))), true)
-            : k === '-' || k === '_'
-              ? ((intensity = Math.max(0.5, +(intensity - 0.01).toFixed(2))), true)
-              : k === 'Escape'
-                ? (view.confirmEnd(), true)
-                : false
-    if (used) e.preventDefault()
-  }
+  const bump = (d: number) =>
+    !plan.test && (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2))))
+  const onKey = soloKeys(
+    {
+      pause: togglePause,
+      skip,
+      end: view.confirmEnd,
+      bump,
+      mode: (k) => setMode(k),
+      step: (d) => setMode(mode.kind, stepMode(mode, d)),
+    },
+    !isSim,
+  )
   addEventListener('keydown', onKey)
   ride.start()
 
@@ -123,23 +168,12 @@ export function runDrill(
     next: f.next && { ...f.next, tgt: f.next.tgt == null ? null : Math.round(f.next.tgt * k) },
   })
 
-  function record(live = ride.live) {
-    const p = ride.rec.power
-    for (; xs.length < p.length; xs.push(el)) {
-      const n = xs.length
-      zones[zoneOf(p[n], profile.ftp)]++
-      if (live.c !== null) {
-        cSum += live.c
-        cN++
-      }
-    }
-  }
   const tick = () => {
     const now = performance.now()
     const dt = Math.min(1, (now - last) / 1000)
     last = now
     const live = ride.live
-    let overlay: [string | null, string?, string?] = [null]
+    let overlay: Overlay = [null]
     if (count > 0) {
       const before = Math.ceil(count)
       count -= dt
@@ -148,19 +182,36 @@ export function runDrill(
       overlay = count > 0 ? [String(Math.ceil(count)), 'Get ready to ride', 'count'] : [null]
     } else {
       const stopped = live.power === 0 || live.cadence === 0
+      const tgt = ride.frame?.tgt
+      below =
+        inRamp(ride.frame?.i) && !manual && tgt && live.avg < tgt * CFG.ftpTest.failBelow
+          ? below + dt
+          : 0
+      if (below >= CFG.ftpTest.failS) rampDone()
       idleFor = stopped ? idleFor + dt : 0
       activeFor = stopped ? 0 : activeFor + dt
       if (!manual && !auto && !sprinting() && idleFor >= STOP_S) auto = true
       else if (auto && activeFor >= GO_S) auto = false
-      if (!manual && !auto) el += dt * fast
+      if (!manual && !auto && !completing) el += dt * fast
+      if (!completing && el >= total) {
+        completing = true
+        grace = CFG.extend.graceS
+      }
+      if (completing && (grace -= dt) <= 0) return void end()
     }
-    const paused = count <= 0 && (manual || auto)
+    total = planTotal(plan.blocks)
+    const paused = count <= 0 && (manual || auto || completing)
     ride.paused = paused
-    const base = frameAt(plan.blocks, el, profile.tier, profile.ftp)
+    const base = frameAt(plan.blocks, completing ? total - 0.001 : el, profile.tier, profile.ftp)
     if (!base) return void end()
     const f = scaled(base, intensity)
     if (count <= 0) {
       ride.setFrame(paused ? { ...f, type: 'steady', tgt: Math.round(profile.ftp * PAUSE_ERG) } : f)
+      const cue = paused ? undefined : cues.due(f.i, f.bel)
+      if (cue) {
+        view.cue(cue)
+        SFX.cue()
+      }
       if (f.i !== lastI) {
         if (lastI >= 0) SFX.block()
         lastI = f.i
@@ -169,37 +220,21 @@ export function runDrill(
       const n = f.type !== 'sprint' && f.next?.type === 'sprint' ? Math.ceil(f.next.in / fast) : 0
       if (n !== lastCount && n > 0 && n <= 3) SFX.countdown()
       lastCount = n
-      if (paused)
-        overlay = [
-          'PAUSED',
-          manual
-            ? 'Press Space to resume. ERG is easing off.'
-            : 'Auto-paused. Start pedalling to carry on.',
-          'pause',
-        ]
-      else if (f.type === 'sprint')
-        overlay = [
-          'SPRINT!',
-          `ERG OFF · ${Math.round(live.power)} W · ${fmt(f.dur - f.bel)}`,
-          'sprint',
-        ]
-      else if (n > 0 && n <= 3) overlay = [String(n), 'Sprint next. ERG switches off', 'count']
-      if (ride.trainerStatus === 'reconnecting')
-        overlay = [
-          'Trainer disconnected, reconnecting…',
-          'Keep pedalling, we will carry on when it is back.',
-          'pause',
-        ]
+      overlay = pickOverlay({
+        f,
+        power: live.power,
+        paused,
+        completing,
+        grace,
+        manual,
+        ergOn: mode.kind === 'erg',
+        sprintIn: n,
+        reconnecting: ride.trainerStatus === 'reconnecting',
+      })
     }
-    record(live)
+    tally.record(ride.rec, el, live)
     if (now >= splashUntil || overlay[2] === 'pause') {
       view.overlay(...overlay)
-    }
-    const p = ride.rec.power
-    if (p.length !== loadN) {
-      load = loadStats(p, profile.ftp)
-      loadN = p.length
-      cadAvg = ride.rec.cadence.reduce((a, b) => a + b, 0) / (p.length || 1)
     }
     view.frame({
       f,
@@ -207,30 +242,31 @@ export function runDrill(
       fast,
       total,
       intensity,
-      paused: paused ? (manual ? 'manual' : 'auto') : null,
-      power: p,
-      xs,
+      paused: paused && !completing ? (manual ? 'manual' : 'auto') : null,
+      power: ride.rec.power,
+      xs: tally.xs,
       cadence: ride.rec.cadence,
       hr: ride.rec.hr,
-      stats: {
-        elapsed: el,
-        remaining: total - el,
-        avg: p.length ? p.reduce((a, b) => a + b, 0) / p.length : 0,
-        np: load.np,
-        if: load.if,
-        tss: load.tss,
-        kj: p.reduce((a, b) => a + b, 0) / 1000,
-        cadence: cadAvg,
-        compliance: cN ? cSum / cN : null,
-        zones,
-      },
+      mode,
+      cadPct: tally.cad.pct(),
+      actions: actions(f),
+      stats: tally.stats(ride.rec, el, total),
     })
   }
   const timer = setInterval(tick, 200)
   const key = soloKey(profile.id)
   const saver = setInterval(() => {
     if (!finished && ride.rec.power.length)
-      saveSnap(key, { plan, el, intensity, tier: profile.tier, rec: ride.rec, xs, cSum, cN })
+      saveSnap(key, {
+        plan,
+        el,
+        intensity,
+        tier: profile.tier,
+        rec: ride.rec,
+        xs: tally.xs,
+        cSum: tally.cSum,
+        cN: tally.cN,
+      })
   }, CFG.recovery.saveMs)
   tick()
 
@@ -242,6 +278,20 @@ export function runDrill(
     clearSnap(key)
     removeEventListener('keydown', onKey)
     await ride.stop()
+    profile.tier = origTier
+    tally.record(ride.rec, el, ride.live)
+    const r = ftpResult(plan, ride.rec.power, tally.xs)
+    if (r) {
+      const pick = await view.prompt(
+        `Your new FTP: ${r} W`,
+        [`Was ${profile.ftp} W. Use it for all your workouts?`],
+        ['Accept', 'Keep old'],
+      )
+      if (pick === 0) {
+        profile.ftp = r
+        saveProfile(profile)
+      }
+    }
     finishRide(profile, ride.rec.summary(), done)
   }
 }

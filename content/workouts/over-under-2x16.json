@@ -25,7 +25,17 @@
       104
      ],
      "step": 120,
-     "label": "Over-under"
+     "label": "Over-under",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Over, under, over, under. Stay switched on."
+      },
+      {
+       "at": 480,
+       "text": "Halfway. The unders are your mates."
+      }
+     ]
     },
     {
      "type": "steady",
@@ -42,7 +52,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

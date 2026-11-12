@@ -59,6 +59,49 @@ function blockList(plan: Plan, tier: Tier, ftp: number) {
   )
 }
 
+const FTP_TESTS: [string, string, string][] = [
+  [
+    'ftp-ramp-test',
+    'Ramp test',
+    'About 25 min. Steps get harder every minute until you cannot hold on. FTP = 75% of your best minute.',
+  ],
+  [
+    'ftp-20min-test',
+    '20 minute test',
+    'About 70 min. Warm-up, a blow-out, then 20 min flat out with ERG off. FTP = 95% of the average.',
+  ],
+]
+
+function ftpCard(p: Profile, act: HomeActions) {
+  return h(
+    'section',
+    { class: 'panel ftp-card' },
+    h('h2', { class: 'label' }, 'Test your FTP'),
+    h(
+      'p',
+      { class: 'dim' },
+      `Your FTP is ${p.ftp} W. A test sets it for you, and every workout follows.`,
+    ),
+    h(
+      'div',
+      { class: 'ftp-opts' },
+      ...FTP_TESTS.map(([id, name, what]) =>
+        h(
+          'div',
+          { class: 'ftp-opt' },
+          h('b', {}, name),
+          h('span', { class: 'dim' }, what),
+          h(
+            'button',
+            { class: 'primary', onclick: needTrainer(() => act.drill(planFor(id, 0))) },
+            'Start',
+          ),
+        ),
+      ),
+    ),
+  )
+}
+
 /** Solo workout setup: pick a plan, pick a tier, see what you are in for, go. */
 export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
   let id = 'ss-2x15'
@@ -120,6 +163,7 @@ export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'lede' },
       'Just you and the plan, no bus. Good for training or testing a trainer.',
     ),
+    ftpCard(p, act),
     h(
       'div',
       { class: 'setup-cols' },

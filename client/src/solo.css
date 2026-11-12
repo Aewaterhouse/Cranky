@@ -485,3 +485,70 @@
     grid-template-columns: repeat(3, 1fr);
   }
 }
+
+.sactions {
+  display: none;
+  flex-basis: 100%;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.sactions.on {
+  display: flex;
+}
+.sactions button {
+  padding: 8px 16px;
+}
+.erg.testing .field {
+  display: none;
+}
+
+.modesw .ctl button {
+  min-width: 0;
+  padding: 9px 12px;
+}
+.erg button.on {
+  background: var(--card2);
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.erg.noerg .sbig:first-child {
+  border-color: color-mix(in srgb, var(--acc) 60%, var(--line));
+}
+
+.iv-c {
+  grid-column: 2 / -1;
+  margin-top: -4px;
+  font-size: 0.74rem;
+  color: #4cc9f0;
+  font-variant-numeric: tabular-nums;
+}
+.iv-c:empty {
+  display: none;
+}
+.iv-c.good {
+  color: var(--tox);
+}
+
+.cue {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  max-width: min(86%, 640px);
+  transform: translate(-50%, -12px);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--acc) 92%, #000);
+  color: #1a1400;
+  font: 700 1.1rem var(--ui);
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.4s,
+    transform 0.4s;
+}
+.cue.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}

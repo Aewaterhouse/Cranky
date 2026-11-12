@@ -7,7 +7,8 @@ export class ErgController {
   private from = 0
   private to: number | null = null
   private t0 = 0
-  private mode: 'erg' | 'sim' | 'off' = 'off'
+  private mode: 'erg' | 'sim' | 'res' | 'slope' | 'off' = 'off'
+  private manual: { kind: 'res' | 'slope'; v: number } | null = null
   private lastSent = -1
   private dead = false
   private fails = 0
@@ -37,6 +38,28 @@ export class ErgController {
     }
   }
 
+  /** ERG off: a fixed resistance level (0-100%). The plan target is then only used for scoring. */
+  setResistance(pct: number) {
+    this.manual = { kind: 'res', v: Math.min(100, Math.max(0, Math.round(pct))) }
+  }
+
+  /** ERG off: simulated gradient in %, within the configured range. */
+  setGrade(pct: number) {
+    const [lo, hi] = CFG.ride.grade
+    this.manual = { kind: 'slope', v: Math.min(hi, Math.max(lo, Math.round(pct))) }
+  }
+
+  /** Back to ERG: control is re-requested and the current target written again. */
+  setErg() {
+    this.manual = null
+    this.mode = 'off'
+    this.lastSent = -1
+  }
+
+  get ergOn() {
+    return this.manual === null
+  }
+
   /** While the trainer is reconnecting nothing is written. On return control is re-requested and the target re-sent. */
   setAway(away: boolean) {
     this.away = away
@@ -50,6 +73,16 @@ export class ErgController {
   async tick() {
     if (this.dead || this.away) return
     try {
+      const m = this.manual
+      if (m) {
+        if (this.mode !== m.kind || this.lastSent !== m.v) {
+          this.mode = m.kind
+          this.lastSent = m.v
+          await (m.kind === 'res' ? this.trainer.setResistance(m.v) : this.trainer.setSim(m.v))
+        }
+        this.fails = 0
+        return
+      }
       if (this.to === null) {
         if (this.mode !== 'sim') {
           this.mode = 'sim'

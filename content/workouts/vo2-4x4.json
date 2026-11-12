@@ -21,13 +21,33 @@
      "type": "steady",
      "dur": 240,
      "pct": 112,
-     "label": "VO2"
+     "label": "VO2",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Four minutes. Smash it, then have a lie down."
+      },
+      {
+       "at": 120,
+       "text": "Halfway. Breathe like you are angry."
+      },
+      {
+       "at": 210,
+       "text": "Thirty seconds. Empty the tank."
+      }
+     ]
     },
     {
      "type": "steady",
      "dur": 240,
      "pct": 50,
-     "label": "Recover"
+     "label": "Recover",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Easy spin. You have earned it."
+      }
+     ]
     }
    ]
   },
@@ -38,7 +58,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

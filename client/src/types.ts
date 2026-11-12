@@ -11,6 +11,10 @@ export interface Block {
   pct?: Pct | [Pct, Pct]
   step?: number
   rep?: number
+  /** Optional cadence band [lo, hi] in rpm for this block. */
+  cad?: [number, number]
+  /** Coach messages shown `at` seconds into the block. */
+  cues?: { at: number; text: string }[]
   blocks?: Block[]
 }
 export interface Plan {
@@ -18,6 +22,8 @@ export interface Plan {
   name: string
   desc?: string
   goal?: string
+  /** Marks an FTP test: the player works out a new FTP at the end. */
+  test?: 'ramp' | 'ftp20'
   blocks: Block[]
 }
 
@@ -31,6 +37,8 @@ export interface Frame {
   dur: number
   /** Target watts, or null when ERG is off (sprint, free). */
   tgt: number | null
+  /** Cadence band for this block, when the plan sets one. */
+  cad?: [number, number]
   next?: { type: BlockType; label: string; in: number; tgt: number | null }
   event?: string
 }
@@ -48,6 +56,8 @@ export interface Trainer {
   requestControl(): Promise<void>
   setPower(watts: number): Promise<void>
   setSim(gradePct: number): Promise<void>
+  /** Fixed resistance level, 0-100% of the trainer's range. */
+  setResistance(pct: number): Promise<void>
   release(): Promise<void>
 }
 

@@ -17,7 +17,29 @@
    "type": "steady",
    "dur": 4800,
    "pct": 66,
-   "label": "Zone 2"
+   "label": "Zone 2",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Zone 2 for ages. That is the whole plan."
+    },
+    {
+     "at": 1200,
+     "text": "Quarter done. Chat pace, mate."
+    },
+    {
+     "at": 2400,
+     "text": "Halfway. Top up the bidon."
+    },
+    {
+     "at": 3600,
+     "text": "Last quarter. Stay boring."
+    },
+    {
+     "at": 4620,
+     "text": "Three minutes to go. Easy as."
+    }
+   ]
   },
   {
    "type": "ramp",
@@ -26,7 +48,13 @@
     60,
     45
    ],
-   "label": "Cool-down"
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "All done. Spin the legs out, you legend."
+    }
+   ]
   }
  ]
 }

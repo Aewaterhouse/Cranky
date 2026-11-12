@@ -1,0 +1,123 @@
+{
+ "id": "ftp-20min-test",
+ "name": "FTP 20 Minute Test",
+ "goal": "test",
+ "test": "ftp20",
+ "desc": "Warm-up, openers, a 5 minute blow-out, then 20 minutes free ride with ERG off: pace it yourself. Your FTP is 95% of the 20 minute average.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    45,
+    70
+   ],
+   "label": "Warm-up",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Warm-up. Nothing hard yet, promise."
+    }
+   ]
+  },
+  {
+   "type": "set",
+   "rep": 3,
+   "blocks": [
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 100,
+     "label": "Opener",
+     "cues": [
+      {
+       "at": 0,
+       "text": "Opener. Wind it up, then back off."
+      }
+     ]
+    },
+    {
+     "type": "steady",
+     "dur": 60,
+     "pct": 50,
+     "label": "Easy"
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 55,
+   "label": "Settle"
+  },
+  {
+   "type": "free",
+   "dur": 300,
+   "label": "Blow-out",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Five minutes all out. Empty the tank early."
+    },
+    {
+     "at": 150,
+     "text": "Halfway. It is meant to hurt."
+    }
+   ]
+  },
+  {
+   "type": "steady",
+   "dur": 600,
+   "pct": 50,
+   "label": "Recover",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Ten minutes easy. You will need every watt of it."
+    }
+   ]
+  },
+  {
+   "type": "free",
+   "dur": 1200,
+   "label": "20 min test",
+   "cues": [
+    {
+     "at": 0,
+     "text": "Twenty minutes, ERG off. Start sensible, finish brave."
+    },
+    {
+     "at": 300,
+     "text": "Five in. Hold this pace, do not be a hero."
+    },
+    {
+     "at": 600,
+     "text": "Halfway. Pain rating? Good."
+    },
+    {
+     "at": 900,
+     "text": "Five to go. Now you can spend it."
+    },
+    {
+     "at": 1140,
+     "text": "One minute. Everything you have got left."
+    }
+   ]
+  },
+  {
+   "type": "ramp",
+   "dur": 600,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down",
+   "cues": [
+    {
+     "at": 0,
+     "text": "That is the test done. Spin it out, then tell your mates."
+    }
+   ]
+  }
+ ]
+}

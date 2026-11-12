@@ -127,3 +127,36 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The PR timeline replays the kept rides in date order and adds any all-time best older than them.
 - Season ladder: seasons are calendar quarters, named by the Australian season they start in. Every finished bus ride is stored; the ladder shows the top 20 runs by score, riders ranked by their best score, and one title per award type for whoever won it most. Bots never appear.
 - Weekly mutator: chosen by ISO week number, shown in the lobby, applied automatically to normal and harder rides. No host toggle; easy difficulty is the opt-out.
+
+## FTP tests (2026-11-12)
+- Two plans with goal `test` (and a plan-level `test: "ramp" | "ftp20"` marker): `ftp-ramp-test` and `ftp-20min-test`. They are plain JSON; the ramp steps are 18 one-minute steady blocks (46% to 148%, so under the 150% cap) labelled "Ramp N%". The measured blocks are found by label ("Ramp ..." to "Cool-down", or "20 min test"). The picker has no "test" group and I may not edit it, so the tests live on a "Test your FTP" card on the solo setup screen (and under All).
+- Test plans always ride at the hard tier and 100% intensity: the tier and intensity controls are hidden and ignored, or the percentages would be meaningless. The rider's own tier is restored afterwards.
+- Ramp ends when the rider presses "I'm done" or has been under 50% of the target for 10 s (real seconds, counted even while auto-paused). Either one jumps the clock to the cool-down. Result = 75% of the best 60 plan seconds inside the ramp (needs at least 54 s and 3 samples).
+- 20 minute test: the blow-out and the 20 minutes are `free` blocks (ERG off). Result = 95% of the mean power over the 20 minute block; needs at least 90% of it ridden, else no result is offered.
+- The result prompt (Accept / Keep old) appears when the ride ends, before the usual results screen. Accept sets `profile.ftp` and saves it; there is no FTP history helper yet. Ending a ramp early still offers a result if a full minute was ridden.
+- The test plans also appear in the bus lobby picker (not mine to hide); a bus ride with a free block works but is pointless.
+
+## Resistance and slope modes (2026-11-12)
+- The solo player has a Mode switch: ERG (default), Resistance (0-100%, steps of 5) and Slope (-5% to +15%, steps of 1, starts at +2%). Keys: E, R, G switch; `,` and `.` lower and raise the level. The ErgController owns it (`setResistance`, `setGrade`, `setErg`): while off ERG it writes only `setResistance` or `setSim` (once, and again only when the level changes or the link returns) and never `setPower` or the ERG ramp. The 50% FTP failsafe at the end of a ride still uses `setPower`, as it is the safe release.
+- FTMS Target Resistance Level (op 0x04) takes a uint8 in units of 0.1 (unitless). The spec gives the trainer's real range in the Supported Resistance Level Range characteristic (0x2AD6), which I do not read yet. I assume 0-100% maps onto 0 to 10.0 (raw 0 to 100, `CFG.ftms.resMax`) and clamp to 255. UNTESTED ON HARDWARE: some trainers have a different range (a different `resMax`, or the characteristic should be read), and some do not support op 0x04 at all.
+- Slope mode reuses the simulation write (op 0x11) with the default rolling resistance and drag, so the trainer's own physics applies. Slope mode at exactly 0% is the same write as the sprint and free-ride "ERG off" state.
+- Scoring in non-ERG modes still uses the plan target (the rider aims for it themselves). The target tile reads "Aim for · ERG off" with an amber border. The mode and its level are not saved in crash recovery (a resumed ride starts in ERG).
+- Tests and fast checks: SimTrainer gets simple physics. Resistance: watts = level x cadence / 30 (50% at 90 rpm is 150 W). Slope: speed = cadence x 0.075 m/s per rpm (a fixed gear), 80 kg, Crr 0.005, CdA 0.32, so +5% at 85 rpm is about 280 W. At 0% grade the sim keeps using the arrow-key watts (that is the sprint and free-ride behaviour), so physics only applies off 0%.
+- FTP tests lock the mode to ERG (the switch is hidden).
+
+## Cadence targets (2026-11-12)
+- A block may carry `cad: [lo, hi]` (rpm, 0 < lo <= hi). `parsePlan` rejects anything else and keeps the band through `set` expansion; `frameAt` passes it on. The Python server reads the same JSON and ignores the field (its tests still pass; no server code changed).
+- Scoring is separate from power compliance: the player counts, per block, the recorded seconds with cadence inside the band (stopped pedalling counts as out). It is shown under the interval as "Cadence 110-120 rpm · 82% in band" (green from 80%) and is not part of the ride summary or results.
+- The cadence tile shows the band in place of "rpm" and is green inside it, amber outside. The chart draws bands (translucent blue, on the 40-140 rpm scale) only while the "Cadence line" toggle is on. Seconds spent paused are not counted. A resumed ride rebuilds the tally from the saved cadence samples.
+- Three cadence drills (goal endurance): `cad-spin-ups` (8 x 1 min at 110-120), `cad-low-strength` (5 x 4 min at 80% and 55-65 rpm), `cad-pyramid` (90 up to 120 and back, 3 min each).
+
+## Coach text cues (2026-11-12)
+- A block may carry `cues: [{at, text}]` (seconds into the block, text non-empty). The parser checks the shape and keeps the cues through set expansion, so a cue inside a repeated set shows on every rep. The server ignores the field.
+- The player shows a cue as a pill over the top of the main chart for 8 s (`CFG.cueS`, real seconds, so `?fast` does not shorten it), with a soft two-note sine chime. It does not block anything and replaces an earlier cue still showing. Each cue shows once per ride; if several fall due in the same tick (a skip, a fast clock) only the newest shows. Cues in a skipped block, and cues before the resume point, stay quiet. Nothing fires while paused.
+- Cues added to 8 workouts: both FTP tests, ss-3x20, ss-2x20, thr-2x20, over-under-2x16, vo2-4x4 and z2-90.
+
+## Extend cool-down / add time (2026-11-12)
+- In the last block, and on the "workout complete" moment, the player shows "+5 min" and "Finish now". +5 min appends an easy block ("Extra easy", 50% FTP in every tier, ignoring the tier factor); pressing it again grows that same block, so it is repeatable. Steady blocks also get "+1 min" (any steady block, current one only; later blocks shift). Ramps, over-unders, sprints and free blocks cannot be stretched. FTP tests only offer the end buttons, not +1 min, since the steps are the test.
+- The player works on a private copy of the plan's blocks (the parsed workouts are shared objects), so extending never changes the library. The chart is rebuilt from the blocks every frame and the interval list adds a row and refreshes durations, so both stay in step. Crash recovery saves the extended plan.
+- On reaching the end the clock stops and "WORKOUT COMPLETE" shows with a 20 s countdown (`CFG.extend.graceS`, real seconds) before the ride finishes by itself, as it used to straight away. +5 min cancels the countdown. During it the trainer eases to 40% FTP and nothing is recorded (same as a pause).
+- Code split to keep drill.ts under 300 lines: `liveTally.ts` (incremental stats), `overlays.ts` (centre message choice), `keys.ts` (key map), `extend.ts`.

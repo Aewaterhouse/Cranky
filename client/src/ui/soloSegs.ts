@@ -10,6 +10,7 @@ export interface Seg {
   w1: number
   kind: 'zone' | 'sprint' | 'free'
   col: string
+  cad?: [number, number]
 }
 
 const FREE = '#7d8590'
@@ -29,6 +30,7 @@ export function segsFromBlocks(blocks: Block[], tier: Tier, ftp: number, intensi
         w1: 0,
         kind: b.type,
         col: sprint ? SPRINT_COLOUR : FREE,
+        cad: b.cad,
       })
     } else {
       const step = b.type === 'over-under' ? b.step! : b.dur
@@ -43,6 +45,7 @@ export function segsFromBlocks(blocks: Block[], tier: Tier, ftp: number, intensi
           w1: z * ftp * intensity,
           kind: 'zone',
           col: zoneColour((a + z) / 2),
+          cad: b.cad,
         })
       }
     }

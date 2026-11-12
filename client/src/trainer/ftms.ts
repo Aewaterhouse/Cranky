@@ -164,6 +164,14 @@ export class FtmsTrainer implements Trainer {
       await this.send([OP.sim, 0, 0, g & 0xff, (g >> 8) & 0xff, 40, 51], 'set simulation')
     })
   }
+  /** Target Resistance Level: uint8 in 0.1 units, so 0-100% maps onto 0 to resMax/10 (untested on hardware). */
+  setResistance(pct: number) {
+    return this.run(async () => {
+      await this.ensureControl()
+      const v = Math.round((pct / 100) * CFG.ftms.resMax)
+      await this.send([OP.resistance, Math.min(255, Math.max(0, v))], 'set resistance')
+    })
+  }
   release() {
     return this.run(async () => {
       this.haveControl = false
@@ -172,7 +180,7 @@ export class FtmsTrainer implements Trainer {
   }
 }
 
-const OP = { request: 0x00, reset: 0x01, power: 0x05, start: 0x07, sim: 0x11 }
+const OP = { request: 0x00, reset: 0x01, resistance: 0x04, power: 0x05, start: 0x07, sim: 0x11 }
 const RESULT = { ok: 1, notPermitted: 5 }
 const RESULT_TEXT: Record<number, string> = {
   2: 'not supported',

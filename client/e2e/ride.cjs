@@ -30,7 +30,7 @@ async function solo(page) {
   await page.click('text=Solo workout')
   await page.click('.chip-sel[data-g="sprint"]')
   await page.click('.plan-card:has-text("Sprints 8×10"), .plan-card:has-text("Sprints 8x10")')
-  await page.click('button:text-is("Start")')
+  await page.click('.startbar button:text-is("Start")')
   await useSim(page)
   await page.waitForSelector('text=Ride done', { timeout: 120000 })
   const text = await page.innerText('body')

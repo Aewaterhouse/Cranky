@@ -25,6 +25,14 @@ function flatten(blocks: Block[], where: string): Block[] {
       const inner = flatten(b.blocks, at)
       return Array.from({ length: b.rep }, () => inner.map((x) => ({ ...x }))).flat()
     }
+    if (b.cad !== undefined) {
+      const [lo, hi] = Array.isArray(b.cad) && b.cad.length === 2 ? b.cad : [0, 0]
+      if (!(lo > 0 && hi >= lo)) throw new Error(`${at}: cad must be [lo, hi] rpm`)
+    }
+    if (b.cues !== undefined) {
+      const ok = Array.isArray(b.cues) && b.cues.every((c) => c?.at >= 0 && !!c.text)
+      if (!ok) throw new Error(`${at}: cues must be [{at, text}]`)
+    }
     if (!(b.dur > 0)) throw new Error(`${at}: dur must be > 0`)
     if (b.type === 'sprint' && (b.dur < CFG.sprintDur.min || b.dur > CFG.sprintDur.max))
       throw new Error(`${at}: sprint dur must be ${CFG.sprintDur.min}-${CFG.sprintDur.max}s`)
@@ -90,6 +98,7 @@ export function frameAt(blocks: Block[], el: number, tier: Tier, ftp: number): F
     label: b.label ?? b.type,
     dur: b.dur,
     tgt: w(b, at.bel),
+    cad: b.cad,
     next: nb && { type: nb.type, label: nb.label ?? nb.type, in: b.dur - at.bel, tgt: w(nb, 0) },
   }
 }

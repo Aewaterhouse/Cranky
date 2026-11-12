@@ -1,0 +1,96 @@
+{
+ "id": "cad-pyramid",
+ "name": "Cadence Pyramid",
+ "goal": "endurance",
+ "desc": "Three minutes at each cadence, climbing from 90 to 120 rpm and back down, at a steady 65% FTP.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 480,
+   "pct": [
+    45,
+    65
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    85,
+    95
+   ],
+   "label": "90 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    95,
+    105
+   ],
+   "label": "100 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    105,
+    115
+   ],
+   "label": "110 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    115,
+    125
+   ],
+   "label": "120 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    105,
+    115
+   ],
+   "label": "110 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    95,
+    105
+   ],
+   "label": "100 rpm"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 65,
+   "cad": [
+    85,
+    95
+   ],
+   "label": "90 rpm"
+  },
+  {
+   "type": "ramp",
+   "dur": 300,
+   "pct": [
+    55,
+    40
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}
