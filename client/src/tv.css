@@ -1,0 +1,373 @@
+/* TV spectator view. The HUD is laid out 600 px tall and scaled to the screen (see spectate.ts). */
+.hud.tv {
+  z-index: 5;
+  zoom: 1; /* the shared HUD zooms big screens itself; the TV scales .tv-ui instead */
+}
+.tv .bs-pips {
+  display: grid;
+}
+.tv-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+.tv .eh {
+  width: min(400px, 38%);
+  padding: 8px 12px 6px;
+}
+.tv .eh-label {
+  display: none;
+}
+.tv .bs,
+.tv .tvb {
+  pointer-events: none;
+}
+.tv-left {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 236px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.4s;
+}
+.tv-left .hud-feed {
+  position: static;
+  width: auto;
+}
+.tvb {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 300px;
+  padding: 10px 10px 12px;
+  transition: opacity 0.4s;
+}
+.tvb h2 {
+  margin: 0 0 6px 4px;
+  font: 0.9rem/1 var(--display);
+  letter-spacing: 0.14em;
+  color: var(--dim);
+}
+.tvb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tvb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.05);
+}
+.tvb-row .ava {
+  width: 44px;
+  height: 44px;
+  font-size: 1rem;
+}
+.tvb-row[data-st='fell'] {
+  background: rgb(255 90 78 / 0.18);
+}
+.tvb-row[data-st='spectator'] {
+  opacity: 0.55;
+}
+.tvb-mid {
+  flex: 1;
+  min-width: 0;
+}
+.tvb-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font: 1.05rem/1.1 var(--display);
+  white-space: nowrap;
+}
+.tvb-name span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tvb-tier {
+  padding: 1px 5px;
+  border-radius: 6px;
+  font: 800 0.55rem/1.3 var(--ui);
+  letter-spacing: 0.08em;
+  background: rgb(255 255 255 / 0.14);
+  color: var(--fg);
+}
+.tvb-tier[data-t='hard'] {
+  background: #ff5a4e;
+  color: #1b0805;
+}
+.tvb-tier[data-t='medium'] {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.tvb-tier[data-t='easy'] {
+  background: var(--tox);
+  color: #0d1a04;
+}
+.tvb-badge {
+  color: var(--bad);
+  font: 800 0.6rem/1 var(--ui);
+  letter-spacing: 0.08em;
+}
+.tvb-bar {
+  position: relative;
+  height: 10px;
+  margin: 5px 0 2px;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 0.1);
+}
+.tvb-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s;
+}
+.tvb-bar small {
+  position: absolute;
+  right: 0;
+  top: -15px;
+  margin: 0;
+  color: var(--fg);
+}
+.tvb-grades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  min-height: 0;
+}
+.tvb-grades i,
+.tvb-g {
+  font: 800 0.55rem/1 var(--ui);
+  padding: 2px 5px;
+  margin: 0 3px 0 0;
+  border-radius: 5px;
+  color: #111;
+  background: var(--g);
+  font-style: normal;
+}
+.tvb-w {
+  text-align: right;
+  min-width: 62px;
+}
+.tvb-w b {
+  font: 1.9rem/1 var(--display);
+}
+
+/* Screens over the scene */
+.tv-slot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.tv-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  pointer-events: auto;
+}
+.tv-screen h2 {
+  margin: 0;
+  font: 1.3rem/1 var(--display);
+  letter-spacing: 0.2em;
+  color: var(--acc);
+}
+.tv.idle .eh,
+.tv.idle .tv-left,
+.tv.idle .tvb {
+  opacity: 0;
+}
+.tvl-code {
+  padding: 4px 44px 8px;
+  border-radius: 20px;
+  background: rgb(12 13 17 / 0.7);
+  font: 2.6rem/1.2 var(--display);
+}
+.tvl-code b {
+  color: var(--acc);
+  letter-spacing: 0.18em;
+  font-size: 6rem;
+}
+.tvl-wait {
+  margin: 0;
+  font: 1.6rem/1.2 var(--display);
+  text-shadow: 0 2px 6px #000;
+}
+.tv-screen .dim {
+  margin: 0;
+  padding: 2px 14px;
+  border-radius: 99px;
+  background: rgb(12 13 17 / 0.7);
+  color: var(--fg);
+  font-size: 1.1rem;
+}
+.tvl-seats {
+  display: flex;
+  gap: 14px;
+  margin-top: 14px;
+}
+.tvl-seat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 128px;
+  padding: 12px 6px;
+  border-radius: 16px;
+  background: rgb(12 13 17 / 0.7);
+}
+.tvl-seat b {
+  font: 1.05rem/1.1 var(--display);
+}
+.tvl-seat.empty,
+.tvl-seat.away {
+  opacity: 0.45;
+}
+.tvl-seat small {
+  color: var(--dim);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+.tve {
+  background: rgb(8 9 12 / 0.88);
+  gap: 10px;
+}
+.tve-score {
+  display: flex;
+  flex-direction: column;
+}
+.tve-score small,
+.tve-stat small {
+  color: var(--dim);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  font-size: 0.8rem;
+}
+.tve-score b {
+  font: 3.6rem/1 var(--display);
+  color: var(--acc);
+}
+.tve-stats {
+  display: flex;
+  gap: 40px;
+}
+.tve-stat {
+  display: flex;
+  flex-direction: column;
+}
+.tve-stat b {
+  font: 1.9rem/1.1 var(--display);
+}
+.tve-cols {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 14px;
+  align-items: center;
+  max-width: 94%;
+}
+.tve-awards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  text-align: left;
+}
+.tve-awards div {
+  display: grid;
+  grid-template-columns: auto auto;
+  column-gap: 8px;
+  align-items: center;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 0.07);
+  font-size: 0.95rem;
+}
+.tve-awards b {
+  font: 1.05rem var(--display);
+  color: var(--acc);
+}
+.tve-awards em {
+  grid-column: 2;
+  font-style: normal;
+  font-weight: 800;
+}
+.tve-awards small {
+  grid-column: 2;
+  color: var(--dim);
+}
+.tve table {
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+.tve th {
+  color: var(--dim);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-align: left;
+  padding: 4px 14px;
+}
+.tve td {
+  padding: 6px 14px;
+  font-weight: 700;
+}
+.tve td .ava {
+  margin: 0 8px 0 0;
+  vertical-align: middle;
+  border: 0;
+}
+
+/* Controls */
+.tv-ctl {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.55;
+  transition: opacity 0.3s;
+}
+.tv-ctl:hover {
+  opacity: 1;
+}
+.tv-ctl button {
+  pointer-events: auto;
+}
+
+/* Phone and iPad portrait: stack under the header. */
+.tv.narrow .eh {
+  width: calc(100% - 24px);
+  left: 12px;
+  translate: 0;
+}
+.tv.narrow .tv-left,
+.tv.narrow .tvb {
+  top: 120px;
+}
+.tv.narrow .tvb {
+  width: 260px;
+}
+.tv.pre .tv-left,
+.tv.pre .tvb {
+  opacity: 1;
+}
+
+/* Home screen: Join and Watch side by side on a bus card. */
+.card-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+}
+.card-btns button {
+  flex: 1;
+}

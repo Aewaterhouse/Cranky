@@ -13,7 +13,21 @@ from . import bots, discord
 from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
-from .protocol import Bots, Buy, ClientMsg, Data, Difficulty, End, Join, Setup, Sprint, Start, Tick, TierMsg
+from .protocol import (
+    Bots,
+    Buy,
+    ClientMsg,
+    Data,
+    Difficulty,
+    End,
+    Join,
+    Setup,
+    Sprint,
+    Start,
+    Tick,
+    TierMsg,
+    Watch,
+)
 
 if TYPE_CHECKING:
     from .store import Store
@@ -83,6 +97,7 @@ class Room:
         self.saved_at = 0.0
         self.brains: dict[str, bots.Brain] = {}
         self.riders: dict[str, Rider] = {}
+        self.watchers: list[WebSocket] = []  # TV spectators: no seat, never counted
         self.host: str | None = None
         self.state = "lobby"
         self.plan_id = "bus-crew-45"
@@ -103,7 +118,19 @@ class Room:
                 r.connected = False
 
     async def broadcast(self, msg: dict) -> None:
-        await asyncio.gather(*(self.send(r, msg) for r in self.riders.values()))
+        await asyncio.gather(
+            *(self.send(r, msg) for r in self.riders.values()), *(self.tell(w, msg) for w in self.watchers)
+        )
+
+    async def tell(self, ws: WebSocket, msg: dict) -> None:
+        try:
+            await ws.send_json(msg)
+        except Exception:  # noqa: BLE001 - a dead spectator is dropped
+            self.unwatch(ws)
+
+    def unwatch(self, ws: WebSocket) -> None:
+        if ws in self.watchers:
+            self.watchers.remove(ws)
 
     async def lobby(self) -> None:
         """Snapshots the room and broadcasts the lobby."""
@@ -174,12 +201,9 @@ class Room:
     def humans(self) -> list[Rider]:
         return [r for r in self.riders.values() if not r.bot]
 
-    async def connect(self, rid: str, ws: WebSocket) -> None:
-        r = self.riders.get(rid)
-        if r:
-            r.ws, r.connected = ws, True
-
     async def disconnect(self, rid: str, ws: WebSocket) -> None:
+        if ws in self.watchers:
+            return self.unwatch(ws)
         r = self.riders.get(rid)
         if r and r.ws is ws:
             r.connected = False
@@ -192,6 +216,15 @@ class Room:
     async def handle(self, rid: str, ws: WebSocket, raw: dict) -> None:
         """Applies one client message."""
         msg = ClientMsg.validate_python(raw)
+        if isinstance(msg, Watch):
+            if ws not in self.watchers:
+                self.watchers.append(ws)
+            await self.tell(ws, self.lobby_msg())
+            if self.state == "done" and self.summary:
+                await self.tell(ws, {"t": "end", "summary": self.summary})
+            return
+        if ws in self.watchers:  # spectators only watch
+            return
         r = self.riders.get(rid)
         if isinstance(msg, Join):
             if r:

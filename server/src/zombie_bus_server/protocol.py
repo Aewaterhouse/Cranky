@@ -16,6 +16,10 @@ class Join(BaseModel):
     look: dict[str, str] = Field(default_factory=dict)
 
 
+class Watch(BaseModel):
+    t: Literal["watch"]
+
+
 class Setup(BaseModel):
     t: Literal["setup"]
     plan: str
@@ -70,7 +74,7 @@ class Buy(BaseModel):
 
 ClientMsg = TypeAdapter(
     Annotated[
-        Join | Setup | Bots | Difficulty | Start | End | TierMsg | Data | Sprint | Buy,
+        Join | Watch | Setup | Bots | Difficulty | Start | End | TierMsg | Data | Sprint | Buy,
         Field(discriminator="t"),
     ]
 )

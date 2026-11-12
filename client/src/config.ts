@@ -31,4 +31,6 @@ export const CFG = {
   localStorageKey: 'zombiebus.profile',
   sim: { baseWatts: 150, baseCadence: 90, noiseW: 4 },
   scene: { speedMax: 22 },
+  /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
+  tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
 }

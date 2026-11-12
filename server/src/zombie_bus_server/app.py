@@ -193,7 +193,6 @@ async def ws_endpoint(ws: WebSocket, code: str, token: str = "") -> None:
         await ws.close()
         return
     rid = me["id"]
-    await room.connect(rid, ws)
     try:
         while True:
             raw = await ws.receive_json()
