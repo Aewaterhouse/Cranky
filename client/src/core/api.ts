@@ -6,16 +6,29 @@ export const token = () => localStorage.getItem(TOKEN) ?? ''
 export async function api<T = unknown>(path: string, init: RequestInit = {}): Promise<T> {
   const r = await fetch(path, {
     ...init,
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${token()}`, ...init.headers },
+    headers: {
+      'content-type': 'application/json',
+      authorization: `Bearer ${token()}`,
+      ...init.headers,
+    },
   })
-  if (!r.ok) throw Object.assign(new Error((await r.json().catch(() => ({}))).detail ?? r.statusText), { status: r.status })
+  if (!r.ok)
+    throw Object.assign(new Error((await r.json().catch(() => ({}))).detail ?? r.statusText), {
+      status: r.status,
+    })
   return r.json()
 }
 
-export interface Me { id: string; name: string }
+export interface Me {
+  id: string
+  name: string
+}
 
 export async function login(name: string, password: string): Promise<Me> {
-  const r = await api<Me & { token: string }>('/api/login', { method: 'POST', body: JSON.stringify({ name, password }) })
+  const r = await api<Me & { token: string }>('/api/login', {
+    method: 'POST',
+    body: JSON.stringify({ name, password }),
+  })
   localStorage.setItem(TOKEN, r.token)
   return { id: r.id, name: r.name }
 }

@@ -8,6 +8,7 @@ import { WsClient } from '../../net/wsClient'
 import { fmt, h, show } from '../../ui/dom'
 import { DURATIONS } from '../../ui/home'
 import { finishRide } from '../../ui/results'
+import { toast } from '../../ui/toast'
 import { TIERS, type Tier, type Trainer } from '../../types'
 import { startBusRide, type BusRide } from './zombieBus'
 
@@ -22,7 +23,7 @@ export async function crew(
     try {
       code = (await api<{ code: string }>('/api/rooms', { method: 'POST' })).code
     } catch {
-      return alert('No game server reachable. Solo drill still works.')
+      return toast('No game server reachable. Solo drill still works.', 'bad')
     }
   }
   sessionStorage.setItem('zombiebus.code', code)
@@ -76,9 +77,9 @@ export async function crew(
       )
     } else if (m.t === 'error') {
       if (/No bus/.test(m.msg)) {
-        alert(m.msg)
+        toast(m.msg, 'bad')
         leave()
-      } else ride ? ride.toast(m.msg) : alert(m.msg)
+      } else ride ? ride.toast(m.msg) : toast(m.msg, 'bad')
     }
   }
 

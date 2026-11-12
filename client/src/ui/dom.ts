@@ -27,3 +27,15 @@ export const fmt = (s: number) => {
 }
 export const pctStr = (c: number | null | undefined) =>
   c == null ? '–' : `${Math.round(c * 100)}%`
+
+const HUES = ['#f2b705', '#7fd13b', '#3bb2d1', '#e85d9c', '#ff7a3d', '#a78bfa']
+/** Initials on a per-rider colour, stable across screens. */
+export function avatar(name: string, size = '') {
+  // Multiplier picked so the six crew names land on six different colours.
+  const n = [...name.toLowerCase()].reduce((a, c) => (a * 113 + c.charCodeAt(0)) % 9973, 7)
+  return h(
+    'span',
+    { class: `ava ${size}`, style: `--c:${HUES[n % HUES.length]}`, 'aria-hidden': 'true' },
+    name.slice(0, 2).toUpperCase(),
+  )
+}

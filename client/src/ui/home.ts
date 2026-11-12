@@ -1,58 +1,60 @@
 import { PLANS } from '../content'
-import { buy, COSMETICS, equip, SLOT_NAMES } from '../core/cosmetics'
-import type { Profile } from '../core/curve'
+import { api } from '../core/api'
 import { generate, parsePlan, planTotal } from '../core/plan'
-import { saveProfile } from '../core/profile'
-import { FtmsTrainer } from '../trainer/ftms'
-import { bindKeys, SimTrainer } from '../trainer/simTrainer'
-import { TIERS, type Plan, type Tier, type Trainer } from '../types'
-import { fmt, h, show } from './dom'
+import type { Plan } from '../types'
+import { avatar, fmt, h } from './dom'
+import { modal } from './toast'
+import { needTrainer } from './trainer'
 
 export interface HomeActions {
   drill(plan: Plan): void
   create(): void
   join(code: string): void
+  logout(): void
+}
+interface Room {
+  code: string
+  state: string
+  plan: string
+  host: string | null
+  riders: string[]
 }
 
-let trainer: Trainer | null = null
-let sim: SimTrainer | null = null
-export const currentTrainer = () => trainer
-
 export const DURATIONS = [0, 30, 45, 60, 75, 90]
+const POLL_MS = 3000
 
 export function planFor(id: string, minutes: number): Plan {
   const raw = PLANS.find((p) => p.id === id)!
   return minutes ? generate(raw, minutes) : parsePlan(raw)
 }
 
-/** Garage: profile, trainer pairing, solo and crew entry points. */
-export function showHome(profile: Profile, act: HomeActions) {
-  const live = h(
-    'div',
-    { class: 'live' },
-    trainer ? `${trainer.name} connected` : 'No trainer connected',
+function busCard(r: Room, join: (code: string) => void) {
+  const running = r.state === 'running'
+  return h(
+    'article',
+    { class: 'bus-card' },
+    h(
+      'header',
+      {},
+      h('h3', {}, `${r.host ?? 'Someone'}’s bus`),
+      h('span', { class: `state${running ? ' run' : ''}` }, running ? 'On the road' : 'Boarding'),
+    ),
+    h('p', { class: 'plan' }, r.plan, h('span', { class: 'code-tag' }, r.code)),
+    h(
+      'div',
+      { class: 'aboard' },
+      ...r.riders.map((n) => avatar(n, 'sm')),
+      h('span', { class: 'dim' }, `${r.riders.length} on board`),
+    ),
+    h(
+      'button',
+      { class: 'primary', onclick: needTrainer(() => join(r.code)) },
+      running ? 'Jump on' : 'Join',
+    ),
   )
-  const watch = () =>
-    trainer?.onData(
-      (d) => (live.textContent = `${trainer!.name}: ${d.power} W · ${Math.round(d.cadence)} rpm`),
-    )
-  watch()
-  const field = (label: string, input: HTMLElement) =>
-    h('label', { class: 'field' }, h('span', {}, label), input)
-  const name = h('input', { value: profile.name, placeholder: 'Your name', maxLength: 16 })
-  const ftp = h('input', { type: 'number', value: profile.ftp, min: 50, max: 600 })
-  const tier = h(
-    'select',
-    {},
-    ...TIERS.map((t) => h('option', { value: t, selected: t === profile.tier }, t)),
-  )
-  const save = () => {
-    profile.name = name.value.trim() || 'Rider'
-    profile.ftp = Math.max(50, Math.min(600, +ftp.value || 200))
-    profile.tier = tier.value as Tier
-    saveProfile(profile)
-  }
-  for (const i of [name, ftp, tier]) i.addEventListener('change', save)
+}
+
+function soloSetup(act: HomeActions) {
   const plan = h(
     'select',
     {},
@@ -69,151 +71,122 @@ export function showHome(profile: Profile, act: HomeActions) {
   const upd = () => (desc.textContent = PLANS.find((p) => p.id === plan.value)?.desc ?? '')
   plan.addEventListener('change', upd)
   upd()
+  const start = needTrainer(() => {
+    close()
+    act.drill(planFor(plan.value, +mins.value))
+  })
+  const close = modal(
+    'Solo drill',
+    h('p', {}, 'Just you and the plan, no bus. Good for testing your legs or a trainer.'),
+    h(
+      'div',
+      { class: 'grid2' },
+      h('label', { class: 'field' }, h('span', {}, 'Plan'), plan),
+      h('label', { class: 'field' }, h('span', {}, 'Length'), mins),
+    ),
+    desc,
+    h(
+      'div',
+      { class: 'actions' },
+      h('button', { class: 'primary', onclick: start }, 'Start drill'),
+    ),
+  )
+}
+
+/** Ride tab: open buses first, then a new bus, then solo. */
+export function rideTab(act: HomeActions) {
+  const list = h('div', { class: 'buses' })
+  let seen = ''
+  const render = (rooms: Room[] | null) => {
+    const key = JSON.stringify(rooms)
+    if (key === seen) return
+    seen = key
+    if (!rooms) return list.replaceChildren(h('p', { class: 'dim' }, 'Looking for buses…'))
+    list.replaceChildren(
+      ...(rooms.length
+        ? rooms.map((r) => busCard(r, act.join))
+        : [
+            h(
+              'div',
+              { class: 'empty' },
+              h('span', { class: 'big-emoji' }, '🛣️'),
+              h('b', {}, 'No buses on the road yet'),
+              h('span', {}, 'Start one and it shows up here for the crew.'),
+            ),
+          ]),
+    )
+  }
+  const poll = async () => {
+    const rooms = await api<Room[]>('/api/rooms').catch(() => [])
+    if (!list.isConnected) return clearInterval(timer)
+    render(rooms)
+  }
+  const timer = setInterval(poll, POLL_MS)
+  render(null)
+  poll()
+
   const code = h('input', {
-    placeholder: 'CODE',
+    placeholder: 'ABCD',
     maxLength: 4,
+    'aria-label': 'Bus code',
     value:
       new URLSearchParams(location.search).get('join') ??
       sessionStorage.getItem('zombiebus.code') ??
       '',
-    style: 'width:6em;text-transform:uppercase',
   })
-  const need = (fn: () => void) => () => {
-    save()
-    if (!trainer) return alert('Connect a trainer or use the simulated trainer first.')
-    if (!profile.name) return alert('Enter your name first.')
-    fn()
+  const joinCode = (e: Event) => {
+    e.preventDefault()
+    const c = code.value.trim().toUpperCase()
+    if (c.length === 4) needTrainer(() => act.join(c))()
+    else code.focus()
   }
-  const connectBt = async () => {
-    if (!navigator.bluetooth)
-      return alert('Web Bluetooth is not available. Use Chrome or Edge over HTTPS (or localhost).')
-    try {
-      const t = new FtmsTrainer()
-      await t.connect()
-      trainer = t
-      watch()
-    } catch (e) {
-      alert(`Could not connect: ${(e as Error).message}`)
-    }
-  }
-  const useSim = () => {
-    if (!sim) {
-      sim = new SimTrainer()
-      sim.start(4)
-      bindKeys(sim, profile.ftp)
-    }
-    trainer = sim
-    watch()
-  }
-  const shop = h('div', { class: 'card' })
-  const renderShop = () => {
-    shop.replaceChildren(
-      h('h2', {}, `Garage shop · ${profile.scrap} scrap`),
+  return h(
+    'div',
+    { class: 'ride' },
+    h(
+      'section',
+      { class: 'hero' },
+      h('h1', {}, 'Ride the bus with the crew'),
       h(
         'p',
-        { class: 'dim' },
-        'Earn scrap on crew rides. Paint and parts show on the bus when you drive (host).',
+        { class: 'lede' },
+        'Everyone pedals at their own FTP. Keep the bus moving or the horde eats you.',
       ),
       h(
         'div',
-        { class: 'shopgrid' },
-        ...COSMETICS.map((c) => {
-          const owned = profile.owned.includes(c.id)
-          const on = profile.look[c.slot] === c.id
-          const act = () => {
-            const r = owned ? equip(profile, c.id) : buy(profile, c.id)
-            if (typeof r === 'string') return alert(r)
-            Object.assign(profile, r)
-            saveProfile(profile)
-            renderShop()
-          }
-          return h(
-            'div',
-            { class: `item${on ? ' on' : ''}` },
-            h(
-              'div',
-              {},
-              c.colour ? h('span', { class: 'swatch', style: `background:${c.colour}` }) : '',
-              h('b', {}, c.name),
-            ),
-            h(
-              'div',
-              { class: 'dim' },
-              `${SLOT_NAMES[c.slot]}${owned ? '' : ` · ${c.price} scrap`}`,
-            ),
-            h(
-              'button',
-              {
-                class: owned ? 'ghost' : '',
-                disabled: !owned && profile.scrap < c.price,
-                onclick: act,
-              },
-              owned ? (on ? 'Unequip' : 'Equip') : 'Buy',
-            ),
-          )
-        }),
+        { class: 'hero-grid' },
+        h('div', {}, h('h2', { class: 'label' }, 'Open buses'), list),
+        h(
+          'div',
+          { class: 'start' },
+          h(
+            'button',
+            { class: 'mega', onclick: needTrainer(act.create) },
+            h('span', { class: 'plus' }, '+'),
+            h('b', {}, 'Start a new bus'),
+            h('small', {}, 'You drive. Pick the plan, share the code.'),
+          ),
+          h(
+            'form',
+            { class: 'by-code', onsubmit: joinCode },
+            h('span', {}, 'Got a code?'),
+            code,
+            h('button', {}, 'Join'),
+          ),
+        ),
       ),
-    )
-  }
-  renderShop()
-  show(
+    ),
     h(
-      'div',
-      { class: 'page' },
-      h('h1', {}, '🧟 Zombie Bus'),
+      'button',
+      { class: 'solo', onclick: () => soloSetup(act) },
+      h('span', { class: 'big-emoji' }, '🚴'),
       h(
-        'div',
-        { class: 'card' },
-        h('h2', {}, 'Rider'),
-        h('div', { class: 'row' }, field('Name', name), field('FTP (W)', ftp), field('Tier', tier)),
-        h(
-          'p',
-          { class: 'dim' },
-          `${profile.stats.rides} rides · ${Math.round(profile.stats.secs / 3600)} h · ${profile.stats.kj} kJ · ${profile.stats.streak} week streak`,
-        ),
+        'span',
+        {},
+        h('b', {}, 'Solo drill'),
+        h('small', {}, 'Ride a workout on your own, no bus.'),
       ),
-      h(
-        'div',
-        { class: 'card' },
-        h('h2', {}, 'Trainer'),
-        live,
-        h(
-          'div',
-          { class: 'row' },
-          h('button', { onclick: connectBt }, 'Connect trainer (Bluetooth)'),
-          h('button', { class: 'ghost', onclick: useSim }, 'Use simulated trainer'),
-        ),
-        h(
-          'p',
-          { class: 'dim' },
-          'Close MyWhoosh/Wahoo apps first. Sim keys: ↑↓ free-ride watts, ←→ cadence, [ ] ERG effort, S sprint power, A easy power.',
-        ),
-      ),
-      h(
-        'div',
-        { class: 'card' },
-        h('h2', {}, 'Ride with the crew'),
-        h(
-          'div',
-          { class: 'row' },
-          h('button', { class: 'primary', onclick: need(act.create) }, 'Start a bus'),
-          code,
-          h('button', { onclick: need(() => act.join(code.value.toUpperCase())) }, 'Join'),
-        ),
-      ),
-      h(
-        'div',
-        { class: 'card' },
-        h('h2', {}, 'Solo drill'),
-        h('div', { class: 'row' }, field('Plan', plan), field('Length', mins)),
-        desc,
-        h(
-          'button',
-          { onclick: need(() => act.drill(planFor(plan.value, +mins.value))) },
-          'Start drill',
-        ),
-      ),
-      shop,
+      h('span', { class: 'arrow' }, '→'),
     ),
   )
 }

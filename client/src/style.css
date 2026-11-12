@@ -1,9 +1,19 @@
 :root {
-  --bg: #15161a;
-  --card: #22242b;
-  --fg: #eee;
-  --dim: #999;
+  --bg: #111214;
+  --bg2: #18191d;
+  --card: #1e1f24;
+  --card2: #26282e;
+  --line: #33353d;
+  --fg: #f3f0e6;
+  --dim: #9c998f;
   --acc: #f2b705;
+  --acc-ink: #1b1500;
+  --tox: #7fd13b;
+  --bad: #ff5a4e;
+  --r: 14px;
+  --display: 'Bungee', 'Impact', sans-serif;
+  --ui: 'Inter', system-ui, sans-serif;
+  --hazard: repeating-linear-gradient(-45deg, var(--acc) 0 10px, #15130c 10px 20px);
   color-scheme: dark;
 }
 * {
@@ -11,35 +21,46 @@
 }
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--fg);
-  font:
-    16px/1.4 system-ui,
-    sans-serif;
+  font: 16px/1.45 var(--ui);
+  background:
+    radial-gradient(1200px 500px at 15% -10%, #2a2410 0, transparent 60%),
+    radial-gradient(900px 500px at 110% 10%, #16240f 0, transparent 55%), var(--bg);
+  background-attachment: fixed;
 }
 #app {
   min-height: 100vh;
 }
 .page {
-  max-width: 820px;
+  max-width: 1100px;
   margin: 0 auto;
-  padding: 16px;
+  padding: 24px 24px 64px;
+}
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
 }
 h1 {
   margin: 8px 0 16px;
+  font-size: 2.2rem;
 }
 h2 {
-  margin: 0 0 8px;
-  font-size: 1.05em;
+  margin: 0 0 10px;
+  font-size: 1.15rem;
 }
 .card {
   background: var(--card);
-  border-radius: 10px;
-  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 16px;
   margin: 12px 0;
 }
 .card.hl {
-  outline: 2px solid var(--acc);
+  border-color: var(--acc);
 }
 .row {
   display: flex;
@@ -52,34 +73,56 @@ h2 {
   flex-direction: column;
   font-size: 0.85em;
   color: var(--dim);
-  gap: 4px;
+  gap: 6px;
 }
 input,
 select,
 button {
   font: inherit;
-  padding: 8px 10px;
-  border-radius: 6px;
-  border: 1px solid #444;
-  background: #111;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--bg2);
   color: var(--fg);
+}
+input:focus-visible,
+select:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
 }
 button {
   cursor: pointer;
-  background: #333;
+  background: var(--card2);
+  font-weight: 600;
+  transition:
+    transform 0.08s,
+    filter 0.15s,
+    background 0.15s;
+}
+button:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 button.primary {
   background: var(--acc);
-  color: #111;
+  color: var(--acc-ink);
   border-color: var(--acc);
-  font-weight: bold;
+  font-weight: 800;
 }
 button.ghost {
   background: transparent;
 }
 .dim {
   color: var(--dim);
-  font-size: 0.85em;
+  font-size: 0.875em;
 }
 table {
   border-collapse: collapse;
@@ -89,8 +132,8 @@ table {
 th,
 td {
   text-align: left;
-  padding: 4px 8px;
-  border-bottom: 1px solid #333;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
 }
 .live {
   font-variant-numeric: tabular-nums;
@@ -222,30 +265,6 @@ td {
 .hud .shop button:disabled {
   opacity: 0.4;
 }
-.shopgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-  gap: 8px;
-}
-.item {
-  background: #181a20;
-  border-radius: 8px;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.item.on {
-  outline: 2px solid var(--acc);
-}
-.swatch {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  margin-right: 6px;
-  vertical-align: middle;
-}
 .hud .busstats:empty,
 .hud .roster:empty {
   display: none;
@@ -318,4 +337,11 @@ td {
   .banner {
     font-size: 2em;
   }
+}
+.plan-graph {
+  display: block;
+  width: 100%;
+  height: 64px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.04);
 }
