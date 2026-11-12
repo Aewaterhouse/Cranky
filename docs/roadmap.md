@@ -1,4 +1,6 @@
-# Roadmap
+# Cranky roadmap
+
+**Cranky** is the app. **Zombie Bus** is its first game; solo workouts, watch parties and later games sit alongside it.
 
 A backlog of what to build next, grouped by theme. Sizes are rough: **S** = an evening, **M** = a weekend, **L** = a week or more. Items the owner asked for are marked ★.
 
@@ -14,12 +16,18 @@ Today it is a working prototype: one game mode, one solo mode, procedural art, s
 
 The suggested order below attacks them in that order: reliable first, then serious, then deep, then pretty.
 
+## Decided
+
+- The product is called **Cranky**. Zombie Bus is one game inside it.
+- Six seats on the bus is enough for now. A seventh rider waits for the next bus.
+- Strava export waits. FIT file export comes first, which also covers manual Strava uploads.
+
 ## Suggested milestones
 
 | Milestone | Goal | Main items |
 | --- | --- | --- |
-| 1. First group ride | Six people finish a ride with no faff | Reliability list, bots, admin page, tuning |
-| 2. Serious trainer | Solo mode you would choose over TrainerRoad for a session | FIT and Strava export, graphs, ride history, workout import, FTP test |
+| 1. First group ride | Six people finish a ride with no faff | Rebrand to Cranky, reliability list, bots, admin page, tuning |
+| 2. Serious trainer | Solo mode you would choose over TrainerRoad for a session | FIT export, graphs, ride history, workout import, FTP test, watch party |
 | 3. Free ride | Real routes without ERG | GPX routes, gradient sim, map, group ride |
 | 4. Deeper game | Zombie Bus stays fun for a season | Route map, roles, zombie types, bosses, campaign |
 | 5. AA polish | Looks and sounds like a product | Art, audio, onboarding, settings, performance |
@@ -35,7 +43,8 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Ride crash recovery | Save the ride every few seconds so a refresh or crash loses nothing | M |
 | Server restart survival | Persist room state so a restart resumes the ride | M |
 | ERG pre-scheduling | Schedule block changes off the server clock so targets are never late | S |
-| More than six seats | Seven accounts exist now; let the bus grow or run two buses | S |
+| Rebrand to Cranky | Rename the app, logo and tab title; the home screen becomes a mode picker (Zombie Bus, Watch Party, Solo, later games) | S |
+| Full-bus handling | Six seats stays; show "bus full" clearly and let a seventh rider spectate | S |
 | Bots to fill the bus | NPC riders so a crew of two still has a full, lively bus | M |
 | Admin page | Add riders and reset passwords in the browser instead of editing config | S |
 | TV / second-screen mode | Pair on the laptop, watch on a TV or iPad (spectator view by code) | M |
@@ -47,8 +56,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 
 | Item | What | Size |
 | --- | --- | --- |
-| ★ Strava export | Connect Strava once, then every ride uploads automatically (needs a free Strava API app) | M |
-| FIT file export | Download any ride as a .fit file for Garmin, intervals.icu, TrainingPeaks | M |
+| FIT file export | Download any ride as a .fit file for Garmin, intervals.icu, TrainingPeaks, or a manual Strava upload | M |
 | ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
 | Compare with mates | Overlay crew power curves; leaderboards per duration in W and W/kg | M |
 | Ride history and detail | Every past ride with its full chart, laps, zones and PRs; rename and delete | M |
@@ -58,6 +66,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Extra ride metrics | HR drift, efficiency factor, variability index, cadence histogram, W′ balance | M |
 | intervals.icu sync | Push rides and pull planned workouts | M |
 | Discord post | Auto-post the ride summary and postcard to the group chat by webhook | S |
+| ★ Strava export (later) | Connect Strava once, then every ride uploads automatically. Parked for now; needs a free Strava API app | M |
 
 ## 3. Solo trainer mode
 
@@ -110,7 +119,24 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Highlights and replay | Auto-clip the best moments (MEGA sprint, last-second escape) for the results page | L |
 | Season ladder | Crew score table per season with resets and titles | M |
 
-## 6. Other modes
+## 6. Watch party ★
+
+A shared room where the crew does the same ERG workout while watching the same video, everything in sync.
+
+| Item | What | Size |
+| --- | --- | --- |
+| Watch party room | Join by code like a bus. The host picks a workout and a YouTube video or playlist; everyone's ERG follows the shared workout clock at their own FTP and tier | M |
+| Synced playback | Play, pause, seek and next-video stay in step for everyone, driven by the server clock; late joiners land at the right spot | M |
+| Layout | Video takes most of the screen; a slim workout strip shows target, power, the band gauge, interval clock and the workout graph | M |
+| Shared queue | Anyone can add videos to the playlist; the host can reorder and skip | S |
+| Crew strip | Small row of everyone's watts, compliance and heart rate, plus emoji reactions over the video | S |
+| Pause rules | Workout pause and video pause are linked: if the host pauses, both stop for everyone | S |
+| Workout-aware video | Optional: dip the video volume and flash the strip a few seconds before each interval change | S |
+| Other sources | Twitch streams and direct video links, where they can be embedded | M |
+
+Notes: YouTube's embedded player supports synced control and is the safe starting point. Netflix and other paid services block embedding, so they are out. Each rider needs a device that can show video and pair the trainer, or use the second-screen mode.
+
+## 7. Other games
 
 | Item | What | Size |
 | --- | --- | --- |
@@ -120,7 +146,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Team time trial | Two crews, same workout, compliance decides | M |
 | Galley Ship, Pub Quiz, Asymmetric Hunt | The remaining ideas from the original plan | L each |
 
-## 7. Polish and production
+## 8. Polish and production
 
 | Item | What | Size |
 | --- | --- | --- |
@@ -135,9 +161,9 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Rider avatars | Body, face and bike customisation beyond hats and kit | M |
 | More cosmetics | Paint patterns, decals, horns, exhaust flames, rider celebrations | M |
 | Installable app | Add-to-home-screen with offline solo mode | S |
-| Name, logo and domain | Decide the real name; favicon and share image | S |
+| Logo and domain | A proper Cranky logo, favicon, share image and domain | S |
 
-## 8. Social and scheduling
+## 9. Social and scheduling
 
 | Item | What | Size |
 | --- | --- | --- |

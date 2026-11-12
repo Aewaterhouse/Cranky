@@ -56,3 +56,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Solo controls: pause drops ERG to 40% FTP; auto-pause after 3 s of zero power or cadence, resuming after 1.5 s of pedalling (never during sprints); intensity 50 to 150% in 1% steps scales ERG targets (still capped at 150% FTP). Load is shown as NP (30 s rolling, 4th-power mean), IF and TSS.
 - CSS is split per area: `style.css` (tokens), `ui.css` (shell, login, modal), `screens.css` (tabs), `setup.css` (picker, solo setup, lobby, rider stats), `solo.css`, `results.css`, and `hud*.css` (HUD, class prefixes keep it separate).
 - Icons are emoji for now (no icon assets to license).
+
+## Product (2026-11-12, owner decisions)
+- The app is called **Cranky**. Zombie Bus is the first game inside it. The code and UI still say "Zombie Bus" until the rebrand item in `docs/roadmap.md` is done.
+- Six bus seats stays.
+- Strava export is parked. Watch party (shared video plus synced ERG workout) is on the roadmap.
