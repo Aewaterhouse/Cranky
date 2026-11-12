@@ -411,3 +411,26 @@ a {
   height: 14px;
   border-radius: 3px;
 }
+.welcome p {
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+.welcome-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+.welcome-dots {
+  display: flex;
+  gap: 6px;
+}
+.welcome-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+}
+.welcome-dots i.on {
+  background: var(--acc);
+}

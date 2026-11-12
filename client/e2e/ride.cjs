@@ -17,6 +17,8 @@ async function rider(browser, name) {
     console.error(`${name} login failed; page says:\n${(await page.innerText('body')).slice(0, 400)}`)
     throw e
   })
+  await page.waitForTimeout(600)
+  if (await page.locator('text=Welcome to Cranky').count()) await page.keyboard.press('Escape')
   return page
 }
 

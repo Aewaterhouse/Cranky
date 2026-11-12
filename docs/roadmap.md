@@ -154,7 +154,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Sound design | Real engine, horde, impact and UI sounds in place of synth beeps | M |
 | Adaptive music | A soundtrack that shifts with the event and intensity | L |
 | Announcer | A dry Aussie voice calling events and sprint grades | M |
-| Onboarding | First-run tutorial: pair the trainer, set FTP, what compliance means | M |
+| ✅ Onboarding | First-run tutorial: pair the trainer, set FTP, what compliance means | M |
 | ✅ Settings | Volume, graphics quality, in-ride display size and colour-blind zone colours, under the rider menu. Units (miles, pounds) are not done: everything is metric | M |
 | ✅ Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |
 | Proper icons | SVG icon set in place of emoji so every device looks the same | S |

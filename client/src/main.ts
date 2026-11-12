@@ -3,6 +3,7 @@ import '@fontsource/inter/latin-400.css'
 import '@fontsource/inter/latin-600.css'
 import '@fontsource/inter/latin-800.css'
 import './style.css'
+import { maybeWelcome } from './ui/onboarding'
 import { applySettings } from './core/settings'
 import './ui.css'
 import './screens.css'
@@ -39,6 +40,7 @@ async function enter(u: Me) {
   home()
   const p = await syncProfile(profile)
   if (p !== profile) home(p)
+  maybeWelcome(profile, () => home())
 }
 
 addEventListener(
