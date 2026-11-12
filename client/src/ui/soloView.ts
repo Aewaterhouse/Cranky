@@ -1,3 +1,4 @@
+import { mediaCorner } from './soloMedia'
 import { CFG } from '../config'
 import { hrZone } from '../core/curve'
 import type { Live } from '../modes/rideController'
@@ -114,6 +115,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   const tgtLabel = tgt.el.firstElementChild as HTMLElement
   const kbd = (t: string) => h('kbd', {}, t)
 
+  const media = mediaCorner()
   const root = h(
     'div',
     { class: `erg${plan.test ? ' testing' : ''}` },
@@ -140,6 +142,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         { class: 'ctl' },
         cadBtn,
         hrBtn,
+        media.button,
         pauseBtn,
         h('button', { onclick: on.skip, title: 'Skip interval (→ or N)' }, 'Skip ', kbd('N')),
         h('button', { class: 'danger', onclick: () => confirmEnd() }, 'End ride'),
@@ -189,6 +192,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       'dialog',
     )
 
+  root.append(media.panel)
   return {
     root,
     panel,
