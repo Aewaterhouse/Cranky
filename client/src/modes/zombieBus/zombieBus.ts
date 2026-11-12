@@ -12,18 +12,21 @@ import { makeHud } from '../../ui/hud'
 import type { Trainer } from '../../types'
 import { RideController } from '../rideController'
 
-const FX_SOUND: Record<string, () => void> = { hit: SFX.hit, grab: SFX.grab, shake: SFX.shake, smash: SFX.MEGA, crash: SFX.hit, hauled: SFX.scrap, tune: SFX.GREAT, fell: SFX.FAIL }
+const FX_SOUND: Record<string, () => void> = { buy: SFX.scrap, repel: SFX.shake, hit: SFX.hit, grab: SFX.grab, shake: SFX.shake, smash: SFX.MEGA, crash: SFX.hit, hauled: SFX.scrap, tune: SFX.GREAT, fell: SFX.FAIL }
 
 /** Zombie Bus ride view driven by server ticks. */
-export function startBusRide(l: Lobby, profile: Profile, trainer: Trainer, net: WsClient, leave: () => void) {
+export function startBusRide(lobby0: Lobby, profile: Profile, trainer: Trainer, net: WsClient, leave: () => void) {
   const stage = h('div', { class: 'stage' })
   show(stage)
   const world = new World(stage)
   if (location.search.includes('debug')) debugPanel()
+  let l = lobby0
   const plan = l.plan
   const total = planTotal(plan.blocks)
   const ride = new RideController(trainer, profile, plan)
   const isHost = () => l.host === profile.id
+  const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
+  let lk = looks()
   const hud = makeHud((t) => {
     profile.tier = t
     saveProfile(profile)
@@ -87,12 +90,15 @@ export function startBusRide(l: Lobby, profile: Profile, trainer: Trainer, net: 
     world.state = {
       speed: b.speed, gap: b.gap, armour: b.armour, mood: (m.i < 0 ? 'drill' : m.ev in { warmup: 1, cooldown: 1 } ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
-      riders: Object.entries(m.riders).map(([id, r]) => ({ id, name: r.name, c: r.s, st: r.st, cadence: r.cad })),
+      busLook: lk[l.host],
+      riders: Object.entries(m.riders).map(([id, r]) => ({ id, name: r.name, c: r.s, st: r.st, cadence: r.cad, look: lk[id] })),
     }
     hud.bus([
       ['Armour', `${Math.round(b.armour)}`], ['Horde gap', `${Math.round(b.gap)} m`], ['Speed', `${Math.round(b.speed * 3.6)} km/h`],
       ['Distance', `${(b.dist / 1000).toFixed(2)} km`], ['Scrap', `${b.scrap}`], ['Engine', b.tune ? 'IN TUNE x1.25' : b.sync ? 'syncing…' : 'out of sync'],
+      ...(b.repel ? [['Repellent', `${b.repel}`] as [string, string]] : []),
     ])
+    hud.shop(b.shop, b.scrap, (item) => net.send({ t: 'buy', item }))
     hud.roster(Object.values(m.riders).map((r) => ({ name: r.name, c: r.s, st: r.st, tier: r.tier, p: r.w })))
   }
 
@@ -105,9 +111,19 @@ export function startBusRide(l: Lobby, profile: Profile, trainer: Trainer, net: 
   return {
     tick,
     toast: (t: string) => hud.toast(t),
+    lobby(m: Lobby) {
+      l = m
+      lk = looks()
+    },
     async finish() {
+      let postcard = ''
+      try {
+        postcard = world.snapshot()
+      } catch {
+        /* no snapshot */
+      }
       await cleanup()
-      return ride.rec.summary()
+      return { summary: ride.rec.summary(), postcard }
     },
     abort: () => void cleanup(),
   }

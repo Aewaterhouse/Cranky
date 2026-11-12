@@ -53,7 +53,7 @@ export function runDrill(plan: Plan, profile: Profile, trainer: Trainer, done: (
     const live = ride.live
     const c = f.tgt ? (live.c ?? 0) : Math.min(1, live.avg / profile.ftp)
     speed += (4 + c * (CFG.scene.speedMax - 4) - speed) * 0.15
-    world.state = { ...world.state, speed, mood: 'drill', riders: [{ id: profile.id, name: profile.name, c: live.c, st: 'riding', cadence: live.cadence }] }
+    world.state = { ...world.state, speed, mood: 'drill', busLook: profile.look, riders: [{ id: profile.id, name: profile.name, c: live.c, st: 'riding', cadence: live.cadence, look: profile.look }] }
     hud.frame(f, live, total)
   }, 250)
 

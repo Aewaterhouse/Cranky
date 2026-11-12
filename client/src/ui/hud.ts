@@ -1,4 +1,5 @@
 import type { Live } from '../modes/rideController'
+import type { ShopItem } from '../net/protocol'
 import type { Frame, SprintResult, Tier } from '../types'
 import { TIERS } from '../types'
 import { fmt, h, pctStr } from './dom'
@@ -17,7 +18,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void) {
   const tgt = el('big'), pow = el('big'), cad = el('big'), comp = el('big')
   const bar = el('bar-fill')
   const block = el('block'), next = el('next'), timer = el('timer')
-  const roster = el('roster'), bus = el('busstats'), banner = el('banner'), toast = el('toast')
+  const roster = el('roster'), bus = el('busstats'), banner = el('banner'), toast = el('toast'), shopEl = el('shop')
   const tier = h('select', { onchange: (e: Event) => onTier((e.target as HTMLSelectElement).value as Tier) }, ...TIERS.map((t) => h('option', { value: t }, t)))
   const stat = (label: string, v: HTMLElement) => h('div', { class: 'stat' }, h('label', {}, label), v)
   const root = h('div', { class: 'hud' },
@@ -27,7 +28,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void) {
       h('div', { class: 'bar' }, bar),
       h('div', { class: 'row' }, tier, h('button', { class: 'ghost', onclick: onQuit }, 'End ride')),
     ),
-    roster, bus, banner, toast,
+    roster, bus, banner, toast, shopEl,
   )
   let bannerT: ReturnType<typeof setTimeout>
   let toastT: ReturnType<typeof setTimeout>
@@ -67,6 +68,17 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void) {
       toast.className = 'toast show'
       clearTimeout(toastT)
       toastT = setTimeout(() => (toast.className = 'toast'), 3000)
+    },
+    /** Servo Stop shop; hidden when closed. */
+    shop(open: boolean, scrap: number, buy: (item: ShopItem) => void) {
+      shopEl.style.display = open ? '' : 'none'
+      if (!open) return
+      const items: [ShopItem, string, number][] = [['plating', 'Armour plating +25', 40], ['repellent', 'Horde repellent', 60], ['sync', 'Wider sync window', 50]]
+      const key = items.map(([, , c]) => scrap >= c).join()
+      if (shopEl.dataset.key === key) return
+      shopEl.dataset.key = key
+      shopEl.replaceChildren(h('b', {}, '🛠 Servo shop (bus scrap)'),
+        ...items.map(([id, name, cost]) => h('button', { disabled: scrap < cost, onclick: () => buy(id) }, `${name} · ${cost}`)))
     },
     sprint(r: SprintResult) {
       this.banner(`${r.grade}! ${r.avg} W (${Math.round(r.pct * 100)}%)${r.combo > 1 ? ` · combo x${r.combo}` : ''}`, `grade-${r.grade}`, 3500)

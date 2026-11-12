@@ -1,4 +1,5 @@
 import { PLANS } from '../content'
+import { buy, COSMETICS, equip, SLOT_NAMES } from '../core/cosmetics'
 import type { Profile } from '../core/curve'
 import { generate, parsePlan, planTotal } from '../core/plan'
 import { saveProfile } from '../core/profile'
@@ -73,6 +74,27 @@ export function showHome(profile: Profile, act: HomeActions) {
     trainer = sim
     watch()
   }
+  const shop = h('div', { class: 'card' })
+  const renderShop = () => {
+    shop.replaceChildren(h('h2', {}, `Garage shop · ${profile.scrap} scrap`),
+      h('p', { class: 'dim' }, 'Earn scrap on crew rides. Paint and parts show on the bus when you drive (host).'),
+      h('div', { class: 'shopgrid' }, ...COSMETICS.map((c) => {
+        const owned = profile.owned.includes(c.id)
+        const on = profile.look[c.slot] === c.id
+        const act = () => {
+          const r = owned ? equip(profile, c.id) : buy(profile, c.id)
+          if (typeof r === 'string') return alert(r)
+          Object.assign(profile, r)
+          saveProfile(profile)
+          renderShop()
+        }
+        return h('div', { class: `item${on ? ' on' : ''}` },
+          h('div', {}, c.colour ? h('span', { class: 'swatch', style: `background:${c.colour}` }) : '', h('b', {}, c.name)),
+          h('div', { class: 'dim' }, `${SLOT_NAMES[c.slot]}${owned ? '' : ` · ${c.price} scrap`}`),
+          h('button', { class: owned ? 'ghost' : '', disabled: !owned && profile.scrap < c.price, onclick: act }, owned ? (on ? 'Unequip' : 'Equip') : 'Buy'))
+      })))
+  }
+  renderShop()
   show(h('div', { class: 'page' },
     h('h1', {}, '🧟 Zombie Bus'),
     h('div', { class: 'card' }, h('h2', {}, 'Rider'), h('div', { class: 'row' }, field('Name', name), field('FTP (W)', ftp), field('Tier', tier)),
@@ -84,5 +106,6 @@ export function showHome(profile: Profile, act: HomeActions) {
       h('div', { class: 'row' }, h('button', { class: 'primary', onclick: need(act.create) }, 'Start a bus'), code, h('button', { onclick: need(() => act.join(code.value.toUpperCase())) }, 'Join'))),
     h('div', { class: 'card' }, h('h2', {}, 'Solo drill'), h('div', { class: 'row' }, field('Plan', plan), field('Length', mins)), desc,
       h('button', { onclick: need(() => act.drill(planFor(plan.value, +mins.value))) }, 'Start drill')),
+    shop,
   ))
 }

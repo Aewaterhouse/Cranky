@@ -1,0 +1,60 @@
+# Manual testing
+
+Headless first (no hardware):
+
+```sh
+cd client && pnpm test       # plan parsing, compliance, ERG caps, curve
+cd server && uv run pytest   # plan, Zombie Bus rules, 4-bot headless multiplayer
+cd client && pnpm build      # type check + build
+```
+
+Use `?debug` for the visual panel and `?fast=N` (drill) or `ZB_TIME_SCALE` (server) to skip time. Needs https or localhost for Bluetooth; see README.
+
+## Phase 0: trainer spike (`/spike.html`)
+
+Close MyWhoosh/Wahoo apps first.
+
+1. Connect: chooser lists the trainer, status shows connected.
+2. Power and cadence update about once a second and match the trainer's own display. Soft-pedal and sprint to check the range.
+3. Set ERG (e.g. 150 W): resistance change is felt within a couple of seconds and power settles on target. Try 100 W then 250 W (ramp over about 2 s, no jolt).
+4. ERG off: resistance releases and you control power freely.
+5. Release/disconnect: trainer returns to normal, no stuck resistance. Reconnect works.
+
+| Rider | Device / OS | Browser | Trainer | Connect | Power/cad | ERG felt | ERG off | Release | Notes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+|  | Mac |  |  |  |  |  |  |  |  |
+|  | Windows |  |  |  |  |  |  |  |  |
+|  | iPad | Bluefy |  |  |  |  |  |  |  |
+|  |  |  |  |  |  |  |  |  |  |
+
+## Phase 1: solo drill, real trainer
+
+1. Set your FTP, pick `ss-2x15` (2x15 sweet spot) and start.
+2. Run start to finish. Each block's target watts match FTP x tier x block % (check the HUD against the trainer's display).
+3. Targets change smoothly on block boundaries; ERG never exceeds 150% FTP.
+4. Sprint blocks: ERG is off, you control power, and a grade (FAIL/HIT/GREAT/MEGA) shows afterwards.
+5. Results screen shows distance/compliance/time in zone; profile (curve, ride count) updates after a reload.
+6. Pause/abort mid-ride: trainer releases and ERG eases to 50% FTP.
+
+## Phase 2: multiplayer
+
+1. 4 riders, mixed devices (Mac, Windows, simulated, iPad display), one 45 min plan (`bus-crew-45`). Host creates, others join with the code or `?join=CODE`.
+2. Lobby shows everyone, tiers and ready state; countdown starts together; all see the same event at the same time.
+3. Reconnect: close a rider's tab mid-ride and reopen it within 60 s in the same browser. It should rejoin the same seat (and ERG resume). After 60 s the rider is a spectator.
+4. Host disconnect and room idle expiry behave sensibly.
+5. Note lag, desync or crashes below.
+
+## Phase 3: Zombie Bus rules
+
+- Fell off: hold under 60% compliance for 30 s. Rider drops one tier, ERG eases, others get a 20 s haul-back effort for bonus scrap.
+- Roadblock: all riders sprint with ERG off; grades add damage; MEGA/LEGEND give slow-mo. A fail costs armour and gap.
+- Horde surge: unders let zombies grab, clean overs shake them off.
+- Engine in tune: all riders within 5 rpm of each other for 8 s gives the x1.25 speed bonus and indicator.
+- Long haul: staying out of zone lets the horde close in; armour at zero means limp.
+- Awards at the end: Iron Lungs, Fell Off King, Roadblock MVP, Sync Master, PR Hunter.
+
+## Results log
+
+| Date | Phase | Who / devices | Result | Issues |
+| --- | --- | --- | --- | --- |
+|  |  |  |  |  |

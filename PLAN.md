@@ -207,46 +207,46 @@ Phased build plan
 Each phase ends with something playable. Do not start a phase until the previous acceptance criteria pass.
 Phase 0: Trainer spike
 A single HTML page that proves trainer control on every rider's device.
-[ ] Connect to an FTMS trainer via Web Bluetooth
-[ ] Show live power and cadence
-[ ] Request control and set ERG target from a number input
-[ ] Simulated trainer toggle
+[x] Connect to an FTMS trainer via Web Bluetooth
+[x] Show live power and cadence
+[x] Request control and set ERG target from a number input
+[x] Simulated trainer toggle
 [ ] Deploy to the VPS over HTTPS
 Acceptance: every rider sees power and cadence and feels ERG change on their own device. iPad result recorded.
 Phase 1: Solo trainer (Drill mode)
-[ ] Rider profile stored locally (name, FTP, tier)
-[ ] Workout JSON schema and a starter library of at least 10 plans
-[ ] Plan runner with ERG control, block countdown and next-block preview
-[ ] Compliance engine and live compliance display
-[ ] Power curve tracking with default curve from FTP
-[ ] Sprint blocks with ERG off and sprint grading (FAIL to LEGEND)
-[ ] Minimal road scene: bus speed from compliance
-[ ] Ride summary with time in zone per block and curve updates, exported as JSON
-[ ] Unit tests for plan parsing, compliance, ERG caps, sprint ERG-off and grading
+[x] Rider profile stored locally (name, FTP, tier)
+[x] Workout JSON schema and a starter library of at least 10 plans
+[x] Plan runner with ERG control, block countdown and next-block preview
+[x] Compliance engine and live compliance display
+[x] Power curve tracking with default curve from FTP
+[x] Sprint blocks with ERG off and sprint grading (FAIL to LEGEND)
+[x] Minimal road scene: bus speed from compliance
+[x] Ride summary with time in zone per block and curve updates, exported as JSON
+[x] Unit tests for plan parsing, compliance, ERG caps, sprint ERG-off and grading
 Acceptance: a full 2x15 sweet spot session runs start to finish on a real trainer with correct targets.
 Phase 2: Multiplayer
-[ ] FastAPI server with WebSocket sessions and join codes
-[ ] Host picks plan and duration; riders pick their tier
-[ ] Server-owned clock and block progression; clients set ERG from server ticks
-[ ] Riders shown on the bus with name tags and live compliance
-[ ] Reconnect within 60 s keeps the rider's slot
-[ ] Profiles, power curves and ride history move to SQLite on the server
+[x] FastAPI server with WebSocket sessions and join codes
+[x] Host picks plan and duration; riders pick their tier
+[x] Server-owned clock and block progression; clients set ERG from server ticks
+[x] Riders shown on the bus with name tags and live compliance
+[x] Reconnect within 60 s keeps the rider's slot
+[x] Profiles, power curves and ride history move to SQLite on the server
 Acceptance: four riders on mixed devices complete a 45 min plan together without desync.
 Phase 3: Game layer
-[ ] Horde, horde gap and armour
-[ ] Events: Long Haul, Horde Surge, Roadblock, Servo Stop
-[ ] Session generator that maps plan blocks to events and scales to 30 to 90 min
-[ ] Engine in tune (cadence sync)
-[ ] Fell off the bus with auto tier drop and team haul-back
-[ ] Sprint grade feedback with sound, slow-mo and combo multiplier
-[ ] End-of-ride summary, awards and new PRs
-[ ] Event audio and lighting moods
+[x] Horde, horde gap and armour
+[x] Events: Long Haul, Horde Surge, Roadblock, Servo Stop
+[x] Session generator that maps plan blocks to events and scales to 30 to 90 min
+[x] Engine in tune (cadence sync)
+[x] Fell off the bus with auto tier drop and team haul-back
+[x] Sprint grade feedback with sound, slow-mo and combo multiplier
+[x] End-of-ride summary, awards and new PRs
+[x] Event audio and lighting moods
 Acceptance: the group rates a 60 min session as more fun than MyWhoosh.
 Phase 4: Shop and cosmetics
-[ ] Scrap economy and balances
-[ ] Servo Stop shop with session upgrades
-[ ] Persistent cosmetics for bus and riders using colour tints and swappable parts
-[ ] Postcard image export
+[x] Scrap economy and balances
+[x] Servo Stop shop with session upgrades
+[x] Persistent cosmetics for bus and riders using colour tints and swappable parts
+[x] Postcard image export
 Acceptance: each rider has bought and equipped at least one cosmetic.
 Later
 Galley Ship, Chaingang, Bike Pub Quiz, Mario Kart Handicap and Asymmetric Hunt modes. Season ladder.

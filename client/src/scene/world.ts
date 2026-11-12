@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import type { Look } from '../core/cosmetics'
 import { makeBus, makeRider } from './bus'
 import { Horde } from './horde'
 import { VIS, type Mood } from './params'
@@ -9,6 +10,7 @@ export interface SceneRider {
   c: number | null
   st: string
   cadence: number
+  look?: Look
 }
 export interface SceneState {
   speed: number
@@ -18,6 +20,8 @@ export interface SceneState {
   riders: SceneRider[]
   /** 0..1 progress towards a roadblock, or null. */
   roadblock: number | null
+  /** The driver's bus cosmetics. */
+  busLook?: Look
 }
 
 const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5']
@@ -160,7 +164,8 @@ export class World {
     this.bus.group.position.y = Math.abs(Math.sin(this.t * 9)) * 0.05 * Math.min(1, s.speed / 10)
     const armour = s.armour ?? 100
     this.flash = Math.max(0, this.flash - dt * 2)
-    this.bus.body.color.set(VIS.busColour).lerp(new THREE.Color('#6a5a4a'), (1 - armour / 100) * 0.7).lerp(new THREE.Color('#f00'), this.flash)
+    this.bus.setLook(s.busLook ?? {})
+    this.bus.body.color.set(this.bus.body.userData.colour).lerp(new THREE.Color('#6a5a4a'), (1 - armour / 100) * 0.7).lerp(new THREE.Color('#f00'), this.flash)
 
     this.horde.group.visible = s.gap !== null
     if (s.gap !== null) {
@@ -201,6 +206,7 @@ export class World {
         this.scene.add(r.group)
       }
       r.label(sr.name, sr.c)
+      r.setLook(sr.look)
       const ph = this.t * (sr.cadence / 60) * Math.PI * 2
       const target =
         sr.st === 'fell'
@@ -210,6 +216,12 @@ export class World {
       r.torso.rotation.z = Math.sin(ph) * 0.15
       r.fade(sr.st === 'spectator' ? 0.3 : 1)
     })
+  }
+
+  /** PNG of the current view (render then read in the same frame). */
+  snapshot(): string {
+    this.renderer.render(this.scene, this.camera)
+    return this.renderer.domElement.toDataURL('image/png')
   }
 
   dispose() {

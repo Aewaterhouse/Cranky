@@ -16,5 +16,7 @@ function home(p: Profile = profile) {
   })
 }
 
+addEventListener('keydown', (e) => e.key === '`' && import('./scene/world').then((m) => m.debugPanel()))
+
 home()
 syncProfile(profile).then((p) => p !== profile && home(p))

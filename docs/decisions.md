@@ -1,0 +1,49 @@
+# Decisions and invented mechanics
+
+Assumptions made without the owner. Tune freely; numbers live in `client/src/config.ts` and
+`server/src/zombie_bus_server/config.py`.
+
+## Plans and tiers
+- A block's `pct` is either one number (the Hard tier %) or `{hard, medium, easy}`. A single number is scaled by tier factor: Hard 1.0, Medium 0.9, Easy 0.8.
+- `ramp` and `over-under` take `pct: [a, b]`. Over-unders alternate a then b every `step` seconds.
+- A `set` block (`rep` + `blocks`) repeats its contents. The generator changes the first set's `rep`, then pads or trims the first and last blocks in 30 s steps. Plans without a set stretch their longest steady block.
+- Block to event mapping: first block = warm-up, last block = cool-down, sprint = Roadblock, over-under = Horde Surge, free or steady below 60% = Servo Stop, everything else = Long Haul. Ramp-up is not built yet.
+- Free blocks and sprints both turn ERG off. The trainer goes to sim mode at 0% grade.
+
+## ERG
+- The 2 s smoothing restarts a linear ramp from the current value whenever the target moves by more than 1 W. On a steady ramp block that gives roughly a 2 s lag, which is fine.
+- The server also caps targets at 150% FTP, as belt and braces.
+- At the end of every ride the ERG failsafe runs: 50% FTP, then release.
+- ERG changes are not pre-scheduled from the server clock. Targets come from each 2 Hz tick, so they can be up to about 0.5 s plus latency late.
+
+## Power curve and sprints
+- Default curve points not listed in the plan: 1 s 400%, 2 min 130%, 10 min 110%, 60 min 100% of FTP.
+- Sprint durations between curve points are log-time interpolated. If either neighbouring point is a default, the grade caps at GREAT.
+- 90-day best is the best real effort from the last 90 days, falling back to the all-time real best, then to the default.
+- MEGA means beating the 90-day best but not the all-time best. LEGEND means beating the all-time best.
+- Sprints are graded on the client (it holds the curve) and the server trusts the result. Friends only.
+- The combo builds per rider on consecutive GREAT-or-better sprints. Each step adds 25% to roadblock damage and scrap.
+
+## Zombie Bus
+- The gap changes at `GAP_K × (group compliance − neutral)` m/s. Neutral depends on the event: warm-up/cool-down 0.5, servo 0.3, long haul 0.8 (creeping up 0.02 a minute, max +0.1), surge overs 0.85 and unders 0.95. Bus speed is mostly visual and feeds distance and scrap.
+- A rider with null compliance (sprint or free) counts as 1.0 in the group mean.
+- When the gap hits 0: −5 armour, horde knocked back to 25 m. At 0 armour the bus limps at 60% speed and takes no more damage.
+- Horde Surge: −12 m grab at the start of every under step. An over averaging ≥0.8 compliance shakes them off for +15 m and +5 scrap.
+- Roadblock: HP is 40 per active rider. Damage per grade is HIT 40, GREAT 80, MEGA 100, LEGEND 120 (times combo). FAIL = −6 armour and a −10 m grab. It resolves when everyone has reported or 4 s after the block ends. Smash = +20 scrap and +20 m. Not smashed = −10 armour.
+- Cadence sync: every active rider pedalling (≥30 rpm) within ±5 rpm of the group median, with 2+ riders. Held 8 s it becomes Engine in tune: ×1.25 speed and +1 m/s gap. The "leader" is the median, so no single rider dictates.
+- Fell off: compliance below 0.6 for 30 s. The rider drops a tier and is excluded from the group mean for a 20 s haul. If the others average ≥0.85 compliance over the haul, the team gets +30 scrap. Either way the rider is back on afterwards, and can't fall again for 60 s.
+- A disconnected rider becomes a spectator immediately and returns on reconnect. Slots are kept for the life of the room, not just 60 s. No data for 3 s counts as zero power, and 60 s of zero power also makes a spectator.
+- End score = distance/10 × (0.5 + armour/200) + scrap.
+- Awards go to the top rider in each category, only if that rider's value is above zero.
+
+## Phase 4
+- Bus scrap is a shared tin for the ride. At a Servo Stop anyone can spend it on session upgrades: plating +25 armour (40), horde repellent that absorbs the next hit or fail (60), sync window +3 rpm (50).
+- At the end of the ride each rider banks whatever is left in the tin, plus 25 per award they won, into their own balance.
+- Cosmetics are bought with personal scrap in the garage. The bus shows the host's (driver's) paint and parts. Riders show their own hat and outfit.
+- Profile, scrap and owned items live in localStorage and sync to the server; the newer `updated` wins. It isn't cheat-proof, and it doesn't need to be.
+- Route vote at Servo Stop is not built.
+
+## Tech
+- No asset packs yet. Everything is procedural Three.js primitives and WebAudio synth sounds, which sidesteps licence and style-mismatch issues for now.
+- Commits are per phase chunk rather than per checklist item, to keep momentum.
+- Profiles have no login: a UUID in localStorage is the identity. Clearing browser data makes a new rider.

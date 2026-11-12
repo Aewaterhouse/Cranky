@@ -26,7 +26,7 @@ export async function crew(code: string | null, profile: Profile, trainer: Train
   let inResults = false
   const status = h('span', { class: 'dim' }, 'connecting…')
   net.onStatus = (up) => (status.textContent = up ? '' : 'reconnecting…')
-  net.onOpen = () => net.send({ t: 'join', name: profile.name, ftp: profile.ftp, tier: profile.tier })
+  net.onOpen = () => net.send({ t: 'join', name: profile.name, ftp: profile.ftp, tier: profile.tier, look: profile.look })
   const leave = () => {
     net.close()
     ride?.abort()
@@ -37,6 +37,7 @@ export async function crew(code: string | null, profile: Profile, trainer: Train
   net.onMsg = (m: ServerMsg) => {
     if (m.t === 'lobby') {
       lobby = m
+      ride?.lobby(m)
       if (m.state === 'running' && !ride) {
         inResults = false
         ride = startBusRide(m, profile, trainer, net, leave)
@@ -47,12 +48,12 @@ export async function crew(code: string | null, profile: Profile, trainer: Train
       const s = ride.finish()
       ride = null
       inResults = true
-      s.then((summary) =>
+      s.then(({ summary, postcard }) =>
         finishRide(profile, summary, (p) => {
           profile = p
           inResults = false
           if (lobby) renderLobby(lobby)
-        }, m.summary, 'Back to the bus'),
+        }, { ...m.summary, postcard }, 'Back to the bus'),
       )
     } else if (m.t === 'error') {
       if (/No bus/.test(m.msg)) {
