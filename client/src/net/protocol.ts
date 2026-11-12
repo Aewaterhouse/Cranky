@@ -59,6 +59,8 @@ export interface BusState {
   shop: boolean
   repel: number
   syncw: number
+  nitro: number
+  boost: boolean
 }
 export interface Fx {
   k: string

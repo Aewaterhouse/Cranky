@@ -167,3 +167,18 @@ def test_difficulty_scales_gap_damage_and_score():
         assert bus.armour == 100 - 10 * C.DIFFICULTY[level]["damage"]
     assert gaps["easy"] > gaps["normal"] > gaps["nightmare"]
     assert scores["nightmare"] > scores["normal"] > scores["easy"]
+
+
+def test_nitro_charges_on_clean_riding_and_fires():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 0.9)
+    run(room, bus, 20)
+    assert bus.nitro == 0
+    set_all(room, 1.0)
+    fx = run(room, bus, C.NITRO_CHARGE_S / 2)
+    assert 0.4 < bus.nitro < 0.6 and not any(f["k"] == "nitro" for f in fx)
+    fx = run(room, bus, C.NITRO_CHARGE_S / 2 + 1)
+    assert any(f["k"] == "nitro" for f in fx) and bus.state(room, 1, 0)["boost"]
+    fast = bus.speed
+    run(room, bus, C.NITRO_S + 1)
+    assert not bus.state(room, 1, 0)["boost"] and bus.speed < fast

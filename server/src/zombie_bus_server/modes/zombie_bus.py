@@ -19,6 +19,8 @@ class ZombieBus:
     def __init__(self, level: str = "normal") -> None:
         self.level = level
         self.speed = 0.0
+        self.nitro = 0.0
+        self.nitro_until = -1.0
         self.dist = 0.0
         self.armour = 100.0
         self.gap = float(C.GAP_START)
@@ -76,7 +78,10 @@ class ZombieBus:
         self.hauling(room, active, dt)
         self.cadence_sync(active, dt)
 
+        boost = self.charge_nitro(room, comp, ev, dt, bool(active))
         self.speed = (C.V_MIN + (C.V_MAX - C.V_MIN) * comp) * (C.TUNE_MULT if self.tune else 1)
+        self.speed *= C.NITRO_SPEED if boost else 1
+        self.gap += C.NITRO_GAP * dt if boost else 0
         self.speed *= C.LIMP_MULT if self.armour <= 0 else 1
         self.dist += self.speed * dt
         self.scrap += self.speed * dt * C.SCRAP_PER_M
@@ -98,6 +103,21 @@ class ZombieBus:
             self.resolve_roadblock()
         fx, self.fx = self.fx, []
         return fx
+
+    def charge_nitro(self, room: Room, comp: float, ev: str, dt: float, riding: bool) -> bool:
+        """Charges or drains the nitro and fires it when full. Returns True while boosting."""
+        if room.el < self.nitro_until:
+            return True
+        if riding and ev in C.NITRO_EVENTS and comp >= C.NITRO_MIN:
+            self.nitro += dt / C.NITRO_CHARGE_S
+        else:
+            self.nitro = max(0.0, self.nitro - dt / C.NITRO_DECAY_S)
+        if self.nitro >= 1:
+            self.nitro, self.nitro_until = 0.0, room.el + C.NITRO_S
+            self.scrap += C.NITRO_SCRAP
+            self.emit("nitro", f"NITRO! Perfect riding lit the afterburner. +{C.NITRO_SCRAP} scrap")
+            return True
+        return False
 
     def block_change(self, room: Room, i: int, b: dict, ev: str) -> None:
         if self.rb:
@@ -270,6 +290,8 @@ class ZombieBus:
             "tune": self.tune,
             "rb": self.rb_progress(room, i, bel),
             "combo": self.combo,
+            "nitro": round(self.nitro, 2),
+            "boost": room.el < self.nitro_until,
             "shop": self.ev == "servo",
             "repel": self.repel,
             "syncw": self.syncw,

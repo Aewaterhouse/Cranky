@@ -109,7 +109,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Crew roles | Driver, gunner, mechanic, lookout: small abilities on a cooldown, fired by a cadence or power cue | L |
 | Personal mini-challenges | "Spin 110 rpm for 20 s", "hold exactly 200 W": quick prompts for bonus scrap | M |
 | Team moves | Synchronised sprint fires the harpoon; rolling turns on the front like a chaingang | M |
-| Streak power-ups | Sustained perfect compliance charges a nitro the crew can spend | S |
+| ✅ Streak power-ups | Near-perfect group riding charges a nitro meter; when full it fires a 15 s boost by itself (no button to press mid-effort) | S |
 | Weather and night | Rain, dust storms, night driving with headlights; visibility as a mechanic | M |
 | Campaign | A multi-ride journey across a map with a persistent bus, damage carried over and unlocks | L |
 | Difficulty and mutators | Easy to nightmare is done (host picks it in the lobby). Still to do: weekly modifiers (double horde, no shop, fog) | S |

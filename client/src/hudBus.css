@@ -302,3 +302,26 @@
   background: rgb(255 255 255 / 0.06);
   text-shadow: none;
 }
+
+.bs-nitro {
+  height: 8px;
+  border-radius: 4px;
+  background: rgb(255 255 255 / 0.1);
+  overflow: hidden;
+}
+.bs-nitro i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #ff7a1a, #ffd23f);
+  transition: width 0.5s linear;
+}
+.bs-nitro[data-s='boost'] i {
+  background: linear-gradient(90deg, #6cf, #fff);
+  animation: bs-pulse 0.5s infinite alternate;
+}
+@keyframes bs-pulse {
+  to {
+    filter: brightness(1.6);
+  }
+}

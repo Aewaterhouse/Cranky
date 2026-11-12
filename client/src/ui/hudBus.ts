@@ -29,6 +29,8 @@ export function makeBusPanel() {
   const syncTrack = h('div', { class: 'bs-sync-t' }, h('i', { class: 'bs-win' }))
   const win = syncTrack.firstElementChild as HTMLElement
   const pipsEl = h('div', { class: 'bs-pips' })
+  const nitroFill = h('i', {})
+  const nitroState = h('span', { class: 'bs-sync-s' })
   const stat = (label: string, v: HTMLElement, unit: string) =>
     h('div', { class: 'bs-stat' }, h('label', {}, label), h('div', {}, v, h('small', {}, unit)))
   const root = h(
@@ -47,6 +49,8 @@ export function makeBusPanel() {
     ),
     h('div', { class: 'bs-head' }, h('label', {}, 'ENGINE SYNC'), syncState),
     syncTrack,
+    h('div', { class: 'bs-head' }, h('label', {}, 'NITRO'), nitroState),
+    h('div', { class: 'bs-nitro' }, nitroFill),
     pipsEl,
   )
   const dots = new Map<string, HTMLElement>()
@@ -100,6 +104,16 @@ export function makeBusPanel() {
       }
       syncTrack.dataset.s = b.tune ? 'tune' : b.sync ? 'sync' : 'off'
       set(syncState, b.tune ? 'IN TUNE ×1.25' : b.sync ? 'IN SYNC…' : `MATCH CADENCE ±${w} rpm`)
+      nitroFill.style.width = `${(b.boost ? 1 : (b.nitro ?? 0)) * 100}%`
+      nitroFill.parentElement!.dataset.s = b.boost ? 'boost' : ''
+      set(
+        nitroState,
+        b.boost
+          ? 'BOOSTING!'
+          : b.nitro > 0.02
+            ? `${Math.round(b.nitro * 100)}%`
+            : 'RIDE CLEAN TO CHARGE',
+      )
       const key = `${b.repel}/${b.syncw}`
       if (pipsEl.dataset.k !== key) {
         pipsEl.dataset.k = key

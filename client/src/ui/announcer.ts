@@ -15,6 +15,7 @@ const LINES: Record<string, string[]> = {
   fell: ['{name} has left the bus.', '{name} is going for a little run.'],
   hauled: ['{name} is back aboard. Barely.'],
   tune: ['Engine is purring.', 'In tune. Listen to that.'],
+  nitro: ['Nitro. Hold on to something.', 'Afterburner. Lovely riding.'],
   repel: ['Repellent. Money well spent.'],
   slowmo: ['{name}. Mega.'],
   FAIL: ['Was that a sprint?', 'We will call that a warm-up.'],

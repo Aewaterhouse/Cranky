@@ -99,6 +99,8 @@ class Bus(BaseModel):
     shop: bool
     repel: int
     syncw: int
+    nitro: float = 0
+    boost: bool = False
 
 
 class Fx(BaseModel):

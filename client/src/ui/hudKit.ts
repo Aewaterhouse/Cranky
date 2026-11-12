@@ -27,6 +27,7 @@ export const FX_ICON: Record<string, string> = {
   sprint: '⚡',
   slowmo: '⚡',
   tune: '🎶',
+  nitro: '🔥',
   scrap: '⚙️',
   buy: '🛒',
   repel: '🛡️',
