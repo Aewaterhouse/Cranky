@@ -160,3 +160,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The player works on a private copy of the plan's blocks (the parsed workouts are shared objects), so extending never changes the library. The chart is rebuilt from the blocks every frame and the interval list adds a row and refreshes durations, so both stay in step. Crash recovery saves the extended plan.
 - On reaching the end the clock stops and "WORKOUT COMPLETE" shows with a 20 s countdown (`CFG.extend.graceS`, real seconds) before the ride finishes by itself, as it used to straight away. +5 min cancels the countdown. During it the trainer eases to 40% FTP and nothing is recorded (same as a pause).
 - Code split to keep drill.ts under 300 lines: `liveTally.ts` (incremental stats), `overlays.ts` (centre message choice), `keys.ts` (key map), `extend.ts`.
+
+## Free ride physics (2026-11-12)
+- Speed comes from a plain power balance: rider (`profile.weightKg`, default 75 kg) plus a 9 kg bike, Crr 0.004, CdA 0.32, air density 1.225, 97.5% drivetrain efficiency (`CFG.freeRide`). 200 W on the flat gives about 33 km/h and 250 W at 8% about 12.5 km/h for 84 kg (the roadmap's rough 10-11 km/h figure did not survive the arithmetic).
+- Speed is integrated each tick in 0.1 s sub-steps. Drive force is capped at 600 N and the speed floor for the force is 0.5 m/s so starting from a standstill is stable. Speed never goes negative (no rolling backwards) and is capped at 22 m/s (about 80 km/h; the rider brakes on very steep descents).
+- `trainerDifficulty` (default 0.5) multiplies only the gradient sent to the trainer, which is then clamped to -10..+20%. The simulated speed always uses the real road gradient.

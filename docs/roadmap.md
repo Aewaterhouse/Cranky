@@ -89,7 +89,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Item | What | Size |
 | --- | --- | --- |
 | ★ GPX routes | Import any GPX (or a Strava route) and ride it; the trainer follows the gradient | L |
-| Ride physics | Speed from power, weight, gradient, drag and rolling resistance; trainer difficulty slider | M |
+| ✅ Ride physics | Speed from power, weight, gradient, drag and rolling resistance; trainer difficulty slider | M |
 | Route library | Famous climbs (Alpe d'Huez, Ventoux, Stelvio) and your local loops, with length and elevation | M |
 | Elevation profile and map | Live position on an elevation chart and an OpenStreetMap map | M |
 | Group free ride | Ride a route together with drafting and an optional keep-together rubber band | L |
