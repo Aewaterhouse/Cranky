@@ -50,6 +50,20 @@ export function riderTab(p: Profile) {
     suggest()
   }
   ftp.addEventListener('change', setFtp)
+  const maxHr = h('input', {
+    type: 'number',
+    value: p.maxHr ?? '',
+    min: 100,
+    max: 230,
+    placeholder: 'optional',
+    inputmode: 'numeric',
+  })
+  maxHr.addEventListener('change', () => {
+    const v = Math.round(+maxHr.value)
+    p.maxHr = v >= 100 && v <= 230 ? v : undefined
+    maxHr.value = p.maxHr ? String(p.maxHr) : ''
+    save()
+  })
   suggest()
   const help = h('p', { class: 'dim' })
   const tiers = seg(
@@ -99,6 +113,13 @@ export function riderTab(p: Profile) {
           tip,
         ),
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Default tier'), tiers, help),
+        h(
+          'section',
+          { class: 'panel' },
+          h('h2', { class: 'label' }, 'Max heart rate'),
+          h('label', { class: 'ftp' }, maxHr, h('span', {}, 'bpm')),
+          h('p', { class: 'dim' }, 'Optional. Colours your heart rate by zone in the solo player.'),
+        ),
         h(
           'section',
           { class: 'panel' },

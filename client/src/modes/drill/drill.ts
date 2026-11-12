@@ -47,13 +47,19 @@ export function runDrill(
   let loadN = 0
   let cadAvg = 0
 
-  const view = soloView(plan, profile.ftp, profile.tier, {
-    pause: () => togglePause(),
-    skip: () => skip(),
-    end: () => end(),
-    intensity: (d) => (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
-    tier: (t) => ((profile.tier = t), saveProfile(profile)),
-  })
+  const view = soloView(
+    plan,
+    profile.ftp,
+    profile.tier,
+    {
+      pause: () => togglePause(),
+      skip: () => skip(),
+      end: () => end(),
+      intensity: (d) => (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2)))),
+      tier: (t) => ((profile.tier = t), saveProfile(profile)),
+    },
+    profile.maxHr,
+  )
   show(view.root)
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
@@ -193,6 +199,7 @@ export function runDrill(
       power: p,
       xs,
       cadence: ride.rec.cadence,
+      hr: ride.rec.hr,
       stats: {
         elapsed: el,
         remaining: total - el,

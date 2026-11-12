@@ -66,3 +66,10 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - On `gattserverdisconnected` the FTMS driver retries `gatt.connect()` after 1 s, 2 s, 4 s, then every 5 s, forever, until `close()` (picking another trainer). It re-fetches the service and characteristics, re-attaches the notification listeners and clears its control flag, so the next ERG write re-requests control.
 - While away, `ErgController` writes nothing and does not count failures. On return it re-requests control and re-sends the target. Live power and cadence read 0 meanwhile, so solo auto-pause behaves. Failsafe now needs 5 consecutive failed writes with the trainer present.
 - Untested on real hardware: only the simulated trainer (`dropFor`) exercises this path.
+
+## Heart-rate strap (2026-11-12)
+- Client-only for now: HR is recorded in the ride summary (`hr[]`, `avgHr`, `maxHr`, null when no strap) and posted with the solo ride, but it is not sent to the server during a ride and other riders do not see it.
+- `trainer/heartRate.ts` holds the BLE driver (service 0x180D, characteristic 0x2A37, uint8 or uint16 by flags bit 0), reconnecting with the same 1, 2, 4, then 5 s backoff as the trainer, plus a module singleton (`currentHr()`). `RideController` reads it once a second for `live.hr` and the recorder.
+- Simulated HR (offered in the trainer modal once the simulated trainer is in use): resting 60 bpm plus 115 bpm times power/FTP (so 175 at FTP, capped at 200), approached with a 30 s first-order lag. Numbers live in `CFG.hr`.
+- `Profile.maxHr` is optional. With it set, the solo HR tile is coloured by zone: below 60%, 60-70, 70-80, 80-90, 90%+ (blue, teal, amber, orange, red).
+

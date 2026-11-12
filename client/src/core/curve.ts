@@ -14,6 +14,8 @@ export interface Profile {
   name: string
   ftp: number
   tier: Tier
+  /** Optional max heart rate (bpm) for HR zones. */
+  maxHr?: number
   /** All-time real bests by duration. */
   allTime: Record<number, { w: number; date: string }>
   rides: RideRecord[]
@@ -147,6 +149,10 @@ export function ftpSuggestion(p: Profile): number | null {
   const s = Math.round(b.w * 0.95)
   return (s - p.ftp) / p.ftp > CFG.ftpSuggestThreshold ? s : null
 }
+
+/** HR zone 1-5: below 60% of max HR, then 60/70/80/90% boundaries. */
+export const hrZone = (bpm: number, maxHr: number) =>
+  1 + [0.6, 0.7, 0.8, 0.9].filter((f) => bpm >= f * maxHr).length
 
 export const zoneOf = (w: number, ftp: number) => {
   const f = w / ftp

@@ -3,6 +3,7 @@ import { inBand, RollingAvg, score } from '../core/compliance'
 import { gradeSprint, type Profile } from '../core/curve'
 import { EffectsBus } from '../core/effects'
 import { RideRecorder } from '../core/ride'
+import { currentHr } from '../trainer/heartRate'
 import { ErgController } from '../trainer/ergController'
 import type { Frame, Plan, SprintResult, Trainer, TrainerStatus } from '../types'
 
@@ -12,6 +13,7 @@ export interface Live {
   avg: number
   c: number | null
   band: boolean
+  hr: number | null
 }
 
 /** Rider-side ride logic shared by every mode: ERG, compliance, sprint grading and recording. */
@@ -20,7 +22,7 @@ export class RideController {
   readonly erg: ErgController
   readonly effects = new EffectsBus()
   readonly rec: RideRecorder
-  live: Live = { power: 0, cadence: 0, avg: 0, c: null, band: false }
+  live: Live = { power: 0, cadence: 0, avg: 0, c: null, band: false, hr: null }
   frame: Frame | null = null
   combo = 0
   /** While true the clock is stopped, so nothing is recorded. */
@@ -37,6 +39,7 @@ export class RideController {
     public profile: Profile,
     plan: Plan,
     private now = () => performance.now() / 1000,
+    private hrNow: () => number | null = currentHr,
   ) {
     this.erg = new ErgController(trainer, profile.ftp, now)
     this.rec = new RideRecorder(plan, profile.ftp)
@@ -60,7 +63,14 @@ export class RideController {
     if (this.trainerStatus === 'reconnecting') return
     const avg = this.avg.push(this.now(), power)
     const tgt = this.frame?.tgt ?? null
-    this.live = { power, cadence, avg, c: score(avg, tgt), band: inBand(avg, tgt) }
+    this.live = {
+      power,
+      cadence,
+      avg,
+      c: score(avg, tgt),
+      band: inBand(avg, tgt),
+      hr: this.hrNow(),
+    }
     if (this.sprint) this.sprint.samples.push(power)
   }
 
@@ -97,7 +107,10 @@ export class RideController {
   private second() {
     const f = this.frame
     if (!f || this.paused) return
-    this.rec.sample(f.i, this.live.power, this.live.cadence, f.tgt, this.live.c, this.live.band)
+    const hr = this.hrNow()
+    this.live = { ...this.live, hr }
+    const l = this.live
+    this.rec.sample(f.i, l.power, l.cadence, f.tgt, l.c, l.band, hr)
   }
 
   async stop() {

@@ -224,6 +224,23 @@
 .options button {
   margin-top: auto;
 }
+.hr-sec {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.hr-sec h3 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+.hr-sec p {
+  margin: 0 0 10px;
+  color: var(--dim);
+}
+.hr-sec .readout {
+  margin-bottom: 10px;
+}
 .hints {
   margin: 0 0 16px;
   padding-left: 18px;
