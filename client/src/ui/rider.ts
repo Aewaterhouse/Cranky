@@ -5,9 +5,16 @@ import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
 import { historyTab } from './historyList'
 import { powerTab } from './riderPower'
+import { trendsTab } from './riderTrends'
 import { history, zoneBar } from './riderStats'
 
-const SUBS = { overview: 'Overview', power: 'Power', history: 'History', settings: 'Settings' }
+const SUBS = {
+  overview: 'Overview',
+  power: 'Power',
+  trends: 'Trends',
+  history: 'History',
+  settings: 'Settings',
+}
 type Sub = keyof typeof SUBS
 let sub: Sub = 'overview'
 
@@ -38,7 +45,7 @@ function overview(p: Profile) {
   )
 }
 
-/** The Rider tab: header, then Overview, Power and Settings sub-tabs. */
+/** The Rider tab: header, then the sub-tabs. */
 export function riderTab(p: Profile) {
   const head = () =>
     h(
@@ -69,15 +76,14 @@ export function riderTab(p: Profile) {
         ),
       ),
     )
-    body.replaceChildren(
-      sub === 'power'
-        ? powerTab(p)
-        : sub === 'history'
-          ? historyTab(p)
-          : sub === 'settings'
-            ? riderSettings(p, () => root.firstElementChild!.replaceWith(head()))
-            : overview(p),
-    )
+    const views: Record<Sub, () => Node> = {
+      overview: () => overview(p),
+      power: () => powerTab(p),
+      trends: () => trendsTab(p),
+      history: () => historyTab(p),
+      settings: () => riderSettings(p, () => root.firstElementChild!.replaceWith(head())),
+    }
+    body.replaceChildren(views[sub]())
   }
   draw()
   return root

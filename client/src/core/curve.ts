@@ -8,6 +8,9 @@ export interface RideRecord {
   kj: number
   best: Record<number, number>
   zones: number[]
+  /** Training stress and normalised power; missing on rides recorded before they were kept. */
+  tss?: number
+  np?: number
 }
 export interface Profile {
   id: string
@@ -148,6 +151,13 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   s.zones = s.zones.map((z, i) => z + (r.zones[i] ?? 0))
   return next
 }
+
+/** The profile record for a finished ride: the recorder's record plus TSS and NP. */
+export const rideRecord = (s: { record: RideRecord; tss: number; np: number }): RideRecord => ({
+  ...s.record,
+  tss: s.tss,
+  np: s.np,
+})
 
 /** Drops a deleted ride from the profile's list and lifetime totals. All-time bests stay. */
 export function removeRide(p: Profile, date: string): Profile {

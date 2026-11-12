@@ -226,7 +226,8 @@ button.hl-row:hover {
 }
 @media (max-width: 700px) {
   .subtabs button {
-    padding: 10px 8px;
+    padding: 10px 6px;
+    font-size: 0.9rem;
   }
   .ride-detail .res-two {
     grid-template-columns: minmax(0, 1fr);
@@ -258,4 +259,69 @@ button.danger {
   .hl-row > :nth-child(8) {
     display: none;
   }
+}
+
+/* Trends */
+.wk-bar {
+  fill: var(--acc);
+  opacity: 0.55;
+}
+.wk-bar.now {
+  opacity: 1;
+}
+.fline {
+  fill: none;
+  stroke-width: 2.2;
+  stroke-linejoin: round;
+}
+.fline.tsb {
+  stroke: var(--tox);
+  stroke-width: 1.5;
+}
+.tsb-fill {
+  fill: var(--tox);
+  opacity: 0.14;
+}
+.rchart .grid.zero {
+  stroke: var(--dim);
+}
+.heat {
+  max-width: 560px;
+}
+.hm {
+  fill: var(--bg2);
+}
+.hm.l1,
+.hm-key.l1 {
+  fill: var(--acc);
+  fill-opacity: 0.3;
+  background: color-mix(in srgb, var(--acc) 30%, var(--bg2));
+}
+.hm.l2,
+.hm-key.l2 {
+  fill: var(--acc);
+  fill-opacity: 0.55;
+  background: color-mix(in srgb, var(--acc) 55%, var(--bg2));
+}
+.hm.l3,
+.hm-key.l3 {
+  fill: var(--acc);
+  fill-opacity: 0.8;
+  background: color-mix(in srgb, var(--acc) 80%, var(--bg2));
+}
+.hm.l4,
+.hm-key.l4 {
+  fill: var(--acc);
+  background: var(--acc);
+}
+.hm-key {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin: 0 2px -2px;
+  border-radius: 3px;
+  background: var(--bg2);
+}
+.ctip small {
+  grid-column: 1 / 4;
 }

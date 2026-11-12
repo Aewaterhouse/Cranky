@@ -108,3 +108,10 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The "crew" flag is added by the client when it posts a bus ride (`finishRide`); older rides read as solo.
 - Deleting a ride removes it from the server and from the profile list and lifetime totals (rides, time, kJ, zones). All-time bests and the weekly streak are left alone because they cannot be unwound.
 - The list comes from the server (all rides), so it can show more rides than the profile's last 200.
+
+## Rider data: fitness trends (2026-11-12)
+- CTL and ATL are exponentially weighted averages with a 42 and 7 day time constant (`1 - exp(-1/n)` per day), started from zero at the first ride. TSB on a day is the previous day's CTL minus ATL (morning form).
+- Rides without a recorded TSS are estimated from time in each zone at a typical IF per zone (0.45, 0.65, 0.83, 0.98, 1.12, 1.35, 1.8), or at IF 0.65 with no zones. New rides store `tss` and `np` on the profile record via `rideRecord()` in `results.ts`.
+- Days are local calendar days; weeks start on Monday.
+- Streaks and the heatmap use the last 200 rides kept on the profile, so a best streak older than that is not counted.
+- Heatmap shades: under 40, 80, 130 and over TSS.
