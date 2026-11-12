@@ -8,7 +8,9 @@ describe('FIT export', () => {
     power: Array.from({ length: 120 }, (_, i) => 150 + (i % 30)),
     cadence: Array(120).fill(90),
     hr: Array.from({ length: 120 }, (_, i) => (i < 5 ? null : 120 + (i % 10))),
-    np: 166, tss: 5.2, intensity: 0.83,
+    np: 166,
+    tss: 5.2,
+    intensity: 0.83,
   }
   const f = encodeFit(ride)
   it('has a valid header and checksums', () => {

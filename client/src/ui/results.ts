@@ -1,3 +1,4 @@
+import { encodeFit } from '../core/fit'
 import '../results.css'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, type Profile } from '../core/curve'
@@ -70,6 +71,24 @@ export function finishRide(
       ? []
       : Object.entries(s.record.best).filter(([d, w]) => !before[+d] || w > before[+d].w)
   const sug = ftpSuggestion(p)
+  const exportFit = () => {
+    const bytes = encodeFit({
+      start: s.record.date,
+      power: s.power,
+      cadence: s.cadence,
+      hr: s.hr,
+      np: s.np,
+      tss: s.tss,
+      intensity: s.if,
+    })
+    const a = h('a', {
+      href: URL.createObjectURL(
+        new Blob([bytes as BlobPart], { type: 'application/octet-stream' }),
+      ),
+      download: `cranky-${s.record.date.slice(0, 16).replace(':', '')}.fit`,
+    })
+    a.click()
+  }
   const exportJson = () => {
     const a = h('a', {
       href: URL.createObjectURL(
@@ -280,6 +299,7 @@ export function finishRide(
       h(
         'div',
         { class: 'row res-actions' },
+        h('button', { onclick: exportFit }, 'Download .fit'),
         h('button', { onclick: exportJson }, 'Export JSON'),
         group ? h('button', { onclick: () => postcard(group, s.planName) }, 'Postcard') : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),

@@ -124,6 +124,7 @@ export class RideRecorder {
       tss: Math.round(load.tss),
       avgCadence: Math.round(mean(this.cadence)),
       power: [...this.power],
+      cadence: [...this.cadence],
       target: [...this.target],
       hr: [...this.hr],
       avgHr: hrs.length ? Math.round(mean(hrs)) : null,
