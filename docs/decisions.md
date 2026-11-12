@@ -61,3 +61,4 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The app is called **Cranky**. Zombie Bus is the first game inside it. The code and UI still say "Zombie Bus" until the rebrand item in `docs/roadmap.md` is done.
 - Six bus seats stays.
 - Strava export is parked. Watch party (shared video plus synced ERG workout) is on the roadmap.
+- Rooms survive a server restart: running and lobby rooms are snapshotted to the SQLite `rooms` table every 5 s while running and on each lobby change (JSON via `to_dict`/`from_dict`, no pickle). Snapshots older than 15 min are dropped at startup. A restored running room has all riders disconnected and its clock paused; the first `join` resumes it from the saved `el`. Done rooms delete their snapshot; idle ones are deleted by the room cleanup.

@@ -5,6 +5,7 @@ import json
 import secrets
 import sqlite3
 import threading
+import time
 from pathlib import Path
 
 from . import config
@@ -21,6 +22,7 @@ class Store:
             CREATE TABLE IF NOT EXISTS rides (n INTEGER PRIMARY KEY, rider TEXT, date TEXT, json TEXT);
             CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT, salt TEXT, hash TEXT);
             CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, id TEXT);
+            CREATE TABLE IF NOT EXISTS rooms (code TEXT PRIMARY KEY, json TEXT, saved_at REAL);
             """)
 
     def get_profile(self, rid: str) -> dict | None:
@@ -109,3 +111,20 @@ class Store:
                 "SELECT u.id, u.name FROM tokens t JOIN users u ON u.id = t.id WHERE t.token = ?", (token,)
             ).fetchone()
         return {"id": row[0], "name": row[1]} if row else None
+
+    def save_room(self, code: str, snapshot: dict) -> None:
+        with self.lock, self.db:
+            self.db.execute(
+                "INSERT OR REPLACE INTO rooms VALUES (?, ?, ?)", (code, json.dumps(snapshot), time.time())
+            )
+
+    def delete_room(self, code: str) -> None:
+        with self.lock, self.db:
+            self.db.execute("DELETE FROM rooms WHERE code = ?", (code,))
+
+    def load_rooms(self, max_age_s: float) -> list[dict]:
+        """Snapshots younger than `max_age_s`; older ones are deleted."""
+        with self.lock, self.db:
+            self.db.execute("DELETE FROM rooms WHERE saved_at < ?", (time.time() - max_age_s,))
+            rows = self.db.execute("SELECT json FROM rooms").fetchall()
+        return [json.loads(r[0]) for r in rows]

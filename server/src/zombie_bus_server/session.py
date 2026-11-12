@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
+from typing import TYPE_CHECKING
 
 from fastapi import WebSocket
 
@@ -12,6 +13,11 @@ from . import config as C
 from .modes.zombie_bus import ZombieBus
 from .plan import block_target, event_for, generate, load_plans, locate, total
 from .protocol import Buy, ClientMsg, Data, End, Join, Setup, Sprint, Start, Tick, TierMsg
+
+if TYPE_CHECKING:
+    from .store import Store
+
+NOT_SAVED = ("ws", "connected", "last_data")
 
 
 @dataclass
@@ -50,6 +56,14 @@ class Rider:
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}
         )
 
+    def to_dict(self) -> dict:
+        """JSON-safe snapshot of everything except the socket and liveness."""
+        return {f.name: getattr(self, f.name) for f in fields(self) if f.name not in NOT_SAVED}
+
+    @classmethod
+    def from_dict(cls, d: dict) -> Rider:
+        return cls(**d)
+
     def target(self, b: dict, bel: float) -> int | None:
         f = block_target(b, self.tier, bel)
         return None if f is None else min(round(f * self.ftp), round(self.ftp * 1.5))
@@ -58,8 +72,11 @@ class Rider:
 class Room:
     """A crew session. The host picks the plan; the server owns the clock."""
 
-    def __init__(self, code: str) -> None:
+    def __init__(self, code: str, store: Store | None = None) -> None:
         self.code = code
+        self.store = store
+        self.paused = False  # a restored running room waits for its first rider
+        self.saved_at = 0.0
         self.riders: dict[str, Rider] = {}
         self.host: str | None = None
         self.state = "lobby"
@@ -81,6 +98,45 @@ class Room:
 
     async def broadcast(self, msg: dict) -> None:
         await asyncio.gather(*(self.send(r, msg) for r in self.riders.values()))
+
+    async def lobby(self) -> None:
+        """Snapshots the room and broadcasts the lobby."""
+        self.save()
+        await self.broadcast(self.lobby_msg())
+
+    def to_dict(self) -> dict:
+        return {
+            "code": self.code,
+            "host": self.host,
+            "state": self.state,
+            "plan_id": self.plan_id,
+            "minutes": self.minutes,
+            "plan": self.plan,
+            "el": self.el,
+            "riders": [r.to_dict() for r in self.riders.values()],
+            "mode": self.mode.to_dict(),
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict, store: Store | None = None) -> Room:
+        """Rebuilds a room with every rider disconnected. A running room stays paused until a rider joins."""
+        room = cls(d["code"], store)
+        room.host, room.state, room.plan_id = d["host"], d["state"], d["plan_id"]
+        room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
+        room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
+        room.mode = ZombieBus.from_dict(d["mode"])
+        room.paused = room.state == "running"
+        return room
+
+    def save(self) -> None:
+        """Writes the snapshot, or deletes it once the room is done."""
+        if not self.store or not self.riders:
+            return
+        self.saved_at = time.monotonic()
+        if self.state == "done":
+            self.store.delete_room(self.code)
+        else:
+            self.store.save_room(self.code, self.to_dict())
 
     def lobby_msg(self) -> dict:
         return {
@@ -116,7 +172,7 @@ class Room:
                 self.host = next((x.id for x in self.riders.values() if x.connected), rid)
             if not any(x.connected for x in self.riders.values()):
                 self.idle_since = time.monotonic()
-            await self.broadcast(self.lobby_msg())
+            await self.lobby()
 
     async def handle(self, rid: str, ws: WebSocket, raw: dict) -> None:
         """Applies one client message."""
@@ -135,9 +191,12 @@ class Room:
             else:
                 r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
             r.ws, r.connected, r.last_data = ws, True, time.monotonic()
+            if self.paused:
+                self.paused = False
+                self.task = asyncio.create_task(self.run())
             if self.host is None or not self.riders[self.host].connected:
                 self.host = rid
-            await self.broadcast(self.lobby_msg())
+            await self.lobby()
             if self.state == "done" and self.summary:
                 await self.send(r, {"t": "end", "summary": self.summary})
             return
@@ -151,7 +210,7 @@ class Room:
             self.mode.buy(r, msg.item)
         elif isinstance(msg, TierMsg):
             r.tier = msg.tier
-            await self.broadcast(self.lobby_msg())
+            await self.lobby()
         elif rid != self.host:
             await self.send(r, {"t": "error", "msg": "Only the host can do that."})
         elif isinstance(msg, Setup) and self.state != "running":
@@ -160,10 +219,10 @@ class Room:
                 return
             self.plan_id, self.minutes, self.state = msg.plan, msg.minutes, "lobby"
             self.plan = generate(load_plans()[msg.plan], msg.minutes)
-            await self.broadcast(self.lobby_msg())
+            await self.lobby()
         elif isinstance(msg, Start) and self.state != "running":
             self.start()
-            await self.broadcast(self.lobby_msg())
+            await self.lobby()
         elif isinstance(msg, End) and self.state == "running":
             await self.finish()
 
@@ -183,6 +242,8 @@ class Room:
                 await self.finish()
                 return
             await self.broadcast(self.step(dt))
+            if time.monotonic() - self.saved_at >= C.SNAPSHOT_S:
+                self.save()
 
     def update_states(self, dt: float) -> None:
         now = time.monotonic()
@@ -225,4 +286,4 @@ class Room:
             self.task.cancel()
         self.summary = self.mode.summary(self)
         await self.broadcast({"t": "end", "summary": self.summary})
-        await self.broadcast(self.lobby_msg())
+        await self.lobby()

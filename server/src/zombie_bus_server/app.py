@@ -17,7 +17,9 @@ app = FastAPI(title="Zombie Bus")
 store = Store()
 for _name in config.SEED_USERS:
     store.add_user(_name, _name)
-rooms: dict[str, Room] = {}
+rooms: dict[str, Room] = {
+    d["code"]: Room.from_dict(d, store) for d in store.load_rooms(config.ROOM_RESUME_MAX_AGE_S)
+}
 LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ"
 
 
@@ -137,12 +139,13 @@ def create_room(u: User) -> dict:
     now = time.monotonic()
     for code, r in list(rooms.items()):
         idle = not any(x.connected for x in r.riders.values()) and now - r.idle_since > config.ROOM_IDLE_S
-        if r.state != "running" and idle:
+        if (r.state != "running" or r.paused) and idle:
             del rooms[code]
+            store.delete_room(code)
     code = "".join(random.choices(LETTERS, k=4))
     while code in rooms:
         code = "".join(random.choices(LETTERS, k=4))
-    rooms[code] = Room(code)
+    rooms[code] = Room(code, store)
     return {"code": code}
 
 
