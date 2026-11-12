@@ -60,7 +60,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ★ Power curve chart | Interactive curve: this ride vs 90-day vs all-time, with W/kg | S |
 | Compare with mates | Overlay crew power curves; leaderboards per duration in W and W/kg | M |
 | Ride history and detail | Every past ride with its full chart, laps, zones and PRs; rename and delete | M |
-| ★ Deeper profile | Weight, W/kg, HR zones, max HR, custom power zones, FTP history chart | M |
+| ✅ ★ Deeper profile | Weight, W/kg, HR zones, max HR, custom power zones, FTP history chart | M |
 | Fitness trends | Weekly TSS, fitness / fatigue / form (CTL, ATL, TSB), calendar heatmap, streaks | M |
 | PR timeline and badges | When each best was set; badges for milestones (first 300 W minute, 100 rides) | S |
 | Extra ride metrics | HR drift, efficiency factor, variability index, cadence histogram, W′ balance | M |

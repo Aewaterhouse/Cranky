@@ -1,0 +1,75 @@
+/* Rider tab: sub-tabs, settings tables, charts. */
+.subtabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  padding: 4px;
+  overflow-x: auto;
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.subtabs button {
+  flex: 1;
+  border: 0;
+  background: none;
+  color: var(--dim);
+  white-space: nowrap;
+}
+.subtabs button.on {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.rchart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.rchart .grid {
+  stroke: var(--line);
+}
+.rchart .ax {
+  fill: var(--dim);
+  font: 11px var(--ui);
+}
+.ftp-line {
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.ftp-dot {
+  fill: var(--acc);
+}
+.ztable td.num {
+  white-space: nowrap;
+}
+.ztable td.num,
+.ztable th:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.zdot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 8px;
+  border-radius: 3px;
+}
+.pct {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.pct input {
+  width: 4.5em;
+  padding: 4px 8px;
+  text-align: right;
+}
+.field .ftp input {
+  font-size: 1.2rem;
+  width: 5em;
+}
+.row .dim {
+  align-self: center;
+}

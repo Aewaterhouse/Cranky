@@ -1,7 +1,7 @@
 import { encodeFit } from '../core/fit'
 import '../results.css'
 import { bankScrap } from '../core/cosmetics'
-import { applyRide, ftpSuggestion, type Profile } from '../core/curve'
+import { applyRide, ftpSuggestion, recordFtp, type Profile } from '../core/curve'
 import { postRide, saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
@@ -116,7 +116,8 @@ export function finishRide(
           {
             class: 'primary',
             onclick: () => {
-              p = { ...p, ftp: sug }
+              p = { ...p }
+              recordFtp(p, sug)
               saveProfile(p)
               ftpBox.replaceChildren(h('div', { class: 'card' }, `FTP updated to ${sug} W.`))
             },

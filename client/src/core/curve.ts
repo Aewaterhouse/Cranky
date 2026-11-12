@@ -16,6 +16,12 @@ export interface Profile {
   tier: Tier
   /** Optional max heart rate (bpm) for HR zones. */
   maxHr?: number
+  restHr?: number
+  weightKg?: number
+  /** Six upper bounds of power zones 1..6 as a fraction of FTP; defaults to `CFG.zones`. */
+  zoneBounds?: number[]
+  /** Every FTP change, oldest first. */
+  ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */
   allTime: Record<number, { w: number; date: string }>
   rides: RideRecord[]
@@ -38,6 +44,7 @@ export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'
   name,
   ftp,
   tier,
+  ftpHistory: [],
   allTime: {},
   rides: [],
   updated: 0,
@@ -140,6 +147,13 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   s.kj += r.kj
   s.zones = s.zones.map((z, i) => z + (r.zones[i] ?? 0))
   return next
+}
+
+/** Sets the FTP and logs the change in the history (no-op if unchanged). Replaces the history array, so copies stay safe. */
+export function recordFtp(p: Profile, ftp: number, now = Date.now()) {
+  if (ftp === p.ftp) return
+  p.ftp = ftp
+  p.ftpHistory = [...(p.ftpHistory ?? []), { date: new Date(now).toISOString(), ftp }]
 }
 
 /** Suggested FTP when 95% of the 20 min best beats FTP by more than the threshold (never suggests a drop). */

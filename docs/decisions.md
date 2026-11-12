@@ -91,3 +91,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `ClockSync` keeps (el, arrival time) for each tick, measures the rate over the last 4 s (1 normally, so a time-scaled test server works), clamps it to 0.5-30, eases small errors out at 20% per tick, snaps when more than 1 s out, never runs backwards except on a snap, and goes quiet after 3 s without a tick.
 - Nothing is scheduled during the countdown (tick `i < 0`) or after the last tick. The ErgController's 2 s ramp is unchanged. Within the same block the server's own `tgt` still wins; across a block boundary the local frame wins until the server tick catches up.
 
+
+## Rider data: deeper profile (2026-11-12)
+- The Rider tab has sub-tabs (Overview, Power, Settings, later History and Trends). The chosen sub-tab is remembered until reload.
+- `ftpHistory` logs only changes (via `recordFtp`). Rides before this change have no history, so the chart ends with today's FTP as its last point.
+- Custom power zone bounds change the zone table and watt ranges only. Recorded time in zone keeps the standard bounds (`CFG.zones`) so rides stay comparable.
+- HR zones use the existing 60/70/80/90% of max boundaries. A resting HR switches the bpm to heart-rate reserve (Karvonen).

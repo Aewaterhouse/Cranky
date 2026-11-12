@@ -1,17 +1,11 @@
 import { CFG } from '../config'
+import { ZONE_NAMES } from '../core/riderMetrics'
 import type { Point, Profile } from '../core/curve'
 import { h } from './dom'
 import { ZONE_COLOURS } from './planGraph'
+import { svgEl } from './svg'
 
-const NS = 'http://www.w3.org/2000/svg'
-const svgEl = (tag: string, attrs: Record<string, string | number>, text?: string) => {
-  const e = document.createElementNS(NS, tag)
-  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v))
-  if (text) e.textContent = text
-  return e
-}
 export const dur = (s: number) => (s < 60 ? `${s} s` : s < 3600 ? `${s / 60} min` : `${s / 3600} h`)
-const ZONE_NAMES = ['Recovery', 'Endurance', 'Tempo', 'Threshold', 'VO2', 'Anaerobic', 'Sprint']
 
 /** Log-time power curve: solid line from real rides, hollow dots where it is only estimated. */
 export function curveChart(allTime: Record<number, Point>, d90: Record<number, Point>) {
