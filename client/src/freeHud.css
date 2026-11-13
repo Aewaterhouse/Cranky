@@ -259,13 +259,12 @@
   border-left-color: var(--acc);
 }
 
-/* Group rides: the drafting and keep-together chip under the speed */
+/* Group rides: the drafting and keep-together chip, bottom right beside the gear */
 .fhud .gchip {
   display: flex;
-  justify-content: center;
   gap: calc(1.4 * var(--u));
-  margin-top: calc(0.8 * var(--u));
-  padding: calc(0.5 * var(--u)) calc(1.4 * var(--u));
+  padding: calc(0.8 * var(--u)) calc(1.4 * var(--u));
+  font-size: calc(2.2 * var(--u));
   font-weight: 600;
   white-space: nowrap;
 }

@@ -89,3 +89,6 @@
 .tv-road .tve table {
   margin: 1rem auto;
 }
+.tv-road .tv-head:empty {
+  display: none;
+}

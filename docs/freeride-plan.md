@@ -75,13 +75,15 @@ The fun is in the riding, but the information has to be as good as the establish
 - [x] Rider animation: out of the saddle on steep ramps and sprints, coasting, celebrating at the top.
 
 ### Phase E: ride together (L)
-- [ ] Server road mode: rooms by code, lobby with route choice, server-run positions, late join, rejoin after a refresh.
-- [ ] Drafting: a real power saving on a wheel, shown on the HUD.
-- [ ] Optional keep-together rubber band, set by the host.
-- [ ] Bots that ride at a percentage of their FTP with a bit of personality.
-- [ ] Name tags, minimap dots, and a gap list ("Luke +0:12").
-- [ ] TV spectator view and crew results for road rides.
-- [ ] Headless test: four simulated riders finish a short route together.
+- [x] Server road mode: rooms by code, lobby with route choice, server-run positions, late join, rejoin after a refresh.
+- [x] Drafting: a real power saving on a wheel, shown on the HUD.
+- [x] Optional keep-together rubber band, set by the host.
+- [x] Bots that ride at a percentage of their FTP with a bit of personality.
+- [x] Name tags, minimap dots, and a gap list ("Luke +0:12").
+- [x] TV spectator view and crew results for road rides.
+- [x] Headless test: four simulated riders finish a short route together.
+
+Built against simulated trainers and one PC only: not yet ridden by two people on two devices, on real trainers or over a slow network. How to add a road game on top: `docs/road-games.md`.
 
 ### Phase F: reasons to come back (M)
 - [ ] Segments: climbs found automatically plus named ones, with a live split against your best and the crew's best.

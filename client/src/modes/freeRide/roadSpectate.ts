@@ -5,6 +5,7 @@ import '../../road.css'
 import { riderRows } from '../../core/hud'
 import { ROUTE_INDEX, loadRoute } from '../../core/routeLibrary'
 import type { RoadLobby, RoadMsg } from '../../net/protocol'
+import { VIS } from '../../scene/params'
 import type { RouteWorld } from '../../scene/route/routeWorld'
 import { clock, h, kmStr, show } from '../../ui/dom'
 import { riderList } from '../../ui/riderList'
@@ -30,6 +31,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
   let world: RouteWorld | undefined
   let worldFor = ''
   let lapDist = 0
+  let ended = false
   /** The rider the camera stays on; empty follows whoever leads. */
   let pick = ''
   const routeName = () => ROUTE_INDEX.find((r) => r.id === lobby?.route)?.name ?? lobby?.route ?? ''
@@ -76,16 +78,28 @@ export function roadSpectate(code: string, leaveTo: () => void) {
     ),
   )
 
+  /** Before the start everyone waits on the line, two abreast. */
+  const lineUp = (l: RoadLobby) =>
+    l.riders.map((r, i) => ({
+      ...r,
+      d: Math.floor(i / 2) * 2,
+      offset: VIS.route.lane * (i % 2 ? 0.5 : 1),
+      speed: 0,
+      cadence: 0,
+    }))
   const frame = () => {
-    if (!lobby || lobby.state !== 'running') return
+    if (!lobby) return
+    if (world && lobby.state === 'lobby' && lobby.riders.length)
+      world.state = { me: lobby.riders[0].id, riders: lineUp(lobby) }
+    if (lobby.state !== 'running' || ended) return
     const riders = link.others()
     if (!riders.length) return
     const out = riders.filter((r) => r.st !== 'finished')
     const lead = (out.length ? out : riders).reduce((a, r) => (r.d > a.d ? r : a))
     const on = riders.find((r) => r.id === pick) ?? lead
     const lapM = lobby.laps > 1 ? lapDist : 0
-    if (world)
-      world.state = { me: on.id, riders: riders.map((r) => (lapM ? { ...r, d: r.d % lapM } : r)) }
+    const shown = riders.map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
+    if (world) world.state = { me: on.id, riders: shown }
     list.set(riderRows(riders, on.id), on.speed)
     const count = link.countdown()
     head.replaceChildren(
@@ -122,6 +136,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
   net.onMsg = (m) => {
     if (m.t === 'lobby') {
       lobby = m
+      ended = m.state === 'done'
       link.lobby(m)
       void build(m)
       if (m.state === 'lobby') {
@@ -131,8 +146,12 @@ export function roadSpectate(code: string, leaveTo: () => void) {
         slot.replaceChildren(roadTvLobby(m, routeName()))
       } else if (m.state === 'running') slot.replaceChildren()
     } else if (m.t === 'tick') link.tick(m)
-    else if (m.t === 'end') slot.replaceChildren(roadTvEnd(m.summary, leave))
-    else if (m.t === 'error') {
+    else if (m.t === 'end') {
+      ended = true
+      list.set([], 0)
+      head.replaceChildren()
+      slot.replaceChildren(roadTvEnd(m.summary, leave))
+    } else if (m.t === 'error') {
       toast(m.msg, 'bad')
       leave()
     }

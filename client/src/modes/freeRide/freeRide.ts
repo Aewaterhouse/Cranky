@@ -186,6 +186,7 @@ export function runFreeRide(
     if (link) {
       ;[dist, speed] = link.correct(dist, speed, dt)
       dist = Math.min(route.distance, Math.max(0, dist))
+      if (!paused) el = link.clock()
       link.report(live.power, live.avg, live.cadence, live.hr ?? null)
       link.takeNotes().forEach((n) => view.toast(n))
     }

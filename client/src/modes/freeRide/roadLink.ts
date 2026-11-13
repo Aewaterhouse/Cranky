@@ -88,6 +88,7 @@ export class RoadLink {
     this.el = -Infinity
     this.riders = {}
     this.close.clear()
+    this.notes = []
   }
 
   private age() {
@@ -97,6 +98,11 @@ export class RoadLink {
   /** What the server last said about me. */
   mine(): RoadRiderTick | undefined {
     return this.riders[this.me]
+  }
+
+  /** The server's ride clock now, in seconds. */
+  clock() {
+    return Math.max(0, this.el + this.age())
   }
 
   /** Seconds until the start: 0 once the ride is under way, Infinity before the first tick. */

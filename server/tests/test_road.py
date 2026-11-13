@@ -29,7 +29,7 @@ def four(route: str, laps: int = 1, together: bool = False) -> RoadSim:
 
 def test_countdown_holds_everyone_on_the_line():
     sim = four("nundah-crit")
-    for _ in range(C.COUNTDOWN_S * C.ROAD_TICK_HZ - 1):
+    for _ in range(C.ROAD_COUNTDOWN_S * C.ROAD_TICK_HZ - 1):
         sim.step(DT)
     assert sim.el < 0 and all(m.d == 0 and m.v == 0 for m in sim.movers.values())
     ride(sim, 5)

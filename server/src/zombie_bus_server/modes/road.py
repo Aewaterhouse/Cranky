@@ -125,7 +125,7 @@ class RoadSim:
         self.rules = RULES[game]()
         self.movers: dict[str, Mover] = {}
         self.order: list[str] = []
-        self.el = -float(C.COUNTDOWN_S)
+        self.el = -float(C.ROAD_COUNTDOWN_S)
         self.first_fin: float | None = None
 
     def add(self, rid: str, kg: float | None, ftp: int, bot: bool = False) -> Mover:

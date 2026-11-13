@@ -86,7 +86,7 @@ client sends what the trainer measures and draws what the server says. Same sock
 | `road` | `route, laps, style, together?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race. |
 | `bots` | `n` | Host only, not while running. 0..5 road bots; humans + bots fit the 8 places. |
 | `data` | `p, w, cad, hr?` | About 2 Hz. Instant power, 3 s power, cadence, heart rate. No data for 3 s reads as zero power: the rider coasts to a stop and the ride goes on. |
-| `start` / `end` | | Host only. `start` begins a 5 s countdown; `end` finishes the ride now. |
+| `start` / `end` | | Host only. `start` begins a 10 s countdown; `end` finishes the ride now. |
 
 ### Server → client
 

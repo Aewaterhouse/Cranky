@@ -34,7 +34,6 @@ export async function groupRide(
     try {
       const made = await api<{ code: string }>('/api/rooms', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ kind: 'road' }),
       })
       code = made.code

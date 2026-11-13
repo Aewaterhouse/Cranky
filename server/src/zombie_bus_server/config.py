@@ -222,6 +222,7 @@ BOT_GRADES = {"FAIL": 10, "HIT": 45, "GREAT": 35, "MEGA": 9, "LEGEND": 1}
 # Road rides (free ride together). The physics and route numbers mirror `freeRide` and `road` in
 # client/src/config.ts; content/tests/road-vectors.json is run by both test suites and fails if either drifts.
 ROAD_TICK_HZ = 4
+ROAD_COUNTDOWN_S = 10  # longer than the bus's: the road world takes a few seconds to load
 ROAD_MAX_RIDERS = 8
 ROAD_DEFAULT_KG = 75
 ROAD_BIKE_KG = 9

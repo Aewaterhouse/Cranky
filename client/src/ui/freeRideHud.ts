@@ -135,7 +135,6 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         spd.el,
         h('div', { class: 'totals' }, ...(laps ? [lap] : []), dist, el, up),
       ),
-      group,
     ),
     h('div', { class: 'hud-tr' }, h('div', { class: 'minimap' }, mapBox), list.el),
     h(
@@ -160,7 +159,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
           h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats'),
         ),
         h('div', { class: 'dock-c' }, grade, climb),
-        h('div', { class: 'dock-r' }, gearChip),
+        h('div', { class: 'dock-r' }, group, gearChip),
       ),
       h('div', { class: 'glass strip' }, whole.el),
     ),
