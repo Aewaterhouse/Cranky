@@ -19,16 +19,16 @@ const DAY = 86400000
 export const weekOf = (t = Date.now(), tzMin = new Date(t).getTimezoneOffset()) =>
   Math.floor((t - tzMin * 60000 + 3 * DAY) / (7 * DAY))
 
-const pick = (week: number, n: number) => (Math.imul(week, 2654435761) >>> 0) % n
-
-/** This week's featured route: the same for everyone, worked out from the week alone, never last week's again. */
+/**
+ * This week's featured route: the same for everyone, worked out from the week alone. It steps through the
+ * routes by a stride that shares no factor with their number, so it is never last week's again and every
+ * route gets a turn before any repeats.
+ */
 export function featuredRoute(routes: RouteSummary[], week = weekOf()): RouteSummary | undefined {
   const sorted = [...routes].sort((a, b) => a.id.localeCompare(b.id))
-  if (!sorted.length) return undefined
-  const i = pick(week, sorted.length)
-  return sorted[
-    (i + (sorted.length > 1 && i === pick(week - 1, sorted.length) ? 1 : 0)) % sorted.length
-  ]
+  const n = sorted.length
+  const stride = [7, 5, 3, 11, 13].find((s) => n % s !== 0) ?? 1
+  return sorted[(((week * stride) % n) + n) % n]
 }
 
 /**

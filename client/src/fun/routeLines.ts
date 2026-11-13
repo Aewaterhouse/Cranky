@@ -25,6 +25,7 @@ export const ROUTE_LINES: Record<string, string> = {
     'A road-race circuit. Somebody always attacks on the rise. Today it is you or nobody.',
   'metros-road-race': 'Club road-race laps. The bunch gets smaller every time round.',
   'nundah-crit': 'A bit over a kilometre, dead flat. Keep turning until told otherwise.',
+  'howick-street-crit': 'A crit with a hill in it. Launceston does not do flat.',
 }
 
 const SPARE = [

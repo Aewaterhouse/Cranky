@@ -64,6 +64,7 @@ export const ROUTE_AT: Record<string, LL> = {
   'mount-hotham': [147.063, -36.894],
   'mount-wellington': [147.26, -42.922],
   'nundah-crit': [153.068, -27.409],
+  'howick-street-crit': [147.143, -41.446],
   'willunga-hill': [138.562, -35.276],
 }
 
