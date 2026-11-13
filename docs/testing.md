@@ -66,3 +66,15 @@ Close MyWhoosh/Wahoo apps first.
 ## Headless end-to-end ride
 
 `scripts/e2e.sh` builds the client, starts a 20× server on port 8199 with a throwaway database, and drives a solo workout plus a two-rider Zombie Bus ride in headless Chromium (`client/e2e/ride.cjs`). It takes about two minutes and fails on any page error. Run it before merging anything that touches the ride flow.
+
+## Free ride 3D world (Phase B)
+
+Run `pnpm dev` in `client/` and open `/route-dev.html` (no server or trainer needed). Add `&debug=1` for the panel.
+
+- `?route=mount-coot-tha&d=1500&speed=8`: the road bends and climbs like the real one, lines and verges are clean, the ground meets the verge with no gap, hills roll away either side and blue hills sit on the horizon.
+- `?route=ben-lomond&d=14700&speed=6` (Jacob's Ladder): each leg of the switchbacks sits on its own bench with rock between, the legs above and below are visible, nothing covers the road, and the rider stays in shot through the hairpins.
+- `?route=mount-hotham&d=26500`: snow patches near the top. `?route=beach-road&d=8000`: flat and open.
+- `?route=nomap` (no coordinates) and `&terrain=0` (no height grid): a gently wandering road with made-up hills, still following the real gradient.
+- Ride any route for a few kilometres at `speed=15`: the chunk count in the help line stays roughly steady and there are no hitches as chunks arrive.
+- Look for: road buried or floating, see-through cracks, flicker where two strips overlap. Note them in the results log with the route and distance.
+

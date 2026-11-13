@@ -49,6 +49,12 @@
 - `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
 - `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `pack.ts` the VO2 Madness pack on the road (order by points, crown, medal, fire); `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
+- `math.ts` clamp, lerp, smooth, hash and value noise with no three.js import (re-exported by `util.ts`).
+
+### scene/route/ (the free-ride road world; files without three.js are unit-tested)
+- `roadPath.ts` projection to local metres, the centreline curve, `poseAt(d)` with banking, spur removal, the made-up line for routes without coordinates (no three.js).
+- `terrainGrid.ts` decodes a pack's height grid and samples it with a trust weight (no three.js); `roadIndex.ts` spatial hash of centreline segments (no three.js); `heightField.ts` `ground(x, z)`: grid or made-up hills, cut and filled to the nearest road (no three.js).
+- `roadGeo.ts` road ribbon triangles and the `Tris` builder; `terrainGeo.ts` terrain rows either side of the road, clipped where another stretch of road is nearer; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.

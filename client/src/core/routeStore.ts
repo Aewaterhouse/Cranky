@@ -14,7 +14,10 @@ export function myRoutes(): Route[] {
 /** Saves an imported route; returns false when the browser refuses (storage full). */
 export function saveMyRoute(r: Route): boolean {
   try {
-    localStorage.setItem(KEY, JSON.stringify([...myRoutes().filter((x) => x.id !== r.id), r]))
+    localStorage.setItem(
+      KEY,
+      JSON.stringify([...myRoutes().filter((x) => x.id !== r.id), { ...r, terrain: undefined }]),
+    )
     return true
   } catch {
     return false

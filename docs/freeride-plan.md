@@ -40,8 +40,8 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] Credits on the route screen and in `CREDITS.md`.
 
 ### Phase B: 3D road world (L)
-- [ ] Road curve, banking and chunk streaming from a pack.
-- [ ] Terrain from the height grid, cut to the road, with distant hills as a simple skyline.
+- [x] Road curve, banking and chunk streaming from a pack.
+- [x] Terrain from the height grid, cut to the road, with distant hills as a simple skyline.
 - [ ] Your rider on a bike, legs turning at your cadence, in your garage kit.
 - [ ] Chase camera that looks into corners and up climbs.
 - [ ] Slim free-ride HUD over the scene: speed, power, cadence, heart rate, gear, gradient; elevation strip along the bottom; minimap in the corner.
