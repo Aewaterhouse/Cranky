@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { box, canvasTex, hash } from '../util'
 
 const PX = 96
-const FACE = '"Arial Narrow", Arial, sans-serif'
+const FACE = '"Arial Narrow", "Roboto Condensed", "Liberation Sans Narrow", Arial, sans-serif'
 const HAND = '"Comic Sans MS", "Chalkboard SE", "Marker Felt", sans-serif'
 const plate = box(1, 1, 1)
 const sheet = new THREE.PlaneGeometry(1, 1)
@@ -91,10 +91,12 @@ function draw(c: CanvasRenderingContext2D, text: string, bg: string, fg: string,
   const face = hand ? HAND : FACE
   const lines = text.split('\n')
   const size = (h - 22) / lines.length
+  c.font = `bold ${size}px ${face}`
+  const fits = lines.map((line) => Math.min(1, (w - 24) / c.measureText(line).width))
+  // Big boards keep their lines near one size, so they read as one notice.
+  const cap = h > PX ? Math.min(...fits) * 1.2 : 1
   lines.forEach((line, i) => {
-    c.font = `bold ${size}px ${face}`
-    const fit = Math.min(1, (w - 24) / c.measureText(line).width)
-    c.font = `bold ${size * fit * (hand ? 0.92 : 1)}px ${face}`
+    c.font = `bold ${size * Math.min(fits[i], cap) * (hand ? 0.92 : 1)}px ${face}`
     c.save()
     c.translate(w / 2, 11 + size * (i + 0.54))
     // Painted by hand: each line a little off level, by an amount that depends only on its words.

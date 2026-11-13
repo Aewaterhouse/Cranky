@@ -91,7 +91,7 @@ function lyrebird() {
 /** A caravan to be towed: nose on -z like the vehicles. */
 function trailer() {
   const m = new Mesher(0.05)
-  m.add(box(2.1, 1.9, 4.2), '#ffffff', [0, 1.5, 0])
+  m.add(box(2.1, 1.9, 4.2), C.paint, [0, 1.5, 0])
   m.add(box(2.12, 0.3, 4.22), C.stripe, [0, 1.2, 0])
   m.add(box(2.12, 0.5, 1.2), C.glass, [0, 1.9, -0.8])
   m.add(box(0.1, 0.1, 1.6), C.black, [0, 0.6, -2.8])
@@ -102,12 +102,12 @@ function trailer() {
 /** A tourist coach: long, tall, a band of dark glass, a stripe. */
 function coach() {
   const m = new Mesher(0.04)
-  m.add(box(2.5, 2.9, 11), '#ffffff', [0, 1.95, 0])
+  m.add(box(2.5, 2.9, 11), C.paint, [0, 1.95, 0])
   m.add(box(2.52, 0.95, 10.4), C.glass, [0, 2.45, 0])
   m.add(box(2.3, 1.2, 0.1), C.glass, [0, 2.3, -5.5])
   m.add(box(2.52, 0.3, 11.02), C.stripe, [0, 1.3, 0])
   m.add(box(2.4, 0.25, 0.2), C.black, [0, 0.55, -5.5])
-  for (const x of [-0.8, 0.8]) m.add(box(0.4, 0.16, 0.06), '#ffeeaa', [x, 0.95, -5.52])
+  for (const x of [-0.8, 0.8]) m.add(box(0.4, 0.16, 0.06), C.lamp, [x, 0.95, -5.52])
   for (const z of [-3.6, 3, 4.1])
     for (const x of [-1.2, 1.2]) m.add(cyl(0.5, 0.5, 0.3, 8), C.black, [x, 0.5, z], [0, 0, H])
   return m.build()

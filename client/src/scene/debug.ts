@@ -1,5 +1,6 @@
 import type GUI from 'lil-gui'
 import { VIS } from './params'
+import { ROUTE_MOODS } from './route/routeMoods'
 
 /** `onRoute` is called when a route-world setting that is baked into the chunks changes. */
 export async function debugPanel(onRoute?: () => void) {
@@ -50,6 +51,8 @@ function routeFolder(f: GUI, rebuild: () => void) {
   cam.add(R, 'camStiff', 0.5, 12)
   cam.add(R, 'fov', 30, 100)
   f.add(R, 'fogNear', 0, 600)
+  f.add(R.mood, 'pick', ['auto', ...ROUTE_MOODS]).name('mood')
+  addAll(f.addFolder('weather').close(), R.mood)
   f.add(R, 'skyR', 600, 4000)
   f.add(R, 'skyJag', 0, 300)
   const built = f.addFolder('Road and ground (rebuilds)')

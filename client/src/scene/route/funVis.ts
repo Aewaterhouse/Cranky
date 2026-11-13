@@ -33,6 +33,9 @@ const big = (text: string): OddDef => ({
 export const FUN = {
   /** How close (metres ahead along the road, or as the crow flies for landmarks) a thing is "nearby" for remarks. */
   nearM: 30,
+  /** Routes we know run through suburbs: where their land cover is unmapped, this share of the dry low ground counts as built-up for the jokes. */
+  suburbs: ['beach-road'],
+  suburbShare: 0.8,
   landmarkM: 70,
   odd: {
     /** Mean metres of road per oddity, out of town and in town. */

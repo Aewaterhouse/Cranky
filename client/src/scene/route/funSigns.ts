@@ -6,7 +6,7 @@ import { hairpins, ramps } from './furniture'
 import { FUN } from './funVis'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
-import { seedOf } from './oddPlan'
+import { jokeCover, seedOf } from './oddPlan'
 import { newPose } from './roadPath'
 import { rng } from './scatter'
 
@@ -127,6 +127,7 @@ export function planFunSigns(
   const { path } = field
   const L = path.length
   const rand = rng(seedOf(id) ^ 0x51a7)
+  const land = jokeCover(id, cover)
   const deal = dealer(SIGN_LINES, rand)
   const want: [number, SignTag][] = []
   for (const r of ramps(path)) want.push([r.d0 - S.rampAhead, 'ramp'])
@@ -151,7 +152,7 @@ export function planFunSigns(
   want.push([S.startAt, 'start'])
   for (let d = S.first + rand() * S.gapMin; d < L; d += S.gapMin + rand() * (S.gapMax - S.gapMin)) {
     path.poseAt(d, pose)
-    const tag = COVER_TAG[cover.at(pose.x, pose.z, pose.y)] ?? 'any'
+    const tag = COVER_TAG[land.at(pose.x, pose.z, pose.y)] ?? 'any'
     want.push([d, rand() < S.anyShare ? 'any' : tag])
   }
 
@@ -166,7 +167,7 @@ export function planFunSigns(
       const { x: px, z: pz, rx, rz } = path.poseAt(d, pose)
       const [x, z] = [px + rx * side * edge, pz + rz * side * edge]
       if (!field.clear(x, z, edge) || features.blocked(x, z, S.pad)) continue
-      if (cover.at(x, z, field.ground(x, z)) === 'w') continue
+      if (land.at(x, z, field.ground(x, z)) === 'w') continue
       const line = deal(tag)
       if (line) out.push({ d, side, x, z, tag, text: wrap(line[0]), council: line[2] === 'c' })
       break

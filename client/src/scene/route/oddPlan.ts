@@ -1,3 +1,4 @@
+import { noise2 } from '../math'
 import { VIS } from '../params'
 import type { Features } from './features'
 import { FUN, type OddDef } from './funVis'
@@ -36,6 +37,20 @@ export function seedOf(s: string) {
   return h >>> 0
 }
 
+/**
+ * Land cover as the jokes see it: the real thing, except that on the routes we know are suburban the unmapped
+ * bush and grass mostly count as built-up, so the bins and the neighbourhood signs come out.
+ */
+export function jokeCover(id: string, cover: LandCover): Pick<LandCover, 'at'> {
+  if (cover.mapped || !FUN.suburbs.includes(id)) return cover
+  return {
+    at(x, z, y) {
+      const c = cover.at(x, z, y)
+      return 'gbfs'.includes(c) && noise2(x / 190 + 3, z / 190) < FUN.suburbShare + 0.1 ? 'u' : c
+    },
+  }
+}
+
 /** Picks from `list` by weight with `u` in 0..1. */
 export function weighted<T>(list: readonly T[], w: (t: T) => number, u: number): T | undefined {
   let left = u * list.reduce((s, t) => s + w(t), 0)
@@ -59,16 +74,18 @@ export function allowed(def: OddDef, cover: string, snow: boolean, coast: boolea
  */
 export class Oddities {
   private cache = new Map<number, Oddity[]>()
+  private cover: Pick<LandCover, 'at'>
   private seed: number
   private bigAt: number
 
   constructor(
     id: string,
     private field: HeightField,
-    private cover: LandCover,
+    cover: LandCover,
     private features: Features,
   ) {
     this.seed = seedOf(id)
+    this.cover = jokeCover(id, cover)
     const rand = rng(this.seed)
     this.bigAt = Math.floor(((O.bigFrom + rand() * O.bigSpan) * field.path.length) / R.chunk)
   }

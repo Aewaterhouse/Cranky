@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { VIS } from '../src/scene/params'
 import { FUN, type OddDef } from '../src/scene/route/funVis'
-import { ODD_KINDS, Oddities, allowed, seedOf, weighted } from '../src/scene/route/oddPlan'
+import { LandCover } from '../src/scene/route/landCover'
+import {
+  ODD_KINDS,
+  Oddities,
+  allowed,
+  jokeCover,
+  seedOf,
+  weighted,
+} from '../src/scene/route/oddPlan'
 import { funWorld } from './funWorld'
 
 const R = VIS.route
@@ -41,6 +49,23 @@ describe('oddity rules', () => {
     for (const c of 'gfbsupar')
       for (const snow of [false, true])
         expect(ODD_KINDS.some((q) => allowed(DEFS[q], c, snow, false, false))).toBe(true)
+  })
+})
+
+describe('suburbs without a map', () => {
+  it('counts most unmapped bush as built-up on the routes we know are suburban, and nowhere else', () => {
+    const bare = new LandCover()
+    const at = (id: string) => {
+      const c = jokeCover(id, bare)
+      return Array.from({ length: 400 }, (_, i) => c.at(i * 37, i * 91, 40))
+    }
+    const town = at(FUN.suburbs[0]).filter((c) => c === 'u').length
+    expect(town).toBeGreaterThan(400 * 0.6)
+    expect(town).toBeLessThan(400)
+    expect(at('mount-coot-tha')).not.toContain('u')
+    expect(jokeCover(FUN.suburbs[0], bare).at(0, 0, 0.2)).toBe('w')
+    const mapped = funWorld(1, 100, () => 'g').cover
+    expect(jokeCover(FUN.suburbs[0], mapped)).toBe(mapped)
   })
 })
 

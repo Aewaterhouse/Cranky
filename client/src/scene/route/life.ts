@@ -98,7 +98,7 @@ export class Life {
           l.at = Math.min(this.path.length - 20, d + L.trafficSee)
           this.pool.paint(
             k,
-            k === 'ute' ? L.utes[Math.floor(hash(h.seed) * L.utes.length)] : '#fff',
+            k === 'ute' ? L.utes[Math.floor(hash(h.seed) * L.utes.length)] : L.col.paint,
           )
         }
       }

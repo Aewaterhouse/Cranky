@@ -12,6 +12,7 @@ import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
  *   riders=N (extra riders strung out around you)  terrain=0 (ignore the pack's height grid)
  *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
  *   next=odd|sign|chalk|life (start just before the next oddity, funny sign, chalk or animal after d; kind=roos)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
+ *   mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower (default: by the clock, mist up high, showers)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel
  */
@@ -39,6 +40,7 @@ const noMap = () =>
 
 async function start() {
   VIS.route.place.fun.odd.only = q.get('odd') ?? ''
+  VIS.route.mood.pick = q.get('mood') ?? 'auto'
   const id = q.get('route') ?? 'mount-coot-tha'
   const route: Route = id === 'nomap' ? noMap() : await loadRoute(id)
   if (q.get('terrain') === '0') delete route.terrain

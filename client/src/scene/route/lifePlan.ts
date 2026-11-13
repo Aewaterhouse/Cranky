@@ -3,7 +3,7 @@ import type { Features } from './features'
 import { FUN } from './funVis'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
-import { allowed, seedOf, weighted } from './oddPlan'
+import { allowed, jokeCover, seedOf, weighted } from './oddPlan'
 import { newPose } from './roadPath'
 import { rng } from './scatter'
 
@@ -40,16 +40,18 @@ export interface Herd {
  */
 export class LifePlan {
   private cache = new Map<number, Herd[]>()
+  private cover: Pick<LandCover, 'at'>
   private seed: number
   private alpine: boolean
 
   constructor(
     id: string,
     private field: HeightField,
-    private cover: LandCover,
+    cover: LandCover,
     private features: Features,
   ) {
     this.seed = seedOf(id) ^ 0x11fe
+    this.cover = jokeCover(id, cover)
     let top = -Infinity
     for (const y of field.path.y) top = Math.max(top, y)
     this.alpine = top >= L.coachAbove

@@ -61,6 +61,8 @@
 - `furniture.ts` where the signs, arches and guard rails go: ramp and hairpin detection, kilometre markers, summit (no three.js); `furnitureGeo.ts` builds them (arch, sign plates, rails and edge posts into the chunk mesh).
 - `funVis.ts` tunables for the jokes (`VIS.route.place.fun`): oddities, funny signs, chalk, wildlife; `oddPlan.ts` which roadside oddity stands where, seeded by route id, chunk by chunk (no three.js); `oddGeoHome.ts` / `oddGeoBush.ts` their geometry; `oddGeo.ts` builds a chunk's oddities and their boards.
 - `funSigns.ts` where the funny signs and the chalk go and what they say (no three.js); `funSignGeo.ts` builds the boards and lays the chalk on the road.
+- `lifePlan.ts` which mob, flock, crossing animal, magpie or oncoming vehicle is where, seeded, chunk by chunk (no three.js); `lifeGeo.ts` animal and vehicle shapes; `life.ts` pooled instanced animals and traffic and how they move each frame.
+- `routeMoods.ts` the free ride's skies (dawn, golden hour, dusk, mist, shower), their tunables and `pickMood` (clock, height, showers; no three.js); `rain.ts` the shower's streaks.
 - `roadGeo.ts` road ribbon triangles, the `Tris` builder, `addBox` and `addBeam`; `terrainGeo.ts` terrain mesh from a patch, coloured by land cover, with water sheets; `streetGeo.ts` side street strips and street-name signs; `signs.ts` shared text plates; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
 - `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 

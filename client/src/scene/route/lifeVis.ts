@@ -52,7 +52,7 @@ export const LIFE = {
   /** Oncoming traffic appears this far ahead in this lane (m right of centre), and is dropped this far behind. */
   trafficSee: 280,
   trafficMs: 9,
-  trafficLane: 1.55,
+  trafficLane: 1.7,
   trafficGone: 90,
   towGap: 5.4,
   /** Routes that reach this height (m) get tourist coaches. */
@@ -94,6 +94,8 @@ export const LIFE = {
     lyreTail: '#3d3027',
     glass: '#3c5566',
     stripe: '#2f7fc4',
+    paint: '#ffffff',
+    lamp: '#ffeeaa',
     black: '#1c1c1f',
   },
 }

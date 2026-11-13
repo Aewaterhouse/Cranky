@@ -11,6 +11,8 @@ const KNOWN = 'gfbsuparw'
 export class LandCover {
   /** Trees thin out above this height and stop a little higher. */
   readonly treeline: number
+  /** True when the pack came with a land cover grid; false when every answer is a guess. */
+  readonly mapped: boolean
   private grid?: Uint8Array
 
   constructor(
@@ -18,6 +20,7 @@ export class LandCover {
     region?: string,
   ) {
     this.treeline = region === 'TAS' ? R.treelineTas : R.treeline
+    this.mapped = !!t?.cover
     if (!t?.cover) return
     const grid = (this.grid = new Uint8Array(t.cols * t.rows))
     t.runs.forEach((row, r) =>
