@@ -1,9 +1,12 @@
 import '../solo.css'
 import '../freeride.css'
+import '../rideHud.css'
+import '../rideHudDock.css'
 import '../freeHud.css'
 import '../freeHudDock.css'
 import '../freeHudSeg.css'
 import { CFG } from '../config'
+import { hudToast } from './hudParts'
 import type { ListRider } from '../core/hud'
 import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
@@ -128,20 +131,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       'dialog',
     )
 
-  const toastBox = h('div', { class: 'fr-toast', role: 'status' })
-  let toastTimer = 0
-  let fanfareUntil = 0
-  const toast = (text: string, secs = CFG.hud.toastS) => {
-    // A fanfare (a PR) holds the stage: a passing remark does not talk over it.
-    const big = secs > CFG.hud.toastS
-    if (!big && performance.now() < fanfareUntil) return
-    fanfareUntil = big ? performance.now() + secs * 1000 : 0
-    toastBox.textContent = text
-    toastBox.classList.add('on')
-    toastBox.classList.toggle('big', big)
-    clearTimeout(toastTimer)
-    toastTimer = window.setTimeout(() => toastBox.classList.remove('on'), secs * 1000)
-  }
+  const { el: toastBox, show: toast } = hudToast()
 
   // Each part is a class on the root; a phone starts without the map and the rider list.
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches

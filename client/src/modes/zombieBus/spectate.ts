@@ -67,7 +67,7 @@ export function spectate(code: string, leaveTo: () => void) {
   }
   const root = h(
     'div',
-    { class: 'hud tv' },
+    { class: 'hud tv rh' },
     ui,
     h(
       'div',

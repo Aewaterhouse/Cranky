@@ -9,6 +9,7 @@ import { saveProfile } from '../../core/profile'
 import { RideRecorder } from '../../core/ride'
 import { clearSnap, saveSnap, soloKey, type SoloSnap } from '../../core/snapshot'
 import { CFG } from '../../config'
+import { isRest } from '../../core/hud'
 import { SFX } from '../../ui/audio'
 import type { SoloAction } from '../../ui/soloExtras'
 import { show } from '../../ui/dom'
@@ -69,6 +70,7 @@ export function runDrill(
   let idleFor = 0
   let activeFor = 0
   let lastI = -1
+  let lastF: Frame | undefined
   let lastCount = 0
   let splashUntil = 0
   const tally = new LiveTally(plan, profile.ftp, resume)
@@ -166,6 +168,7 @@ export function runDrill(
     mode: (k: RideMode) => setMode(k),
     step: (d: number) => setMode(mode.kind, stepMode(mode, d)),
     gear,
+    toggle: view.toggle,
   }
   const onKey = soloKeys(keyActs, !isSim)
   addEventListener('keydown', onKey)
@@ -184,6 +187,7 @@ export function runDrill(
     last = now
     const live = ride.live
     let overlay: Overlay = [null]
+    let changeIn = 0
     if (count > 0) {
       const before = Math.ceil(count)
       count -= dt
@@ -224,12 +228,26 @@ export function runDrill(
       }
       if (f.i !== lastI) {
         if (lastI >= 0) SFX.block()
+        const blocks = ride.rec.summary().blocks
+        const was = blocks.find((b) => b.i === lastI)
+        // An effort just ended (not a rest, not a sprint, which has its own grade): say how it went.
+        if (
+          was?.secs &&
+          lastF &&
+          lastF.type !== 'sprint' &&
+          !isRest(lastF.type, lastF.tgt, profile.ftp)
+        )
+          view.summary(was, tally.cad.pct()[lastI])
         lastI = f.i
-        view.panel.done(ride.rec.summary().blocks, ride.rec.sprints, f.i)
+        view.panel.done(blocks, ride.rec.sprints, f.i)
       }
-      const n = f.type !== 'sprint' && f.next?.type === 'sprint' ? Math.ceil(f.next.in / fast) : 0
-      if (n !== lastCount && n > 0 && n <= 3) SFX.countdown()
-      lastCount = n
+      lastF = f
+      // 3-2-1 with a tone before every change; into a sprint it is the big one over the chart.
+      const toGo = paused ? 0 : Math.ceil((f.dur - f.bel) / fast)
+      changeIn = toGo <= CFG.hud.countS ? toGo : 0
+      const n = f.type !== 'sprint' && f.next?.type === 'sprint' ? changeIn : 0
+      if (changeIn !== lastCount && changeIn > 0) SFX.countdown()
+      lastCount = changeIn
       overlay = pickOverlay({
         f,
         power: live.power,
@@ -259,6 +277,8 @@ export function runDrill(
       cadence: ride.rec.cadence,
       hr: ride.rec.hr,
       mode,
+      weightKg: profile.weightKg || CFG.freeRide.defaultKg,
+      count: overlay[0] === null ? changeIn : 0,
       cadPct: tally.cad.pct(),
       actions: actions(f),
       stats: tally.stats(ride.rec, el, total),

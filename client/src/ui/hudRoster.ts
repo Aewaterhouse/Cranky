@@ -1,22 +1,23 @@
 import type { RiderTick } from '../net/protocol'
-import { avatar, h } from './dom'
-import { compColour, hrColour, hrText, set } from './hudKit'
+import { h } from './dom'
+import { compColour, hrColour, set } from './hudKit'
 
 const HAUL_S = 20
 
 interface Row {
   root: HTMLElement
   tier: HTMLElement
-  badge: HTMLElement
-  bar: HTMLElement
   watts: HTMLElement
+  status: HTMLElement
   hr: HTMLElement
 }
 
-/** Right-hand crew roster. Rows are kept and updated in place. */
-export function makeRoster(footer: Node) {
-  const list = h('div', { class: 'rs-list' })
-  const root = h('section', { class: 'hud-glass rs' }, list, footer)
+/**
+ * The crew, on the right edge in the rider list's rows: name and tier, watts, compliance (or what happened to
+ * them) and heart rate. Rows are kept and updated in place; mine is the highlighted one.
+ */
+export function makeRoster() {
+  const root = h('div', { class: 'glass rlist crew' })
   const rows = new Map<string, Row>()
   const fellAt = new Map<string, number>()
   return {
@@ -25,54 +26,47 @@ export function makeRoster(footer: Node) {
       for (const [id, r] of Object.entries(riders)) {
         let row = rows.get(id)
         if (!row) {
-          const tier = h('span', { class: 'rs-tier' })
-          const badge = h('span', { class: 'rs-badge' })
-          const bar = h('i', {})
-          const watts = h('b', {})
-          const hr = h('span', { class: 'rs-hr' })
+          const tier = h('small', {})
+          const watts = h('span', { class: 'rw' })
+          const status = h('span', { class: 'rg' })
+          const hr = h('span', { class: 'rb' })
           row = {
             root: h(
               'div',
-              { class: `rs-row${id === meId ? ' me' : ''}` },
-              avatar(r.name),
-              h(
-                'div',
-                { class: 'rs-mid' },
-                h('div', { class: 'rs-name' }, h('span', {}, r.name), tier, badge, hr),
-                h('div', { class: 'rs-bar' }, bar),
-              ),
-              h('div', { class: 'rs-w' }, watts, h('small', {}, 'W')),
+              { class: `rrow${id === meId ? ' me' : ''}` },
+              h('span', { class: 'rn' }, r.name, tier),
+              watts,
+              status,
+              hr,
             ),
             tier,
-            badge,
-            bar,
             watts,
+            status,
             hr,
           }
           rows.set(id, row)
-          list.append(row.root)
+          root.append(row.root)
         }
         if (r.st === 'fell' && !fellAt.has(id)) fellAt.set(id, el)
         if (r.st !== 'fell') fellAt.delete(id)
         const left = Math.max(0, HAUL_S - (el - (fellAt.get(id) ?? el)))
         row.root.dataset.st = r.st
         set(row.tier, r.tier[0].toUpperCase())
-        row.tier.dataset.t = r.tier
-        set(row.watts, r.st === 'riding' ? `${Math.round(r.w)}` : '–')
-        set(row.hr, hrText(r))
+        row.tier.title = `${r.tier} tier`
+        set(row.watts, r.st === 'riding' ? `${Math.round(r.w)} W` : '–')
+        set(row.hr, r.hr && r.st !== 'spectator' ? `♥ ${r.hr}` : '')
         row.hr.style.color = hrColour(r.hrp)
         set(
-          row.badge,
+          row.status,
           r.st === 'fell'
-            ? `FELL OFF · ${Math.ceil(left)}s`
+            ? `fell · ${Math.ceil(left)} s`
             : r.st === 'spectator'
-              ? 'SPECTATING'
-              : '',
+              ? 'watching'
+              : r.s == null
+                ? 'free'
+                : `${Math.round(r.s * 100)}%`,
         )
-        const frac = r.st === 'fell' ? left / HAUL_S : (r.s ?? 0)
-        row.bar.style.width = `${Math.round(frac * 100)}%`
-        row.bar.style.background = r.st === 'fell' ? 'var(--bad)' : compColour(r.s)
-        row.bar.parentElement!.classList.toggle('free', r.st === 'riding' && r.s == null)
+        row.status.style.color = r.st === 'fell' ? 'var(--bad)' : compColour(r.s)
       }
       for (const [id, row] of rows)
         if (!riders[id]) {

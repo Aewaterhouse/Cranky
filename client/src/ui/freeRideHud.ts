@@ -1,7 +1,7 @@
 import { CFG } from '../config'
 import { climbAt, findClimbs } from '../core/climbs'
 import { gearCount } from '../core/gears'
-import { gradeColour, powerZone, riderRows, windText } from '../core/hud'
+import { gradeColour, riderRows, windText } from '../core/hud'
 import { steadySpeed, totalMass } from '../core/physics'
 import { ascentFrom, routeAt } from '../core/route'
 import { settings } from '../core/settings'
@@ -9,9 +9,9 @@ import { clock, h } from './dom'
 import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
-import { ZONE_COLOURS } from './planGraph'
 import { riderList } from './riderList'
-import { hudSizeRow } from './hudSize'
+import { hudMenu, hudStat as stat, hudVal as val } from './hudParts'
+import { powerPanel } from './hudPower'
 import { UNIT } from './units'
 import { segBoard } from './segBoard'
 import { segPanel } from './segPanel'
@@ -23,17 +23,7 @@ const C = CFG.hud
  * totals top centre, minimap top right, a thin elevation strip along the bottom, and everything else on need.
  */
 export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd }: FreeParts) {
-  /** A number with its unit small after it. */
-  const val = (cls: string, unit: string, lead = '') => {
-    const v = h('b', {}, '–')
-    return { v, el: h('span', { class: `hv ${cls}` }, lead, v, h('small', {}, unit)) }
-  }
-  const pw = val('hpw', 'W')
-  const wkg = val('wkg', 'W/kg')
-  const zone = h('span', { class: 'zone' })
-  const bar = h('i', { class: 'pw-bar' })
-  const cad = val('sub off', 'rpm')
-  const hr = val('sub off', 'bpm', '♥ ')
+  const power = powerPanel()
   const spd = val('spd', UNIT.names().speed)
   const dist = h('span', {})
   const el = h('span', {})
@@ -41,10 +31,6 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const lap = h('span', { class: 'lap' })
   const laps = !!route.lapOf
 
-  const stat = (label: string) => {
-    const v = h('b', {}, '–')
-    return { v, el: h('div', {}, h('span', {}, label), v) }
-  }
   const stats = {
     avg: stat('Avg power'),
     np: stat('Normalised'),
@@ -89,16 +75,9 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
 
   const diff = diffSlider(on.difficulty, difficulty)
   const pauseBtn = h('button', {})
-  const menu = h('div', { class: 'glass hmenu' })
-  menu.hidden = true
-  const item = (label: string | Node, key: string, act: () => void, cls = '') =>
-    h(
-      'button',
-      { class: cls, onclick: () => ((menu.hidden = true), act()) },
-      label,
-      h('kbd', {}, key),
-    )
-  pauseBtn.onclick = () => ((menu.hidden = true), on.pause())
+  const m = hudMenu()
+  const { el: menu, item } = m
+  pauseBtn.onclick = () => (m.close(), on.pause())
   menu.append(
     h('h2', {}, route.name),
     route.approx ? h('span', { class: 'tag-approx' }, 'approximate profile') : '',
@@ -111,9 +90,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       'Trainer difficulty',
       diff.el,
     ),
-    h(
-      'div',
-      { class: 'menu-grid' },
+    m.grid(
       pauseBtn,
       item('End ride', 'Esc', confirmEnd, 'danger'),
       item('Stats', 'S', () => toggle('stats')),
@@ -121,22 +98,16 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       item('Riders', 'R', () => toggle('riders')),
       item('Clean view', 'H', () => toggle('clean')),
     ),
-    hudSizeRow(),
+    m.size(),
   )
 
   const root = h(
     'div',
-    { class: 'fhud' },
+    { class: 'fhud rhud' },
     h(
       'div',
       { class: 'hud-tl' },
-      h(
-        'div',
-        { class: 'glass power' },
-        h('div', { class: 'pw-row' }, pw.el, h('div', { class: 'pw-side' }, zone, wkg.el)),
-        bar,
-        h('div', { class: 'pw-sub' }, cad.el, hr.el),
-      ),
+      power.el,
       h('div', { class: 'glass hstats' }, ...Object.values(stats).map((s) => s.el), board.el),
     ),
     h(
@@ -160,15 +131,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
           'div',
           { class: 'dock-l' },
           menu,
-          h(
-            'button',
-            {
-              class: 'glass',
-              'aria-label': 'Menu',
-              onclick: () => (menu.hidden = !menu.hidden),
-            },
-            '☰',
-          ),
+          m.button,
           h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats'),
         ),
         h('div', { class: 'dock-c' }, grade, climb, segBox),
@@ -178,23 +141,12 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     ),
   )
 
-  let hadCadence = false
   const layout: FreeLayout = {
     el: root,
     setDifficulty: diff.set,
     frame(s) {
       const l = s.live
-      const z = powerZone(l.avg / s.ftp)
-      pw.v.textContent = String(Math.round(l.avg))
-      wkg.v.textContent = (l.avg / s.weightKg).toFixed(1)
-      zone.textContent = `Z${z}`
-      bar.style.background = ZONE_COLOURS[z - 1]
-      // Each sensor keeps its slot, so nothing shuffles when one drops out.
-      hadCadence ||= l.cadence > 0
-      cad.v.textContent = String(Math.round(l.cadence))
-      cad.el.classList.toggle('off', !hadCadence)
-      hr.v.textContent = String(l.hr ?? '')
-      hr.el.classList.toggle('off', l.hr == null)
+      power.set({ power: l.avg, ftp: s.ftp, weightKg: s.weightKg, cadence: l.cadence, hr: l.hr })
       spd.v.textContent = UNIT.speed(s.speed)
       const upLeft = ascentFrom(route, s.dist)
       dist.textContent = UNIT.dist(s.dist, s.dist < 10000 ? 2 : 1)

@@ -1,4 +1,4 @@
-/* HUD: bus status and crew roster. */
+/* HUD: bus status (and the TV board's heart-rate cell). */
 /* Bus status */
 .bs {
   padding: 10px 14px 12px;
@@ -181,112 +181,6 @@
     background-color: rgb(255 60 50 / 0.55);
   }
 }
-
-/* Roster */
-.rs {
-  padding: 8px;
-}
-.rs-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.rs-row {
-  display: grid;
-  grid-template-columns: 32px 1fr auto;
-  align-items: center;
-  gap: 9px;
-  padding: 5px 8px 5px 5px;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  transition: opacity 0.3s;
-}
-.rs-row .ava {
-  width: 32px;
-  height: 32px;
-  font-size: 0.72rem;
-}
-.rs-row.me {
-  background: rgb(242 183 5 / 0.14);
-  border-color: rgb(242 183 5 / 0.6);
-}
-.rs-row[data-st='fell'] {
-  background: rgb(255 90 78 / 0.18);
-  border-color: rgb(255 90 78 / 0.6);
-}
-.rs-row[data-st='spectator'] {
-  opacity: 0.5;
-}
-.rs-name {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 700;
-  font-size: 0.88rem;
-  min-width: 0;
-}
-.rs-name > span:first-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.rs-tier {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 5px;
-  background: rgb(255 255 255 / 0.14);
-  font-size: 0.62rem;
-  font-weight: 800;
-  line-height: 16px;
-  text-align: center;
-  text-shadow: none;
-}
-.rs-tier[data-t='hard'] {
-  background: #e94f37;
-}
-.rs-tier[data-t='medium'] {
-  background: #f2b705;
-  color: #1b1500;
-}
-.rs-tier[data-t='easy'] {
-  background: #44bba4;
-  color: #05221c;
-}
-.rs-badge {
-  margin-left: auto;
-  font-size: 0.6rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--bad);
-  white-space: nowrap;
-}
-.rs-row[data-st='spectator'] .rs-badge {
-  color: var(--dim);
-}
-.rs-bar {
-  height: 6px;
-  margin-top: 4px;
-  border-radius: 3px;
-  background: rgb(255 255 255 / 0.12);
-  overflow: hidden;
-}
-.rs-bar.free {
-  background: repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.18) 0 4px, transparent 4px 8px);
-}
-.rs-bar i {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
-  transition:
-    width 0.5s,
-    background 0.4s;
-}
-.rs-w {
-  font: 1.05rem/1 var(--display);
-  min-width: 52px;
-  text-align: right;
-}
-.rs-hr,
 .tvb-hr {
   margin-left: auto;
   padding-left: 6px;
@@ -294,22 +188,6 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
-}
-.rs-foot {
-  display: flex;
-  gap: 6px;
-  justify-content: space-between;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgb(255 255 255 / 0.08);
-}
-.rs-foot select,
-.rs-foot button {
-  padding: 4px 10px;
-  font-size: 0.75rem;
-  border-radius: 8px;
-  background: rgb(255 255 255 / 0.06);
-  text-shadow: none;
 }
 
 .bs-nitro {

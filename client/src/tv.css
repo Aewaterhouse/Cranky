@@ -159,6 +159,16 @@
 .tvb-w b {
   font: 1.9rem/1 var(--display);
 }
+/* Numbers as the ride HUD writes them: fixed-width digits, the unit small and light after the number. */
+.hud.tv {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+.tv .tvb-w small,
+.tv .bs-stat small {
+  font: 500 0.76rem var(--ui);
+  color: inherit;
+  opacity: 0.8;
+}
 
 /* Screens over the scene */
 .tv-slot {

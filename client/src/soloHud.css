@@ -1,0 +1,164 @@
+/* Solo workout player: the shared ride HUD (rideHud.css, rideHudAim.css) around the close-up chart, which sits
+   where the other modes have the road. Only the solo player's own pieces are here. */
+.solo-ride {
+  position: fixed;
+  inset: 0;
+}
+.solo-ride .rhud {
+  --sb: max(calc(2 * var(--u)), env(safe-area-inset-bottom));
+}
+.solo-stage {
+  position: absolute;
+  inset: calc(32 * var(--u)) max(var(--edge), env(safe-area-inset-right)) calc(19 * var(--u))
+    max(var(--edge), env(safe-area-inset-left));
+}
+.hud-riders .solo-stage {
+  right: calc(var(--edge) + 50 * var(--u));
+}
+.solo-stage .wchart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.solo-stage .ctag {
+  top: calc(-2.6 * var(--u));
+  left: 46px;
+}
+/* The target is the hero here, so it is a size up on the other modes' power. */
+.shud .hpw {
+  font-size: calc(9 * var(--u));
+}
+.shud .power {
+  min-width: calc(34 * var(--u));
+}
+.shud .strip {
+  height: calc(9 * var(--u));
+}
+.shud .strip .wchart {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Interval list: the rider list's rows, with the zone colour on the edge */
+.rhud .ilist .irow {
+  grid-template-columns: 14ch 5ch 11ch 9ch;
+  border-left-color: var(--zc, rgba(255, 255, 255, 0.25));
+}
+.irow .rn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.irow .rd {
+  text-align: right;
+  font-weight: 500;
+  opacity: 0.8;
+}
+.irow.past {
+  opacity: 0.6;
+}
+.irow.me .rw {
+  color: var(--acc);
+  opacity: 1;
+}
+.irow .rg.good {
+  color: var(--ok);
+}
+.irow .rg.miss {
+  color: var(--bad);
+}
+.irow .rg[class*='g-'],
+.irow.iv-sprint .rw {
+  color: #e040fb;
+}
+
+/* Stats drawer extras: time in zone and the ghost note */
+.rhud .hstats .zbar {
+  display: flex;
+  height: calc(1.2 * var(--u));
+  margin: calc(0.4 * var(--u)) 0;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.rhud .hstats .ghost-note {
+  display: block;
+  max-width: calc(34 * var(--u));
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Context buttons in the dock: +1 min, I'm done, +5 min, Finish now */
+.shud .sactions {
+  display: flex;
+  gap: var(--u);
+}
+.shud .sactions button {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border-radius: var(--u);
+  font-size: calc(2 * var(--u));
+}
+.shud .sactions button.primary {
+  background: var(--acc);
+  color: var(--acc-ink);
+  text-shadow: none;
+}
+.shud .sactions button.danger,
+.rhud .hmenu button.danger {
+  color: var(--bad);
+}
+.rhud .hmenu button.on {
+  box-shadow: inset 0 0 0 calc(0.25 * var(--u)) var(--acc);
+}
+.rhud .hmenu .seg button.on {
+  box-shadow: none;
+}
+.rhud .hmenu label {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.6 * var(--u));
+}
+.rhud .hmenu select {
+  pointer-events: auto;
+  font: inherit;
+}
+/* An FTP test runs at one tier, in ERG, at 100%. */
+.solo-ride.testing .modesw,
+.solo-ride.testing .tier,
+.solo-ride.testing .dock-r {
+  display: none;
+}
+.solo-ride .media {
+  left: auto;
+  right: max(var(--edge), env(safe-area-inset-right));
+  bottom: calc(24 * var(--u));
+}
+
+/* A narrow screen in HUD units (CFG.hud.tightBelowU): a slimmer list, and only the time to go under the clock */
+.tight.hud-riders .solo-stage {
+  right: calc(var(--edge) + 38 * var(--u));
+}
+.tight .rhud .ilist .irow {
+  grid-template-columns: 12ch 5ch 10ch;
+}
+.tight .irow .rg,
+.tight .totals span:first-child {
+  display: none;
+}
+.tight .totals span + span::before {
+  content: none;
+}
+
+@media (max-height: 500px) {
+  .solo-stage {
+    inset: calc(26 * var(--u)) max(var(--edge), env(safe-area-inset-right)) calc(17 * var(--u))
+      calc(var(--edge) + 38 * var(--u));
+  }
+  .shud .hpw {
+    font-size: calc(7 * var(--u));
+  }
+  .shud .strip {
+    height: calc(6 * var(--u));
+  }
+}

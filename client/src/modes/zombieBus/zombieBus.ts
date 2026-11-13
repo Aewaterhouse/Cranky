@@ -80,6 +80,8 @@ export function startBusRide(
       tier: profile.tier,
       rec: ride.rec,
       meId: profile.id,
+      weightKg: profile.weightKg,
+      quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
       onBuy: (item) => net.send({ t: 'buy', item }),
       mad:
         l.game === 'madness'
@@ -97,7 +99,6 @@ export function startBusRide(
   ride.onTrainerStatus = (s) =>
     hud.banner(
       s === 'connected' ? 'Trainer reconnected' : 'Trainer disconnected, reconnecting…',
-      '',
       4000,
     )
   ride.start()

@@ -1,5 +1,6 @@
 import { onClickShift } from '../../trainer/zwiftClick'
 import type { RideMode } from '../../ui/soloMode'
+import type { SoloPart } from '../../ui/soloView'
 
 export interface KeyActions {
   pause: () => void
@@ -12,9 +13,12 @@ export interface KeyActions {
   step: (d: number) => void
   /** Virtual gear: +1 (X) or -1 (Z). */
   gear: (d: number) => void
+  /** H clean view, S stats, I the interval list. */
+  toggle: (part: SoloPart) => void
 }
 
 const MODES: Record<string, RideMode> = { e: 'erg', r: 'res', g: 'slope' }
+const PARTS: Record<string, SoloPart> = { h: 'clean', s: 'stats', i: 'riders' }
 
 /** Keyboard handler for the solo player. `skipOnArrow` is off with the simulator, whose arrows steer it. */
 export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
@@ -23,6 +27,7 @@ export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
     if (tag === 'INPUT' || tag === 'SELECT' || e.ctrlKey || e.metaKey) return
     const k = e.key
     const mode = MODES[k.toLowerCase()]
+    const part = PARTS[k.toLowerCase()]
     const act =
       k === ' ' || k === 'p' || k === 'P'
         ? on.pause
@@ -40,7 +45,9 @@ export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
                     ? () => on.gear(k.toLowerCase() === 'x' ? 1 : -1)
                     : mode
                       ? () => on.mode(mode)
-                      : undefined
+                      : part
+                        ? () => on.toggle(part)
+                        : undefined
     if (!act) return
     act()
     e.preventDefault()

@@ -1,5 +1,11 @@
 import { announce } from './announcer'
 import '../hud.css'
+import '../rideHud.css'
+import '../rideHudDock.css'
+import '../rideHudAim.css'
+import '../busHud.css'
+import { CFG } from '../config'
+import { busAim } from '../core/aim'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
 import type { ShopItem, Tick } from '../net/protocol'
@@ -7,10 +13,11 @@ import type { Frame, Plan, SprintResult, Tier } from '../types'
 import { TIERS } from '../types'
 import { h } from './dom'
 import { makeBusPanel } from './hudBus'
-import { makeCockpit } from './hudCockpit'
 import { makeHeader } from './hudHeader'
 import { eventOf, FX_DEFAULT, madEvents } from './hudKit'
 import { makeMadPanel } from './hudMad'
+import { hudMenu, hudToast, hudUnit } from './hudParts'
+import { powerPanel } from './hudPower'
 import { makeRoster } from './hudRoster'
 import { makeShop } from './hudShop'
 import { makeSplash } from './hudSplash'
@@ -21,24 +28,36 @@ export interface HudOpts {
   tier?: Tier
   rec?: RideRecorder
   meId?: string
+  weightKg?: number
+  /** What the End button says: the host ends the ride for everyone, anyone else leaves the bus. */
+  quitLabel?: () => string
   onBuy?: (item: ShopItem) => void
   /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
   mad?: string[]
 }
 /** Events whose title card replaces a feed line. */
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
+const KEYS: Record<string, string> = { h: 'clean', s: 'stats', tab: 'stats', r: 'riders' }
 
-/** Ride overlay: event header, cockpit, bus status, roster, stats, splashes, feed and shop. */
+/**
+ * Bus ride overlay. The rider's own numbers sit where every mode has them (power top left, the block clock
+ * top centre, the crew on the right edge, the plan along the bottom); the game's panels (bus status or the
+ * Madness box, shop, feed, splashes) are grouped in the layer underneath.
+ */
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {
   const sp = makeSplash()
-  const cockpit = makeCockpit()
+  const power = powerPanel(true)
   madEvents(!!o.mad)
   const header = makeHeader(o.mad ? undefined : o.plan, o.tier ?? 'hard')
+  header.root.classList.add('glass', 'speed')
   const bus = makeBusPanel()
   const mad = o.mad ? makeMadPanel(o.mad) : null
   let mask: string | undefined
   const shop = makeShop((i) => o.onBuy?.(i))
   const stats = o.rec ? makeStats(o.rec) : null
+  const toast = hudToast()
+  const sprint = h('div', { class: 'glass nchip sprint' }, 'SPRINT · all out · ERG off')
+  sprint.hidden = true
   const tier = h(
     'select',
     {
@@ -47,26 +66,82 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     },
     ...TIERS.map((t) => h('option', { value: t }, t)),
   )
-  const roster = makeRoster(
+  const roster = makeRoster()
+  const toggle = (part: string) => root.classList.toggle(`hud-${part}`)
+  const m = hudMenu()
+  const quit = m.item('End ride', '', onQuit, 'danger')
+  m.el.append(
+    h('h2', {}, o.plan?.name ?? 'Zombie Bus'),
+    h('label', {}, 'Your tier', tier),
+    m.grid(
+      m.item('Stats', 'S', () => toggle('stats')),
+      m.item('Crew', 'R', () => toggle('riders')),
+      m.item('Clean view', 'H', () => toggle('clean')),
+      quit,
+    ),
+    m.size(),
+  )
+  const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
+  const root: HTMLElement = h(
+    'div',
+    { class: `bus-ride rh${phone ? '' : ' hud-riders'}` },
     h(
       'div',
-      { class: 'rs-foot' },
-      tier,
-      h('button', { class: 'ghost', onclick: onQuit }, 'End ride'),
+      { class: 'rhud bhud' },
+      h('div', { class: 'hud-tl' }, power.el, ...(stats ? [stats.root] : [])),
+      h('div', { class: 'hud-tc' }, header.root, sprint),
+      h('div', { class: 'hud-tr' }, roster.root),
+      h(
+        'div',
+        { class: 'hud-bot' },
+        h(
+          'div',
+          { class: 'dock' },
+          h(
+            'div',
+            { class: 'dock-l' },
+            m.el,
+            m.button,
+            ...(stats
+              ? [h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats')]
+              : []),
+          ),
+        ),
+        ...(mad ? [] : [h('div', { class: 'glass strip' }, header.tl)]),
+      ),
+    ),
+    toast.el,
+    h(
+      'div',
+      { class: 'hud' },
+      h('div', { class: `hud-left${mad ? ' mad' : ''}` }, mad?.root ?? bus.root),
+      h('div', { class: 'hud-right' }, sp.feed),
+      shop.root,
+      sp.flash,
+      sp.layer,
     ),
   )
-  const root = h(
-    'div',
-    { class: 'hud' },
-    header.root,
-    h('div', { class: 'hud-left' }, mad?.root ?? bus.root),
-    h('div', { class: 'hud-right' }, roster.root, sp.feed),
-    shop.root,
-    h('div', { class: 'hud-bl' }, ...(stats ? [stats.root] : [])),
-    cockpit.root,
-    sp.flash,
-    sp.layer,
-  )
+  // The game's panels are drawn at a 720 px design height and zoomed to the same unit as the shared HUD.
+  let gz = 0
+  const fit = () => {
+    const z = hudUnit() / CFG.hud.designU
+    if (z !== gz) root.style.setProperty('--gz', String((gz = z)))
+  }
+  const onKey = (e: KeyboardEvent) => {
+    if (!root.isConnected) return removeEventListener('keydown', onKey)
+    const part = KEYS[e.key.toLowerCase()]
+    if (!part || e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT') return
+    e.preventDefault()
+    toggle(part)
+  }
+  // In clean view a tap anywhere brings the HUD back (there is no H key on a phone).
+  const onTap = () =>
+    root.isConnected
+      ? root.classList.remove('hud-clean')
+      : removeEventListener('pointerdown', onTap)
+  addEventListener('pointerdown', onTap)
+  addEventListener('keydown', onKey)
+  fit()
   let lastI = -2
   let lastCount = 0
   let rbProg: number | null = null
@@ -74,6 +149,15 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     const best = Math.max(0, ...(o.rec?.sprints.map((s) => s.avg) ?? []))
     return best || (o.rec?.ftp ?? Math.max(200, live.avg)) * 1.2
   }
+  const setPower = (f: Frame | null, live: Live) =>
+    power.set({
+      power: f?.type === 'sprint' ? live.power : live.avg,
+      ftp: o.rec?.ftp ?? CFG.hud.fallbackFtp,
+      weightKg: o.weightKg || CFG.freeRide.defaultKg,
+      cadence: live.cadence,
+      hr: live.hr,
+      aim: busAim(f, live.power, bestSprint(live)),
+    })
   const api = {
     root,
     setTier(t: string) {
@@ -85,9 +169,12 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (!f) return
       const e = ev ?? (f.type === 'sprint' ? 'roadblock' : (f.event ?? 'longhaul'))
       root.classList.remove('pre')
-      cockpit.update(f, live, bestSprint(live))
+      fit()
+      setPower(f, live)
+      sprint.hidden = f.type !== 'sprint'
       header.update(f, e, f.el, total, rbProg, mask)
       stats?.update()
+      quit.firstChild!.textContent = o.quitLabel?.() ?? 'End ride'
       if (f.i !== lastI) {
         lastI = f.i
         if (f.type === 'sprint')
@@ -112,7 +199,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     /** Before the bus leaves: show live power and a big countdown. */
     countdown(n: number, live: Live) {
       root.classList.add('pre')
-      cockpit.update(null, live, 0)
+      fit()
+      setPower(null, live)
       sp.splash('sp-count sp-pre', `${n}`, mad ? 'MADNESS STARTS IN' : 'BUS LEAVES IN', 1100, 0)
     },
     /** Everything that comes from the server tick: bus, roster, shop, fx. */
@@ -159,9 +247,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           )
       }
     },
-    /** Generic splash, kept for the solo mode. */
-    banner: (text: string, cls = '', ms = 2500) => sp.splash(`sp-title ${cls}`, text, '', ms, 1),
-    toast: (text: string) => sp.line('', text),
+    /** A passing message, top centre like every mode's toasts (the trainer dropping out, a rider leaving). */
+    banner: (text: string, ms = 2500) => toast.show(text, ms / 1000),
+    toast: (text: string) => toast.show(text),
     sprint: (r: SprintResult) => (announce(r.grade), sp.grade(r)),
   }
   return api

@@ -70,6 +70,58 @@ export function riderRows(riders: ListRider[], meId: string, c = CFG.hud.riders)
   }))
 }
 
+export type Tol = 'ok' | 'warn' | 'bad'
+/**
+ * How far `power` is off `target`: green inside the compliance band, amber out to `tol.warn`, red beyond.
+ * `pos` is where the needle sits on the bar, 0 (far under) to 1 (far over).
+ */
+export function tolerance(power: number, target: number, c = CFG.hud.tol) {
+  const dev = (power - target) / target
+  const a = Math.abs(dev)
+  const state: Tol = a <= CFG.compliance.band ? 'ok' : a <= c.warn ? 'warn' : 'bad'
+  return { state, dev, pos: 0.5 + Math.max(-c.span, Math.min(c.span, dev)) / c.span / 2 }
+}
+
+/** "on target", or which way to go and by how many watts. Words, so colour is not the only cue. */
+export function tolText(power: number, target: number) {
+  const d = Math.round(power - target)
+  return tolerance(power, target).state === 'ok'
+    ? 'on target'
+    : `${d > 0 ? '▼ ease' : '▲ push'} ${Math.abs(d)} W`
+}
+
+/** A rest: a free block, or a target in zone 1. The "Next" chip stays up through these. */
+export const isRest = (type: string, target: number | null, ftp: number) =>
+  type === 'free' || (type !== 'sprint' && target != null && target < ftp * CFG.hud.zones[0])
+
+/** The "Next" chip: "Next: 5:00 at 320 W". A sprint or free block never names a power. */
+export function nextText(next: { type: string; tgt: number | null }, durS: number) {
+  const m = `${Math.floor(durS / 60)}:${String(Math.round(durS % 60)).padStart(2, '0')}`
+  return next.type === 'sprint'
+    ? `Next: ${m} sprint, all out`
+    : next.tgt == null
+      ? `Next: ${m} free ride`
+      : `Next: ${m} at ${next.tgt} W`
+}
+
+/** The pop-up after an effort: average power, watts off the target and the share of seconds in the band. */
+export const effortSummary = (b: {
+  secs: number
+  avgPower: number
+  avgTarget: number
+  inBandSecs: number
+}) => ({
+  avg: b.avgPower,
+  off: b.avgPower - b.avgTarget,
+  inBand: b.secs ? b.inBandSecs / b.secs : 0,
+})
+
+/** Which `rows` of `n` list entries to show so entry `at` sits one from the top (the last one done stays in view). */
+export function listWindow(n: number, at: number, rows = CFG.hud.intervalRows) {
+  const from = Math.max(0, Math.min(at - 1, n - rows))
+  return [from, Math.min(n, from + rows)] as const
+}
+
 /** Wind along the road for the stats drawer: "Head 11 km/h", "Tail 6 km/h" or "Still". */
 export function windText(ms: number, units: Units = 'metric') {
   const v = Math.round(speedIn(Math.abs(ms), units))

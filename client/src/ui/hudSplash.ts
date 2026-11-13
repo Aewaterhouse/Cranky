@@ -36,7 +36,7 @@ export function makeSplash() {
     flash,
     splash,
     grade(r: SprintResult) {
-      const sub = `${r.avg} W · ${Math.round(r.pct * 100)}% of target${r.combo > 1 ? `  ·  COMBO ×${r.combo}` : ''}`
+      const sub = `${r.avg} W · ${Math.round(r.pct * 100)}% of your best${r.combo > 1 ? `  ·  COMBO ×${r.combo}` : ''}`
       const legend = r.grade === 'LEGEND'
       splash(
         `sp-grade sp-${r.grade}`,
