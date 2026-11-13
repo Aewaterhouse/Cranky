@@ -1,3 +1,5 @@
+import { LIFE } from './lifeVis'
+
 /** One kind of roadside oddity: how often, where it may stand and what its sign may say. */
 export interface OddDef {
   /** Relative weight among the kinds allowed at a spot. */
@@ -21,8 +23,8 @@ export interface OddDef {
 const big = (text: string): OddDef => ({
   w: 0.3,
   on: 'gbsupa',
-  near: 9,
-  far: 16,
+  near: 3,
+  far: 8,
   r: 5,
   text: [text],
 })
@@ -282,4 +284,5 @@ export const FUN = {
     fade: 0.85,
     tints: ['#f6f6f2', '#f6f6f2', '#f7e36a', '#f4a6c0', '#a6d8f4'],
   },
+  life: LIFE,
 }

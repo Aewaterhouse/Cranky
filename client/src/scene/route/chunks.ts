@@ -15,7 +15,7 @@ import { buildLandmarks, dropLandmarkGeos } from './landmarkGeo'
 import type { Landmark } from './landmarkPlan'
 import { buildOddities, dropOddGeos } from './oddGeo'
 import type { Oddities } from './oddPlan'
-import { Patch } from './patch'
+import { Patch, drawnHeight } from './patch'
 import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
 import { newPose } from './roadPath'
@@ -27,6 +27,7 @@ import { buildTerrain } from './terrainGeo'
 const R = VIS.route
 const P = R.place
 const pose = newPose()
+const NONE: Patch[] = []
 /** Water catches the sun; streets lie on the ground and win the depth test against it by a growing margin. */
 const WATER = new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true })
 const STREET = new THREE.MeshLambertMaterial({
@@ -54,6 +55,7 @@ export class Chunks {
   /** Milliseconds the last chunk took to build, for the harness. */
   lastMs = 0
   private live = new Map<number, THREE.Group>()
+  private patches = new Map<number, Patch[]>()
   private at = NaN
   private pending = true
   private span = 0
@@ -62,6 +64,13 @@ export class Chunks {
 
   get count() {
     return this.live.size
+  }
+
+  /** Height of the ground as drawn under (x, z), for things that move about on it. */
+  height = (x: number, z: number) => {
+    const { field } = this.place
+    const k = field.fine.nearest(x, z, 100) < Infinity ? Math.floor(field.fine.at / R.chunk) : -9
+    return drawnHeight(field, this.patches.get(k) ?? NONE, x, z)
   }
 
   /** Call every frame with the rider's distance. Builds at most one chunk per call, nearest first, unless `all`. */
@@ -145,6 +154,7 @@ export class Chunks {
     }
     this.group.add(g)
     this.live.set(k, g)
+    this.patches.set(k, patches)
     this.lastMs = performance.now() - t0
   }
 
@@ -158,6 +168,7 @@ export class Chunks {
     this.place.signs.release(g)
     this.group.remove(g)
     this.live.delete(k)
+    this.patches.delete(k)
   }
 
   /** Drops every chunk so the next update rebuilds with the current visual settings. */

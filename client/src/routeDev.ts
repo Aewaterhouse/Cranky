@@ -11,7 +11,7 @@ import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
  *   d=<metres along>  speed=<m/s, auto-rides>  cadence=rpm  offset=<metres right of the centreline>
  *   riders=N (extra riders strung out around you)  terrain=0 (ignore the pack's height grid)
  *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
- *   next=odd|sign|chalk (start just before the next oddity, funny sign or chalk after d)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
+ *   next=odd|sign|chalk|life (start just before the next oddity, funny sign, chalk or animal after d; kind=roos)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel
  */

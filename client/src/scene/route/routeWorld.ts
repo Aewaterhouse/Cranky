@@ -11,6 +11,8 @@ import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
 import { LandCover } from './landCover'
 import { planLandmarks, type Landmark } from './landmarkPlan'
+import { Life } from './life'
+import { LifePlan } from './lifePlan'
 import { Oddities } from './oddPlan'
 import { Signs } from './signs'
 import { RoadPath } from './roadPath'
@@ -51,6 +53,8 @@ export class RouteWorld {
   readonly riders: RoadRiders
   readonly odd: Oddities
   private landmarks: Map<number, Landmark[]>
+  private lifePlan: LifePlan
+  private life: Life
   private things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
   private root = new THREE.Group()
@@ -101,6 +105,8 @@ export class RouteWorld {
       odd: (this.odd = new Oddities(route.id, this.field, cover, features)),
     })
     this.riders = new RoadRiders(path)
+    this.lifePlan = new LifePlan(route.id, this.field, cover, features)
+    this.life = new Life(this.lifePlan, path, this.chunks.height)
     path.poseAt(0, this.riders.me)
     const k = this.key
     k.castShadow = true
@@ -113,7 +119,7 @@ export class RouteWorld {
     k.shadow.bias = -0.0004
     k.shadow.normalBias = 0.06
     this.scene.fog = this.fog
-    this.root.add(this.chunks.group, this.riders.group, this.skyline.mesh)
+    this.root.add(this.chunks.group, this.riders.group, this.life.group, this.skyline.mesh)
     this.scene.add(this.root, this.sky.group, k, k.target, this.hemi, this.camera)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
@@ -158,6 +164,7 @@ export class RouteWorld {
     const me = this.riders.me
     const d = this.riders.meD
     this.chunks.update(d, ahead, this.quality.level, all)
+    this.life.update(dt, this.t, d, me, this.quality.level)
     if (Math.hypot(me.x - this.ox, me.y - this.oy, me.z - this.oz) > RECENTRE_M) {
       this.ox = Math.round(me.x)
       this.oy = Math.round(me.y)
@@ -182,6 +189,7 @@ export class RouteWorld {
   near(): string | undefined {
     const F = R.place.fun
     const d = this.riders.meD
+    if (this.life.event) return this.life.event
     const o = this.odd.next(d - 5, F.nearM + 5)
     if (o && o.rank < F.odd.share[this.quality.level]) return o.kind
     const { x, z } = this.riders.me
@@ -193,6 +201,7 @@ export class RouteWorld {
 
   /** Where the next thing of a sort is after `d` metres (optionally of one kind), for the harness. */
   nextThing(sort: string, d: number, kind?: string): number | undefined {
+    if (sort === 'life') return this.lifePlan.next(d, kind)?.d
     const map = (this.things as Record<string, Map<number, { d: number }[]> | undefined>)[sort]
     if (map)
       return [...map.values()]
@@ -211,6 +220,7 @@ export class RouteWorld {
   /** Drops the built chunks so visual settings changed in the debug panel show up. */
   rebuild() {
     this.odd.clear()
+    this.lifePlan.clear()
     this.chunks.clear()
   }
 
@@ -225,6 +235,7 @@ export class RouteWorld {
     cancelAnimationFrame(this.raf)
     removeEventListener('resize', this.resize)
     this.chunks.clear()
+    this.life.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }
