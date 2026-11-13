@@ -214,3 +214,17 @@
   font-size: 0.75rem;
   margin: 8px 0;
 }
+
+.startbar .laps {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.startbar .laps[hidden] {
+  display: none;
+}
+.startbar .laps button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  font-size: 1.25rem;
+}

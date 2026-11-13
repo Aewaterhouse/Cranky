@@ -46,7 +46,7 @@ function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void) {
     h(
       'span',
       { class: 'dim' },
-      `${r.km.toFixed(r.km < 10 ? 1 : 0)} km · ${Math.round(r.gainM)} m up · avg ${r.avgGrade}%`,
+      `${r.km.toFixed(r.km < 10 ? 1 : 0)} km${r.loop ? ' lap' : ''} · ${Math.round(r.gainM)} m up${r.loop ? '' : ` · avg ${r.avgGrade}%`}`,
     ),
     h(
       'span',

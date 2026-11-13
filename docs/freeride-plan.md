@@ -39,7 +39,7 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] Route picker: cards with a mini profile, distance, climb, difficulty, and an estimated time at your FTP; filter by state and length.
 - [x] Credits on the route screen and in `CREDITS.md`.
 - [x] Six routes from the owner's ride recordings: Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith and Metros road race laps, Nundah crit track.
-- [ ] Lap routes: choose a number of laps (or ride until you stop) for the loop courses.
+- [x] Lap routes: a lap stepper on the setup screen for the loop courses (short circuits default to about 12 km; end the ride whenever you like). Unit-tested, not yet ridden in a browser.
 - [ ] Backfill map features for the routes the map server refused (see `docs/decisions.md`).
 
 ### Phase B: 3D road world (L) — built 2026-11-13, seen only in software-rendered screenshots

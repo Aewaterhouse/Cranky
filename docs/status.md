@@ -24,6 +24,7 @@
 - Workout builder (solo picker, My workouts).
 - Free ride Phase C so far: land-cover ground, side streets and street signs, gum trees and scrub, houses and shops from real footprints, road furniture, landmarks. Seen in headless screenshots and by the owner on Mount Coot-tha.
 - HUD research (`docs/hud-notes.md`).
+- Free ride: roadside oddities, funny signs and chalk, wildlife, traffic, location-aware quips, time of day and weather; the HUD redesign from `docs/hud-notes.md`; six routes from the owner's rides; lap rides on loop courses.
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
@@ -38,6 +39,9 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Eight route packs still have no map features (the public map server kept refusing): Full Gas Friday, Metros, Mount Buffalo, Mount Hotham, kunanyi, Willunga, Akuna Bay, Great Ocean Road, Beach Road. Re-run `scripts/routes/build_routes.py <id> --force` to fill them in.
+- Free-ride frame rate swings between 2 and 14 fps in the software renderer depending on the route; never measured on a real GPU.
+- Lap rides, quips in the HUD and the new HUD have not been ridden by a person yet.
 - Free ride 3D world: no trees or buildings yet (Phase C), thin see-through cracks where terrain strips meet on stacked hairpins, sliver triangles in far terrain, and a true out-and-back U-turn folds the road on itself. Frame rate on a real GPU is unmeasured.
 - Most features are tested only against the simulated trainer and headless Chromium.
 - Icons are emoji, so they vary by device.

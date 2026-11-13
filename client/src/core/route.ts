@@ -46,10 +46,37 @@ export interface Route {
   points: RoutePoint[]
   distance: number
   ascent: number
+  /** A closed circuit that can be ridden for any number of laps. */
+  loop?: boolean
+  /** Set on a multi-lap route: the single lap it repeats. The 3D world draws this one. */
+  lapOf?: Route
   /** Bundled routes only; never stored with imported routes. */
   terrain?: TerrainData
   features?: RouteFeatures
 }
+/** `laps` times round a loop as one long route; the scenery still comes from the single lap. */
+export function withLaps(base: Route, laps: number): Route {
+  const n = Math.max(1, Math.min(lapsMax(base), Math.round(laps)))
+  if (n === 1) return base
+  const points = Array.from({ length: n }, (_, k) =>
+    base.points.slice(k ? 1 : 0).map((p) => ({ ...p, d: p.d + k * base.distance })),
+  ).flat()
+  return {
+    ...base,
+    name: `${base.name} · ${n} laps`,
+    points,
+    distance: base.distance * n,
+    ascent: base.ascent * n,
+    lapOf: base,
+  }
+}
+/** The most laps of a loop that fit under the lap-ride distance cap. */
+export const lapsMax = (r: Route) =>
+  Math.max(1, Math.min(R.laps.max, Math.floor(R.laps.maxM / Math.max(1, r.distance))))
+/** A sensible starting number of laps: enough to make a ride of a short circuit. */
+export const lapsDefault = (r: Route) =>
+  Math.max(1, Math.min(lapsMax(r), Math.round(R.laps.defaultM / Math.max(1, r.distance))))
+
 /** A raw track point: `d` is metres along the route. */
 export interface RawPoint {
   d?: number

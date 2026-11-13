@@ -111,6 +111,8 @@ export const CFG = {
     sendEveryS: 1,
     sendDeltaPct: 0.2,
     spacingM: 10,
+    /** Lap rides: at most `max` laps or `maxM` metres; short circuits default to about `defaultM`. */
+    laps: { max: 99, maxM: 300_000, defaultM: 12_000 },
     smoothM: 100,
     maxGradePct: 20,
     maxStored: 4000,

@@ -426,3 +426,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The HUD root class is `fhud`, not `hud`: the bus HUD owns `.hud` (and zooms it by the display size, which would have scaled this one twice).
 - Not done from the notes: heart-rate dot going red above 90% of max, minimap auto-fade, tap-to-expand totals and swipe gestures on a phone.
 
+## Lap rides on loop courses (2026-11-13)
+- A route marked `loop` gets a lap stepper beside Start. The ride is the lap repeated end to end as one long route (`withLaps`), so distance, climb, the elevation strip, ETA and the finish all work unchanged. The 3D world still draws the single lap and riders wrap round it, so scenery is built once.
+- Limits (`CFG.freeRide.laps`): at most 99 laps or 300 km. The stepper starts at about 12 km worth of laps (10 for the Nundah crit track, 1 for the road race circuits). There is no endless mode: pick plenty of laps and end the ride when you have had enough.
+- Lap count, lap times and a bell on the last lap are not shown yet.

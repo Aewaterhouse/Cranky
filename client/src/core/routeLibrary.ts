@@ -22,6 +22,8 @@ export interface RouteSummary {
   avgGrade: number
   maxGrade: number
   profile: number[]
+  /** A circuit: laps can be chosen. */
+  loop?: boolean
 }
 /** The lazy-loaded pack for one route; `pts` are [lat, lon, ele]. */
 export interface RoutePack {
@@ -29,7 +31,8 @@ export interface RoutePack {
   name: string
   region: string
   blurb: string
-  published: { km: number; gainM: number; source: string }
+  published: { km: number | null; gainM: number | null; source: string }
+  loop?: boolean
   pts: [number, number, number][]
   terrain?: TerrainData
   features?: RouteFeatures
@@ -54,6 +57,7 @@ export function packToRoute(pack: RoutePack): Route {
   })
   return buildRoute(pack.id, pack.name, raw, pack.blurb, {
     region: pack.region,
+    loop: pack.loop,
     terrain: pack.terrain,
     features: pack.features,
   })

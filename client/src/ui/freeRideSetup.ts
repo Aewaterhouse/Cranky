@@ -1,6 +1,14 @@
 import type { Profile } from '../core/curve'
 import { CFG } from '../config'
-import { parseGpx, routeSeconds, routeStats, type Route } from '../core/route'
+import {
+  lapsDefault,
+  lapsMax,
+  parseGpx,
+  routeSeconds,
+  routeStats,
+  withLaps,
+  type Route,
+} from '../core/route'
 import { loadRoute } from '../core/routeLibrary'
 import { myRoutes, removeMyRoute, saveMyRoute } from '../core/routeStore'
 import { h } from './dom'
@@ -50,6 +58,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     async (r) => {
       try {
         sel = await loadRoute(r.id)
+        laps = lapsDefault(sel)
         paint()
       } catch (e) {
         toast(`Could not load ${r.name}: ${(e as Error).message}`)
@@ -57,9 +66,26 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     },
   )
   const startLabel = h('span', { class: 'sb-what' })
+  let laps = 1
+  const lapsBox = h('span', { class: 'laps' })
+  const lapsFor = (r: Route) => {
+    const step = (by: number) => () => {
+      laps = Math.max(1, Math.min(lapsMax(r), laps + by))
+      paint()
+    }
+    lapsBox.replaceChildren(
+      h('button', { class: 'ghost', title: 'One lap fewer', onclick: step(-1) }, '−'),
+      h('b', {}, `${laps} ${laps === 1 ? 'lap' : 'laps'}`),
+      h('button', { class: 'ghost', title: 'One lap more', onclick: step(1) }, '+'),
+      h('span', { class: 'dim' }, `${km(r.distance * laps)} · end the ride whenever you like`),
+    )
+  }
   const go = h(
     'button',
-    { class: 'primary go', onclick: needTrainer(() => sel && act.freeRide(sel)) },
+    {
+      class: 'primary go',
+      onclick: needTrainer(() => sel && act.freeRide(sel.loop ? withLaps(sel, laps) : sel)),
+    },
     'Start',
   )
   const paint = () => {
@@ -80,6 +106,8 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
         : [h('p', { class: 'dim' }, 'No routes yet. Import a GPX file to start.')]),
     )
     startLabel.replaceChildren(sel ? h('b', {}, sel.name) : 'Pick a route')
+    lapsBox.hidden = !sel?.loop
+    if (sel?.loop) lapsFor(sel)
     go.disabled = !sel
   }
   const file = h('input', {
@@ -125,6 +153,6 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'dim credit' },
       'Route data © OpenStreetMap contributors (ODbL); elevation from NASA SRTM',
     ),
-    h('div', { class: 'startbar' }, startLabel, go),
+    h('div', { class: 'startbar' }, startLabel, lapsBox, go),
   )
 }

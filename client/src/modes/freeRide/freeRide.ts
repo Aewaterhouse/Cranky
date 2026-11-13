@@ -106,6 +106,9 @@ export function runFreeRide(
     watts: profile.ftp * (G.ftp[0] + ((G.ftp[1] - G.ftp[0]) * i) / all.length),
   }))
   const riders = [me, ...ghosts.map((g) => g.rider)]
+  // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
+  const lapM = route.lapOf?.distance
+  const shown = lapM ? riders.map((r) => ({ ...r })) : riders
   let world: RouteWorld | undefined
   // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
   const quipper = new Quipper()
@@ -121,8 +124,8 @@ export function runFreeRide(
     import('../../scene/route/routeWorld')
       .then((m) => {
         if (finished) return
-        world = new m.RouteWorld(view.stage, route)
-        world.state = { me: me.id, riders }
+        world = new m.RouteWorld(view.stage, route.lapOf ?? route)
+        world.state = { me: me.id, riders: shown }
       })
       .catch(() => view.flat())
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
@@ -207,6 +210,7 @@ export function runFreeRide(
       g.rider.cadence = paused ? 0 : G.cadence
       g.rider.d = Math.min(route.distance, g.rider.d + g.rider.speed * dt)
     }
+    if (lapM) riders.forEach((r, i) => Object.assign(shown[i], r, { d: r.d % lapM }))
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
