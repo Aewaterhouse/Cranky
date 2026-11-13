@@ -753,3 +753,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - With ERG off the bus has no road, so the gears sit on a flat road at `CFG.ride.gradeStart` (2%, the old hand-set starting gradient): the trainer gets 2% plus the gear offset times shift strength, clamped to the solo slope range, through `ergController.setGrade`. The ↑ ↓ hand gradient is gone; the arrows now shift like Z and X. The block target is still shown and scored.
 - Each rider's choice is per device (`settings.busErg`) and is sent to the server as `{t: 'erg', on}` on joining and whenever it changes; the lobby shows "ERG" or "⚙ Gears" on each seat. Bots always show as ERG.
 - The rear-view mirror moved to the top right (`VIS.mirrorX` 0.83, `mirrorY` 0.03): at the top centre it sat over the event header and the countdown and banner under it.
+
+## Trainer mode per ride (2026-11-14)
+- The host's pick (`trainers`: choose, erg, gears) defaults to "each rider chooses", so nothing changes unless the driver sets it. A forced pick does not overwrite the rider's saved ERG / Gears preference; it only applies for that ride. The server works out each rider's `erg` from both (`Room.erg_of`).

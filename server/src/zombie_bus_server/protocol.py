@@ -82,6 +82,13 @@ class Sprint(BaseModel):
     combo: int = 0
 
 
+class TrainerMode(BaseModel):
+    """Host: everyone on ERG, everyone on gears, or each rider chooses (`choose`)."""
+
+    t: Literal["trainers"]
+    mode: Literal["erg", "gears", "choose"]
+
+
 class Erg(BaseModel):
     """The rider's trainer mode: ERG holds the target, off means virtual gears. Shown to the crew."""
 
@@ -109,6 +116,7 @@ ClientMsg = TypeAdapter(
         | Data
         | Sprint
         | Erg
+        | TrainerMode
         | Buy,
         Field(discriminator="t"),
     ]

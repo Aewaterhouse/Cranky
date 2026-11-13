@@ -1,10 +1,15 @@
 import { CFG } from '../config'
+import type { TrainerMode } from '../net/protocol'
 import { resistance } from './physics'
 
 const G = CFG.gears
 
 export const gearCount = G.ratios.length
 export const gearText = (gear: number) => `Gear ${gear}/${gearCount}`
+
+/** On the bus: ERG or gears as the host set the ride, or the rider's own pick when the host lets them choose. */
+export const busErgOn = (mode: TrainerMode | undefined, own: boolean) =>
+  mode === 'erg' ? true : mode === 'gears' ? false : own
 
 /** One gear up (d = 1) or down (d = -1), stopping at the first and last gear. */
 export const shiftGear = (gear: number, d: number) => Math.min(gearCount, Math.max(1, gear + d))

@@ -29,6 +29,7 @@ from .protocol import (
     Start,
     Tick,
     TierMsg,
+    TrainerMode,
     Watch,
 )
 
@@ -131,6 +132,7 @@ class Room:
         self.plan_id = "bus-crew-45"
         self.minutes = 0
         self.difficulty = "normal"
+        self.trainers = "choose"  # erg, gears or choose: the host's pick for this ride
         self.game = "bus"
         self.plan = generate(load_plans()[self.plan_id], 0)
         self.el = 0.0
@@ -175,6 +177,7 @@ class Room:
             "plan_id": self.plan_id,
             "minutes": self.minutes,
             "difficulty": self.difficulty,
+            "trainers": self.trainers,
             "game": self.game,
             "plan": self.plan,
             "el": self.el,
@@ -189,6 +192,7 @@ class Room:
         room.host, room.state, room.plan_id = d["host"], d["state"], d["plan_id"]
         room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
         room.difficulty = d.get("difficulty", "normal")
+        room.trainers = d.get("trainers", "choose")
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.game = d.get("game", "bus")
         room.mode = MODES[room.game].from_dict(d["mode"])
@@ -218,6 +222,7 @@ class Room:
             "minutes": self.minutes,
             "mutator": weekly_mutator() if self.difficulty != "easy" and self.game == "bus" else None,
             "difficulty": self.difficulty,
+            "trainers": self.trainers,
             "game": self.game,
             "riders": [
                 {
@@ -228,7 +233,7 @@ class Room:
                     "connected": r.connected,
                     "look": r.look,
                     "bot": r.bot,
-                    "erg": r.erg,
+                    "erg": self.erg_of(r),
                 }
                 for r in self.riders.values()
             ],
@@ -317,6 +322,9 @@ class Room:
             self.game, self.state = msg.game, "lobby"
             self.deal()
             await self.lobby()
+        elif isinstance(msg, TrainerMode) and self.state != "running":
+            self.trainers = msg.mode
+            await self.lobby()
         elif isinstance(msg, Difficulty) and self.state != "running":
             self.difficulty = msg.level
             await self.lobby()
@@ -328,6 +336,10 @@ class Room:
             await self.lobby()
         elif isinstance(msg, End) and self.state == "running":
             await self.finish()
+
+    def erg_of(self, r: Rider) -> bool:
+        """Whether the rider is on ERG: the host's pick for the ride, or the rider's own when they choose."""
+        return r.erg if self.trainers == "choose" else self.trainers == "erg"
 
     def deal(self) -> None:
         """Builds the plan for the chosen game: the picked workout, or a fresh VO2 Madness deck."""
@@ -396,7 +408,7 @@ class Room:
                 "st": r.st,
                 "hr": r.hr,
                 "hrp": None if r.hrp is None else round(r.hrp, 2),
-                "erg": r.erg,
+                "erg": self.erg_of(r),
             }
             for r in self.riders.values()
         }

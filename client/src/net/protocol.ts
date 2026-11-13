@@ -3,6 +3,7 @@ import type { GroupSummary } from '../ui/results'
 import type { Look } from '../core/cosmetics'
 import type { Grade, Plan, Tier } from '../types'
 
+export type TrainerMode = 'erg' | 'gears' | 'choose'
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
 export type Game = 'bus' | 'madness'
 /** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
@@ -42,6 +43,7 @@ export type ClientMsg =
     }
   | { t: 'buy'; item: ShopItem }
   | { t: 'erg'; on: boolean }
+  | { t: 'trainers'; mode: TrainerMode }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
 export type ShopItem = 'plating' | 'repellent' | 'sync'
@@ -66,6 +68,8 @@ export interface Lobby {
   plan: Plan
   minutes: number
   difficulty: Difficulty
+  /** The host's pick for the ride: everyone on ERG, everyone on gears, or each rider chooses. */
+  trainers?: TrainerMode
   game?: Game
   mutator: { id: string; name: string; desc: string } | null
   riders: LobbyRider[]

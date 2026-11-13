@@ -116,6 +116,7 @@ position, through `ErgController.setGrade`.
 
 ## ERG or gears (bus rooms)
 - Client `{t: 'erg', on}` at any time: this rider's trainer mode (ERG, or ERG off on virtual gears). Lobby riders and tick riders carry `erg` (default true).
+- Host `{t: 'trainers', mode: 'choose' | 'erg' | 'gears'}` before the start: the ride's trainer mode, in the lobby as `trainers`. Unless it is `choose`, every rider's `erg` follows it.
 
 ## Downloads
 - `PUT /api/rides/files/<name>` (logged in; body is the file, a .fit, .json or .png up to 8 MB) returns `{"url": "/api/rides/files/<key>/<name>"}`.

@@ -18,6 +18,7 @@ import { makeHud } from '../../ui/hud'
 import type { Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
+import { busErgOn } from '../../core/gears'
 import { totalMass } from '../../core/physics'
 import { onClickShift } from '../../trainer/zwiftClick'
 
@@ -71,8 +72,9 @@ export function startBusRide(
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
   // Non-ERG riding: virtual gears, the trainer gets a gradient; targets still score. All writes stay in ergController.
-  const gears = busGears(ride.erg, totalMass(profile.weightKg))
-  const applyErg = () => (settings.busErg ? ride.erg.setErg() : gears.send(ride.live.cadence, true))
+  const ergOn = () => busErgOn(l.trainers, settings.busErg)
+  const gears = busGears(ride.erg, totalMass(profile.weightKg), ergOn)
+  const applyErg = () => (ergOn() ? ride.erg.setErg() : gears.send(ride.live.cadence, true))
   const hud = makeHud(
     (t) => {
       profile.tier = t
@@ -85,8 +87,12 @@ export function startBusRide(
     },
     {
       erg: {
-        on: () => settings.busErg,
+        on: ergOn,
         toggle: () => {
+          if (l.trainers && l.trainers !== 'choose')
+            return hud.toast(
+              `The driver has everyone on ${l.trainers === 'erg' ? 'ERG' : 'gears'} this ride`,
+            )
           saveSettings({ busErg: !settings.busErg })
           net.send({ t: 'erg', on: settings.busErg })
           applyErg()
@@ -127,8 +133,8 @@ export function startBusRide(
       4000,
     )
   ride.start()
-  if (!settings.busErg) applyErg()
-  const offClick = onClickShift((d) => !settings.busErg && gears.shift(d, ride.live.cadence))
+  if (!ergOn()) applyErg()
+  const offClick = onClickShift((d) => !ergOn() && gears.shift(d, ride.live.cadence))
   const sender = setInterval(() => {
     const v = ride.live
     gears.send(v.cadence)

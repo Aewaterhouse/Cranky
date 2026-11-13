@@ -165,3 +165,20 @@ def test_each_riders_erg_choice_reaches_the_lobby_and_ticks():
     lobby, tick = asyncio.run(main())
     assert {r["id"]: r["erg"] for r in lobby["riders"]} == {"h0": True, "h1": False}
     assert tick["riders"]["h1"]["erg"] is False and tick["riders"]["h0"]["erg"] is True
+
+
+def test_host_can_put_the_whole_ride_on_erg_or_gears():
+    async def main():
+        room, ws = await lobby_with(2, "MODE")
+        await room.handle("h1", ws, {"t": "trainers", "mode": "gears"})  # not the host: ignored
+        assert room.trainers == "choose"
+        await room.handle("h1", ws, {"t": "erg", "on": False})
+        await room.handle("h0", ws, {"t": "trainers", "mode": "erg"})
+        forced = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        await room.handle("h0", ws, {"t": "trainers", "mode": "choose"})
+        free = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        return forced, free
+
+    forced, free = asyncio.run(main())
+    assert forced["trainers"] == "erg" and all(r["erg"] for r in forced["riders"])
+    assert {r["id"]: r["erg"] for r in free["riders"]} == {"h0": True, "h1": False}

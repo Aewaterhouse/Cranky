@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { CFG } from '../src/config'
-import { nextStrength } from '../src/core/gears'
+import { busErgOn, nextStrength } from '../src/core/gears'
 import { soloKeys, type KeyActions } from '../src/modes/drill/keys'
 import { freeKeys, type FreeKeyActions } from '../src/modes/freeRide/keys'
 
@@ -25,5 +25,14 @@ describe('shift strength', () => {
     soloKeys(solo, true)(press("'"))
     soloKeys(solo, true)(press(';'))
     expect(vi.mocked(solo.strength).mock.calls).toEqual([[1], [-1]])
+  })
+})
+
+describe('ERG or gears on the bus', () => {
+  it('follows the host when they set the ride, else the rider', () => {
+    expect(busErgOn('erg', false)).toBe(true)
+    expect(busErgOn('gears', true)).toBe(false)
+    expect(busErgOn('choose', false)).toBe(false)
+    expect(busErgOn(undefined, true)).toBe(true)
   })
 })

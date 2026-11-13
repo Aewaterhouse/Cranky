@@ -32,7 +32,7 @@ Already in the code when the notes were written (built in a hurry, never tested,
 
 - [x] **Zombie Bus without ERG (built, untested).** Check it on a trainer. Add virtual gears and the gear tile, so non-ERG riders shift instead of setting a gradient by hand, and make the choice visible in the lobby so the crew knows who is on ERG. Done: with ERG off the bus rider shifts 24 virtual gears on a flat 2% road (Z X, the arrows, the menu or a Zwift Click; `;` `'` and the menu slider set shift strength), with the gear tile under the power panel and "⚙ Gears" in place of "🔒 ERG". Each rider picks ERG or Gears in the lobby; the choice goes to the server (`erg` message) and shows on every seat and in each tick. The trainer check is in owner-checks.md.
 - [x] **VO2 Madness without ERG.** Done: Madness rides through the same code as the bus, so the ERG / Gears choice in the lobby, the gear tile, Z X, the arrows and the Click all work there too. Madness scores heart-rate effort, not holding a target, so riding on gears changes nothing in the scoring; the interval target is still shown as a guide.
-- [ ] **A lobby option per ride:** ERG, non-ERG, or each rider chooses.
+- [x] **A lobby option per ride:** ERG, non-ERG, or each rider chooses. Done: the driver picks "Each rider", "All ERG" or "All gears" in the bus lobby (🚲 Trainers row). When set for everyone, the rider's own ERG / Gears switch hides, the seats show the forced mode, and `E` mid-ride says the driver has set it. Each rider is the default.
 
 ## 4. Free ride feel
 

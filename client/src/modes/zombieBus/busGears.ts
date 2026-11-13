@@ -8,14 +8,14 @@ import { gearTile, stepStrength, strengthSlider } from '../../ui/gearTile'
  * The bus with ERG off: virtual gears on a flat bus road (`CFG.ride.gradeStart`), the gear tile and the shift
  * strength slider. The rider shifts to hold the target; the trainer only ever gets a gradient, via `erg`.
  */
-export function busGears(erg: ErgController, mass: number) {
+export function busGears(erg: ErgController, mass: number, ergOn: () => boolean) {
   let gear: number = CFG.gears.start
   let sent = NaN
   const tile = gearTile()
   const slider = strengthSlider()
   /** Sends the gear-adjusted gradient when it has moved enough (always when `force`). */
   const send = (cadence: number, force = false) => {
-    if (settings.busErg) return
+    if (ergOn()) return
     const { chainring, shiftStrength } = settings
     const g = gearGrade(
       CFG.ride.gradeStart,

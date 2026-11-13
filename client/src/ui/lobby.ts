@@ -1,5 +1,5 @@
 import type { Profile } from '../core/curve'
-import type { Difficulty, Game, Lobby } from '../net/protocol'
+import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
 import { TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
 import { avatar, h, seg } from './dom'
@@ -18,6 +18,8 @@ export interface LobbyCtx {
   tier(t: Tier): void
   /** This rider's trainer mode: ERG, or virtual gears with ERG off. */
   erg(on: boolean): void
+  /** Host: the whole ride on ERG, on gears, or each rider chooses. */
+  trainers(mode: TrainerMode): void
   bots(n: number): void
   difficulty(level: Difficulty): void
   game(game: Game): void
@@ -53,11 +55,17 @@ export function lobbyView(c: LobbyCtx) {
     settings.busErg ? 'erg' : 'gears',
     (v) => c.erg(v === 'erg'),
   )
-  const ergNote = h(
-    'p',
-    { class: 'dim' },
-    'ERG holds your target for you. Gears: ERG off, you shift (Z X, the arrows or a Zwift Click) to hold it.',
-  )
+  const ERG_WHAT =
+    'ERG holds your target for you. Gears: ERG off, you shift (Z X, the arrows or a Zwift Click) to hold it.'
+  const ergNote = h('p', { class: 'dim' }, ERG_WHAT)
+  const TRAINERS: [TrainerMode, string][] = [
+    ['choose', 'Each rider'],
+    ['erg', 'All ERG'],
+    ['gears', 'All gears'],
+  ]
+  const trainSeg = seg(TRAINERS, 'choose', (v) => c.trainers(v), 'diff')
+  const trainNote = h('span', { class: 'dim' })
+  const trainRow = h('div', { class: 'bot-row' }, h('span', {}, '🚲 Trainers'), trainSeg, trainNote)
   const botN = h('b', {}, '0')
   const botBtn = (d: number, label: string) =>
     h(
@@ -158,6 +166,15 @@ export function lobbyView(c: LobbyCtx) {
     gameSeg.hidden = !isHost
     gameNote.textContent = isHost ? '' : GAMES.find(([g]) => g === (l.game ?? 'bus'))![1]
     diffRow.hidden = mad
+    const trainers = l.trainers ?? 'choose'
+    trainSeg.set(trainers)
+    trainSeg.hidden = !isHost
+    trainNote.textContent = isHost ? '' : TRAINERS.find(([t]) => t === trainers)![1]
+    ergSeg.hidden = trainers !== 'choose'
+    ergNote.textContent =
+      trainers === 'choose'
+        ? ERG_WHAT
+        : `${driver} has everyone on ${trainers === 'erg' ? 'ERG' : 'gears (ERG off, you shift)'} this ride.`
     diffSeg.set(l.difficulty)
     mutRow.hidden = !l.mutator
     if (l.mutator)
@@ -251,6 +268,7 @@ export function lobbyView(c: LobbyCtx) {
           botRow,
           gameRow,
           diffRow,
+          trainRow,
           mutRow,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
