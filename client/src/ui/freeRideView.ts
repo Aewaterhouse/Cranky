@@ -7,7 +7,7 @@ import { CFG } from '../config'
 import type { ListRider } from '../core/hud'
 import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
-import type { SegLive } from '../modes/freeRide/segmentRun'
+import type { SegBoard, SegLive } from '../modes/freeRide/segmentRun'
 import type { Live } from '../modes/rideController'
 import { h } from './dom'
 import { freeRideFlat } from './freeRideFlat'
@@ -48,6 +48,8 @@ export interface FreeState {
   /** The climb or sprint segment being ridden or coming up, and the splits for the whole route or lap. */
   seg?: SegLive
   whole?: string[]
+  /** The top three of that segment (of the whole route or lap between segments). */
+  board?: SegBoard
   /** Headwind in m/s (a tailwind is negative), when the wind setting is on. */
   wind?: number
   /** Group rides: watts saved by drafting right now, and the keep-together scale on my speed (1 is none). */

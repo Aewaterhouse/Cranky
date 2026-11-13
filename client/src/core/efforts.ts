@@ -20,6 +20,8 @@ export interface CrewRow extends Best {
 export interface SegBest {
   pr?: Best
   crew?: CrewRow
+  /** The segment's crew board, fastest first, me included. */
+  top?: CrewRow[]
 }
 export type Bests = Record<string, SegBest>
 interface Saved {
@@ -108,7 +110,7 @@ export function rideBests(rider: string, route: string): Bests {
       save(rider, s)
       merge()
       for (const [seg, rows] of Object.entries(r.crew))
-        (out[seg] ??= {}).crew = rows.find((x) => x.id !== rider)
+        Object.assign((out[seg] ??= {}), { crew: rows.find((x) => x.id !== rider), top: rows })
     })
     .catch(() => {})
   return out

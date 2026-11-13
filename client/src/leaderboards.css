@@ -1,0 +1,104 @@
+/* Crew leaderboards dialog and the top three in the ride's stats drawer. */
+.lb-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.lb-top select {
+  flex: 1 1 220px;
+  min-height: 44px;
+}
+.lb-segs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.lb-segs button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 44px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+  text-align: left;
+}
+.lb-segs button.on {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.lb-segs small {
+  color: var(--dim);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.lb-line {
+  margin: 0 0 2px;
+  font-style: italic;
+}
+.lb-rank {
+  margin: 0 0 10px;
+  color: var(--acc);
+  font-weight: 600;
+}
+.lb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.lb-table th {
+  text-align: left;
+  color: var(--dim);
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+.lb-table td,
+.lb-table th {
+  padding: 7px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.lb-table tr.me td {
+  background: color-mix(in srgb, var(--acc) 16%, transparent);
+  font-weight: 700;
+}
+.lb-table small {
+  color: var(--dim);
+  font-weight: 400;
+}
+.lb-body {
+  min-height: 120px;
+  overflow-x: auto;
+}
+.lb-open {
+  min-height: 44px;
+}
+
+.seg-board {
+  margin-top: calc(0.8 * var(--u, 6px));
+  padding-top: calc(0.6 * var(--u, 6px));
+  border-top: 1px solid rgb(255 255 255 / 0.18);
+}
+.seg-board .sb-name {
+  display: block;
+  max-width: calc(34 * var(--u, 6px));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acc);
+  opacity: 1;
+}
+.seg-board div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5em;
+  font-variant-numeric: tabular-nums;
+}
+.seg-board .me {
+  color: var(--acc);
+}

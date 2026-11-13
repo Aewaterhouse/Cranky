@@ -13,6 +13,7 @@ import { ROUTE_INDEX, loadRoute } from '../core/routeLibrary'
 import { myRoutes, removeMyRoute, saveMyRoute } from '../core/routeStore'
 import { h } from './dom'
 import { ghostPick } from './ghostPick'
+import { openLeaderboards } from './leaderboards'
 import type { HomeActions } from './home'
 import { toast } from './toast'
 import { routePicker } from './routePicker'
@@ -174,7 +175,21 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       'No ERG. Your power moves you along a real route and the trainer follows the gradient.',
     ),
     weekCard(p, pickBundled),
-    h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Routes'), lib.el),
+    h(
+      'section',
+      { class: 'panel' },
+      h('h2', { class: 'label' }, 'Routes'),
+      h(
+        'button',
+        {
+          class: 'lb-open',
+          title: 'Crew times on every segment of the picked route',
+          onclick: () => openLeaderboards(p.id, sel?.id),
+        },
+        '🏆 Leaderboards',
+      ),
+      lib.el,
+    ),
     h(
       'section',
       { class: 'panel' },

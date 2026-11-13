@@ -11,6 +11,7 @@ import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
 import { ZONE_COLOURS } from './planGraph'
 import { riderList } from './riderList'
+import { segBoard } from './segBoard'
 
 const C = CFG.hud
 
@@ -54,6 +55,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     ...(settings.wind === 'off' ? {} : { wind: stat('Wind') }),
   }
 
+  const board = segBoard()
   const whole = profileChart(route, undefined, true)
   const next = profileChart(route, { behind: C.climb.behindM, ahead: C.climb.aheadM }, true)
   const climbs = findClimbs(route)
@@ -131,7 +133,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         bar,
         h('div', { class: 'pw-sub' }, cad.el, hr.el),
       ),
-      h('div', { class: 'glass hstats' }, ...Object.values(stats).map((s) => s.el)),
+      h('div', { class: 'glass hstats' }, ...Object.values(stats).map((s) => s.el), board.el),
     ),
     h(
       'div',
@@ -246,6 +248,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         const home = inClimb ? segCol : segBox
         if (segName.parentElement !== home) home.replaceChildren(segName, segLines)
       }
+      board.set(s.board)
       stats.whole.el.hidden = !s.whole?.length
       stats.whole.v.textContent = s.whole?.join(' · ') ?? ''
       gearChip.hidden = !s.gears

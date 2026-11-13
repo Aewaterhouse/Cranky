@@ -541,3 +541,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - A free or group ride's row in History shows a small line map of its route, the route name, the distance and "free ride" or "group ride". The ride's detail gets a route card (the map with the part ridden drawn brighter and the start marked, distance, climbing, whether it was finished) and the same segments card as the end-of-ride summary.
 - The map is an SVG line drawn from the bundled pack (or the imported route if this browser still has it), not Leaflet: no tiles, no network, and cheap enough for a list. A ride on a route this device no longer has shows no map.
 - The list endpoint gained `route` (the route id) and `distance`; both are null for other rides and for rides from before Phase F.
+
+## 2026-11-14 Free ride Phase G: production
+
+### Closing Phase F gaps
+- Crew leaderboards are a dialog (`ui/leaderboards.ts`), opened from the Routes panel of the free-ride setup (on the picked route) and from the Passport. Pick a route, then a segment (the whole route or lap first), then time or W/kg. No new endpoint: it reads `/api/segments/{id}/leaderboard`. The server sends ten rows, which covers the crew; "You are 2nd of 5" counts the rows shown.
+- Equal results share a rank. The line under the leader comes from `fun/boardLines.ts`, picked from the leader's time so a board always says the same thing; there are three sets (a mate leads, you lead, only one time on the board).
+- In a ride the stats drawer shows "Top three" for the climb or sprint in play (from its lead-in to its end) and for the whole route or lap otherwise. A PR set during the ride is folded in on the device, as "You". Hidden when nobody has a time.
+

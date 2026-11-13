@@ -15,6 +15,7 @@ import type { Stamp } from '../core/passport'
 import { ROUTE_INDEX } from '../core/routeLibrary'
 import { segClock } from '../core/segments'
 import { h } from './dom'
+import { openLeaderboards } from './leaderboards'
 import { badgeGrid } from './riderBadges'
 import { svgEl } from './svg'
 import { weekCard } from './weekCard'
@@ -96,6 +97,11 @@ export function passportTab(p: Profile) {
         done.length
           ? `${done.length} of ${ROUTE_INDEX.length} routes stamped · ${sum((s) => s.n)} finishes · ${metres(sum((s) => s.vertM))} climbed`
           : 'Nothing stamped yet. Finish a free ride on any route and its dot fills in.',
+      ),
+      h(
+        'button',
+        { class: 'lb-open', onclick: () => openLeaderboards(p.id) },
+        '🏆 Crew leaderboards',
       ),
       h(
         'div',
