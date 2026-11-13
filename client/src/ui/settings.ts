@@ -51,6 +51,18 @@ export function settingsTab() {
         ),
       ),
       row(
+        'Free ride remarks',
+        'Dry comments about the road, the wildlife and your riding. Spoken too when the announcer is on.',
+        seg(
+          [
+            ['on', 'On'],
+            ['off', 'Off'],
+          ],
+          settings.quips ? 'on' : 'off',
+          (v) => saveSettings({ quips: v === 'on' }),
+        ),
+      ),
+      row(
         'Graphics',
         'Auto drops the quality if the 3D scene runs slowly.',
         seg<Settings['gfx']>(

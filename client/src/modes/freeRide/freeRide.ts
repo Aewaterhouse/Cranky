@@ -9,10 +9,12 @@ import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
 import { onClickShift } from '../../trainer/zwiftClick'
 import { show } from '../../ui/dom'
+import { toast } from '../../ui/toast'
 import { freeRideView } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { Quipper, speak } from './quips'
 
 const STOP_S = 3
 const GO_S = 1.5
@@ -94,6 +96,16 @@ export function runFreeRide(
     look: profile.look,
   }
   let world: RouteWorld | undefined
+  // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
+  const quipper = new Quipper()
+  const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
+  const climbs = top.ele - route.points[0].ele >= F.quips.summitGainM
+  const onQuip = (text: string) => {
+    const v = view as { toast?: (text: string) => void }
+    if (v.toast) v.toast(text)
+    else toast(text)
+    speak(text)
+  }
   if (settings.freeRideView === '3d')
     import('../../scene/route/routeWorld')
       .then((m) => {
@@ -193,6 +205,25 @@ export function runFreeRide(
       weightKg: profile.weightKg || F.defaultKg,
       etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
     })
+    const quip =
+      settings.quips &&
+      !starting &&
+      quipper.next({
+        now: now / 1000,
+        t: el,
+        dist,
+        total: route.distance,
+        grade: p.grade,
+        speed,
+        ftpPct:
+          (100 * pw.slice(-5).reduce((a, b) => a + b, live.power)) /
+          (Math.min(5, pw.length) + 1) /
+          profile.ftp,
+        stopped: paused,
+        summit: climbs && dist >= top.d,
+        near: world?.near(),
+      })
+    if (quip) onQuip(quip)
     if (dist >= route.distance) void end()
   }
   const timer = setInterval(tick, 200)

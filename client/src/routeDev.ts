@@ -11,8 +11,9 @@ import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
  *   d=<metres along>  speed=<m/s, auto-rides>  cadence=rpm  offset=<metres right of the centreline>
  *   riders=N (extra riders strung out around you)  terrain=0 (ignore the pack's height grid)
  *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
+ *   next=odd|sign|chalk (start just before the next oddity, funny sign or chalk after d)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
- * Keys: , . speed   [ ] jump 500 m back or on   g debug panel
+ * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel
  */
 const q = new URLSearchParams(location.search)
 const num = (k: string, d: number) => (q.has(k) ? Number(q.get(k)) : d)
@@ -37,12 +38,18 @@ const noMap = () =>
   )
 
 async function start() {
+  VIS.route.place.fun.odd.only = q.get('odd') ?? ''
   const id = q.get('route') ?? 'mount-coot-tha'
   const route: Route = id === 'nomap' ? noMap() : await loadRoute(id)
   if (q.get('terrain') === '0') delete route.terrain
   if (q.get('fixture') === '1') addFixture(route)
   const world = new RouteWorld(document.getElementById('stage')!, route)
   const st = { d: num('d', 0), speed: num('speed', 8) }
+  const jump = (sort: string) => {
+    const at = world.nextThing(sort, st.d + num('back', 14) + 1, q.get('kind') ?? undefined)
+    if (at !== undefined) st.d = Math.max(0, at - num('back', 14))
+  }
+  if (q.has('next')) jump(q.get('next')!)
   const extra = num('riders', 0)
   const riders: RoadRider[] = Array.from({ length: extra + 1 }, (_, i) => ({
     id: `r${i}`,
@@ -59,7 +66,7 @@ async function start() {
           : { outfit: 'outfit-hivis' },
   }))
   world.state = { me: 'r0', riders }
-  Object.assign(window, { world, st })
+  Object.assign(window, { world, st, jump, VIS })
 
   let last = performance.now()
   setInterval(() => {
@@ -84,6 +91,7 @@ async function start() {
     else if (e.key === '.') st.speed += 2
     else if (e.key === '[') st.d = Math.max(0, st.d - 500)
     else if (e.key === ']') st.d = Math.min(route.distance, st.d + 500)
+    else if (e.key === 'n') jump(q.get('next') ?? 'odd')
     else if (e.key === 'g') openPanel()
   })
   let frames = 0

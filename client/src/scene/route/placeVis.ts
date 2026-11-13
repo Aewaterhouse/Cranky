@@ -1,5 +1,8 @@
+import { FUN } from './funVis'
+
 /** Tunables for what stands on the route world (plants, buildings, furniture, landmarks). Shown in the debug panel as `VIS.route.place`. */
 export const PLACE = {
+  fun: FUN,
   /** Plant density multiplier and how far from the road plants are scattered (m), per quality level. */
   detail: { potato: 0.25, low: 0.5, medium: 1, high: 1.5 },
   reach: { potato: 60, low: 230, medium: 300, high: 470 },

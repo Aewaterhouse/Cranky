@@ -89,6 +89,38 @@ export const CFG = {
     maxGradePct: 20,
     maxStored: 4000,
     ftpFrac: 0.75,
+    /** The free-ride commentator (words in src/fun/quipLines.ts). Times in seconds. */
+    quips: {
+      /** Never two remarks closer than this; once-a-ride ones (summit, halfway) may follow a little sooner. */
+      gapS: 60,
+      milestoneGapS: 12,
+      /** Above this % of FTP only a word of encouragement, and only this often. */
+      hardPct: 105,
+      hardGapS: 90,
+      /** Remarks about nothing in particular come about this far apart. */
+      ambientS: 150,
+      /** Share of roadside things that get a remark when one is allowed. */
+      nearChance: 0.75,
+      /** Sitting still this long earns one remark. */
+      stoppedS: 20,
+      /** "Off we go" after this much riding. */
+      startS: 8,
+      /** Routes shorter than these get no "1 km to go" or "halfway". */
+      togoMinM: 2500,
+      halfMinM: 4000,
+      /** Gradients (%) that count as steep, a climb, flat and a descent; speeds (m/s) that count as fast and slow. */
+      steepPct: 9,
+      climbPct: 4,
+      flatPct: 1.5,
+      descentPct: -4,
+      fastMs: 14,
+      slowMs: 2.5,
+      /** Below this % of FTP the rider is having a rest; "long ride" remarks start after this long. */
+      easyPct: 45,
+      longS: 3600,
+      /** The summit only counts when it is this far above the start (m). */
+      summitGainM: 100,
+    },
     library: {
       /** Length filter bounds in km: short below `short`, long from `long`. */
       lengthKm: { short: 25, long: 60 },

@@ -5,12 +5,16 @@ import { VC } from '../util'
 import { dropBuildingGeos } from './buildingGeo'
 import { buildBuildings, buildPlants } from './chunkProps'
 import type { Features } from './features'
+import { buildChalk, buildFunSigns } from './funSignGeo'
+import type { Chalk, FunSign } from './funSigns'
 import type { Furn } from './furniture'
 import { buildFurniture, buildRails, dropFurnitureGeos } from './furnitureGeo'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
 import { buildLandmarks, dropLandmarkGeos } from './landmarkGeo'
 import type { Landmark } from './landmarkPlan'
+import { buildOddities, dropOddGeos } from './oddGeo'
+import type { Oddities } from './oddPlan'
 import { Patch } from './patch'
 import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
@@ -39,6 +43,9 @@ export interface Place {
   signs: Signs
   furniture: Map<number, Furn[]>
   landmarks: Map<number, Landmark[]>
+  odd: Oddities
+  funSigns: Map<number, FunSign[]>
+  chalk: Map<number, Chalk[]>
 }
 
 /** Builds road, terrain and what stands on it a chunk at a time around the rider and throws away what falls behind. */
@@ -93,7 +100,7 @@ export class Chunks {
   private build(k: number, level: Level) {
     const far = level !== 'potato'
     const t0 = performance.now()
-    const { field, cover, features, signs, furniture, landmarks } = this.place
+    const { field, cover, features, signs, furniture, landmarks, odd } = this.place
     const d0 = k * R.chunk
     const d1 = d0 + R.chunk
     field.path.poseAt(d0, pose)
@@ -107,12 +114,20 @@ export class Chunks {
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)
     if (cf) for (const m of buildStreets(cf, field, patches, strips, solid, signs)) g.add(m)
-    const spots = scatter(k, patches, cover, features, P.detail[level], P.reach[level])
+    const odds = odd.chunk(k).filter((o) => o.rank < P.fun.odd.share[level])
+    // Nothing grows through the couch.
+    const spots = scatter(k, patches, cover, features, P.detail[level], P.reach[level]).filter(
+      (s) => !odds.some((o) => Math.hypot(o.x - s.x, o.z - s.z) < o.r + P.fun.odd.plantClear),
+    )
     for (const m of buildPlants(spots, solid)) g.add(m)
     if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
     for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
+    for (const m of buildOddities(odds, field, patches, solid, signs)) g.add(m)
+    const { funSigns, chalk } = this.place
+    for (const m of buildFunSigns(funSigns.get(k) ?? [], field, patches, solid, signs)) g.add(m)
+    for (const m of buildChalk(chalk.get(k) ?? [], field.path, solid, signs)) g.add(m)
     WATER.color.set(R.waterTint)
     WATER.specular.set(R.waterGlint)
     WATER.shininess = R.waterShine
@@ -153,5 +168,6 @@ export class Chunks {
     dropBuildingGeos()
     dropFurnitureGeos()
     dropLandmarkGeos()
+    dropOddGeos()
   }
 }

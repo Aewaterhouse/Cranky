@@ -6,10 +6,12 @@ import { Quality, type Level } from '../quality'
 import { Sky } from '../sky'
 import { Chunks } from './chunks'
 import { Features } from './features'
+import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
 import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
 import { LandCover } from './landCover'
-import { planLandmarks } from './landmarkPlan'
+import { planLandmarks, type Landmark } from './landmarkPlan'
+import { Oddities } from './oddPlan'
 import { Signs } from './signs'
 import { RoadPath } from './roadPath'
 import { RoadRiders, type RoadRider } from './roadRiders'
@@ -47,6 +49,9 @@ export class RouteWorld {
   readonly field: HeightField
   readonly chunks: Chunks
   readonly riders: RoadRiders
+  readonly odd: Oddities
+  private landmarks: Map<number, Landmark[]>
+  private things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
   private root = new THREE.Group()
   private ox = 0
@@ -78,13 +83,22 @@ export class RouteWorld {
     // Map features share the height grid's origin, so they are only usable alongside it.
     const cover = new LandCover(terrain, route.region)
     const features = new Features(terrain && route.features, this.field)
+    const furniture = planFurniture(path)
+    const taken = [...furniture.values()].flat().map((f) => f.d)
+    this.things = {
+      sign: planFunSigns(route.id, this.field, cover, features, taken),
+      chalk: planChalk(route.id, path),
+    }
     this.chunks = new Chunks({
       field: this.field,
       cover,
       features,
       signs: new Signs(),
-      furniture: planFurniture(path),
-      landmarks: planLandmarks(route.id, terrain, this.field, cover, features),
+      furniture,
+      funSigns: this.things.sign,
+      chalk: this.things.chalk,
+      landmarks: (this.landmarks = planLandmarks(route.id, terrain, this.field, cover, features)),
+      odd: (this.odd = new Oddities(route.id, this.field, cover, features)),
     })
     this.riders = new RoadRiders(path)
     path.poseAt(0, this.riders.me)
@@ -164,8 +178,39 @@ export class RouteWorld {
       .add(this.key.target.position)
   }
 
+  /** The kind of oddity, landmark or animal the rider is passing right now, for the commentator. */
+  near(): string | undefined {
+    const F = R.place.fun
+    const d = this.riders.meD
+    const o = this.odd.next(d - 5, F.nearM + 5)
+    if (o && o.rank < F.odd.share[this.quality.level]) return o.kind
+    const { x, z } = this.riders.me
+    for (const k of [-1, 0, 1])
+      for (const l of this.landmarks.get(Math.floor(d / R.chunk) + k) ?? [])
+        if (Math.hypot(l.x - x, l.z - z) < F.landmarkM) return l.kind
+    return undefined
+  }
+
+  /** Where the next thing of a sort is after `d` metres (optionally of one kind), for the harness. */
+  nextThing(sort: string, d: number, kind?: string): number | undefined {
+    const map = (this.things as Record<string, Map<number, { d: number }[]> | undefined>)[sort]
+    if (map)
+      return [...map.values()]
+        .flat()
+        .map((t) => t.d)
+        .filter((t) => t > d)
+        .sort((a, b) => a - b)[0]
+    for (let at = d, n = 0; n < 400; n++) {
+      const o = sort === 'odd' ? this.odd.next(at) : undefined
+      if (!o || !kind || o.kind === kind) return o?.d
+      at = o.d
+    }
+    return undefined
+  }
+
   /** Drops the built chunks so visual settings changed in the debug panel show up. */
   rebuild() {
+    this.odd.clear()
     this.chunks.clear()
   }
 
