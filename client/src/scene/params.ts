@@ -79,6 +79,11 @@ export const VIS = {
   servoStop: -12,
   servoBrake: 40,
   servoPullAway: 0.6,
+  /** Rear-view mirror on the bus (1 on): width as a share of the screen, top edge as a share of its height, camera height. */
+  mirror: 1,
+  mirrorW: 0.26,
+  mirrorY: 0.15,
+  mirrorHeight: 3.6,
   moodBlend: 1.6,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {

@@ -48,10 +48,12 @@ SYNC_MIN_CADENCE = 30
 TUNE_MULT = 1.25
 
 # Bus and horde. Gap changes at GAP_K * (group compliance - neutral) m/s; neutral depends on the event.
+# Pulling away uses GAP_K_AWAY instead, so a crew riding clean in ERG keeps the horde in sight.
 V_MIN = 6.0
 V_MAX = 20.0
 LIMP_MULT = 0.6
-GAP_K = 15.0
+GAP_K = 20.0
+GAP_K_AWAY = 6.0
 NEUTRAL = {
     "warmup": 0.5,
     "cooldown": 0.5,
@@ -69,8 +71,8 @@ SHAKE_COMPLIANCE = 0.8
 SHAKE_GAP = 15
 SHAKE_SCRAP = 5
 TUNE_GAP_BONUS = 1.0
-GAP_START = 50
-GAP_MAX = 120
+GAP_START = 30
+GAP_MAX = 70
 HIT_DAMAGE = 5
 HIT_KNOCKBACK = 25
 SCRAP_PER_M = 1 / 100

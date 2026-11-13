@@ -7,6 +7,7 @@ import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
 import { Ground } from './ground'
 import { Billboards, Servo } from './landmarks'
+import { Mirror } from './mirror'
 import { MoodBlend } from './moods'
 import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
@@ -71,6 +72,7 @@ export class World {
   private props = new Props(0)
   private boards = new Billboards(0)
   private servo = new Servo()
+  private mirror!: Mirror
   private bus = makeBus()
   private horde = new Horde()
   private block = new Roadblock()
@@ -139,6 +141,7 @@ export class World {
     )
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
+    this.mirror = new Mirror(this.host)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
     this.resize()
@@ -185,6 +188,7 @@ export class World {
     this.t += dt
     this.step(dt, sm)
     this.renderer.render(this.scene, this.camera)
+    this.mirror.render(this.renderer, this.scene, this.state.gap !== null && !this.state.mad)
   }
 
   private step(dt: number, sm: number) {
@@ -282,6 +286,7 @@ export class World {
     cancelAnimationFrame(this.raf)
     removeEventListener('resize', this.resize)
     this.fxl.dispose()
+    this.mirror.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }

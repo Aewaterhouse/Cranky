@@ -302,3 +302,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Bus postcard in History: ride a short bus ride with bots, then open it in History and tap Save postcard. The Zombie Bus card shows the score, distance, armour, sync, scrap, crew and awards on the sky background.
 - Bus countdown: a sped-up bus ride with bots (`ZB_TIME_SCALE`). Before each change of target the top centre shows "Next: 250 W" and a big 5, 4, 3, 2, 1 with a beep each; before a sprint only the SPRINT INCOMING splash shows.
 - Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with the scrap count and "Open shop", which brings the cards back. At the next servo stop it opens in full.
+- Rear-view mirror: `/scene-dev.html?riders=3&gap=60` shows a framed strip top centre with the horde in it; `gap=none` hides it; `mad=1` has none. Debug panel (`g`), Rear-view mirror folder, changes its size and place.

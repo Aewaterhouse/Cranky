@@ -109,7 +109,8 @@ class ZombieBus:
             neutral = self.surge(b, bel, comp, neutral)
         if neutral is not None and active:
             neutral += C.DIFFICULTY[self.level]["neutral"]
-            self.gap += (C.GAP_K * (comp - neutral) + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
+            k = C.GAP_K_AWAY if comp > neutral else C.GAP_K
+            self.gap += (k * (comp - neutral) + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
         self.gap = min(C.GAP_MAX, self.gap)
         if self.gap <= 0:
             self.gap = 0
