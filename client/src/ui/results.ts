@@ -87,7 +87,9 @@ export function finishRide(
   const week = weeklyRewards(stampRide(p, s), s, ROUTE_INDEX)
   p = week.p
   saveProfile(p)
-  if (s.record.secs >= 30) void postRide(profile.id, { ...s, crew: !!group || !!road })
+  // The crew's result rides along (without the scene still) so History can rebuild the bus postcard.
+  const crew = group && { ...group, postcard: undefined }
+  if (s.record.secs >= 30) void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew })
   const prs =
     p === profile
       ? []

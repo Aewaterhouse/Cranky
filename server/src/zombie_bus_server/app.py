@@ -36,6 +36,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(title="Cranky", lifespan=lifespan)
+store.backfill_bus_results()
 for _name in config.SEED_USERS:
     store.add_user(_name, _name)
 KINDS: dict[str, type[Room]] = {"bus": Room, "road": RoadRoom}

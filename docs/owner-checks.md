@@ -118,3 +118,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Shift strength mid-ride: on a real screen and an iPad, the gear chip shows the strength and tapping it opens the menu with the slider; `;` and `'` step it with a keyboard.
 - [ ] Servo stop: on a bus ride, the bus pulls into the servo, stays parked for the stop, then drives off; nothing slides along with the bus.
 - [ ] Downloads in Bluefy on the iPad: on the results screen and in History, tap Download .fit, Export JSON and Save postcard. A sheet appears; Save should bring up iOS Save / Share (or open the file), the postcard picture can be pressed and held, and Copy link pasted into Safari downloads it. Say which of these works.
+- [ ] Old bus rides on Railway: after the next deploy, open a bus ride from before 2026-11-14 in History and tap Save postcard. It should be the Zombie Bus card with that ride's score; a plain card means the ladder had no matching row.

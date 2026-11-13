@@ -87,12 +87,16 @@ export function groupSection(g: GroupSummary, myId: string) {
 }
 
 /** Composes the end-of-ride scene snapshot with the crew's numbers and downloads a PNG for the group chat. */
-export async function postcard(g: GroupSummary, planName: string) {
+export async function postcard(g: GroupSummary, planName: string, date = new Date().toISOString()) {
   const c = document.createElement('canvas')
   c.width = 1200
   c.height = 800
   const x = c.getContext('2d')!
-  x.fillStyle = '#15161a'
+  // the sky the free-ride card uses, for a card rebuilt in History with no scene still
+  const sky = x.createLinearGradient(0, 0, 0, 520)
+  sky.addColorStop(0, '#2b3a55')
+  sky.addColorStop(1, '#e8a86b')
+  x.fillStyle = sky
   x.fillRect(0, 0, 1200, 800)
   if (g.postcard) {
     const img = new Image()
@@ -126,5 +130,5 @@ export async function postcard(g: GroupSummary, planName: string) {
         680 + Math.floor(i / 2) * 36,
       ),
     )
-  return savePng(c, `zombie-bus-${new Date().toISOString().slice(0, 10)}`)
+  return savePng(c, `zombie-bus-${new Date(date).toLocaleDateString('en-CA')}`)
 }

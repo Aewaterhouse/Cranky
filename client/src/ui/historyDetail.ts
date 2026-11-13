@@ -12,6 +12,8 @@ import { segmentSection } from './segResults'
 import { ZONE_COLOURS } from './planGraph'
 import { downloadFit, downloadJson } from './rideExport'
 import { ridePostcard, savePng } from './ridePostcard'
+import type { GroupSummary } from './results'
+import { postcard } from './resultsGroup'
 import { segsFromSeries } from './soloSegs'
 import { modal, toast } from './toast'
 import { workoutChart } from './workoutChart'
@@ -159,8 +161,12 @@ function body(s: RideSummary) {
 }
 
 /** Full view of one stored ride. `back` returns to the list (also after a delete). */
-/** Rebuilds the ride's postcard from what was saved (no still is kept, so it gets the skyline). */
-async function savePostcard(p: Profile, s: RideSummary) {
+/**
+ * Rebuilds the ride's postcard from what was saved: a bus ride's crew card from its stored result, any other
+ * ride's card on the sky with the power skyline (no still is kept).
+ */
+async function savePostcard(p: Profile, s: RideSummary & { group?: GroupSummary }) {
+  if (s.group) return postcard(s.group, s.planName, s.record.date)
   const c = await ridePostcard(s, p.weightKg || CFG.freeRide.defaultKg, undefined, settings.units)
   const day = new Date(s.record.date).toLocaleDateString('en-CA')
   return savePng(c, `cranky-${s.route?.id ?? 'ride'}-${day}`)

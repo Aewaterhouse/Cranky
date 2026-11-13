@@ -103,7 +103,7 @@
 ## server/ (FastAPI, uv)
 - `src/zombie_bus_server/app.py` REST (login, riders, rooms, profile), WebSocket, static client.
 - `config.py` tunables, env vars, `SEED_USERS`; `protocol.py` message schemas; `plan.py` plan loading, targets, generator.
-- `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete).
+- `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete), backups and the startup backfill of old bus results.
 - `modes/zombie_bus.py` bus, horde, events, shop, awards rules; `modes/vo2_madness.py` VO2 Madness: dealing the session, effort scoring, crown, mystery box, awards.
 - `road_physics.py` and `road_route.py` Python ports of the client's ride physics, route resampling and curvature; `modes/road.py` `RoadSim`, `Mover` and the `Rules` hook for road games; `road_room.py` road rooms (lobby, late join, rejoin, finish); `road_bots.py` road bot personalities.
 - `files.py` downloads the client built, kept in memory for a few minutes behind an unguessable link (`tests/test_files.py`).

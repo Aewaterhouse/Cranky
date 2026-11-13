@@ -6,9 +6,12 @@ import secrets
 import sqlite3
 import threading
 import time
+from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
 from . import config
+
+AU_EAST = (timezone(timedelta(hours=10)), timezone(timedelta(hours=11)))
 
 
 class Store:
@@ -222,3 +225,42 @@ class Store:
                 "SELECT date, plan, json FROM results WHERE date >= ? AND date < ? ORDER BY n", (start, end)
             ).fetchall()
         return [{**json.loads(j), "date": d, "plan": p} for d, p, j in rows]
+
+    def backfill_bus_results(self) -> int:
+        """Gives bus rides saved before rides carried their crew result one from the season ladder's results.
+
+        A results row knows its plan, the day the bus finished (server time) and every rider on it, so a
+        crew ride by one of those riders, on that plan, finishing that day, is the same ride. Same-day repeats
+        pair up in order. VO2 Madness rides never reach the ladder, so they stay without one.
+
+        Returns:
+            How many rides were given a result.
+        """
+        with self.lock, self.db:
+            rides = self.db.execute(
+                "SELECT n, rider, json FROM rides WHERE json_extract(json, '$.crew') AND "
+                "json_extract(json, '$.group') IS NULL AND json_extract(json, '$.route') IS NULL ORDER BY n"
+            ).fetchall()
+            results = self.db.execute("SELECT date, plan, json FROM results ORDER BY n").fetchall()
+            pool: dict[tuple[str, str, str], list[dict]] = {}
+            for day, plan, j in results:
+                summary = json.loads(j)
+                for r in summary.get("riders", []):
+                    pool.setdefault((r.get("id", ""), plan, day), []).append(summary)
+            done = 0
+            for n, rider, j in rides:
+                ride = json.loads(j)
+                rec = ride.get("record", {})
+                try:
+                    start = datetime.fromisoformat(rec.get("date", "").replace("Z", "+00:00"))
+                except ValueError:
+                    continue
+                end = start + timedelta(seconds=rec.get("secs", 0))
+                # the server may have moved (PC, then Railway): its own zone, eastern Australia, UTC
+                days = [end.astimezone(z).strftime("%Y-%m-%d") for z in (None, *AU_EAST, UTC)]
+                match = next((m for d in days if (m := pool.get((rider, ride.get("planName", ""), d)))), None)
+                if match:
+                    ride["group"] = match.pop(0)
+                    self.db.execute("UPDATE rides SET json = ? WHERE n = ?", (json.dumps(ride), n))
+                    done += 1
+        return done
