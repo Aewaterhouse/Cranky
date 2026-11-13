@@ -115,6 +115,9 @@ export const VIS = {
     bush: '#4c8a47',
     rock: '#8b8780',
     snow: '#f3f6fa',
+    sea: '#3d8fc4',
+    /** Ground below this height (m) is drawn as water. */
+    seaLevel: 0.5,
   },
   moods: {
     drill: {

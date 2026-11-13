@@ -61,10 +61,21 @@ function routeFolder(f: GUI, rebuild: () => void) {
   built.add(R, 'hillAmp', 0, 300)
   built.add(R, 'hillScale', 50, 800)
   built.add(R, 'snowLine', 0, 2500)
+  built.add(R, 'seaLevel', -1, 5)
   built.add(R, 'rockSlope', 0.3, 1)
   for (const k of ['aheadPotato', 'aheadLow', 'aheadMedium', 'aheadHigh'] as const)
     built.add(R, k, 200, 2000, 50)
-  for (const k of ['tarmac', 'line', 'gravel', 'grass', 'dry', 'bush', 'rock', 'snow'] as const)
+  for (const k of [
+    'tarmac',
+    'line',
+    'gravel',
+    'grass',
+    'dry',
+    'bush',
+    'rock',
+    'snow',
+    'sea',
+  ] as const)
     built.addColor(R, k)
   built.onChange(rebuild)
 }

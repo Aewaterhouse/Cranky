@@ -11,6 +11,8 @@ const AIM_UP = 1.1
 const KICK_DEG = 5
 const KICK_AT = 18
 const JUMP_M = 60
+/** The camera never trails its spot by more than this, however fast the rider or slow the frame rate. */
+const LAG_MAX_M = 4
 
 /**
  * Chase camera for the road: sits on the road behind the rider (so it is never inside a cut bank), aims part-way
@@ -55,9 +57,16 @@ export class RouteCam {
     // Snap rather than fly when the rider has jumped (the first frame, a rejoin, the harness).
     const jumped = Math.hypot(b.x - this.x, b.y - this.y, b.z - this.z) > JUMP_M
     const k = jumped ? 1 : 1 - Math.exp(-dt * R.camStiff)
-    this.x += (b.x + b.rx * side - this.x) * k
+    const tx = b.x + b.rx * side
+    const tz = b.z + b.rz * side
+    this.x += (tx - this.x) * k
     this.y += (b.y + R.camHeight - this.y) * k
-    this.z += (b.z + b.rz * side - this.z) * k
+    this.z += (tz - this.z) * k
+    const lag = Math.hypot(tx - this.x, tz - this.z)
+    if (lag > LAG_MAX_M) {
+      this.x = tx + ((this.x - tx) * LAG_MAX_M) / lag
+      this.z = tz + ((this.z - tz) * LAG_MAX_M) / lag
+    }
     this.lx += (rx + (a.x + a.rx * side - rx) * m - this.lx) * k
     this.ly += (me.y + (a.y - me.y) * m + AIM_UP - this.ly) * k
     this.lz += (rz + (a.z + a.rz * side - rz) * m - this.lz) * k

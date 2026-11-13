@@ -325,3 +325,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Quality levels are the bus scene's (`Quality`, same Graphics setting): pixel ratio and shadows as before, plus how far ahead the road is built (350, 500, 800, 1000 m) and, on potato, no terrain beyond 90 m from the road. Fog closes in to match.
 - Nothing here writes to the trainer. Free ride still sends gradient only, through `ergController.ts`.
 
+## 2026-11-13 Free ride 3D road world (Phase B): polish
+- Sea: the height data reads zero over water, so ground below 0.5 m is drawn flat blue. It is a stand-in until Phase C paints water from the map; low-lying land right at sea level would also turn blue. Tunable (`seaLevel`, `sea`).
+- The camera eases to its spot behind the rider but never trails it by more than 4 m, so a fast descent or a slow frame rate cannot leave the rider a dot in the distance.
+

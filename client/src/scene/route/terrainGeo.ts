@@ -13,6 +13,7 @@ const rock = new THREE.Color()
 const snow = new THREE.Color()
 const gravel = new THREE.Color()
 const dry = new THREE.Color()
+const sea = new THREE.Color()
 const tint = new THREE.Color()
 /** A row's ground runs this far past the half-way line to the next bit of road, then drops a skirt this deep. */
 const OVERLAP_M = 2.5
@@ -22,6 +23,8 @@ const FAN_RAD = 0.2
 
 /** Face colour from height and steepness: grass and bush, rock on steep faces, snow up high. */
 function shade(x: number, y: number, z: number, up: number, verge: boolean) {
+  // The height data reads zero over the sea, so flat ground at zero is drawn as water.
+  if (y < R.seaLevel) return tint.copy(sea).multiplyScalar(0.97 + hash(x * 13.7 + z * 7.3) * 0.06)
   tint.copy(grass).lerp(bush, smooth(0.35, 0.7, noise2(x / 90 + 3, z / 90)))
   tint.lerp(dry, smooth(0.5, 0.8, noise2(x / 150 + 20, z / 150 + 4)) * 0.6)
   if (verge) tint.lerp(gravel, 0.2)
@@ -67,6 +70,7 @@ export function buildTerrain(field: HeightField, d0: number, d1: number, far: bo
   snow.set(R.snow)
   gravel.set(R.gravel)
   dry.set(R.dry)
+  sea.set(R.sea)
   const step = R.rowStep
   const rows = Math.round((d1 - d0) / step)
   const offs = [R.roadHalf + R.verge, ...R.inner, ...(far ? R.outer : [])]
