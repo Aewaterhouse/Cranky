@@ -17,7 +17,7 @@ export interface Effort {
   rideDate?: string
   /** Lap rides: which lap, from 1. */
   lap?: number
-  /** Whole-route and lap efforts: metres from the start every `traceS` seconds, for ghosts. */
+  /** Metres from the segment's start every `traceS` seconds: the pace of the effort, for splits and ghosts. */
   trace?: number[]
 }
 
@@ -89,8 +89,7 @@ export class SegmentTracker {
           })
         const o = this.open.get(s.id)
         if (!o || o.at !== a) continue
-        const traced = s.kind === 'route' || s.kind === 'lap'
-        while (traced && el > p.el && o.t0 + (o.trace.length + 1) * T <= el) {
+        while (el > p.el && o.t0 + (o.trace.length + 1) * T <= el) {
           const at = (o.t0 + (o.trace.length + 1) * T - p.el) / (el - p.el)
           o.trace.push(Math.round(Math.min(b, p.d + Math.max(0, at) * (d - p.d)) - a))
         }
@@ -109,7 +108,7 @@ export class SegmentTracker {
           wkg: +(watts / this.kg).toFixed(2),
           date: this.now(),
           ...(this.laps > 1 ? { lap: k + 1 } : {}),
-          ...(traced ? { trace: o.trace.filter((_, i) => (i + 1) * T < secs) } : {}),
+          trace: o.trace.filter((_, i) => (i + 1) * T < secs),
         })
       }
     return out
@@ -125,4 +124,16 @@ export function traceAt(trace: number[], secs: number, lenM: number, t: number):
   const t1 = Math.min(secs, (i + 1) * T)
   const b = (i + 1) * T < secs ? (trace[i] ?? lenM) : lenM
   return a + ((b - a) * (Math.max(0, t) - i * T)) / (t1 - i * T)
+}
+
+/** Seconds into an effort (`trace`, `secs` over `lenM` metres) at which it was `m` metres along. */
+export function traceTime(trace: number[], secs: number, lenM: number, m: number): number {
+  if (m >= lenM) return secs
+  const T = CFG.segments.traceS
+  const i = trace.findIndex((d) => d >= m)
+  const a = i < 0 ? (trace[trace.length - 1] ?? 0) : i ? trace[i - 1] : 0
+  const b = i < 0 ? lenM : trace[i]
+  const t0 = (i < 0 ? trace.length : i) * T
+  const t1 = i < 0 ? secs : t0 + T
+  return b > a ? t0 + ((t1 - t0) * (Math.max(0, m) - a)) / (b - a) : t0
 }

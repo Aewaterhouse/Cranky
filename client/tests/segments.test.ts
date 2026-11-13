@@ -2,15 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { CFG } from '../src/config'
 import { buildRoute, withLaps, type Route } from '../src/core/route'
 import { ROUTE_INDEX, loadRoute } from '../src/core/routeLibrary'
-import {
-  modelTimes,
-  routeSegments,
-  segClock,
-  segFrac,
-  splitText,
-  type Segment,
-} from '../src/core/segments'
-import { SegmentTracker, traceAt } from '../src/core/segmentTracker'
+import { routeSegments, segClock, splitText, type Segment } from '../src/core/segments'
+import { SegmentTracker, traceAt, traceTime } from '../src/core/segmentTracker'
 import { segmentRun } from '../src/modes/freeRide/segmentRun'
 
 /** A route from [length m, gradient %] legs. */
@@ -108,14 +101,17 @@ describe('segment derivation', () => {
 })
 
 describe('split maths', () => {
-  it('shares time by how long a steady rider takes, not by distance', () => {
-    const r = hill()
-    const times = modelTimes(r)
-    const whole = routeSegments(r)[2]
-    expect(segFrac(times, 10, whole, 0)).toBe(0)
-    expect(segFrac(times, 10, whole, 3500)).toBe(1)
-    // 1 km of flat is 29% of the distance but far less of the time on a route with a 1.5 km climb.
-    expect(segFrac(times, 10, whole, 1000)).toBeLessThan(0.2)
+  it('reads the time a best took to reach a spot off its trace', () => {
+    // 300 m in 20 s: 100 m in the first 5 s, then 50 m, 50 m, and 100 m in the last 5 s.
+    const trace = [100, 150, 200]
+    expect(traceTime(trace, 20, 300, 0)).toBe(0)
+    expect(traceTime(trace, 20, 300, 50)).toBeCloseTo(2.5)
+    expect(traceTime(trace, 20, 300, 175)).toBeCloseTo(12.5)
+    expect(traceTime(trace, 20, 300, 250)).toBeCloseTo(17.5)
+    expect(traceTime(trace, 20, 300, 300)).toBe(20)
+    // It is the inverse of where a ghost on the same trace would be.
+    expect(traceAt(trace, 20, 300, traceTime(trace, 20, 300, 130))).toBeCloseTo(130)
+    expect(traceTime([], 3, 30, 15)).toBeCloseTo(1.5)
   })
 
   it('formats splits and times', () => {
@@ -147,7 +143,7 @@ describe('segment tracker', () => {
       wkg: 2.5,
       date: 'now',
     })
-    expect(out[0].trace).toBeUndefined()
+    expect(out[0].trace).toEqual([50, 100, 150])
   })
 
   it('knows the time so far only while on the segment', () => {
@@ -207,10 +203,16 @@ describe('segments in a ride', () => {
   it('shows the segment coming up, then a live split against my best and the crew, then the result', () => {
     const climb = routeSegments(hill())[0]
     const len = climb.end - climb.start
+    // Both bests were ridden at a steady pace: mine 10 s slower than this ride will be, Luke's 20 s faster.
+    const steady = (secs: number) => ({
+      secs,
+      date: '',
+      trace: Array.from({ length: Math.ceil(secs / 5) - 1 }, (_, i) => ((i + 1) * 5 * len) / secs),
+    })
     const bests = {
       [climb.id]: {
-        pr: { secs: len / 10 + 10, date: '' },
-        crew: { id: 'luke', name: 'Luke', secs: len / 10 - 20, date: '' },
+        pr: steady(len / 10 + 10),
+        crew: { id: 'luke', name: 'Luke', ...steady(len / 10 - 20) },
       },
     }
     const { run, said, stored, lives } = ride(bests)
@@ -219,8 +221,8 @@ describe('segments in a ride', () => {
     expect(before.lines[0]).toMatch(/^PR /)
     const late = lives[Math.floor((climb.end - 20) / 10)].seg!
     expect(late.name).toBe(climb.name)
-    expect(late.lines[1]).toMatch(/^−0:(09|1[0-2]) vs PR$/)
-    expect(late.lines[2]).toMatch(/^\+0:(1[6-9]|20) vs Luke$/)
+    expect(late.lines[1]).toMatch(/^−0:(09|10) vs PR$/)
+    expect(late.lines[2]).toMatch(/^\+0:(19|20) vs Luke$/)
     const res = run.results.find((r) => r.segment === climb.id)!
     expect(res).toMatchObject({ pr: true, first: false, crewBest: false, watts: 200 })
     expect(said.find(([t]) => t.startsWith('New PR!'))?.[1]).toBe(1)

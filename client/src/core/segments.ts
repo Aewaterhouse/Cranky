@@ -1,6 +1,5 @@
 import { CFG } from '../config'
 import { findClimbs } from './climbs'
-import { steadySpeed, totalMass } from './physics'
 import type { Route } from './route'
 
 const S = CFG.segments
@@ -18,6 +17,12 @@ export interface Segment {
 
 /** The single lap behind a lap ride, or the route itself. */
 export const baseRoute = (r: Route) => r.lapOf ?? r
+
+/** The id of the whole-route segment (one lap, on a circuit): what ghosts and the route board are keyed on. */
+export const wholeId = (route: Route) => {
+  const r = baseRoute(route)
+  return segId(r.id, r.loop ? 'lap' : 'route', 0)
+}
 
 const segId = (route: string, kind: SegKind, start: number) =>
   `${route}:${kind}:${Math.round(start / S.idRoundM) * S.idRoundM}`
@@ -92,32 +97,6 @@ export function routeSegments(route: Route): Segment[] {
     end: r.distance,
   }
   return [...climbs, ...sprint, whole]
-}
-
-/**
- * Seconds a steady `modelW` rider is into the route at each point. Live splits use it to share a best time
- * out along a segment, so a split halfway up a climb that starts steep is not judged on distance alone.
- */
-export function modelTimes(route: Route): number[] {
-  const r = baseRoute(route)
-  const mass = totalMass(undefined)
-  const space = r.points[1].d - r.points[0].d
-  const out = [0]
-  for (let i = 0; i < r.points.length - 1; i++)
-    out.push(out[i] + space / Math.max(0.5, steadySpeed(S.modelW, r.points[i].grade, mass)))
-  return out
-}
-
-/** Share of a segment's time a steady rider has used by `d` (metres along the lap), 0 to 1. */
-export function segFrac(times: number[], space: number, seg: Segment, d: number): number {
-  const at = (m: number) => {
-    const x = Math.min(times.length - 1, Math.max(0, m / space))
-    const i = Math.min(times.length - 2, Math.floor(x))
-    return times[i] + (times[i + 1] - times[i]) * (x - i)
-  }
-  const a = at(seg.start)
-  const whole = at(seg.end) - a
-  return whole > 0 ? Math.min(1, Math.max(0, (at(d) - a) / whole)) : 1
 }
 
 /** A segment time: "24.3 s" under a minute, then m:ss, then h:mm:ss. */

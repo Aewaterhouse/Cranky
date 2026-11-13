@@ -70,6 +70,9 @@ def test_only_the_best_effort_keeps_its_trace_for_ghosts():
         120,
         180,
     ]
+    # A ride's pre-load carries the leaders' pace, for live splits against the crew's best.
+    crew = client.get("/api/efforts?route=test-hill", headers=h).json()["crew"][seg]
+    assert crew[0]["id"] == "angus" and crew[0]["trace"] == [60, 120, 180]
     # Anyone in the crew can ride against it; a rider with no effort gives a 404.
     _, other = auth("alex", "Alex")
     assert client.get(f"/api/segments/{seg}/ghost/angus", headers=other).status_code == 200

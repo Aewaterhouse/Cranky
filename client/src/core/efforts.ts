@@ -8,7 +8,7 @@ export interface Best {
   date: string
   watts?: number
   wkg?: number
-  /** Whole-route and lap bests keep their trace so they can ride again as a ghost. */
+  /** Its pace (see `Effort.trace`), for live splits and for riding again as a ghost. */
   trace?: number[]
 }
 /** A row of a segment's crew leaderboard: one rider's best. */

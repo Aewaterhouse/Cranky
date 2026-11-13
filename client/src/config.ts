@@ -281,16 +281,33 @@ export const CFG = {
     sprint: { lenM: 300, flatPct: 2, leadM: 100 },
     /** A climb takes the name of a named peak or lookout within this far of its top (m). */
     poiM: 400,
-    /** Live splits share a best time out along the segment by the time a steady `modelW` rider would take. */
-    modelW: 200,
-    /** Whole-route and lap efforts keep the distance every `traceS` seconds, for ghosts. */
+    /** Every effort keeps its distance every `traceS` seconds: the pace that live splits and ghosts replay. */
     traceS: 5,
     /** A group-ride position jump bigger than this (m) is a late join, not riding: no segment starts or ends. */
     jumpM: 40,
     /** Efforts kept waiting for the server at most. */
     queueMax: 200,
-    /** How solid a ghost rider is drawn (0 to 1). */
-    ghostOpacity: 0.38,
+    /** A ghost turns its cranks at this cadence. */
+    ghostCadence: 85,
+  },
+  /** Route passport (Rider tab). */
+  passport: {
+    /** The map: the box of longitudes and latitudes drawn, the east-west squeeze and units per degree. */
+    map: { west: 112.5, east: 154.5, north: 9.5, south: 44.5, squeeze: 0.89, scale: 11 },
+    /** Route dots are kept at least this far apart (map units). */
+    dotGap: 15,
+    /** Metres climbed in total on one route for the three climbing badges (the last is an Everest). */
+    vertTiers: [2000, 4424, 8848],
+    /** Finishes of one route for the two repeat badges. */
+    repeatTiers: [5, 20],
+    /** Brisbane routes start within `km` of the city. */
+    brisbane: { at: [153.03, -27.47], km: 25 },
+  },
+  /** Weekly goals: scrap for finishing the featured route, and the rider's own climbing target. */
+  weekly: {
+    featuredScrap: 30,
+    /** The target is `stretch` times the average of the last `weeks` weeks with any climbing, to the nearest `roundM`. */
+    vert: { defaultM: 600, minM: 300, maxM: 6000, stretch: 1.1, roundM: 50, weeks: 4, scrap: 50 },
   },
   /**
    * Group rides. `draft` and `band` mirror DRAFT_* and BAND_* in the server's config.py (the server decides; the

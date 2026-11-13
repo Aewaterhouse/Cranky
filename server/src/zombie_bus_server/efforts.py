@@ -99,10 +99,12 @@ class Efforts:
         segments = [
             r[0] for r in self._rows("SELECT DISTINCT segment FROM efforts WHERE route = ?", (route,))
         ]
-        return {
-            "mine": {b["segment"]: b for b in self.bests(rider, route)},
-            "crew": {s: self.leaderboard(s) for s in segments},
-        }
+        crew = {s: self.leaderboard(s) for s in segments}
+        # The best of the others is first or second: those two carry their pace, for live splits against it.
+        for s, rows in crew.items():
+            for row in rows[:2]:
+                row["trace"] = (self.ghost(s, row["id"]) or {}).get("trace")
+        return {"mine": {b["segment"]: b for b in self.bests(rider, route)}, "crew": crew}
 
     def ghost(self, segment: str, rider: str) -> dict | None:
         """A rider's best effort on a segment with its trace, or None if they have no traced effort."""

@@ -1,17 +1,15 @@
 import { CFG } from '../../config'
-import type { Bests } from '../../core/efforts'
+import type { Best, Bests } from '../../core/efforts'
 import type { Route } from '../../core/route'
 import {
   baseRoute,
-  modelTimes,
   routeSegments,
   segClock,
-  segFrac,
   splitText,
   type SegKind,
   type Segment,
 } from '../../core/segments'
-import { SegmentTracker, type Effort, type SegResult } from '../../core/segmentTracker'
+import { SegmentTracker, traceTime, type Effort, type SegResult } from '../../core/segmentTracker'
 import { segLine } from '../../fun/segmentLines'
 
 /** What the HUD's segment panel shows. */
@@ -26,7 +24,7 @@ export interface SegLive {
 
 /**
  * The segments of one ride: times them, works out the live splits against `bests` (my PR and the best of
- * the crew), and says so when one is finished. `say(text, level)`: 0 a plain result, 1 a PR, 2 a crew best.
+ * the crew, each from the pace of that effort itself), and says so when one is finished. `say(text, level)`: 0 a plain result, 1 a PR, 2 a crew best.
  * No DOM and no network: the caller stores what `onEffort` hands it.
  */
 export function segmentRun(
@@ -40,21 +38,24 @@ export function segmentRun(
   const lapM = route.lapOf ? base.distance : Infinity
   const laps = route.lapOf ? Math.round(route.distance / base.distance) : 1
   const segs = routeSegments(route)
-  const times = modelTimes(route)
-  const space = base.points[1].d - base.points[0].d
   const tracker = new SegmentTracker(segs, base.id, rider.kg, lapM, laps)
   const whole = segs[segs.length - 1]
   const results: SegResult[] = []
   let joules = 0
 
-  /** "−0:04 vs PR" and "+0:11 vs Luke" for a go `t` seconds in at `d` metres along the lap. */
+  /**
+   * "−0:04 vs PR" and "+0:11 vs Luke" for a go `t` seconds in at `d` metres along the lap: my time against
+   * the time the best took to get this far, read off its own trace. A best with no trace gives no split.
+   */
   const splits = (s: Segment, t: number, d: number) => {
-    const f = segFrac(times, space, s, d)
     const b = bests[s.id]
-    return [
-      ...(b?.pr ? [`${splitText(t - b.pr.secs * f)} vs PR`] : []),
-      ...(b?.crew ? [`${splitText(t - b.crew.secs * f)} vs ${b.crew.name}`] : []),
-    ]
+    const vs = (best: Best | undefined, who: string) =>
+      best?.trace
+        ? [
+            `${splitText(t - traceTime(best.trace, best.secs, s.end - s.start, d - s.start))} vs ${who}`,
+          ]
+        : []
+    return [...vs(b?.pr, 'PR'), ...vs(b?.crew, b?.crew?.name ?? '')]
   }
 
   function finish(e: Effort) {

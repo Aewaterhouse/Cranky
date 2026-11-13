@@ -126,10 +126,15 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
 
   const toastBox = h('div', { class: 'fr-toast', role: 'status' })
   let toastTimer = 0
+  let fanfareUntil = 0
   const toast = (text: string, secs = CFG.hud.toastS) => {
+    // A fanfare (a PR) holds the stage: a passing remark does not talk over it.
+    const big = secs > CFG.hud.toastS
+    if (!big && performance.now() < fanfareUntil) return
+    fanfareUntil = big ? performance.now() + secs * 1000 : 0
     toastBox.textContent = text
     toastBox.classList.add('on')
-    toastBox.classList.toggle('big', secs > CFG.hud.toastS)
+    toastBox.classList.toggle('big', big)
     clearTimeout(toastTimer)
     toastTimer = window.setTimeout(() => toastBox.classList.remove('on'), secs * 1000)
   }
