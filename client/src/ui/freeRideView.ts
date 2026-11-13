@@ -1,6 +1,7 @@
 import '../solo.css'
 import '../freeride.css'
 import '../freeHud.css'
+import '../freeHudDock.css'
 import { CFG } from '../config'
 import type { ListRider } from '../core/hud'
 import { routeStats, type Route } from '../core/route'

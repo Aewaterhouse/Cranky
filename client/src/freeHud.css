@@ -5,7 +5,7 @@
   --glass: rgba(10, 11, 14, 0.48);
   --edge: calc(3 * var(--u));
 }
-.hud {
+.fhud {
   position: fixed;
   inset: 0;
   z-index: 1;
@@ -19,29 +19,29 @@
   --sb: max(calc(2 * var(--u)), env(safe-area-inset-bottom));
   --sl: max(var(--edge), env(safe-area-inset-left));
 }
-.fr:not(.fr3d) .hud,
-.hud-clean .hud,
+.fr:not(.fr3d) .fhud,
+.hud-clean .fhud,
 .hud-clean .fr-toast,
-.hud [hidden] {
+.fhud [hidden] {
   display: none !important;
 }
-.hud .off {
+.fhud .off {
   visibility: hidden;
 }
-.hud .glass {
+.fhud .glass {
   background: var(--glass);
   backdrop-filter: blur(8px);
   border-radius: var(--u);
 }
-.hud small {
+.fhud small {
   font: 500 0.4em var(--ui);
   margin-left: 0.25em;
   opacity: 0.8;
 }
-.hud b {
+.fhud b {
   font-weight: 700;
 }
-.hud button {
+.fhud button {
   pointer-events: auto;
   font: inherit;
   color: inherit;
@@ -50,7 +50,7 @@
   min-width: 0;
   cursor: pointer;
 }
-.hud kbd {
+.fhud kbd {
   font: 700 0.7em var(--ui);
   margin-left: 0.6em;
   padding: 0 0.4em;
@@ -69,7 +69,7 @@
   align-items: flex-start;
   gap: var(--u);
 }
-.hud .power {
+.fhud .power {
   padding: calc(1.2 * var(--u)) calc(1.8 * var(--u)) calc(1.4 * var(--u));
 }
 .pw-row {
@@ -78,13 +78,13 @@
   justify-content: space-between;
   gap: calc(2 * var(--u));
 }
-.hud .hpw {
+.fhud .hpw {
   min-width: 4.4ch;
   font-size: calc(7 * var(--u));
   line-height: 0.95;
 }
-.hud .hpw b,
-.hud .spd b {
+.fhud .hpw b,
+.fhud .spd b {
   font: 400 1em / 1 var(--display);
 }
 .pw-side {
@@ -96,7 +96,7 @@
 .pw-side small {
   font-size: 0.6em;
 }
-.hud .zone {
+.fhud .zone {
   font-size: 0.8em;
   opacity: 0.75;
 }
@@ -105,7 +105,6 @@
   height: calc(0.6 * var(--u));
   margin: calc(0.7 * var(--u)) 0 calc(1 * var(--u));
   border-radius: 99px;
-  transition: background 0.3s;
 }
 .pw-sub {
   display: grid;
@@ -118,22 +117,22 @@
 }
 
 /* Stats drawer: under the power panel, only when asked for */
-.hud .hstats {
+.fhud .hstats {
   display: none;
   min-width: 100%;
   padding: calc(1 * var(--u)) calc(1.8 * var(--u));
   font-size: calc(2.1 * var(--u));
 }
-.hud-stats .hud .hstats {
+.hud-stats .fhud .hstats {
   display: block;
 }
-.hud .hstats div {
+.fhud .hstats div {
   display: flex;
   justify-content: space-between;
   gap: calc(3 * var(--u));
   line-height: 1.5;
 }
-.hud .hstats span {
+.fhud .hstats span {
   font-weight: 500;
   opacity: 0.75;
 }
@@ -145,16 +144,16 @@
   left: 50%;
   transform: translateX(-50%);
 }
-.hud .speed {
+.fhud .speed {
   padding: calc(0.8 * var(--u)) calc(2.2 * var(--u)) calc(1 * var(--u));
   text-align: center;
 }
-.hud .spd {
+.fhud .spd {
   display: inline-block;
   min-width: 7ch;
   font-size: calc(4.4 * var(--u));
 }
-.hud .totals {
+.fhud .totals {
   display: flex;
   justify-content: center;
   margin-top: calc(0.4 * var(--u));
@@ -162,7 +161,7 @@
   white-space: nowrap;
   color: rgba(255, 255, 255, 0.78);
 }
-.hud .totals span + span::before {
+.fhud .totals span + span::before {
   content: '·';
   margin: 0 0.6em;
   opacity: 0.6;
@@ -226,13 +225,13 @@
   line-height: 1.2;
   background: rgba(255, 255, 255, 0.55);
 }
-.hud .rlist {
+.fhud .rlist {
   display: none;
   margin-block: auto;
   padding: calc(0.5 * var(--u));
   font-size: calc(2 * var(--u));
 }
-.hud-riders .hud .rlist {
+.hud-riders .fhud .rlist {
   display: block;
 }
 .rrow {
@@ -258,198 +257,4 @@
 .rrow.me {
   background: rgba(255, 255, 255, 0.2);
   border-left-color: var(--acc);
-}
-
-/* Bottom: corner controls, gradient and climb, gear; then the whole-route strip */
-.hud-bot {
-  position: absolute;
-  left: var(--sl);
-  right: var(--sr);
-  bottom: var(--sb);
-  display: flex;
-  flex-direction: column;
-  gap: var(--u);
-}
-.dock {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: end;
-  gap: calc(1.5 * var(--u));
-}
-.dock-l,
-.dock-c,
-.dock-r {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--u);
-}
-.dock-l {
-  position: relative;
-}
-.dock-l > button {
-  font-size: calc(2 * var(--u));
-  opacity: 0.85;
-}
-.dock-r {
-  justify-content: flex-end;
-}
-.hud .grade {
-  padding: calc(0.5 * var(--u)) calc(1.6 * var(--u));
-  font: 400 calc(4 * var(--u)) / 1.15 var(--display);
-  white-space: nowrap;
-  transition: color 0.3s;
-}
-.hud .climb {
-  display: flex;
-  align-items: stretch;
-  gap: calc(1.5 * var(--u));
-  height: calc(9.5 * var(--u));
-  padding: calc(0.8 * var(--u)) calc(1.2 * var(--u));
-}
-.climb-txt {
-  display: grid;
-  grid-template-columns: auto auto;
-  align-content: space-between;
-  gap: 0 calc(1.6 * var(--u));
-  font-size: calc(2.8 * var(--u));
-  white-space: nowrap;
-}
-.climb-txt > span:first-child {
-  grid-column: 1 / -1;
-  font-size: calc(1.8 * var(--u));
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--acc);
-}
-.climb-txt .hv:nth-child(2) {
-  grid-column: 1 / -1;
-  font-size: 1.25em;
-}
-.climb-txt small {
-  font-size: 0.55em;
-}
-.climb-prof {
-  position: relative;
-  width: calc(34 * var(--u));
-  border-radius: calc(0.6 * var(--u));
-  overflow: hidden;
-}
-.hud .gear {
-  display: flex;
-  align-items: baseline;
-  gap: calc(0.8 * var(--u));
-  padding: calc(0.6 * var(--u)) calc(1.4 * var(--u));
-  font-size: calc(3 * var(--u));
-}
-.hud .gear > span:first-child {
-  font: 500 0.55em var(--ui);
-  opacity: 0.75;
-}
-.hud .gear small {
-  font-size: 0.55em;
-  margin-left: 0;
-}
-.hud .strip {
-  position: relative;
-  height: calc(5 * var(--u));
-  margin: 0 calc(5 * var(--u));
-  overflow: hidden;
-}
-
-/* Menu: trainer difficulty, pause, end ride and the toggles */
-.hud .hmenu {
-  position: absolute;
-  left: 0;
-  bottom: calc(100% + var(--u));
-  width: max-content;
-  max-width: 80vw;
-  padding: calc(1.6 * var(--u));
-  display: flex;
-  flex-direction: column;
-  gap: calc(1.2 * var(--u));
-  background: rgba(10, 11, 14, 0.82);
-  pointer-events: auto;
-}
-.hud .hmenu h2 {
-  margin: 0;
-  font: 400 calc(2.6 * var(--u)) var(--display);
-}
-.hud .hmenu label {
-  font: 500 calc(2 * var(--u)) var(--ui);
-  letter-spacing: 0;
-  text-transform: none;
-  color: rgba(255, 255, 255, 0.8);
-}
-.hud .hmenu .diff input {
-  width: calc(24 * var(--u));
-}
-.hud .hmenu .diff .pct {
-  font-size: calc(2.8 * var(--u));
-  min-width: 4ch;
-}
-.menu-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: calc(0.8 * var(--u));
-}
-.menu-grid button {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: calc(0.8 * var(--u));
-}
-
-/* Pause and end-ride messages sit over everything; only the dialog takes clicks */
-.fr3d > .overlay {
-  position: fixed;
-  z-index: 3;
-  border-radius: 0;
-  background: rgba(17, 18, 20, 0.35);
-  backdrop-filter: none;
-  pointer-events: none;
-}
-.fr3d > .overlay.dialog {
-  background: rgba(17, 18, 20, 0.7);
-  pointer-events: auto;
-}
-
-@media (pointer: coarse) {
-  .hud button {
-    min-width: 44px;
-    min-height: 44px;
-  }
-}
-/* Phone landscape (the same height as CFG.hud.phoneMaxH): tighter panels, fewer totals, a slim climb strip */
-@media (max-height: 500px) {
-  .fr {
-    --edge: max(4vh, calc(2 * var(--u)));
-  }
-  .hud .hpw {
-    font-size: calc(6 * var(--u));
-  }
-  .hud .totals .up {
-    display: none;
-  }
-  .hud .strip {
-    height: calc(3.5 * var(--u));
-    margin: 0;
-  }
-  .hud .climb {
-    height: calc(7.5 * var(--u));
-  }
-  .climb-txt {
-    grid-template-columns: auto auto auto;
-    font-size: calc(2.4 * var(--u));
-  }
-  .climb-txt .hv:nth-child(2) {
-    grid-column: auto;
-    font-size: 1em;
-  }
-  .climb-prof {
-    width: calc(24 * var(--u));
-  }
-  .hud .grade {
-    font-size: calc(3.4 * var(--u));
-  }
 }

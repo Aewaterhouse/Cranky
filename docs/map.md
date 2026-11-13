@@ -18,7 +18,7 @@
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.
 - `src/style.css` design tokens and base; `ui.css` shell, login, modal, toasts; `screens.css` tabs and trainer modal; `setup.css` plan picker, solo setup, lobby, rider stats; `solo.css` workout player; `results.css` results.
-- `src/freeride.css` free ride flat layout and setup; `freeHud.css` free-ride HUD over the 3D world (sizes in `--u`, 1% of screen height).
+- `src/freeride.css` free ride flat layout and setup; `freeHud.css` free-ride HUD over the 3D world (sizes in `--u`, 1% of screen height): base and top panels; `freeHudDock.css` its bottom dock, climb panel, strip, menu and phone rules.
 - `src/hud.css` HUD base; `hudBus.css` bus status and roster; `hudPanels.css` stats, shop, feed; `hudSplash.css` splashes, responsive.
 
 ### core/

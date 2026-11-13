@@ -91,7 +91,7 @@ export const CFG = {
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
     toastS: 3,
-    /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHud.css uses the same number. */
+    /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */
     phoneMaxH: 500,
     /** No ETA to the top below this speed (m/s). */
     etaMinMs: 1,

@@ -106,7 +106,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
 
   const root = h(
     'div',
-    { class: 'hud' },
+    { class: 'fhud' },
     h(
       'div',
       { class: 'hud-tl' },

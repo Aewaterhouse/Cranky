@@ -379,8 +379,10 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `?ghosts=N` (up to 8) adds made-up mates to a free ride, riding steadily at 60 to 95% of your FTP from just up the road. It exists to look at the rider list and a bunch before group free rides do; it is a dev aid like `?fast=`.
 - Keys: H clean view, S stats, M minimap, R rider list. On touch, the ☰ menu has the same toggles and a tap on the scene leaves clean view. Clean view also hides toasts; the pause and end-ride messages still show.
 - Trainer difficulty, Pause and End ride live in the ☰ menu (bottom left). The route name is in the menu and in a toast at the start.
-- Phone landscape is "500 CSS px tall or less" (`CFG.hud.phoneMaxH`): minimap and rider list start off, the climbed total is dropped from the top line, side margins are 4 vh or the safe area, whichever is bigger. Buttons are at least 44 px on touch screens. `index.html` was not given `viewport-fit=cover`, so today the browser keeps the page clear of the notch itself and the safe-area insets read as zero.
+- Phone landscape is "500 CSS px tall or less" (`CFG.hud.phoneMaxH`, repeated in `freeHudDock.css`): minimap and rider list start off, the climbed total is dropped from the top line, side margins are 4 vh or the safe area, whichever is bigger. Buttons are at least 44 px on touch screens. `index.html` was not given `viewport-fit=cover`, so today the browser keeps the page clear of the notch itself and the safe-area insets read as zero.
 - The minimap is the same Leaflet map as before, made small and round-cornered, still showing the whole route with the OpenStreetMap credit. No auto-fade.
 - Toasts: `view.toast(text)` on the free ride view, one at a time, 3 s (`CFG.hud.toastS`), under the speed. A new one replaces the old.
+- The bottom dock is a flex row with equal sides, so the gradient chip and climb panel stay centred; when a big display size runs it out of room the climb profile narrows (down to 8 units) rather than pushing the gear chip off screen.
+- The HUD root class is `fhud`, not `hud`: the bus HUD owns `.hud` (and zooms it by the display size, which would have scaled this one twice).
 - Not done from the notes: heart-rate dot going red above 90% of max, minimap auto-fade, tap-to-expand totals and swipe gestures on a phone.
 
