@@ -17,6 +17,8 @@ import type { HomeActions } from './home'
 import { toast } from './toast'
 import { routePicker } from './routePicker'
 import { needTrainer } from './trainer'
+import { weekCard } from './weekCard'
+import '../passport.css'
 
 const km = (m: number) => `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`
 
@@ -171,6 +173,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'lede' },
       'No ERG. Your power moves you along a real route and the trainer follows the gradient.',
     ),
+    weekCard(p, pickBundled),
     h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Routes'), lib.el),
     h(
       'section',

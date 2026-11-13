@@ -3,6 +3,8 @@ import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
 import { postRide, saveProfile } from '../core/profile'
+import { ROUTE_INDEX } from '../core/routeLibrary'
+import { weeklyRewards } from '../core/weekly'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
@@ -74,8 +76,9 @@ export function finishRide(
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
   const banked = group ? bankScrap(group.scrap, myAwards) : 0
   if (banked) p = { ...p, scrap: p.scrap + banked }
-  // A free ride goes in the passport.
-  p = stampRide(p, s)
+  // A free ride goes in the passport and may pay this week's rewards (each once a week).
+  const week = weeklyRewards(stampRide(p, s), s, ROUTE_INDEX)
+  p = week.p
   saveProfile(p)
   if (s.record.secs >= 30) postRide({ ...s, crew: !!group || !!road })
   const prs =
@@ -209,6 +212,14 @@ export function finishRide(
       group ? groupSection(group, profile.id) : '',
       road ? roadSection(road, profile.id) : '',
       segmentSection(s.segments),
+      ...week.won.map((w) =>
+        h(
+          'div',
+          { class: 'card hl res-scrap' },
+          h('b', {}, `+${w.scrap} scrap`),
+          ` ${w.text}. Balance: ${p.scrap}.`,
+        ),
+      ),
       ftpBox,
       h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
       h(

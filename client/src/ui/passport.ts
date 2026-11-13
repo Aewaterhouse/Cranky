@@ -17,6 +17,7 @@ import { segClock } from '../core/segments'
 import { h } from './dom'
 import { badgeGrid } from './riderBadges'
 import { svgEl } from './svg'
+import { weekCard } from './weekCard'
 
 const line = (pts: [number, number][], close = false) =>
   pts
@@ -84,6 +85,7 @@ export function passportTab(p: Profile) {
   return h(
     'div',
     { class: 'passport' },
+    weekCard(p),
     h(
       'section',
       { class: 'panel' },

@@ -180,4 +180,7 @@ FIT file
 11. Download .fit for an ERG workout: same file as always, no map.
 Passport
 12. Rider tab, Passport. The map shows Australia with numbered dots; the route just finished is filled in and its row shows rides, best time and metres climbed. The "First Stamp" badge is earned.
+The week
+13. Free ride setup shows "This week": a route of the week (outlined in the grid, "Pick it" selects it) and the weekly climb bar. Finish the route of the week: the summary shows "+30 scrap", the card says "Banked", and the balance in the header goes up. Finish it again: no second payment.
+14. Climb past the weekly target (600 m for a new rider): "+50 scrap" once.
 

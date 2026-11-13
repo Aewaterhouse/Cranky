@@ -5,6 +5,7 @@ import { badges, stickBadges } from '../src/core/badges'
 import { newProfile, type Profile } from '../src/core/curve'
 import { passportBadges, stampRide } from '../src/core/passport'
 import { ROUTE_INDEX, loadRoute } from '../src/core/routeLibrary'
+import { featuredRoute, vertTarget, weekOf, weekState, weeklyRewards } from '../src/core/weekly'
 
 const ride = (id: string, date: string, ascent: number, ...secs: number[]) => ({
   route: { id },
@@ -136,5 +137,73 @@ describe('passport badges', () => {
     expect(stickBadges(p)).toBe(true)
     expect(badges({ ...p, passport: {} }).find((b) => b.id === 'pp1')!.earned).toBe(true)
     expect(new Set(badges(p).map((b) => b.id)).size).toBe(badges(p).length)
+  })
+})
+
+describe('weekly route and climb', () => {
+  const week = weekOf(Date.parse('2026-11-11T10:00:00Z'))
+  const utc = (iso: string) => weekOf(Date.parse(iso), 0)
+
+  it('picks the same featured route for everyone all week and a different one next week', () => {
+    const a = featuredRoute(ROUTE_INDEX, week)!
+    expect(featuredRoute([...ROUTE_INDEX].reverse(), week)).toBe(a)
+    // Monday to Sunday, by the clock on the wall: Brisbane is ten hours ahead of UTC.
+    expect([utc('2026-11-09T00:30:00Z'), utc('2026-11-15T23:30:00Z')]).toEqual([week, week])
+    expect([utc('2026-11-08T23:30:00Z'), utc('2026-11-16T00:30:00Z')]).toEqual([week - 1, week + 1])
+    expect(weekOf(Date.parse('2026-11-15T13:30:00Z'), -600)).toBe(week)
+    expect(weekOf(Date.parse('2026-11-15T14:30:00Z'), -600)).toBe(week + 1)
+    const year = Array.from({ length: 52 }, (_, i) => featuredRoute(ROUTE_INDEX, week + i)!.id)
+    year.slice(1).forEach((id, i) => expect(id).not.toBe(year[i]))
+    expect(new Set(year).size).toBeGreaterThan(8)
+    expect(featuredRoute([], week)).toBeUndefined()
+  })
+
+  it('sets a default climbing target, then a bit more than the recent average, within limits', () => {
+    const c = CFG.weekly.vert
+    const p = newProfile('me')
+    expect(vertTarget(p, week)).toBe(c.defaultM)
+    p.weeks = { [week - 1]: { vertM: 1000 }, [week - 2]: { vertM: 0 }, [week - 3]: { vertM: 2000 } }
+    expect(vertTarget(p, week)).toBe(1650)
+    // This week's own climbing never moves this week's target.
+    p.weeks[week] = { vertM: 5000 }
+    expect(vertTarget(p, week)).toBe(1650)
+    expect(vertTarget({ ...p, weeks: { [week - 1]: { vertM: 20 } } }, week)).toBe(c.minM)
+    expect(vertTarget({ ...p, weeks: { [week - 1]: { vertM: 90000 } } }, week)).toBe(c.maxM)
+  })
+
+  it('pays for the featured route and the climbing target once each a week', () => {
+    const feat = featuredRoute(ROUTE_INDEX, week)!
+    const done = ride(feat.id, '2026-11-11T10:00:00Z', 400, 900)
+    let { p, won } = weeklyRewards(newProfile('me'), done, ROUTE_INDEX)
+    expect(won.map((w) => w.scrap)).toEqual([CFG.weekly.featuredScrap])
+    expect(p.scrap).toBe(CFG.weekly.featuredScrap)
+    expect(weekState(p, week)).toMatchObject({ vertM: 400, featuredDone: true, vertDone: false })
+    // Riding it again the same week pays nothing more, but the climbing still counts to the target.
+    ;({ p, won } = weeklyRewards(p, done, ROUTE_INDEX))
+    expect(won.map((w) => w.scrap)).toEqual([CFG.weekly.vert.scrap])
+    expect(p.scrap).toBe(CFG.weekly.featuredScrap + CFG.weekly.vert.scrap)
+    ;({ p, won } = weeklyRewards(p, done, ROUTE_INDEX))
+    expect(won).toEqual([])
+    expect(p.scrap).toBe(CFG.weekly.featuredScrap + CFG.weekly.vert.scrap)
+    expect(weekState(p, week)).toMatchObject({ vertM: 1200, featuredDone: true, vertDone: true })
+  })
+
+  it('pays nothing for an unfinished featured route, another route, or a ride that was not a free ride', () => {
+    const feat = featuredRoute(ROUTE_INDEX, week)!
+    const other = ROUTE_INDEX.find((r) => r.id !== feat.id)!
+    const me = newProfile('me')
+    expect(weeklyRewards(me, ride(feat.id, '2026-11-11T10:00:00Z', 50), ROUTE_INDEX).won).toEqual(
+      [],
+    )
+    expect(
+      weeklyRewards(me, ride(other.id, '2026-11-11T10:00:00Z', 50, 900), ROUTE_INDEX).won,
+    ).toEqual([])
+    const plain = weeklyRewards(me, { record: { date: '2026-11-11T10:00:00Z' } }, ROUTE_INDEX)
+    expect(plain.p).toBe(me)
+    // Old weeks are dropped once the target no longer looks at them.
+    const old = { ...me, weeks: { [week - 9]: { vertM: 500 }, [week - 2]: { vertM: 700 } } }
+    const kept = weeklyRewards(old, ride(other.id, '2026-11-11T10:00:00Z', 50), ROUTE_INDEX).p
+      .weeks!
+    expect(Object.keys(kept).map(Number).sort()).toEqual([week - 2, week])
   })
 })
