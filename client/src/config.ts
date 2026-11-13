@@ -126,7 +126,26 @@ export const CFG = {
     grade: [-10, 20],
     sendEveryS: 1,
     sendDeltaPct: 0.2,
+    /** The trainer's gradient is read this many seconds of travel up the road, at most `maxM`. */
+    lead: { s: 1.5, maxM: 30 },
+    /**
+     * Bends: grip (m/s²) sets the speed for the radius, never below `minMs`. The brakes come on early enough to
+     * slow at `brakeMs2`, never harder than `maxBrakeMs2`. The road ahead is checked every `stepM`.
+     */
+    corner: { latMs2: 7, minMs: 5.5, brakeMs2: 2.5, maxBrakeMs2: 4, stepM: 5 },
+    /**
+     * Wind setting to m/s; each sky scales it; it swells and drops by `gust` over `gustS` seconds. Where it
+     * blows from changes with the route and the day.
+     */
+    wind: {
+      ms: { off: 0, breeze: 3, blowy: 6 },
+      mood: { routeDawn: 0.6, routeGolden: 0.8, routeDusk: 0.7, routeMist: 0.4, routeShower: 1.4 },
+      gust: 0.15,
+      gustS: 23,
+    },
     spacingM: 10,
+    /** Arms go up for this far past the top of a real climb, and for this far before the finish (m). */
+    cheer: { summitM: 40, finishM: 40 },
     /** Lap rides: at most `max` laps or `maxM` metres; short circuits default to about `defaultM`. */
     laps: { max: 99, maxM: 300_000, defaultM: 12_000 },
     smoothM: 100,

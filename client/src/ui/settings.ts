@@ -90,6 +90,43 @@ export function settingsTab() {
         ),
       ),
       row(
+        'Free ride sounds',
+        'Freehub, wind, tyres, gear clunks and the birds, surf or traffic of the place. All made up on the spot, no recordings.',
+        seg(
+          [
+            ['on', 'On'],
+            ['off', 'Off'],
+          ],
+          settings.rideSounds ? 'on' : 'off',
+          (v) => saveSettings({ rideSounds: v === 'on' }),
+        ),
+      ),
+      row(
+        'Calm camera',
+        'Free ride with a steady camera: no shake, lean, tuck or widening view. Turn it on if the motion bothers you.',
+        seg(
+          [
+            ['on', 'On'],
+            ['off', 'Off'],
+          ],
+          settings.calmCamera ? 'on' : 'off',
+          (v) => saveSettings({ calmCamera: v === 'on' }),
+        ),
+      ),
+      row(
+        'Free ride wind',
+        'A headwind or tailwind that depends on which way the road points. It changes with the route, the day and the weather.',
+        seg<Settings['wind']>(
+          [
+            ['off', 'Off'],
+            ['breeze', 'Breeze'],
+            ['blowy', 'Blowy'],
+          ],
+          settings.wind,
+          (wind) => saveSettings({ wind }),
+        ),
+      ),
+      row(
         'In-ride display size',
         'How big the numbers are during a ride. Auto suits most screens; go Large or Huge if the telly is across the room.',
         seg(

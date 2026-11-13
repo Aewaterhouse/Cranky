@@ -67,6 +67,8 @@ export class RouteWorld {
   private oy = 0
   private oz = 0
   private mood = new MoodBlend()
+  /** The sky right now (a key of the route moods), for the wind and the sounds of the place. */
+  moodName = 'route'
   private sky = new Sky(true)
   private skyline = new Skyline()
   private rig = new RouteCam()
@@ -171,6 +173,7 @@ export class RouteWorld {
     }
     const day = Math.floor(Date.now() / 86400000)
     const mood = pickMood(this.hour, this.riders.me.y, this.t, this.seed, day)
+    this.moodName = mood
     this.life.dusk = mood === 'routeDawn' || mood === 'routeDusk'
     const env = this.mood.update(dt, mood)
     const ahead = R[AHEAD[this.quality.level]]

@@ -23,6 +23,12 @@ export interface RoadRider {
   speed: number
   cadence: number
   look?: Look
+  /** Watts now; left out, the rider is taken to be pedalling. */
+  power?: number
+  /** Power as a share of the rider's FTP, for getting out of the saddle on hard efforts. */
+  effort?: number
+  /** Arms up: over the top or at the finish. */
+  cheer?: boolean
 }
 
 interface Entry {

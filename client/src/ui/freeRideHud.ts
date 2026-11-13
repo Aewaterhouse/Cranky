@@ -1,9 +1,10 @@
 import { CFG } from '../config'
 import { climbAt, findClimbs } from '../core/climbs'
 import { gearCount } from '../core/gears'
-import { gradeColour, powerZone, riderRows } from '../core/hud'
+import { gradeColour, powerZone, riderRows, windText } from '../core/hud'
 import { steadySpeed, totalMass } from '../core/physics'
 import { ascentFrom, routeAt } from '../core/route'
+import { settings } from '../core/settings'
 import { clock, h, kmStr } from './dom'
 import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
@@ -49,6 +50,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     arrive: stat('Arrive'),
     trainer: stat('Trainer feels'),
     ...(laps ? { lastLap: stat('Last lap'), bestLap: stat('Best lap') } : {}),
+    ...(settings.wind === 'off' ? {} : { wind: stat('Wind') }),
   }
 
   const whole = profileChart(route, undefined, true)
@@ -194,6 +196,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         { hour: 'numeric', minute: '2-digit' },
       )
       stats.trainer.v.textContent = `${s.trainerGrade.toFixed(1)}%`
+      if (stats.wind && s.wind !== undefined) stats.wind.v.textContent = windText(s.wind)
       if (s.lap && stats.lastLap && stats.bestLap) {
         lap.textContent = `Lap ${s.lap.n} / ${s.lap.of}`
         stats.lastLap.v.textContent = s.lap.lastS === undefined ? '–' : clock(s.lap.lastS)

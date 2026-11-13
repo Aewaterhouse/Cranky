@@ -1,9 +1,9 @@
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
-import { gearGrade, shiftGear } from '../../core/gears'
+import { shiftGear } from '../../core/gears'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
-import { steadySpeed, stepSpeed, totalMass, trainerGrade } from '../../core/physics'
+import { steadySpeed, stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
@@ -16,6 +16,7 @@ import { freeRideView, type FreePart } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { RoadFeel, cheering, trainerTarget } from './feel'
 import { Quipper, speak } from './quips'
 
 const STOP_S = 3
@@ -113,6 +114,8 @@ export function runFreeRide(
   const shown = lapM ? riders.map((r) => ({ ...r })) : riders
   const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
   let world: RouteWorld | undefined
+  const feel = new RoadFeel(route)
+  let wind = 0
   // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
   const quipper = new Quipper()
   const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
@@ -189,14 +192,23 @@ export function runFreeRide(
     const p = routeAt(route, dist)
     if (paused) speed = 0
     else {
-      speed = stepSpeed(speed, live.power, p.grade, mass, dt * fast)
+      wind = feel.wind(dist, settings.wind, world?.moodName, el)
+      speed = stepSpeed(speed, live.power, p.grade, mass, dt * fast, wind, feel.limit(dist, speed))
       el += dt * fast
       dist = Math.min(route.distance, dist + speed * dt * fast)
     }
-    // Paused means an easy, flat trainer; riding means the road gradient scaled by difficulty, then
-    // adjusted for the virtual gear. Game speed above still comes from power alone.
-    const road = trainerGrade(p.grade, difficulty)
-    const want = paused ? 0 : gearGrade(road, live.cadence, gear, mass, F.grade, settings.chainring)
+    // Game speed comes from power and the real gradient; the trainer gets the road just ahead (see trainerTarget).
+    const want = trainerTarget(
+      route,
+      dist,
+      speed,
+      difficulty,
+      paused,
+      live.cadence,
+      gear,
+      mass,
+      settings.chainring,
+    )
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want
       sentAt = now / 1000
@@ -206,6 +218,9 @@ export function runFreeRide(
     me.d = dist
     me.speed = speed * fast
     me.cadence = paused ? 0 : live.cadence
+    me.power = paused ? 0 : live.power
+    me.effort = live.power / profile.ftp
+    me.cheer = !starting && cheering(dist, route.distance, climbs ? top.d : undefined)
     for (const g of ghosts) {
       g.rider.speed = paused
         ? 0
@@ -247,6 +262,7 @@ export function runFreeRide(
       ],
       me: me.id,
       lap,
+      wind: settings.wind === 'off' ? undefined : wind,
     })
     const quip =
       settings.quips &&

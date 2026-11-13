@@ -39,7 +39,7 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map and Click mapping; `modes/drill/slope.ts` slope mode gradient sender with gears.
-- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/feel.ts` what the road's shape does to the ride: bend speed limit, wind along the road, the look-ahead gradient for the trainer (`trainerTarget`) and when to cheer; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
 - `fun/signLines.ts`, `fun/chalkLines.ts`, `fun/quipLines.ts` the words for roadside signs, road chalk and the commentator, each tagged with when it applies.
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).

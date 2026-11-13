@@ -43,6 +43,8 @@ export interface FreeState {
   me: string
   /** Lap rides only. */
   lap?: LapInfo
+  /** Headwind in m/s (a tailwind is negative), when the wind setting is on. */
+  wind?: number
 }
 
 /** HUD parts that can be switched on and off. */
