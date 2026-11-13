@@ -10,7 +10,7 @@ export const LIFE = {
   endClear: 100,
   coastProbe: 70,
   slope: 0.5,
-  share: { potato: 0.4, low: 0.7, medium: 1, high: 1 },
+  share: { lowpower: 0.2, potato: 0.4, low: 0.7, medium: 1, high: 1 },
   /** Herds are laid out this many chunks ahead, at most this many of a kind at once, and re-seated this often. */
   chunksAhead: 2,
   herdsShown: 3,

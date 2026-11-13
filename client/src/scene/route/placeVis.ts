@@ -4,8 +4,8 @@ import { FUN } from './funVis'
 export const PLACE = {
   fun: FUN,
   /** Plant density multiplier and how far from the road plants are scattered (m), per quality level. */
-  detail: { potato: 0.25, low: 0.5, medium: 1, high: 1.5 },
-  reach: { potato: 60, low: 230, medium: 300, high: 470 },
+  detail: { lowpower: 0.1, potato: 0.25, low: 0.5, medium: 1, high: 1.5 },
+  reach: { lowpower: 35, potato: 60, low: 230, medium: 300, high: 470 },
   /** Trees and small plants per hectare beside the road, by land cover letter. */
   trees: { g: 3, f: 70, b: 40, s: 8, u: 14, p: 12, a: 0, r: 0, w: 0 },
   under: { g: 40, f: 30, b: 40, s: 120, u: 20, p: 6, a: 35, r: 30, w: 0 },

@@ -1,0 +1,18 @@
+/* The frame-time overlay: route harness, and rides with ?perf=1 */
+.perf-ov {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  z-index: 40;
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.7);
+  color: #9f9;
+  font:
+    12px/1.45 ui-monospace,
+    monospace;
+  transform: translateX(-50%);
+  pointer-events: none;
+  white-space: pre;
+}

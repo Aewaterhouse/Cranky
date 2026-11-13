@@ -2,8 +2,9 @@ import * as THREE from 'three'
 import type { Route } from '../../core/route'
 import type { Place } from '../../core/soundMix'
 import { MoodBlend } from '../moods'
+import type { PerfMon } from '../perfMon'
 import { VIS } from '../params'
-import { Quality, type Level } from '../quality'
+import { LEVELS, Quality, startLevel, type Level } from '../quality'
 import { Sky } from '../sky'
 import type { CamShot } from './camShots'
 import { Chunks } from './chunks'
@@ -30,12 +31,13 @@ import { TerrainGrid } from './terrainGrid'
 export type { RoadRider } from './roadRiders'
 
 const R = VIS.route
-const AHEAD: Record<Level, 'aheadPotato' | 'aheadLow' | 'aheadMedium' | 'aheadHigh'> = {
+const AHEAD = {
+  lowpower: 'aheadLowpower',
   potato: 'aheadPotato',
   low: 'aheadLow',
   medium: 'aheadMedium',
   high: 'aheadHigh',
-}
+} as const satisfies Record<Level, string>
 /** Move the floating origin once the rider is this far from it. */
 const RECENTRE_M = 300
 
@@ -55,16 +57,18 @@ export class RouteWorld {
   shot?: CamShot
   onShotEnd?: () => void
   private focus = newPose()
+  /** The frame-time monitor, when asked for (`watchPerf` in worldDev.ts). */
+  perf?: PerfMon
   quality: Quality
   readonly field: HeightField
   readonly chunks: Chunks
   readonly riders: RoadRiders
   readonly odd: Oddities
   private landmarks: Map<number, Landmark[]>
-  private lifePlan: LifePlan
+  readonly lifePlan: LifePlan
   private cover: Pick<LandCover, 'at'>
   private life: Life
-  private things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
+  readonly things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
   /** Works out the funny signs and chalk again, for when their tunables change. */
   private replan: () => void
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
@@ -95,7 +99,9 @@ export class RouteWorld {
     private host: HTMLElement,
     route: Route,
   ) {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true })
+    // Smoothing edges is the dearest thing a weak device does, so a world that starts low goes without.
+    const smooth = R.antialias > 0 && LEVELS.indexOf(startLevel()) >= LEVELS.indexOf('medium')
+    this.renderer = new THREE.WebGLRenderer({ antialias: smooth })
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowMap
     host.prepend(this.renderer.domElement)
@@ -145,7 +151,14 @@ export class RouteWorld {
     )
     this.scene.add(this.root, this.sky.group, this.rain.lines, k, k.target, this.hemi, this.camera)
     addEventListener('resize', this.resize)
-    this.quality = new Quality(this.renderer, () => this.resize())
+    let was: number = LEVELS.indexOf(startLevel())
+    this.quality = new Quality(this.renderer, () => {
+      // Scenery built for a better level is what was too slow: a drop rebuilds it thinner straight away.
+      const now = this.quality ? LEVELS.indexOf(this.quality.level) : was
+      if (now < was) this.chunks.clear()
+      was = now
+      this.resize()
+    })
     this.resize()
     this.loop()
   }
@@ -162,9 +175,14 @@ export class RouteWorld {
   private loop = () => {
     this.raf = requestAnimationFrame(this.loop)
     const now = performance.now()
-    const dt = Math.min(0.1, (now - this.last) / 1000)
+    // A hidden tab that still gets frames (some browsers, a covered window) draws once a second at most.
+    if (document.hidden && now - this.last < R.hiddenFrameMs) return
+    const real = (now - this.last) / 1000
+    this.perf?.frame(real)
+    const dt = Math.min(0.1, real)
     this.last = now
-    this.quality.frame(dt)
+    // The quality steps on the real frame time: capped, a crawl of two frames a second read as ten.
+    this.quality.frame(real)
     this.t += dt
     this.step(dt)
     this.renderer.render(this.scene, this.camera)
@@ -240,24 +258,6 @@ export class RouteWorld {
       this.cover.at(x + rx * o, z + rz * o, this.field.ground(x + rx * o, z + rz * o))
     const coast = [0.25, 0.5, 0.75, 1].some((k) => /[aw]/.test(at(k * coastM) + at(-k * coastM)))
     return { cover: at(R.roadHalf + R.verge + 6), y, coast }
-  }
-
-  /** Where the next thing of a sort is after `d` metres (optionally of one kind), for the harness. */
-  nextThing(sort: string, d: number, kind?: string): number | undefined {
-    if (sort === 'life') return this.lifePlan.next(d, kind)?.d
-    const map = (this.things as Record<string, Map<number, { d: number }[]> | undefined>)[sort]
-    if (map)
-      return [...map.values()]
-        .flat()
-        .map((t) => t.d)
-        .filter((t) => t > d)
-        .sort((a, b) => a - b)[0]
-    for (let at = d, n = 0; n < 400; n++) {
-      const o = sort === 'odd' ? this.odd.next(at) : undefined
-      if (!o || !kind || o.kind === kind) return o?.d
-      at = o.d
-    }
-    return undefined
   }
 
   /** Confetti and streamers over the rider: a summit, the finish. */

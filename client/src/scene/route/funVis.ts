@@ -42,7 +42,7 @@ export const FUN = {
     gap: 480,
     townGap: 240,
     /** Share of the oddities drawn at each quality level (the same ones for everyone at that level). */
-    share: { potato: 0.4, low: 0.7, medium: 1, high: 1 },
+    share: { lowpower: 0.2, potato: 0.4, low: 0.7, medium: 1, high: 1 },
     /** None this close to either end of the route, where the arches stand. */
     endClear: 60,
     tries: 5,

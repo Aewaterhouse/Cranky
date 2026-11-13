@@ -5,6 +5,8 @@ import { lessMotion, settings } from '../../core/settings'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { SFX } from '../../ui/audio'
+import '../../perf.css'
+import { perfOverlay } from '../../ui/perfOverlay'
 import { rideIntro } from '../../ui/rideIntro'
 import { momentFlash } from '../../ui/rideMoment'
 import { rideSound } from '../../ui/rideSound'
@@ -47,14 +49,20 @@ export function rideWorld(
   view.root.classList.toggle('intro-on', !!intro)
   const cardOnly = () => setTimeout(endIntro, CFG.intro.cardS * 1000)
   if (settings.freeRideView === '3d')
-    Promise.all([import('../../scene/route/routeWorld'), import('../../scene/route/camShots')])
-      .then(([m, sp]) => {
+    Promise.all([
+      import('../../scene/route/routeWorld'),
+      import('../../scene/route/camShots'),
+      import('../../scene/route/worldDev'),
+    ])
+      .then(([m, sp, dev]) => {
         if (gone) return
         VIS.route.feel.cam.calm = settings.calmCamera || still ? 1 : 0
         VIS.route.camDist = CFG.camDist[settings.camDist]
         world = new m.RouteWorld(view.stage, base)
         world.state = { me: me.id, riders: [me] }
         const w = world
+        if (new URLSearchParams(location.search).get('perf') === '1')
+          view.root.append(perfOverlay(dev.watchPerf(w)).el)
         orbit = (secs, onFront) => (w.shot = new sp.OrbitShot(secs, onFront))
         if (!intro) return
         if (still) return void cardOnly()

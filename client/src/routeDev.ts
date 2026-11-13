@@ -4,6 +4,9 @@ import { ROUTE_INDEX, loadRoute } from './core/routeLibrary'
 import { addFixture } from './routeDevFixture'
 import { debugPanel } from './scene/debug'
 import { VIS } from './scene/params'
+import { nextThing, watchPerf } from './scene/route/worldDev'
+import { perfOverlay } from './ui/perfOverlay'
+import './perf.css'
 import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
 import { rideSound } from './ui/rideSound'
 
@@ -53,7 +56,7 @@ async function start() {
   const world = new RouteWorld(document.getElementById('stage')!, route)
   const st = { d: num('d', 0), speed: num('speed', 8) }
   const jump = (sort: string) => {
-    const at = world.nextThing(sort, st.d + num('back', 14) + 1, q.get('kind') ?? undefined)
+    const at = nextThing(world, sort, st.d + num('back', 14) + 1, q.get('kind') ?? undefined)
     if (at !== undefined) st.d = Math.max(0, at - num('back', 14))
   }
   if (q.has('next')) jump(q.get('next')!)
@@ -115,6 +118,9 @@ async function start() {
   const openPanel = () => void debugPanel(() => world.rebuild())
   if (q.has('debug')) openPanel()
   const help = document.getElementById('help')!
+  const readPerf = watchPerf(world)
+  if (q.get('hud') !== '0') document.body.append(perfOverlay(readPerf).el)
+  Object.assign(window, { readPerf })
   if (q.get('hud') === '0') help.classList.add('hide')
   addEventListener('keydown', (e) => {
     if (e.key === ',') st.speed = Math.max(0, st.speed - 2)

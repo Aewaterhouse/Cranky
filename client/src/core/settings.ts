@@ -7,7 +7,7 @@ export interface Settings {
   /** Master volume 0..1 for effects and the mood drone. */
   volume: number
   /** Graphics quality for the 3D scene. */
-  gfx: 'auto' | 'potato' | 'low' | 'medium' | 'high'
+  gfx: 'auto' | 'lowpower' | 'potato' | 'low' | 'medium' | 'high'
   /** In-ride HUD size multiplier; 0 means automatic (bigger on big screens). */
   hudScale: number
   /** Colour-blind-friendly zone and gradient colours. */
