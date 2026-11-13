@@ -1,4 +1,6 @@
 import { api } from '../core/api'
+import { CFG } from '../config'
+import { settings } from '../core/settings'
 import { removeRide, type Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
@@ -9,6 +11,7 @@ import { routeTrace } from './routeTrace'
 import { segmentSection } from './segResults'
 import { ZONE_COLOURS } from './planGraph'
 import { downloadFit, downloadJson } from './rideExport'
+import { ridePostcard, savePng } from './ridePostcard'
 import { segsFromSeries } from './soloSegs'
 import { modal, toast } from './toast'
 import { workoutChart } from './workoutChart'
@@ -156,6 +159,13 @@ function body(s: RideSummary) {
 }
 
 /** Full view of one stored ride. `back` returns to the list (also after a delete). */
+/** Rebuilds the ride's postcard from what was saved (no still is kept, so it gets the skyline). */
+async function savePostcard(p: Profile, s: RideSummary) {
+  const c = await ridePostcard(s, p.weightKg || CFG.freeRide.defaultKg, undefined, settings.units)
+  const day = new Date(s.record.date).toLocaleDateString('en-CA')
+  return savePng(c, `cranky-${s.route?.id ?? 'ride'}-${day}`)
+}
+
 export function rideDetail(p: Profile, n: number, back: () => void) {
   const root = h('div', { class: 'ride-detail' })
   const head = (s?: RideSummary) =>
@@ -220,6 +230,7 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
             'Download .fit',
           ),
           h('button', { onclick: () => downloadJson(s) }, 'Export JSON'),
+          h('button', { onclick: () => void savePostcard(p, s) }, 'Save postcard'),
           h('button', { class: 'ghost danger', onclick: del }, 'Delete'),
         ),
       )

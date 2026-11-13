@@ -49,6 +49,7 @@ describe('summit and finish moments', () => {
 
 describe('postcard numbers', () => {
   const ride = {
+    route: { id: 'mount-coot-tha', name: 'Mount Coot-tha' },
     distance: 12040,
     ascent: 303,
     avgPower: 200,
@@ -64,6 +65,14 @@ describe('postcard numbers', () => {
       ['Avg power', '200 W'],
       ['W/kg', '2.50'],
       ['PRs', '2'],
+    ])
+  })
+  it('shows NP and TSS instead of distance and climb for a workout', () => {
+    const tiles = postcardTiles({ ...ride, route: undefined, np: 230, tss: 41 }, 80)
+    expect(tiles.slice(0, 3)).toEqual([
+      ['NP', '230 W'],
+      ['TSS', '41'],
+      ['Time', '30:30'],
     ])
   })
   it('leaves PRs off when there are none', () => {

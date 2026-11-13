@@ -7,7 +7,7 @@ const W = 1200
 const H = 800
 const PHOTO_H = 560
 
-/** The headline numbers on a free ride's postcard. */
+/** The headline numbers on a ride's postcard: distance and climbing on a route, NP and TSS in a workout. */
 export function postcardTiles(
   s: RideSummary,
   kg: number,
@@ -15,8 +15,15 @@ export function postcardTiles(
 ): [label: string, value: string][] {
   const prs = s.segments?.filter((r) => r.pr).length ?? 0
   return [
-    ['Distance', distLabel(s.distance ?? 0, units)],
-    ['Climbed', climbLabel(s.ascent ?? 0, units)],
+    ...((s.route
+      ? [
+          ['Distance', distLabel(s.distance ?? 0, units)],
+          ['Climbed', climbLabel(s.ascent ?? 0, units)],
+        ]
+      : [
+          ['NP', `${s.np} W`],
+          ['TSS', String(s.tss)],
+        ]) as [string, string][]),
     ['Time', segClock(s.record.secs)],
     ['Avg power', `${s.avgPower} W`],
     ['W/kg', (s.avgPower / kg).toFixed(2)],
@@ -25,7 +32,7 @@ export function postcardTiles(
 }
 
 /**
- * A postcard of a free ride: the still taken at the lookout or the finish (or, without one, the ride's power as
+ * A postcard of a ride: the still taken at the lookout or the finish (or, without one, the ride's power as
  * a skyline) with the route name, the date and the headline numbers.
  */
 export async function ridePostcard(
