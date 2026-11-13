@@ -1,0 +1,118 @@
+.bld {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 16px max(16px, calc(50% - 460px));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bld-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.bld-name {
+  flex: 1;
+  min-width: 200px;
+}
+.bld input {
+  background: var(--card2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font: inherit;
+}
+.bld-preview {
+  height: 110px;
+  background: var(--card);
+  border-radius: var(--r);
+  padding: 6px;
+}
+.bld-preview .plan-graph {
+  width: 100%;
+  height: 100%;
+}
+.bld-empty,
+.bld-sum {
+  color: var(--dim);
+  text-align: center;
+  margin: 0;
+}
+.bld-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bld-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 8px 10px;
+}
+.bld-row.over {
+  border-color: var(--acc);
+}
+.bld-grip {
+  cursor: grab;
+  color: var(--dim);
+}
+.bld-fields {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  align-items: center;
+}
+.bld-fields label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+.bld-fields input[type='number'] {
+  width: 64px;
+}
+.bld-cue {
+  flex: 1;
+  min-width: 160px;
+}
+.bld-acts,
+.bld-add,
+.bld-foot {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.bld-foot {
+  justify-content: flex-end;
+}
+.bld-btn {
+  background: var(--card2);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.bld-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.bld-btn.go {
+  background: var(--acc);
+  color: var(--acc-ink);
+  border-color: var(--acc);
+}
+.pp-edit {
+  right: 36px;
+}

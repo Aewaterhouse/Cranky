@@ -271,3 +271,16 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Exceptions, all shipped: Willunga Hill reads 202 m against 225 m (3 km at the Tour Down Under's 7.5%), 10.2% under, written with `--force`. Mount Coot-tha (12.1 km, 303 m, from the Botanic Gardens and round Sir Samuel Griffith Drive) and Akuna Bay and West Head (51.1 km, 856 m) have no published figure for the variant used, and Great Ocean Road (45.1 km, 438 m) and Beach Road (22.7 km, 90 m) have no published climb, so those numbers are unchecked.
 - Packs hold the centreline only (lat, lon, height every 10 m). The height grid and map features in the plan arrive with Phases B and C.
 - `client/tests/routePacks.test.ts` loads every pack through the real loader and compares it with its card, so a broken pack or path fails the suite.
+## 2026-11-13: workout builder
+- Builder opens as a full-screen overlay from the My workouts group in the solo picker (+ Build workout, and a pencil on built cards). Saved with the same `my-` ids and localStorage store as imports.
+- Plans keep an optional `edit` field (the builder blocks) so they can be edited again; imported workouts have none and are not editable.
+- Intervals block = on/off pair repeated, stored as a `set`. Cue and cadence apply to the on part.
+- Percentages are clamped to 20-150 (the ERG cap from config); sprints and free blocks carry no target; sprint time clamps to the config range.
+- IF is normalised power over FTP (sprint counted as 120
+## 2026-11-13: workout builder
+- Builder opens as a full-screen overlay from the My workouts group in the solo picker (+ Build workout, and a pencil on built cards). Saved with the same `my-` ids and localStorage store as imports.
+- Plans keep an optional `edit` field (the builder blocks) so they can be edited again; imported workouts have none and are not editable.
+- Intervals block = on/off pair repeated, stored as a `set`. Cue and cadence apply to the on part.
+- Percentages clamp to 20-150 (ERG cap from config); sprint and free blocks carry no target; sprint time clamps to the config range.
+- IF is normalised power over FTP (sprint counted as 120 per cent, free as 50); TSS = hours x IF squared x 100.
+- Preview uses the existing plan graph, not the player chart. Delete is the existing X on the card.
