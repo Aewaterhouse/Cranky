@@ -93,3 +93,7 @@ Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.ro
 - `?route=mount-coot-tha&d=2440&fixture=1`: made-up map data. Ground changes colour by zone with soft edges, a pale side street meets the road at the tarmac edge every 250 m with a green name sign on the corner, lakes are flat blue with sand round them.
 - `?route=great-ocean-road&d=12000` and `?route=beach-road&d=8000` (no map data): sea is flat blue with a strip of sand, land is bush and grass.
 - `?route=mount-hotham&d=26500`: heath and rock above the treeline, snow on top.
+- `?route=mount-coot-tha&d=2500`: tall pale gums and white scribbly gums either side, thicker in the dark forest patches, shrubs and tussocks near the verge, tree shadows across the road. Nothing on the tarmac or verge.
+- `?route=mount-coot-tha&d=2700&fixture=1`: houses along the side streets with different walls and roofs, doors facing the road, none on a street. Look for a house half-buried or floating on steep ground.
+- `?route=mount-hotham&d=20000` then `d=24000`: snow gums, then only boulders, tussocks and shrubs above the treeline.
+- Settings, Graphics, Potato: far fewer plants and none beyond 60 m.

@@ -2,15 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { buildRoute, type RouteFeatures, type TerrainData } from '../src/core/route'
 import { packToRoute } from '../src/core/routeLibrary'
 import { VIS } from '../src/scene/params'
+import { buildingKind } from '../src/scene/route/chunkProps'
 import { Features, STREET_STRIDE } from '../src/scene/route/features'
 import { HeightField } from '../src/scene/route/heightField'
 import { LandCover } from '../src/scene/route/landCover'
 import { Patch, drawnHeight } from '../src/scene/route/patch'
 import { RoadPath } from '../src/scene/route/roadPath'
+import { TREES, scatter } from '../src/scene/route/scatter'
 import { TerrainGrid } from '../src/scene/route/terrainGrid'
 import { FIXTURE_PACK } from './fixtures/routePack'
 
 const R = VIS.route
+const P = R.place
 const LAT0 = -37
 const LON0 = 145
 /** A grid of `h`-high cells whose origin is 600 m west and south of the route's start. */
@@ -169,5 +172,87 @@ describe('map features', () => {
     const none = world(terrain(100)).features
     expect(none.chunk(0)).toBeUndefined()
     expect(none.blocked(0, 0, 5)).toBe(false)
+  })
+})
+
+describe('plants', () => {
+  const features: RouteFeatures = {
+    roads: [
+      {
+        n: 'Cross St',
+        k: 'street',
+        p: [
+          [400, 1110],
+          [800, 1110],
+        ],
+      },
+    ],
+    buildings: [[650, 1150, 12, 9, 0, 4]],
+  }
+  const grow = (t: TerrainData, ele: number, detail = 1, f?: RouteFeatures, region?: string) => {
+    const w = world(t, ele, f)
+    const patches = [new Patch(w.field, 400, 600, true, -1), new Patch(w.field, 400, 600, true, 1)]
+    const spots = scatter(2, patches, new LandCover(t, region), w.features, detail, 300)
+    return { spots, w }
+  }
+  const forest = terrain(100, () => 'f')
+  it('never grow on the road, a side street or a building, and trees keep off the verge', () => {
+    const { spots, w } = grow(forest, 100, 1, features)
+    expect(spots.length).toBeGreaterThan(100)
+    for (const s of spots) {
+      const off = Math.abs(s.x - 600)
+      expect(off).toBeGreaterThan(
+        R.roadHalf + R.verge + (TREES.includes(s.kind) ? P.treeClear : P.underClear) - 0.01,
+      )
+      expect(w.features.blocked(s.x, s.z, TREES.includes(s.kind) ? P.streetClear : 0.5)).toBe(false)
+      expect(s.y).toBeCloseTo(w.field.ground(s.x, s.z), 0)
+    }
+  })
+  it('grow the same every time, and more of them at higher detail', () => {
+    const a = grow(forest, 100).spots
+    expect(grow(forest, 100).spots).toEqual(a)
+    const half = grow(forest, 100, 0.5).spots.length
+    expect(half).toBeGreaterThan(a.length * 0.35)
+    expect(half).toBeLessThan(a.length * 0.65)
+  })
+  it('follow the land cover: nothing in water, forest thicker than grass', () => {
+    expect(
+      grow(
+        terrain(100, () => 'w'),
+        100,
+      ).spots,
+    ).toHaveLength(0)
+    const trees = (c: string) =>
+      grow(
+        terrain(100, () => c),
+        100,
+      ).spots.filter((s) => TREES.includes(s.kind)).length
+    expect(trees('f')).toBeGreaterThan(trees('g') * 8)
+  })
+  it('turn to snow gums near the treeline and stop above it', () => {
+    const kinds = (ele: number, region?: string) =>
+      new Set(
+        grow(
+          terrain(ele, () => 'f'),
+          ele,
+          1,
+          undefined,
+          region,
+        )
+          .spots.map((s) => s.kind)
+          .filter((k) => TREES.includes(k)),
+      )
+    expect([...kinds(R.treeline - 100)]).toEqual(['snowgum'])
+    expect(kinds(R.treeline + P.treelineFade + 10).size).toBe(0)
+    expect(kinds(R.treelineTas + P.treelineFade + 10, 'TAS').size).toBe(0)
+    expect(kinds(400).has('gum')).toBe(true)
+  })
+  it('picks pubs and servos from big footprints', () => {
+    const b = { x: 0, z: 0, rot: 0 }
+    expect(buildingKind({ ...b, w: 14, d: 12, h: 7 })).toBe('pub')
+    expect(['servo', 'shop']).toContain(buildingKind({ ...b, w: 20, d: 14, h: 4 }))
+    expect(['gable', 'verandah', 'hip', 'shop']).toContain(
+      buildingKind({ ...b, w: 12, d: 9, h: 3.5 }),
+    )
   })
 })

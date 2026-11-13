@@ -1,3 +1,5 @@
+import { PLACE } from './route/placeVis'
+
 /** Tunable visual parameters, exposed in the debug panel (press ` or add ?debug). */
 export interface MoodDef {
   /** Sky zenith colour. */
@@ -151,6 +153,7 @@ export const VIS = {
     streetBias: 2,
     street: '#b7b1a3',
     mainStreet: '#96938c',
+    place: PLACE,
     signs: {
       post: '#8d949a',
       streetW: 2.6,

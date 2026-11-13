@@ -137,7 +137,7 @@ export class RouteWorld {
     this.riders.update(this.state.riders, this.state.me, dt)
     const me = this.riders.me
     const d = this.riders.meD
-    this.chunks.update(d, ahead, this.quality.level !== 'potato', all)
+    this.chunks.update(d, ahead, this.quality.level, all)
     if (Math.hypot(me.x - this.ox, me.y - this.oy, me.z - this.oz) > RECENTRE_M) {
       this.ox = Math.round(me.x)
       this.oy = Math.round(me.y)

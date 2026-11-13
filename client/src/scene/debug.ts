@@ -83,7 +83,7 @@ function routeFolder(f: GUI, rebuild: () => void) {
     'mainStreet',
   ] as const)
     built.addColor(R, k)
-  for (const k of ['ground', 'signs'] as const)
+  for (const k of ['ground', 'signs', 'place'] as const)
     addAll(built.addFolder(k).close(), R[k] as Record<string, unknown>)
   built.onChange(rebuild)
 }

@@ -1,17 +1,23 @@
 import * as THREE from 'three'
 import { VIS } from '../params'
+import type { Level } from '../quality'
 import { VC } from '../util'
+import { dropBuildingGeos } from './buildingGeo'
+import { buildBuildings, buildPlants } from './chunkProps'
 import type { Features } from './features'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
 import { Patch } from './patch'
+import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
 import { newPose } from './roadPath'
+import { scatter } from './scatter'
 import type { Signs } from './signs'
 import { buildStreets } from './streetGeo'
 import { buildTerrain } from './terrainGeo'
 
 const R = VIS.route
+const P = R.place
 const pose = newPose()
 /** Water catches the sun; streets lie on the ground and win the depth test against it by a growing margin. */
 const WATER = new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true })
@@ -46,7 +52,7 @@ export class Chunks {
   }
 
   /** Call every frame with the rider's distance. Builds at most one chunk per call, nearest first, unless `all`. */
-  update(d: number, ahead: number, far: boolean, all = false) {
+  update(d: number, ahead: number, level: Level, all = false) {
     const L = R.chunk
     const { path } = this.place.field
     const here = Math.floor(d / L)
@@ -73,12 +79,13 @@ export class Chunks {
       for (const k of i ? [here + i, here - i] : [here]) {
         if (this.live.has(k) || !wanted(k)) continue
         if (this.pending && !all) return
-        this.build(k, far)
+        this.build(k, level)
         this.pending = true
       }
   }
 
-  private build(k: number, far: boolean) {
+  private build(k: number, level: Level) {
+    const far = level !== 'potato'
     const t0 = performance.now()
     const { field, cover, features, signs } = this.place
     const d0 = k * R.chunk
@@ -94,6 +101,9 @@ export class Chunks {
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)
     if (cf) for (const m of buildStreets(cf, field, patches, strips, solid, signs)) g.add(m)
+    const spots = scatter(k, patches, cover, features, P.detail[level], P.reach[level])
+    for (const m of buildPlants(spots, solid)) g.add(m)
+    if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     WATER.color.set(R.waterTint)
     WATER.specular.set(R.waterGlint)
     WATER.shininess = R.waterShine
@@ -130,5 +140,7 @@ export class Chunks {
   clear() {
     for (const [k, g] of this.live) this.drop(k, g)
     this.pending = true
+    dropPlantGeos()
+    dropBuildingGeos()
   }
 }
