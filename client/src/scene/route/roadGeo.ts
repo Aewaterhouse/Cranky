@@ -78,3 +78,33 @@ export function buildRoad(path: RoadPath, d0: number, d1: number, out: Tris) {
     }
   }
 }
+
+const corner = new Float64Array(24)
+const QUADS = [1, 3, 7, 5, 0, 4, 6, 2, 2, 6, 7, 3, 0, 1, 5, 4, 4, 5, 7, 6, 0, 2, 3, 1]
+/** Adds a box centred at (cx, cy, cz) with the given half sizes, turned `yaw` radians about the vertical. */
+export function addBox(
+  out: Tris,
+  cx: number,
+  cy: number,
+  cz: number,
+  hx: number,
+  hy: number,
+  hz: number,
+  yaw: number,
+  colour: THREE.Color,
+) {
+  const c = Math.cos(yaw)
+  const s = Math.sin(yaw)
+  for (let i = 0; i < 8; i++) {
+    const x = i & 1 ? hx : -hx
+    const z = i & 4 ? hz : -hz
+    corner[i * 3] = cx + x * c + z * s
+    corner[i * 3 + 1] = cy + (i & 2 ? hy : -hy)
+    corner[i * 3 + 2] = cz - x * s + z * c
+  }
+  for (let q = 0; q < 24; q += 4) {
+    const [a, b, e, f] = [QUADS[q] * 3, QUADS[q + 1] * 3, QUADS[q + 2] * 3, QUADS[q + 3] * 3]
+    out.add(corner, a, b, e, colour)
+    out.add(corner, a, e, f, colour)
+  }
+}

@@ -90,3 +90,6 @@ Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.ro
 
 - `?route=ben-lomond&d=15000`: no see-through sheets between the legs of Jacob's Ladder; rock walls between benches are fine, thin cracks inside the tightest hairpins are known.
 - `?route=akuna-bay&d=9680`: the out-and-back to the water is two carriageways with a turning loop at the end; the rider keeps left out and back.
+- `?route=mount-coot-tha&d=2440&fixture=1`: made-up map data. Ground changes colour by zone with soft edges, a pale side street meets the road at the tarmac edge every 250 m with a green name sign on the corner, lakes are flat blue with sand round them.
+- `?route=great-ocean-road&d=12000` and `?route=beach-road&d=8000` (no map data): sea is flat blue with a strip of sand, land is bush and grass.
+- `?route=mount-hotham&d=26500`: heath and rock above the treeline, snow on top.

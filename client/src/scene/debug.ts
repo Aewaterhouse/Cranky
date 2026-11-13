@@ -65,17 +65,35 @@ function routeFolder(f: GUI, rebuild: () => void) {
   built.add(R, 'rockSlope', 0.3, 1)
   for (const k of ['aheadPotato', 'aheadLow', 'aheadMedium', 'aheadHigh'] as const)
     built.add(R, k, 200, 2000, 50)
+  for (const k of ['treeline', 'treelineTas', 'alpineBand'] as const) built.add(R, k, 0, 2500, 10)
+  for (const k of ['coverJitter', 'waterLift', 'streetLift', 'streetHalf', 'mainHalf'] as const)
+    built.add(R, k, 0, 6)
+  built.add(R, 'coverNoise', 5, 200)
+  built.add(R, 'waterShine', 1, 200)
+  built.add(R, 'streetBias', 0, 20)
   for (const k of [
     'tarmac',
     'line',
     'gravel',
-    'grass',
-    'dry',
-    'bush',
-    'rock',
     'snow',
     'sea',
+    'waterTint',
+    'waterGlint',
+    'street',
+    'mainStreet',
   ] as const)
     built.addColor(R, k)
+  for (const k of ['ground', 'signs'] as const)
+    addAll(built.addFolder(k).close(), R[k] as Record<string, unknown>)
   built.onChange(rebuild)
+}
+
+/** Every colour, number and nested group of `o`, so new tunables show up without being listed here. */
+function addAll(f: GUI, o: Record<string, unknown>) {
+  for (const [k, v] of Object.entries(o)) {
+    if (typeof v === 'string' && v.startsWith('#')) f.addColor(o, k)
+    else if (typeof v === 'number') f.add(o, k, Math.min(0, v * 4), Math.max(1, Math.abs(v) * 4))
+    else if (v && typeof v === 'object' && !Array.isArray(v))
+      addAll(f.addFolder(k).close(), v as Record<string, unknown>)
+  }
 }

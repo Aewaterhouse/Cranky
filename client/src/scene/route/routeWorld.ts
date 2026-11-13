@@ -5,7 +5,10 @@ import { VIS } from '../params'
 import { Quality, type Level } from '../quality'
 import { Sky } from '../sky'
 import { Chunks } from './chunks'
+import { Features } from './features'
 import { HeightField } from './heightField'
+import { LandCover } from './landCover'
+import { Signs } from './signs'
 import { RoadPath } from './roadPath'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
@@ -70,7 +73,13 @@ export class RouteWorld {
     const terrain = route.points[0].lat === undefined ? undefined : route.terrain
     const path = new RoadPath(route, terrain)
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))
-    this.chunks = new Chunks(this.field)
+    // Map features share the height grid's origin, so they are only usable alongside it.
+    this.chunks = new Chunks({
+      field: this.field,
+      cover: new LandCover(terrain, route.region),
+      features: new Features(terrain && route.features, this.field),
+      signs: new Signs(),
+    })
     this.riders = new RoadRiders(path)
     path.poseAt(0, this.riders.me)
     const k = this.key

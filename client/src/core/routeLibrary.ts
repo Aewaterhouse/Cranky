@@ -1,6 +1,13 @@
 import { CFG } from '../config'
 import { rideSeconds, totalMass } from './physics'
-import { buildRoute, haversine, type RawPoint, type Route, type TerrainData } from './route'
+import {
+  buildRoute,
+  haversine,
+  type RawPoint,
+  type Route,
+  type RouteFeatures,
+  type TerrainData,
+} from './route'
 
 const L = CFG.freeRide.library
 
@@ -25,6 +32,7 @@ export interface RoutePack {
   published: { km: number; gainM: number; source: string }
   pts: [number, number, number][]
   terrain?: TerrainData
+  features?: RouteFeatures
 }
 
 export const ROUTE_INDEX: RouteSummary[] = Object.values(
@@ -47,6 +55,7 @@ export function packToRoute(pack: RoutePack): Route {
   return buildRoute(pack.id, pack.name, raw, pack.blurb, {
     region: pack.region,
     terrain: pack.terrain,
+    features: pack.features,
   })
 }
 

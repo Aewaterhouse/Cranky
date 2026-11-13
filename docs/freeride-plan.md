@@ -49,7 +49,7 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] Automatic quality levels and the 2D fallback.
 
 ### Phase C: the place (L)
-- [ ] Painted map ground: land use, water, side streets, street-name signs at junctions.
+- [x] Painted map ground: land use, water, side streets, street-name signs at junctions. (Built against made-up fixture data; real map data is not in the packs yet.)
 - [ ] Trees and scrub where the map says bush; low-poly houses and shops from building outlines.
 - [ ] Road furniture: kilometre markers, gradient signs, numbered hairpins, guard rails on the drop side, start and summit arches.
 - [ ] Hand-placed landmarks per route (Coot-tha TV towers and lookout, the Ben Lomond plateau, Hotham's summit hut, the Twelve Apostles turn-off).
