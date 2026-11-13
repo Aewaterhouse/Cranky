@@ -127,3 +127,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Fallen riders: on a bus ride, when someone falls off, the red banner shows, everyone else's target goes up 5% (ERG follows), the crew list shows each share % and the 💪 carrier, and the extra feels fair. Answer in `docs/questions.md`.
 - [ ] Cables on the bus: visible from the chase camera on a real screen, brighter when riding hard, dark when someone falls off.
 - [ ] Bus on gears: pick Gears in the lobby, ride a bus with ERG off on a real trainer. Shifting with the Click (or Z X) should let you hold the target at a normal cadence; say if the 2% base road feels right.
+- [ ] VO2 Madness on gears: pick Gears in the lobby and ride a Madness round; the top gears on the 2% base road should be hard enough for a VO2 interval.
