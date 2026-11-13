@@ -42,6 +42,8 @@ export const CFG = {
   trends: { ctlDays: 42, atlDays: 7, fitnessDays: 90, weeks: 12, heatWeeks: 26 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
   recordHz: 1,
+  /** Finished rides kept on the device while the server cannot be reached, at most. */
+  rideQueueMax: 5,
   localStorageKey: 'zombiebus.profile',
   sim: {
     baseWatts: 150,

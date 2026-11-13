@@ -37,7 +37,3 @@ export async function syncProfile(p: Profile): Promise<Profile> {
   }
   return p
 }
-
-export function postRide(summary: unknown) {
-  api('/api/rides', { method: 'POST', body: JSON.stringify({ summary }) }).catch(() => {})
-}

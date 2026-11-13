@@ -71,3 +71,27 @@ def test_free_rides_list_their_route_and_distance():
     client.post("/api/rides", json={"summary": free}, headers=h)
     row = next(r for r in client.get("/api/rides", headers=h).json() if r["date"] == "2026-04-01T08:00:00Z")
     assert (row["route"], row["distance"], row["crew"]) == ("willunga-hill", 2900, False)
+
+
+def test_posting_the_same_ride_twice_stores_it_once():
+    """A ride queued offline may be sent again after a dropped reply: the start time makes it one ride."""
+    _, h = auth("angus", "Angus")
+    had = len(client.get("/api/rides", headers=h).json())
+    s = summary("2026-03-01T08:00:00.123Z")
+    first = client.post("/api/rides", json={"summary": s}, headers=h).json()
+    again = client.post("/api/rides", json={"summary": s}, headers=h).json()
+    assert (first["saved"], again["saved"]) == (True, False)
+    other = client.post("/api/rides", json={"summary": summary("2026-03-01T09:00:00.000Z")}, headers=h)
+    assert other.json()["saved"] is True
+    assert len(client.get("/api/rides", headers=h).json()) == had + 2
+    # The same start time from another rider is another ride.
+    _, h2 = auth("ali", "Ali")
+    assert client.post("/api/rides", json={"summary": s}, headers=h2).json()["saved"] is True
+
+
+def test_rides_without_a_date_are_never_merged():
+    _, h = auth("jack", "Jack")
+    had = len(client.get("/api/rides", headers=h).json())
+    for _ in range(2):
+        assert client.post("/api/rides", json={"summary": {"planName": "Old"}}, headers=h).json()["saved"]
+    assert len(client.get("/api/rides", headers=h).json()) == had + 2

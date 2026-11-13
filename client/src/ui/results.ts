@@ -3,7 +3,8 @@ import { CFG } from '../config'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
-import { postRide, saveProfile } from '../core/profile'
+import { saveProfile } from '../core/profile'
+import { postRide } from '../core/rideQueue'
 import { ROUTE_INDEX } from '../core/routeLibrary'
 import { settings } from '../core/settings'
 import { weeklyRewards } from '../core/weekly'
@@ -86,7 +87,7 @@ export function finishRide(
   const week = weeklyRewards(stampRide(p, s), s, ROUTE_INDEX)
   p = week.p
   saveProfile(p)
-  if (s.record.secs >= 30) postRide({ ...s, crew: !!group || !!road })
+  if (s.record.secs >= 30) void postRide(profile.id, { ...s, crew: !!group || !!road })
   const prs =
     p === profile
       ? []

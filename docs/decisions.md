@@ -601,3 +601,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Hidden tab: browsers already stop animation frames for a hidden tab; where one still delivers them the world now draws at most once a second (`VIS.route.hiddenFrameMs`). The ride itself (the 200 ms tick, the trainer) is untouched.
 - Looked for and not changed, because nothing here could measure them: draw calls (40 to 90, already instanced per kind per chunk), sign canvas textures (made once per chunk build), per-frame allocations, transparency overdraw. Chunk builds are 100 to 200 ms each under this CPU cap and are the cause of the 1% lows; they were left on the main thread.
 - Invented numbers to tune on real hardware: the 20 fps "very slow" line and the two-level drop, everything about Low power, and the `nearbyShare` table.
+
+### Rides finished offline
+- A finished ride (any mode, 30 s or longer) now goes into a queue on the device first (`core/rideQueue.ts`, localStorage, one queue per rider) and is sent from there; it leaves the queue when the server has taken it. What cannot be sent waits, and goes up at the next login and whenever the browser says the network is back (the same moments queued segment efforts are sent).
+- The queue holds five rides (`CFG.rideQueueMax`): a ride carries its per-second arrays, roughly 100 kB an hour, and localStorage is small. If storage is full the oldest queued rides are dropped to make room for the new one. A ride the server refuses outright (a 4xx) is dropped; a server error or no network keeps it.
+- Idempotent on the server: `POST /api/rides` ignores a ride the rider already has with the same start time (`record.date`, to the millisecond) and answers `saved: false`. No schema change. A ride with no date (none are made any more) is never merged.
+- Not covered: the profile itself was already saved locally and synced newest-wins; group rides need the server anyway.

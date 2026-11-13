@@ -64,12 +64,26 @@ class Store:
             )
         return out
 
-    def add_ride(self, rid: str, summary: dict) -> None:
+    def add_ride(self, rid: str, summary: dict) -> bool:
+        """Stores a ride. A ride the rider already has (same start time) is left alone, so a retry is safe.
+
+        Returns:
+            True if it was stored, False if it was already there.
+        """
         date = summary.get("record", {}).get("date", "")
         with self.lock, self.db:
+            have = (
+                date
+                and self.db.execute(
+                    "SELECT 1 FROM rides WHERE rider = ? AND date = ?", (rid, date)
+                ).fetchone()
+            )
+            if have:
+                return False
             self.db.execute(
                 "INSERT INTO rides (rider, date, json) VALUES (?, ?, ?)", (rid, date, json.dumps(summary))
             )
+        return True
 
     def rides(self, rid: str) -> list[dict]:
         with self.lock:
