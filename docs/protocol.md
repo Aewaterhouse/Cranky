@@ -21,8 +21,8 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/rides` | → the caller's rides, newest first: `[{id, date, plan, secs, avgPower, np, tss, kj, compliance, crew}]`. Fields missing from older rides are null; `crew` is false. |
 | GET | `/api/rides/{n}` | → the full stored summary (per-second arrays included); 404 unless it is your ride |
 | DELETE | `/api/rides/{n}` | Removes one of your rides; 404 unless it is yours. The profile is not touched. |
-| POST | `/api/rooms` | → `{code}`: new 4-letter room code |
-| GET | `/api/rooms` | → open buses `[{code, state, plan, host, riders: [names]}]` |
+| POST | `/api/rooms` | Optional `{kind: 'bus' \| 'road'}` (default `bus`) → `{code}`: new 4-letter room code |
+| GET | `/api/rooms` | → open rooms `[{code, kind, state, plan, host, riders: [names]}]`; for a road room `plan` is the route's name |
 | GET | `/api/plans` | → `[{id, name, desc, secs}]` |
 
 Every endpoint except health, riders and login needs `Authorization: Bearer <token>` (401 otherwise). Riders are seeded from `config.SEED_USERS`; the rider id is the lower-case name. Security is deliberately light (friends only, Tailscale).
@@ -70,3 +70,41 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 `fx`: list of `{k, text?, id?}`, one-shot effects since the last tick. `k` is one of
 `drop, airstrike, gunship, nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.
+
+## Road rooms (group free ride)
+
+A room made with `{kind: 'road'}` is a ride on a bundled route. The server owns every rider's position; the
+client sends what the trainer measures and draws what the server says. Same socket, same `join`, `watch`,
+`bots`, `start`, `end` and `error` messages as a bus room. Every `lobby` message carries `kind` (`bus` or
+`road`), so a client that joined the wrong sort of room by code can say so.
+
+### Client → server
+
+| t | Fields | Notes |
+| --- | --- | --- |
+| `join` | `name, ftp, tier, look` | As the bus (`tier` is ignored). The rider's weight comes from their stored profile (`weightKg`, default 75). Joining a ride that is already running puts the rider on the back of the group; the same id joining again takes its old place on the road back. |
+| `road` | `route, laps, style, together?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race. |
+| `bots` | `n` | Host only, not while running. 0..5 road bots; humans + bots fit the 8 places. |
+| `data` | `p, w, cad, hr?` | About 2 Hz. Instant power, 3 s power, cadence, heart rate. No data for 3 s reads as zero power: the rider coasts to a stop and the ride goes on. |
+| `start` / `end` | | Host only. `start` begins a 5 s countdown; `end` finishes the ride now. |
+
+### Server → client
+
+| t | Fields |
+| --- | --- |
+| `lobby` | `kind: 'road', code, host, state, route, laps, distance (m, all laps), style, together, riders: [{id, name, ftp, kg, connected, look, bot, line}]`; `line` is a bot's one-line character, null for people |
+| `tick` | `kind: 'road', el, riders: {id: {d, v, w, cad, hr, lane, draft, band, st, fin}}, game, fx`; 4 Hz |
+| `end` | `summary: {kind: 'road', route, name, laps, distance, secs, style, together, riders: [{id, name, bot, place, time, dist, late, avgPower, wkg, saved}]}` |
+
+`el` is ride seconds, negative during the countdown. Per rider: `d` metres along the whole ride (all laps),
+`v` ground speed in m/s (the keep-together band included), `lane` metres right of the centre line, `draft` the
+drag multiplier (1 is clean air, 0.73 is a 27% saving), `band` the keep-together scale on distance covered
+(1 when off), `st` one of `riding`, `stopped`, `away` (socket gone) or `finished`, `fin` the rider's time in
+seconds once finished. `game` is the rule set's own state (null for a plain ride). `fx` is a list of
+`{k, id, text}`; the only kind so far is `finish`, with `text` the finishing place.
+
+Results: `time` is null for a rider who did not finish; `dist` is what they rode; `late` marks a late joiner
+(ranked after everyone who rode the whole way); `saved` is the average watts drafting saved them.
+
+A road tick never carries a power target (`tgt`): the trainer only ever gets a gradient from the rider's own
+position, through `ErgController.setGrade`.

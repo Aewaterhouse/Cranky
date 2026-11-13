@@ -41,6 +41,14 @@ class Game(BaseModel):
     game: Literal["bus", "madness"]
 
 
+class RoadSetup(BaseModel):
+    t: Literal["road"]
+    route: str = Field(max_length=60)
+    laps: int = Field(default=1, ge=1, le=99)
+    style: Literal["social", "race"] = "social"
+    together: bool | None = None
+
+
 class Start(BaseModel):
     t: Literal["start"]
 
@@ -81,7 +89,19 @@ class Buy(BaseModel):
 
 ClientMsg = TypeAdapter(
     Annotated[
-        Join | Watch | Setup | Bots | Difficulty | Game | Start | End | TierMsg | Data | Sprint | Buy,
+        Join
+        | Watch
+        | Setup
+        | RoadSetup
+        | Bots
+        | Difficulty
+        | Game
+        | Start
+        | End
+        | TierMsg
+        | Data
+        | Sprint
+        | Buy,
         Field(discriminator="t"),
     ]
 )

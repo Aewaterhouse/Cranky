@@ -95,6 +95,8 @@ class Rider:
 class Room:
     """A crew session. The host picks the plan; the server owns the clock."""
 
+    kind = "bus"
+
     def __init__(self, code: str, store: Store | None = None) -> None:
         self.code = code
         self.store = store
@@ -145,6 +147,7 @@ class Room:
 
     def to_dict(self) -> dict:
         return {
+            "kind": "bus",
             "code": self.code,
             "host": self.host,
             "state": self.state,
@@ -186,6 +189,7 @@ class Room:
     def lobby_msg(self) -> dict:
         return {
             "t": "lobby",
+            "kind": "bus",
             "code": self.code,
             "host": self.host,
             "state": self.state,
@@ -223,16 +227,19 @@ class Room:
                 self.idle_since = time.monotonic()
             await self.lobby()
 
+    async def watch(self, ws: WebSocket) -> None:
+        """Seats a TV spectator and catches it up."""
+        if ws not in self.watchers:
+            self.watchers.append(ws)
+        await self.tell(ws, self.lobby_msg())
+        if self.state == "done" and self.summary:
+            await self.tell(ws, {"t": "end", "summary": self.summary})
+
     async def handle(self, rid: str, ws: WebSocket, raw: dict) -> None:
         """Applies one client message."""
         msg = ClientMsg.validate_python(raw)
         if isinstance(msg, Watch):
-            if ws not in self.watchers:
-                self.watchers.append(ws)
-            await self.tell(ws, self.lobby_msg())
-            if self.state == "done" and self.summary:
-                await self.tell(ws, {"t": "end", "summary": self.summary})
-            return
+            return await self.watch(ws)
         if ws in self.watchers:  # spectators only watch
             return
         r = self.riders.get(rid)

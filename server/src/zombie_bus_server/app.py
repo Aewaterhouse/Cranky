@@ -6,7 +6,7 @@ import re
 import time
 from contextlib import asynccontextmanager
 from datetime import date
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
@@ -14,6 +14,7 @@ from pydantic import BaseModel, ValidationError
 
 from . import config, ladder
 from .plan import flatten, load_plans, total
+from .road_room import RoadRoom
 from .session import Room
 from .store import Store
 
@@ -37,8 +38,10 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Cranky", lifespan=lifespan)
 for _name in config.SEED_USERS:
     store.add_user(_name, _name)
+KINDS: dict[str, type[Room]] = {"bus": Room, "road": RoadRoom}
 rooms: dict[str, Room] = {
-    d["code"]: Room.from_dict(d, store) for d in store.load_rooms(config.ROOM_RESUME_MAX_AGE_S)
+    d["code"]: KINDS[d.get("kind", "bus")].from_dict(d, store)
+    for d in store.load_rooms(config.ROOM_RESUME_MAX_AGE_S)
 }
 LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ"
 
@@ -190,8 +193,12 @@ def plans() -> list[dict]:
     ]
 
 
+class NewRoom(BaseModel):
+    kind: Literal["bus", "road"] = "bus"
+
+
 @app.post("/api/rooms")
-def create_room(u: User) -> dict:
+def create_room(u: User, body: NewRoom | None = None) -> dict:
     now = time.monotonic()
     for code, r in list(rooms.items()):
         idle = not any(x.connected for x in r.humans()) and now - r.idle_since > config.ROOM_IDLE_S
@@ -201,7 +208,7 @@ def create_room(u: User) -> dict:
     code = "".join(random.choices(LETTERS, k=4))
     while code in rooms:
         code = "".join(random.choices(LETTERS, k=4))
-    rooms[code] = Room(code, store)
+    rooms[code] = KINDS[body.kind if body else "bus"](code, store)
     return {"code": code}
 
 
@@ -211,6 +218,7 @@ def list_rooms(u: User) -> list[dict]:
     return [
         {
             "code": r.code,
+            "kind": r.kind,
             "state": r.state,
             "plan": r.plan["name"],
             "host": r.riders[r.host].name if r.host else None,
