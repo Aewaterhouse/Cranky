@@ -12,6 +12,7 @@ import type { FreeLayout, FreeParts } from './freeRideView'
 import { ZONE_COLOURS } from './planGraph'
 import { riderList } from './riderList'
 import { segBoard } from './segBoard'
+import { segPanel } from './segPanel'
 
 const C = CFG.hud
 
@@ -65,8 +66,8 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const gain = val('', 'm', '+')
   const topEta = val('', 'ETA')
   // The segment being timed: a column of the climb panel on a climb, a panel of its own for a sprint.
-  const segName = h('span', { class: 'seg-name' })
-  const segLines = h('div', { class: 'seg-lines' })
+  const sp = segPanel()
+  const [segName, segLines] = [sp.name, sp.lines]
   const segCol = h('div', { class: 'seg-col' }, segName, segLines)
   const segBox = h('div', { class: 'glass segbox' })
   const climb = h(
@@ -238,13 +239,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       segCol.hidden = !inClimb
       segBox.hidden = !sg || !!c
       if (sg) {
-        const lead = sg.inM === undefined ? '' : ` in ${Math.ceil(sg.inM / 10) * 10} m`
-        segName.textContent = inClimb ? sg.name : `${sg.name}${lead}`
-        segLines.replaceChildren(
-          ...sg.lines.map((t) =>
-            h('span', { class: t[0] === '−' ? 'up' : t[0] === '+' ? 'down' : '' }, t),
-          ),
-        )
+        sp.set(sg, inClimb)
         const home = inClimb ? segCol : segBox
         if (segName.parentElement !== home) home.replaceChildren(segName, segLines)
       }

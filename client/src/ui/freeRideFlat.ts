@@ -1,9 +1,12 @@
 import { gearText } from '../core/gears'
-import { gradeColour } from '../core/hud'
+import { gradeColour, riderRows } from '../core/hud'
 import { ascentFrom } from '../core/route'
 import { clock, h, kmStr } from './dom'
 import { profileChart } from './freeRideChart'
 import type { FreeLayout, FreeParts } from './freeRideView'
+import { riderList } from './riderList'
+import { segBoard } from './segBoard'
+import { segPanel } from './segPanel'
 
 /** Trainer difficulty slider with its percentage; `set` moves it without firing the handler. */
 export function diffSlider(on: (v: number) => void, value: number) {
@@ -54,6 +57,15 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
   const gsub = h('small', {})
   const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, gsub)
   const pauseBtn = h('button', { onclick: on.pause })
+  // The same lap counter, segment panel, splits, top three and rider gaps (ghosts included) as the 3D HUD.
+  const lap = h('div', { class: 'fs-lap' })
+  const sp = segPanel()
+  const segBox = h('div', { class: 'fs-seg' }, sp.name, sp.lines)
+  const wholeSplit = h('div', { class: 'fs-whole' })
+  const board = segBoard()
+  const list = riderList()
+  const side = h('aside', { class: 'fr-side' }, lap, segBox, wholeSplit, board.el, list.el)
+  lap.hidden = segBox.hidden = wholeSplit.hidden = side.hidden = true
   const diff = diffSlider(on.difficulty, difficulty)
 
   const root = h(
@@ -91,6 +103,7 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
         h('div', { class: 'chartbox whole' }, whole.el),
         h('div', { class: 'chartbox strip' }, gbox, h('div', { class: 'next' }, next.el)),
       ),
+      side,
       mapBox,
       ov,
     ),
@@ -133,6 +146,20 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
       gv.textContent = s.grade.toFixed(1)
       gbox.style.setProperty('--g', gradeColour(s.grade))
       gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
+      lap.hidden = !s.lap
+      if (s.lap)
+        lap.replaceChildren(
+          h('b', {}, `Lap ${s.lap.n} / ${s.lap.of}`),
+          h('span', {}, `Last ${s.lap.lastS === undefined ? '–' : clock(s.lap.lastS)}`),
+          h('span', {}, `Best ${s.lap.bestS === undefined ? '–' : clock(s.lap.bestS)}`),
+        )
+      segBox.hidden = !s.seg
+      if (s.seg) sp.set(s.seg)
+      wholeSplit.hidden = !s.whole?.length
+      wholeSplit.textContent = `${route.lapOf ? 'This lap' : 'This ride'} ${s.whole?.join(' · ') ?? ''}`
+      board.set(s.board)
+      list.set(riderRows(s.riders, s.me), s.speed)
+      side.hidden = [...side.children].every((c) => (c as HTMLElement).hidden)
       whole.set(s.dist)
       next.set(s.dist)
       pauseBtn.replaceChildren(s.paused === 'manual' ? 'Resume ' : 'Pause ', h('kbd', {}, 'Space'))

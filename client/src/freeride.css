@@ -130,6 +130,60 @@
   color: var(--dim);
   font-weight: 600;
 }
+/* Laps, the segment being timed, the top three and the gaps to riders and ghosts (shared with the 3D HUD) */
+.fr-side {
+  --u: 7px;
+  flex: none;
+  width: clamp(200px, 20vw, 300px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--card);
+}
+.fr-side[hidden],
+.fr-side [hidden] {
+  display: none;
+}
+.fs-lap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  align-items: baseline;
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.fs-lap b {
+  flex-basis: 100%;
+  font: 400 1.5rem var(--display);
+  color: var(--fg);
+}
+.fs-seg {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.fs-seg .seg-name,
+.fr-side .seg-board .sb-name {
+  max-width: 100%;
+}
+.fs-whole {
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.fr-side .seg-board {
+  margin: 0;
+}
+.fr-side .rlist {
+  display: block;
+  padding: 0;
+  background: none;
+  backdrop-filter: none;
+  font-variant-numeric: tabular-nums;
+}
 .fr-map {
   flex: none;
   width: clamp(280px, 28vw, 520px);
