@@ -721,3 +721,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 ## Bus results with the ride, and the backfill (2026-11-14)
 - The crew summary the server sends at the end (score, distance, armour, sync, scrap, every rider's line and the awards) is stored in each rider's ride as `group`, without the scene still (a large PNG data URL). History rebuilds the Zombie Bus postcard from it on the free-ride card's sky.
 - Older bus rides are matched to the season ladder's `results` rows at server startup (`Store.backfill_bus_results`): same rider, same plan, and the day the ride finished. The results table only records the day, in the server's local time, and the server moved from the owner's PC to Railway, so the day is tried in the server's zone, then UTC+10, UTC+11 and UTC. Two same-plan bus rides on one day pair up in order. The backfill only touches crew rides with no route and no `group`, so it is safe to run every start.
+
+## Nightly backups and restoring (2026-11-14)
+- The server already backed up at startup and every 24 hours after. On Railway every deploy is a startup, so a busy day of deploys could push all the older copies out of the 14 kept. Now it backs up at a fixed hour each night (`ZB_BACKUP_HOUR`, default 17 server time, 3 or 4 am in Brisbane on a UTC server) and at startup only if the newest copy is over a day old.
+- Restoring: the server holds the database open, so copying over it while running is unsafe. A `restore.db` next to the database is swapped in at startup instead, and the live file is kept as `*.before-restore`.
+- Imported GPX routes (`routeStore.ts`) and My workouts stay in the browser's storage. They are not ride history, so they were left alone; noted under known issues.

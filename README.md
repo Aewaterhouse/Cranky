@@ -126,4 +126,24 @@ Point an HTTPS proxy (Caddy: `reverse_proxy localhost:8000`) at port 8000, passi
 ## Optional extras
 
 - `ZB_DISCORD_WEBHOOK`: a Discord channel webhook URL. When set, the server posts each finished Zombie Bus ride summary there.
-- `ZB_BACKUPS`: folder for the daily database backups (default `server/backups/`, newest 14 kept).
+- `ZB_BACKUPS`: folder for the nightly database backups (default `backups/` beside the database, so `/data/backups` on Railway; newest 14 kept).
+- `ZB_BACKUP_HOUR`: the hour (server time) of the nightly backup (default 17, which is 3 or 4 am in Brisbane when the server runs on UTC).
+
+## Backups and restoring
+
+Everything lives in one SQLite file: riders, profiles, ride history, segment efforts and the season ladder. On Railway it is `/data/zombie_bus.db` on the volume.
+
+Two kinds of backup cover it:
+- **The server's own.** Every night at `ZB_BACKUP_HOUR` it writes `cranky-YYYYMMDD-HHMMSS.db` into `/data/backups` and keeps the newest 14. It also writes one at startup if the newest is over a day old.
+- **Railway volume backups** (daily and weekly, set in the Railway dashboard under the volume's Backups tab). These copy the whole volume, the server's backups included.
+
+To restore from one of the server's backups (Railway):
+1. Open a shell on the service: `railway ssh` (or the service's shell in the dashboard).
+2. `ls -l /data/backups` and pick a file.
+3. `cp /data/backups/cranky-20261114-170000.db /data/restore.db`
+4. Restart the service (dashboard, or `railway redeploy`). At startup the server moves the live file to `/data/zombie_bus.db.before-restore` and puts `restore.db` in its place.
+5. Check History, then delete `/data/zombie_bus.db.before-restore` once you are happy (or copy it back to `/data/restore.db` and restart to undo).
+
+To restore the whole volume instead, use Restore on a backup in the volume's Backups tab in Railway; it replaces everything on `/data`.
+
+Locally it is the same: copy a backup from `server/backups/` to `server/restore.db` and restart the server.

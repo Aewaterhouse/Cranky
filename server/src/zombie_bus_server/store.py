@@ -14,6 +14,17 @@ from . import config
 AU_EAST = (timezone(timedelta(hours=10)), timezone(timedelta(hours=11)))
 
 
+def restore_pending(path: Path = config.DB_PATH) -> bool:
+    """At startup, swaps in `restore.db` from beside the database; the old file becomes `*.before-restore`."""
+    pending = path.parent / "restore.db"
+    if not pending.exists():
+        return False
+    if path.exists():
+        path.replace(path.with_name(path.name + ".before-restore"))
+    pending.replace(path)
+    return True
+
+
 class Store:
     """Tiny JSON-in-SQLite store. One connection shared across threads behind a lock."""
 

@@ -1,3 +1,5 @@
+import time
+
 from fastapi.testclient import TestClient
 
 from zombie_bus_server.app import app
@@ -80,3 +82,29 @@ def test_backup_copies_and_prunes(tmp_path):
     assert len(files) == 2 and files[-1] == dest
     names = {r[0] for r in sqlite3.connect(dest).execute("SELECT name FROM users")}
     assert "Alex" in names
+
+
+def test_backup_runs_nightly_and_catches_up_at_startup(monkeypatch):
+    from zombie_bus_server import app as a
+    from zombie_bus_server import config
+
+    monkeypatch.setattr(a.time, "localtime", lambda _: time.struct_time((2026, 11, 14, 15, 30, 0, 0, 0, 0)))
+    monkeypatch.setattr(config, "BACKUP_HOUR", 17)
+    assert a.backup_wait(1e9, None) == 0  # no backup yet: straight away
+    assert a.backup_wait(1e9, 1e9 - 25 * 3600) == 0  # the last one missed a night
+    assert a.backup_wait(1e9, 1e9 - 3600) == 5400  # 15:30 now, 17:00 tonight
+    monkeypatch.setattr(config, "BACKUP_HOUR", 15)
+    assert a.backup_wait(1e9, 1e9 - 3600) == 23.5 * 3600  # missed today's hour: tomorrow
+
+
+def test_restore_swaps_in_the_backup_and_keeps_the_old_file(tmp_path):
+    from zombie_bus_server.store import restore_pending
+
+    db = tmp_path / "zombie_bus.db"
+    assert not restore_pending(db)
+    db.write_text("live")
+    (tmp_path / "restore.db").write_text("backup")
+    assert restore_pending(db)
+    assert db.read_text() == "backup"
+    assert (tmp_path / "zombie_bus.db.before-restore").read_text() == "live"
+    assert not (tmp_path / "restore.db").exists()

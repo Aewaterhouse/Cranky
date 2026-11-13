@@ -16,19 +16,31 @@ from . import config, efforts, files, ladder
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
 from .session import Room
-from .store import Store
+from .store import Store, restore_pending
 
+restore_pending()
 store = Store()
+
+
+def backup_wait(now: float, newest: float | None) -> float:
+    """Seconds to the next backup: 0 if the newest is over a day old or missing, else to the nightly hour."""
+    if newest is None or now - newest >= config.BACKUP_EVERY_S:
+        return 0.0
+    t = time.localtime(now)
+    gone = t.tm_hour * 3600 + t.tm_min * 60 + t.tm_sec
+    return (config.BACKUP_HOUR * 3600 - gone) % 86400 or 86400.0
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    """Backs the database up at startup and then daily."""
+    """Backs the database up every night (and at startup if the newest backup is over a day old)."""
 
     async def loop() -> None:
         while True:
+            copies = sorted(config.BACKUP_DIR.glob("cranky-*.db"))
+            newest = copies[-1].stat().st_mtime if copies else None
+            await asyncio.sleep(backup_wait(time.time(), newest))
             await asyncio.to_thread(store.backup, config.BACKUP_DIR, config.BACKUP_KEEP)
-            await asyncio.sleep(config.BACKUP_EVERY_S)
 
     task = asyncio.create_task(loop())
     yield
