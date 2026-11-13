@@ -1,0 +1,215 @@
+/* Free-ride HUD, bottom half: dock, climb panel, strip, menu, overlay and the phone rules (see freeHud.css). */
+/* Bottom: corner controls, gradient and climb, gear; then the whole-route strip */
+.hud-bot {
+  position: absolute;
+  left: var(--sl);
+  right: var(--sr);
+  bottom: var(--sb);
+  display: flex;
+  flex-direction: column;
+  gap: var(--u);
+}
+.dock {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(1.5 * var(--u));
+}
+.dock-l,
+.dock-c,
+.dock-r {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--u);
+}
+/* Equal sides keep the middle centred; when a big display size runs out of room the climb profile gives way. */
+.dock-l,
+.dock-r {
+  flex: 1 1 0;
+}
+.dock-l {
+  position: relative;
+}
+.dock-c,
+.fhud .climb {
+  min-width: 0;
+}
+.dock-l > button {
+  font-size: calc(2 * var(--u));
+  opacity: 0.85;
+}
+.dock-r {
+  justify-content: flex-end;
+}
+.fhud .grade {
+  padding: calc(0.5 * var(--u)) calc(1.6 * var(--u));
+  font: 400 calc(4 * var(--u)) / 1.15 var(--display);
+  white-space: nowrap;
+}
+.fhud .climb {
+  display: flex;
+  align-items: stretch;
+  gap: calc(1.5 * var(--u));
+  height: calc(10.5 * var(--u));
+  padding: calc(0.8 * var(--u)) calc(1.2 * var(--u));
+}
+.climb-txt {
+  display: grid;
+  grid-template-columns: auto auto;
+  align-content: space-between;
+  gap: 0 calc(1.6 * var(--u));
+  font-size: calc(2.6 * var(--u));
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.climb-txt > span:first-child {
+  grid-column: 1 / -1;
+  font-size: calc(1.8 * var(--u));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.climb-txt .hv:nth-child(2) {
+  grid-column: 1 / -1;
+  font-size: 1.25em;
+}
+.climb-txt small {
+  font-size: 0.55em;
+}
+.climb-prof {
+  position: relative;
+  width: calc(34 * var(--u));
+  min-width: calc(8 * var(--u));
+  border-radius: calc(0.6 * var(--u));
+  overflow: hidden;
+}
+.fhud .gear {
+  display: flex;
+  align-items: baseline;
+  gap: calc(0.8 * var(--u));
+  padding: calc(0.6 * var(--u)) calc(1.4 * var(--u));
+  font-size: calc(3 * var(--u));
+  white-space: nowrap;
+}
+.fhud .gear > span:first-child {
+  font: 500 0.55em var(--ui);
+  opacity: 0.75;
+}
+.fhud .gear small {
+  font-size: 0.55em;
+  margin-left: 0;
+}
+.fhud .strip {
+  position: relative;
+  height: calc(5 * var(--u));
+  margin: 0 calc(5 * var(--u));
+  overflow: hidden;
+}
+
+/* Menu: trainer difficulty, pause, end ride and the toggles */
+.fhud .hmenu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + var(--u));
+  width: max-content;
+  max-width: 80vw;
+  padding: calc(1.6 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(1.2 * var(--u));
+  background: rgba(10, 11, 14, 0.82);
+  pointer-events: auto;
+}
+.fhud .hmenu h2 {
+  margin: 0;
+  font: 400 calc(2.6 * var(--u)) var(--display);
+}
+.fhud .hmenu label {
+  font: 500 calc(2 * var(--u)) var(--ui);
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.8);
+}
+.fhud .hmenu .diff input {
+  width: calc(24 * var(--u));
+}
+.fhud .hmenu .diff .pct {
+  font-size: calc(2.8 * var(--u));
+  min-width: 4ch;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(0.8 * var(--u));
+}
+.menu-grid button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: calc(0.8 * var(--u));
+}
+
+/* Pause and end-ride messages sit over everything; only the dialog takes clicks */
+.fr3d > .overlay {
+  position: fixed;
+  z-index: 3;
+  border-radius: 0;
+  background: rgba(17, 18, 20, 0.35);
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.fr3d > .overlay.dialog {
+  background: rgba(17, 18, 20, 0.7);
+  pointer-events: auto;
+}
+
+@media (pointer: coarse) {
+  .fhud button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+/* Phone landscape (the same height as CFG.hud.phoneMaxH): tighter panels, fewer totals, a slim climb strip */
+@media (max-height: 500px) {
+  .fr {
+    --edge: max(4vh, calc(2 * var(--u)));
+  }
+  .fhud .hpw {
+    font-size: calc(6 * var(--u));
+  }
+  .fhud .totals .up {
+    display: none;
+  }
+  .fhud .strip {
+    height: calc(3.5 * var(--u));
+    margin: 0;
+  }
+  .fhud .climb {
+    height: calc(7.5 * var(--u));
+  }
+  .climb-txt {
+    grid-template-columns: auto auto auto;
+    font-size: calc(2.4 * var(--u));
+  }
+  .climb-txt .hv:nth-child(2) {
+    grid-column: auto;
+    font-size: 1em;
+  }
+  .climb-prof {
+    width: calc(24 * var(--u));
+  }
+  .fhud .grade {
+    font-size: calc(3.4 * var(--u));
+  }
+  .fhud small,
+  .fhud .pw-side small,
+  .fhud .pw-sub small {
+    font-size: 0.6em;
+  }
+  .fhud .hpw small {
+    font-size: 0.4em;
+  }
+  .fhud .climb-txt small {
+    font-size: 0.75em;
+  }
+}

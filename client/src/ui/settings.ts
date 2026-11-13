@@ -91,7 +91,7 @@ export function settingsTab() {
       ),
       row(
         'In-ride display size',
-        'How big the numbers are during a bus ride.',
+        'How big the numbers are during a ride. Auto suits most screens; go Large or Huge if the telly is across the room.',
         seg(
           [
             ['0', 'Auto'],

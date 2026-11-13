@@ -84,6 +84,26 @@ Run `pnpm dev` in `client/` and open `/route-dev.html` (no server or trainer nee
 - Not yet checked on a real graphics card: frame rate. The target is 60 fps at Medium on a mid laptop.
 
 
+## Free-ride HUD (Phase B2)
+
+In the app: Ride, Free ride, Mount Coot-tha, Start with the simulated trainer. Add `?fast=6` to the address to get to the hills sooner and `&ghosts=4` for made-up mates.
+
+- Default view: power big at top left with a zone-coloured bar and "Z3" beside it, W/kg small, cadence beneath; speed top centre with distance, time and climbed under it; minimap top right; a thin elevation strip along the bottom. Nothing else. The road and rider are never covered.
+- Heart rate appears beside cadence only with a strap (or the simulated one) connected; cadence does not move when it comes and goes.
+- Pedal harder and easier: the bar under the power goes grey, blue, green, yellow, orange, red at 60, 76, 90, 105 and 119% of FTP.
+- On a slope of 2% or more a gradient chip appears above the strip (arrow, number, colour); it goes on the flat.
+- On Coot-tha the climb panel appears about 150 m before the first climb ("Climb in 120 m"), then shows the average gradient, distance and metres to the top, an ETA and the next kilometre of profile. It goes at the top and does not flicker on the rolling bits.
+- X or Z (or a Zwift Click): the gear chip appears bottom right and stays. It is not there before the first shift unless a Click is paired.
+- S or the Stats button: the drawer under the power opens and closes (average and normalised power, to go, climb to go, finish in, arrive, trainer gradient).
+- The ☰ button: route name, trainer difficulty slider, Pause, End ride and the Stats, Map, Riders and Clean view toggles. + and - still change the difficulty.
+- H: everything goes. H again (or a tap on the scene) brings it back. M hides the minimap, R the rider list.
+- With `&ghosts=4`: the rider list sits on the right under the map, you highlighted, riders ahead above you with "+" gaps and behind with "-"; gaps are in metres while you are stopped.
+- A toast with the route name shows under the speed for three seconds at the start.
+- Settings, In-ride display size: Small, Normal, Large and Huge all keep every panel on screen without overlap.
+- Phone in landscape (or a 844 by 390 window): no minimap or rider list until switched on from the menu, buttons big enough to tap, nothing under the notch.
+- Settings, Free ride view, Charts: the old flat layout still works, with its tiles, both profiles and the big map.
+- Not checked on real hardware: a telly across the room, an iPad, a phone with a notch, a real heart-rate strap.
+
 ## Free ride 3D world (Phase C)
 
 Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.route.camBack=40` for a view from above.

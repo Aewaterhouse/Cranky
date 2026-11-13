@@ -2,15 +2,15 @@ import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { gearGrade, shiftGear } from '../../core/gears'
 import { normalisedPower } from '../../core/ride'
-import { stepSpeed, totalMass, trainerGrade } from '../../core/physics'
+import { steadySpeed, stepSpeed, totalMass, trainerGrade } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
-import { onClickShift } from '../../trainer/zwiftClick'
+import { clickSource, onClickShift } from '../../trainer/zwiftClick'
 import { show } from '../../ui/dom'
 import { toast } from '../../ui/toast'
-import { freeRideView } from '../../ui/freeRideView'
+import { freeRideView, type FreePart } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
@@ -20,6 +20,8 @@ const STOP_S = 3
 const GO_S = 1.5
 const DIFF_KEY = 'cranky.trainerDifficulty'
 const F = CFG.freeRide
+const G = F.ghosts
+const HUD_KEYS: Record<string, FreePart> = { h: 'clean', s: 'stats', m: 'map', r: 'riders' }
 
 function loadDifficulty() {
   try {
@@ -48,7 +50,8 @@ export function runFreeRide(
   trainer: Trainer,
   done: (p: Profile) => void,
 ) {
-  const fast = +(new URLSearchParams(location.search).get('fast') ?? 1)
+  const params = new URLSearchParams(location.search)
+  const fast = +(params.get('fast') ?? 1)
   const mass = totalMass(profile.weightKg)
   const plan = freePlan(route, profile.ftp, profile.weightKg)
   const ride = new RideController(trainer, profile, plan)
@@ -66,6 +69,7 @@ export function runFreeRide(
   let sent = 0
   let sentAt = -Infinity
   let gear = CFG.gears.start
+  let shifted = false
 
   const view = freeRideView(
     route,
@@ -85,6 +89,7 @@ export function runFreeRide(
     }
   }
   show(view.root)
+  view.toast(route.name)
   // The 3D world is one rider on the road for now; group rides will hand it more.
   const me: RoadRider = {
     id: profile.id,
@@ -95,6 +100,12 @@ export function runFreeRide(
     cadence: 0,
     look: profile.look,
   }
+  // Dev aid (?ghosts=N): made-up mates riding steadily at a spread of efforts, to see the rider list and a bunch.
+  const ghosts = G.names.slice(0, +(params.get('ghosts') ?? 0)).map((name, i, all) => ({
+    rider: { ...me, id: `ghost${i}`, name, look: undefined, d: G.gapM * (i + 1) },
+    watts: profile.ftp * (G.ftp[0] + ((G.ftp[1] - G.ftp[0]) * i) / all.length),
+  }))
+  const riders = [me, ...ghosts.map((g) => g.rider)]
   let world: RouteWorld | undefined
   // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
   const quipper = new Quipper()
@@ -111,7 +122,7 @@ export function runFreeRide(
       .then((m) => {
         if (finished) return
         world = new m.RouteWorld(view.stage, route)
-        world.state = { me: me.id, riders: [me] }
+        world.state = { me: me.id, riders }
       })
       .catch(() => view.flat())
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
@@ -141,12 +152,14 @@ export function runFreeRide(
               ? () => nudge(-0.05)
               : k === 'z' || k === 'Z' || k === 'x' || k === 'X'
                 ? () => shift(k.toLowerCase() === 'x' ? 1 : -1)
-                : null
+                : k.toLowerCase() in HUD_KEYS
+                  ? () => view.toggle(HUD_KEYS[k.toLowerCase()])
+                  : null
     if (!act) return
     act()
     e.preventDefault()
   }
-  const shift = (d: number) => (gear = shiftGear(gear, d))
+  const shift = (d: number) => ((shifted = true), (gear = shiftGear(gear, d)))
   addEventListener('keydown', onKey)
   const offClick = onClickShift(shift)
   ride.start()
@@ -187,23 +200,38 @@ export function runFreeRide(
     me.d = dist
     me.speed = speed * fast
     me.cadence = paused ? 0 : live.cadence
+    for (const g of ghosts) {
+      g.rider.speed = paused
+        ? 0
+        : steadySpeed(g.watts, routeAt(route, g.rider.d).grade, mass) * fast
+      g.rider.cadence = paused ? 0 : G.cadence
+      g.rider.d = Math.min(route.distance, g.rider.d + g.rider.speed * dt)
+    }
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
+    const kg = profile.weightKg || F.defaultKg
     view.frame({
       live,
       speed,
       grade: p.grade,
       trainerGrade: sent,
       gear,
+      gears: shifted || !!clickSource(),
       dist,
       el,
       paused: manual ? 'manual' : auto ? 'auto' : null,
       starting,
       avgPower: pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0,
       np: normalisedPower(pw),
-      weightKg: profile.weightKg || F.defaultKg,
+      ftp: profile.ftp,
+      weightKg: kg,
       etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
+      riders: [
+        { ...me, wkg: live.avg / kg },
+        ...ghosts.map((g) => ({ ...g.rider, wkg: g.watts / kg })),
+      ],
+      me: me.id,
     })
     const quip =
       settings.quips &&

@@ -1,10 +1,14 @@
 import '../solo.css'
 import '../freeride.css'
-import { gearText } from '../core/gears'
-import { ascentFrom, routeStats, type Route } from '../core/route'
+import '../freeHud.css'
+import '../freeHudDock.css'
+import { CFG } from '../config'
+import type { ListRider } from '../core/hud'
+import { routeStats, type Route } from '../core/route'
 import type { Live } from '../modes/rideController'
-import { fmt, h } from './dom'
-import { gradeColour, profileChart } from './freeRideChart'
+import { h } from './dom'
+import { freeRideFlat } from './freeRideFlat'
+import { freeRideHud } from './freeRideHud'
 
 export interface FreeHandlers {
   pause: () => void
@@ -19,8 +23,9 @@ export interface FreeState {
   speed: number
   grade: number
   trainerGrade: number
-  /** Virtual gear. */
+  /** Virtual gear, and whether the rider is using the gears (so the chip is worth showing). */
   gear: number
+  gears: boolean
   dist: number
   el: number
   paused: 'manual' | 'auto' | null
@@ -28,61 +33,40 @@ export interface FreeState {
   starting: boolean
   avgPower: number
   np: number
+  ftp: number
   weightKg: number
   /** Seconds to the finish at the average speed so far. */
   etaS: number
+  /** Everyone on the road, me included. */
+  riders: ListRider[]
+  me: string
 }
 
-const kmh = (v: number) => (v * 3.6).toFixed(1)
-const km = (m: number) => (m / 1000).toFixed(m < 10000 ? 2 : 1)
-const clock = (s: number) => {
-  const t = Math.max(0, Math.round(s))
-  return t >= 3600 ? `${Math.floor(t / 3600)}:${fmt(t % 3600).padStart(5, '0')}` : fmt(t)
+/** HUD parts that can be switched on and off. */
+export type FreePart = 'clean' | 'stats' | 'map' | 'riders'
+
+/** What a layout is handed, and what it gives back. */
+export interface FreeParts {
+  route: Route
+  on: FreeHandlers
+  difficulty: number
+  mapBox: HTMLElement
+  ov: HTMLElement
+  toggle: (part: FreePart) => void
+  confirmEnd: () => void
+}
+export interface FreeLayout {
+  el: HTMLElement
+  frame(s: FreeState): void
+  setDifficulty(v: number): void
 }
 
 /**
- * Free ride player: big numbers, whole-route and next-km elevation profiles, optional map, controls. With `world`
- * the same parts become a slim HUD over the 3D scene, which is drawn into `stage`.
+ * Free ride player. With `world` it is a HUD over the 3D scene, which is drawn into `stage`; otherwise (or after
+ * `flat()`) the flat layout of tiles, profiles and map. Both share the map, the pause overlay and the toasts.
  */
 export function freeRideView(route: Route, on: FreeHandlers, difficulty: number, world = false) {
-  const num = (label: string, unit = '', cls = '') => {
-    const v = h('b', {}, '–')
-    const sub = h('i', {})
-    return {
-      v,
-      sub,
-      el: h(
-        'div',
-        { class: `sbig ${cls}` },
-        h('span', {}, label),
-        v,
-        unit ? h('small', {}, unit) : '',
-        sub,
-      ),
-    }
-  }
-  const speed = num('Speed', 'km/h')
-  const pow = num('Power · 3 s', 'W')
-  const cad = num('Cadence', 'rpm')
-  const hr = num('HR', 'bpm')
-  const gearN = num('Gear', '', 'only3d')
-  const gradN = num('Gradient', '%', 'only3d')
   const stage = h('div', { class: 'fr-stage' })
-  const dist = num('Distance', 'km', 'sm')
-  const togo = num('To go', 'km', 'sm')
-  const up = num('Climbed', 'm', 'sm')
-  const upLeft = num('Climb to go', 'm', 'sm')
-  const el = num('Elapsed', '', 'sm')
-  const eta = num('ETA', '', 'sm')
-  const avgP = num('Avg power', 'W', 'sm')
-  const np = num('NP', 'W', 'sm')
-  const wkg = num('W/kg', '', 'sm')
-
-  const whole = profileChart(route)
-  const next = profileChart(route, { behind: 100, ahead: 900 })
-  const gv = h('b', {}, '0.0')
-  const gsub = h('small', {})
-  const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, gsub)
   const mapBox = h('div', { class: 'fr-map' })
   mapBox.hidden = true
   let mapUpdate: ((d: number) => void) | undefined
@@ -101,22 +85,6 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       })
 
   const ov = h('div', { class: 'overlay' })
-  const pauseBtn = h('button', { onclick: on.pause })
-  const diffVal = h('b', { class: 'pct' })
-  const diff = h('input', {
-    type: 'range',
-    min: 0,
-    max: 100,
-    step: 5,
-    'aria-label': 'Trainer difficulty',
-    oninput: () => on.difficulty(+diff.value / 100),
-  })
-  const setDiff = (v: number) => {
-    diff.value = String(Math.round(v * 100))
-    diffVal.textContent = `${Math.round(v * 100)}%`
-  }
-  setDiff(difficulty)
-
   let dialog = false
   const say = (nodes: Node[] | null, cls = '') => {
     dialog = cls === 'dialog'
@@ -141,97 +109,54 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       ],
       'dialog',
     )
-  const kbd = (t: string) => h('kbd', {}, t)
+
+  const toastBox = h('div', { class: 'fr-toast', role: 'status' })
+  let toastTimer = 0
+  const toast = (text: string) => {
+    toastBox.textContent = text
+    toastBox.classList.add('on')
+    clearTimeout(toastTimer)
+    toastTimer = window.setTimeout(() => toastBox.classList.remove('on'), CFG.hud.toastS * 1000)
+  }
+
+  // Each part is a class on the root; a phone starts without the map and the rider list.
+  const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
+  const toggle = (part: FreePart) => root.classList.toggle(`hud-${part}`)
+  const parts: FreeParts = { route, on, difficulty, mapBox, ov, toggle, confirmEnd }
+  let layout = world ? freeRideHud(parts) : freeRideFlat(parts)
   const root = h(
     'div',
-    { class: world ? 'fr fr3d' : 'fr' },
+    { class: `fr${world ? ' fr3d' : ''}${phone ? '' : ' hud-map hud-riders'}` },
     stage,
-    h(
-      'header',
-      { class: 'solo-head' },
-      h('h1', {}, route.name),
-      route.approx ? h('span', { class: 'tag-approx' }, 'approximate profile') : '',
-      h(
-        'label',
-        {
-          class: 'field',
-          title:
-            'How much of the road gradient your trainer gets. Your speed always uses the real gradient.',
-        },
-        'Trainer difficulty',
-        h('div', { class: 'diff' }, diff, diffVal),
-      ),
-      h(
-        'div',
-        { class: 'ctl' },
-        pauseBtn,
-        h('button', { class: 'danger', onclick: confirmEnd }, 'End ride'),
-      ),
-    ),
-    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, hr.el, gearN.el, gradN.el),
-    h(
-      'section',
-      { class: 'fr-mid' },
-      h(
-        'div',
-        { class: 'fr-charts' },
-        h('div', { class: 'chartbox whole' }, whole.el),
-        h('div', { class: 'chartbox strip' }, gbox, h('div', { class: 'next' }, next.el)),
-      ),
-      mapBox,
-      ov,
-    ),
-    h(
-      'div',
-      { class: 'frrow frbot' },
-      dist.el,
-      togo.el,
-      up.el,
-      upLeft.el,
-      el.el,
-      eta.el,
-      avgP.el,
-      np.el,
-      wkg.el,
-    ),
+    layout.el,
+    toastBox,
   )
+  if (world) root.append(ov)
+  // In clean view a tap anywhere brings the HUD back (there is no H key on a phone).
+  stage.addEventListener('click', () => root.classList.remove('hud-clean'))
 
   return {
     root,
     stage,
     /** Drops back to the flat layout (no WebGL, or the scene failed to start). */
-    flat: () => root.classList.remove('fr3d'),
+    flat() {
+      if (!root.classList.contains('fr3d')) return
+      root.classList.remove('fr3d')
+      const f = freeRideFlat(parts)
+      layout.el.replaceWith(f.el)
+      layout = f
+    },
     confirmEnd,
-    setDifficulty: setDiff,
+    toggle,
+    /** A short message, top centre, gone after a few seconds. */
+    toast,
+    setDifficulty(v: number) {
+      parts.difficulty = v
+      layout.setDifficulty(v)
+    },
     frame(s: FreeState) {
-      const l = s.live
-      const set = (n: { v: HTMLElement }, t: string) => (n.v.textContent = t)
-      set(speed, kmh(s.speed))
-      set(pow, String(Math.round(l.avg)))
-      set(cad, String(Math.round(l.cadence)))
-      set(hr, l.hr ? String(l.hr) : '–')
-      set(dist, km(s.dist))
-      set(togo, km(Math.max(0, route.distance - s.dist)))
-      const gained = route.ascent - ascentFrom(route, s.dist)
-      set(up, String(Math.round(gained)))
-      set(upLeft, String(Math.round(route.ascent - gained)))
-      set(el, clock(s.el))
-      set(eta, clock(s.etaS))
-      eta.sub.textContent = `arrive ${new Date(Date.now() + s.etaS * 1000).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit' })}`
-      set(avgP, String(Math.round(s.avgPower)))
-      set(np, String(Math.round(s.np)))
-      set(wkg, (l.avg / s.weightKg).toFixed(2))
-      gv.textContent = s.grade.toFixed(1)
-      set(gearN, String(s.gear))
-      set(gradN, s.grade.toFixed(1))
-      gradN.v.style.color = gradeColour(s.grade)
-      gradN.sub.textContent = `trainer ${s.trainerGrade.toFixed(1)}%`
-      gbox.style.setProperty('--g', gradeColour(s.grade))
-      gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
-      whole.set(s.dist)
-      next.set(s.dist)
+      layout.frame(s)
       mapUpdate?.(s.dist)
-      pauseBtn.replaceChildren(s.paused === 'manual' ? 'Resume ' : 'Pause ', kbd('Space'))
       root.classList.toggle('paused', !!s.paused)
       if (dialog) return
       const msg = s.starting

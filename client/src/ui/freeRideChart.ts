@@ -1,10 +1,6 @@
+import { gradeColour } from '../core/hud'
 import { routeAt, type Route } from '../core/route'
 import { h } from './dom'
-
-/** Green on the flat and descents, then yellow, orange and red as it steepens. */
-export function gradeColour(g: number) {
-  return g < 2 ? '#7fd13b' : g < 5 ? '#f2d60a' : g < 8 ? '#ff9f1c' : g < 12 ? '#ff5a4e' : '#c2185b'
-}
 
 const COL_W = 3
 const STEPS_KM = [0.5, 1, 2, 5, 10, 20, 50, 100]
@@ -13,8 +9,9 @@ const STEPS_KM = [0.5, 1, 2, 5, 10, 20, 50, 100]
  * Canvas elevation profile, filled column by column in the colour of the gradient.
  * Without `ahead` it shows the whole route and dims what has been ridden;
  * with `ahead` it shows `behind` m back to `ahead` m forward of the rider.
+ * `slim` drops the axes and labels for the thin HUD strips.
  */
-export function profileChart(route: Route, win?: { behind: number; ahead: number }) {
+export function profileChart(route: Route, win?: { behind: number; ahead: number }, slim = false) {
   const cv = h('canvas', { class: 'frchart' })
   const el = h('div', { class: 'frchart-box' }, cv)
   let dist = 0
@@ -31,10 +28,10 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
       ? Math.max(0, Math.min(dist - win.behind, route.distance - win.behind - win.ahead))
       : 0
     const d1 = win ? d0 + win.behind + win.ahead : route.distance
-    const L = win ? 8 : 46
-    const T = win ? 10 : 16
-    const B = box.h - (win ? 18 : 24)
-    const W = box.w - L - 8
+    const L = slim ? 0 : win ? 8 : 46
+    const T = slim ? 3 : win ? 10 : 16
+    const B = box.h - (slim ? 0 : win ? 18 : 24)
+    const W = box.w - L - (slim ? 0 : 8)
     const cols = Math.max(2, Math.floor(W / COL_W))
     const at = (c: number) =>
       routeAt(route, Math.min(route.distance, d0 + ((c + 0.5) / cols) * (d1 - d0)))
@@ -47,7 +44,8 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
     }
     const span = Math.max(win ? 30 : 60, hi - lo)
     const mid = (hi + lo) / 2
-    lo = mid - span / 2 - span * 0.04
+    // A slim strip keeps a band of colour under the lowest point, or the valleys would have no fill to read.
+    lo = mid - span / 2 - span * (slim ? 0.45 : 0.04)
     hi = mid + span / 2 + span * 0.1
     const y = (e: number) => B - ((e - lo) / (hi - lo)) * (B - T)
     const x = (d: number) => L + ((d - d0) / (d1 - d0)) * W
@@ -57,7 +55,7 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
     ctx.strokeStyle = 'rgba(255,255,255,0.07)'
     ctx.lineWidth = 1
     // Elevation gridlines (whole route only) and distance ticks.
-    if (!win) {
+    if (!win && !slim) {
       const step = [10, 20, 50, 100, 200, 500, 1000].find((s) => (hi - lo) / s <= 5) ?? 1000
       for (let e = Math.ceil(lo / step) * step; e < hi; e += step) {
         ctx.beginPath()
@@ -72,7 +70,7 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
       ? 0.2
       : (STEPS_KM.find((s) => (d1 - d0) / 1000 / s <= 10) ?? STEPS_KM[STEPS_KM.length - 1])
     ctx.textAlign = 'center'
-    for (let k = Math.ceil(d0 / 1000 / kmStep) * kmStep; k * 1000 <= d1; k += kmStep) {
+    for (let k = Math.ceil(d0 / 1000 / kmStep) * kmStep; !slim && k * 1000 <= d1; k += kmStep) {
       const px = x(k * 1000)
       ctx.fillStyle = css('--dim')
       ctx.fillText(
@@ -96,21 +94,21 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
     ctx.beginPath()
     samples.forEach((s, c) => ctx[c ? 'lineTo' : 'moveTo'](L + (c + 0.5) * COL_W, y(s.ele)))
     ctx.strokeStyle = 'rgba(255,255,255,0.85)'
-    ctx.lineWidth = 2
+    ctx.lineWidth = slim ? 1.5 : 2
     ctx.stroke()
     // Rider marker.
     const me = routeAt(route, dist)
     ctx.strokeStyle = 'rgba(255,255,255,0.6)'
     ctx.lineWidth = 1.5
     ctx.beginPath()
-    ctx.moveTo(x(dist), T - 4)
+    ctx.moveTo(x(dist), slim ? 0 : T - 4)
     ctx.lineTo(x(dist), B)
     ctx.stroke()
     ctx.beginPath()
-    ctx.arc(x(dist), y(me.ele), win ? 7 : 6, 0, 7)
+    ctx.arc(x(dist), y(me.ele), slim ? Math.min(5, box.h / 7) : win ? 7 : 6, 0, 7)
     ctx.fillStyle = '#fff'
     ctx.fill()
-    ctx.lineWidth = 3
+    ctx.lineWidth = slim ? 2 : 3
     ctx.strokeStyle = css('--acc')
     ctx.stroke()
   }

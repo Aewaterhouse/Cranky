@@ -1,5 +1,5 @@
-/* Free ride player and setup */
-.fr {
+/* Free ride player (flat layout) and setup */
+.fr-flat {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -160,113 +160,15 @@
   border-radius: var(--r);
 }
 
-/* 3D world: the scene fills the screen and the same parts sit over it as a slim HUD */
-.fr-stage,
-.fr .only3d {
+/* 3D world: the scene fills the screen; the HUD over it is in freeHud.css */
+.fr-stage {
   display: none;
-}
-.fr3d {
-  gap: 8px;
 }
 .fr3d .fr-stage {
   display: block;
   position: fixed;
   inset: 0;
   z-index: 0;
-}
-.fr3d > :not(.fr-stage) {
-  position: relative;
-  z-index: 1;
-}
-.fr3d .only3d {
-  display: flex;
-}
-.fr3d .solo-head h1 {
-  font-size: 1.25rem;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
-}
-.fr3d .solo-head .field {
-  padding: 4px 12px;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  color: var(--fg);
-}
-.fr3d .fr-map .leaflet-control-attribution {
-  font-size: 9px;
-}
-.fr3d .sbig,
-.fr3d .chartbox,
-.fr3d .solo-head .field,
-.fr3d .solo-head button {
-  background: color-mix(in srgb, var(--card) 70%, transparent);
-  backdrop-filter: blur(6px);
-}
-.fr3d .frrow.frtop {
-  grid-template-columns: repeat(6, minmax(0, 170px));
-  justify-content: center;
-}
-.fr3d .sbig {
-  padding: 4px 12px;
-}
-.fr3d .sbig b {
-  font-size: clamp(1.5rem, 2.8vw, 2.4rem);
-}
-.fr3d .sbig b + small {
-  top: 6px;
-  right: 10px;
-  font-size: 0.7rem;
-}
-.fr3d .fr-mid {
-  pointer-events: none;
-}
-.fr3d .fr-mid .overlay.open,
-.fr3d .fr-map {
-  pointer-events: auto;
-}
-
-.fr3d .overlay {
-  background: rgba(17, 18, 20, 0.35);
-  backdrop-filter: none;
-}
-.fr3d .overlay.dialog {
-  background: rgba(17, 18, 20, 0.7);
-}
-.fr3d .fr-charts {
-  justify-content: flex-end;
-}
-.fr3d .chartbox.whole,
-.fr3d .gradebox {
-  display: none;
-}
-.fr3d .chartbox.strip {
-  height: clamp(70px, 11vh, 120px);
-}
-.fr3d .fr-map {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: clamp(150px, 17vw, 260px);
-  aspect-ratio: 1;
-}
-.fr3d .sbig.sm {
-  padding: 3px 10px;
-}
-.fr3d .sbig.sm b {
-  font-size: clamp(1rem, 1.5vw, 1.35rem);
-}
-.fr3d .sbig.sm i {
-  display: none;
-}
-@media (max-width: 900px) {
-  .fr3d .frrow.frtop {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .fr3d .frrow.frbot .sbig:nth-child(n + 5) {
-    display: none;
-  }
-  .fr3d .frrow.frbot {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
 }
 
 .route-grid {
