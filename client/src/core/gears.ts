@@ -4,27 +4,23 @@ import { resistance } from './physics'
 const G = CFG.gears
 
 export const gearCount = G.ratios.length
-export const gearText = (gear: number) => `Gear ${gear}/${gearCount}`
 
 /** One gear up (d = 1) or down (d = -1), stopping at the first and last gear. */
 export const shiftGear = (gear: number, d: number) => Math.min(gearCount, Math.max(1, gear + d))
 
 /**
- * The gradient (%) to send the trainer so that pedalling at `cadence` in virtual `gear` costs the same
- * power as on the road's gradient `roadPct`. The trainer's wheel turns at the physical ratio
- * (chainring / Zwift Cog); the virtual bike's at the gear's ratio. Clamped to `range`.
+ * How far the virtual gear moves the gradient (% points) at `cadence` on a real road of `roadPct`: the
+ * gradient at which the trainer's wheel (chainring / Zwift Cog) costs the same power as the virtual bike
+ * in `gear`, minus the road. Zero when the rider is barely pedalling.
  */
-export function gearGrade(
+export function gearOffset(
   roadPct: number,
   cadence: number,
   gear: number,
   mass: number,
-  range: readonly number[],
   chainring = G.chainring,
 ) {
-  const [lo, hi] = range
-  const clamp = (v: number) => Math.min(hi, Math.max(lo, +v.toFixed(1) || 0))
-  if (cadence < G.minCadence) return clamp(roadPct)
+  if (cadence < G.minCadence) return 0
   const rev = (cadence / 60) * G.wheelM
   const vVirt = rev * G.ratios[gear - 1]
   const vReal = (rev * chainring) / G.cogTeeth
@@ -37,5 +33,24 @@ export function gearGrade(
     if (resistance(vReal, mid, mass) * vReal < want) a = mid
     else b = mid
   }
-  return clamp((a + b) / 2)
+  return (a + b) / 2 - roadPct
+}
+
+/**
+ * The gradient (%) sent to the trainer: road × `difficulty` plus the gear offset × `strength`, clamped
+ * to `range`. The offset always uses the real road, so difficulty does not change how a gear feels.
+ */
+export function gearGrade(
+  roadPct: number,
+  cadence: number,
+  gear: number,
+  mass: number,
+  range: readonly number[],
+  chainring = G.chainring,
+  difficulty = 1,
+  strength = 1,
+) {
+  const [lo, hi] = range
+  const g = roadPct * difficulty + gearOffset(roadPct, cadence, gear, mass, chainring) * strength
+  return Math.min(hi, Math.max(lo, +g.toFixed(1) || 0))
 }

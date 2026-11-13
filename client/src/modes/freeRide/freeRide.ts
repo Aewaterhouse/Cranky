@@ -2,7 +2,7 @@ import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { gearGrade, shiftGear } from '../../core/gears'
 import { normalisedPower } from '../../core/ride'
-import { stepSpeed, totalMass, trainerGrade } from '../../core/physics'
+import { stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { settings } from '../../core/settings'
 import { onClickShift } from '../../trainer/zwiftClick'
@@ -140,10 +140,12 @@ export function runFreeRide(
       el += dt * fast
       dist = Math.min(route.distance, dist + speed * dt * fast)
     }
-    // Paused means an easy, flat trainer; riding means the road gradient scaled by difficulty, then
-    // adjusted for the virtual gear. Game speed above still comes from power alone.
-    const road = trainerGrade(p.grade, difficulty)
-    const want = paused ? 0 : gearGrade(road, live.cadence, gear, mass, F.grade, settings.chainring)
+    // Paused means an easy, flat trainer; riding means road × difficulty plus the gear offset × shift
+    // strength. Game speed above still comes from power alone.
+    const { chainring, shiftStrength } = settings
+    const want = paused
+      ? 0
+      : gearGrade(p.grade, live.cadence, gear, mass, F.grade, chainring, difficulty, shiftStrength)
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want
       sentAt = now / 1000

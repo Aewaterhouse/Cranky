@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { resistance, stepSpeed, steadySpeed, totalMass, trainerGrade } from '../src/core/physics'
+import { CFG } from '../src/config'
+import { gearGrade } from '../src/core/gears'
+import { resistance, stepSpeed, steadySpeed, totalMass } from '../src/core/physics'
 
 const kmh = (v: number) => v * 3.6
 const M = totalMass(75)
@@ -69,11 +71,13 @@ describe('ride physics', () => {
 
   it('difficulty scales only the trainer grade, not the physics', () => {
     const before = steadySpeed(250, 8, M)
-    expect(trainerGrade(8, 0.5)).toBe(4)
-    expect(trainerGrade(8, 1)).toBe(8)
-    expect(trainerGrade(8, 0)).toBe(0)
-    expect(trainerGrade(30, 1)).toBe(20)
-    expect(trainerGrade(-3, 0.5)).toBe(-1.5)
+    // At zero cadence there is no gear offset, so the trainer gets road × difficulty.
+    const tg = (g: number, d: number) => gearGrade(g, 0, 12, M, CFG.freeRide.grade, 34, d)
+    expect(tg(8, 0.5)).toBe(4)
+    expect(tg(8, 1)).toBe(8)
+    expect(tg(8, 0)).toBe(0)
+    expect(tg(30, 1)).toBe(20)
+    expect(tg(-3, 0.5)).toBe(-1.5)
     expect(steadySpeed(250, 8, M)).toBe(before)
   })
 })

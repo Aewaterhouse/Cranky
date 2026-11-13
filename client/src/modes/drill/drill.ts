@@ -20,7 +20,7 @@ import { RideController } from '../rideController'
 import { addEasy, addMinute, ownPlan } from './extend'
 import { CueTracker } from './cues'
 import { soloClick, soloKeys } from './keys'
-import { slopeSender } from './slope'
+import { slopeGears } from './slope'
 import { LiveTally } from './liveTally'
 import { pickOverlay, type Overlay } from './overlays'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
@@ -61,7 +61,6 @@ export function runDrill(
   let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
   let below = 0
   let mode = startMode()
-  const sendSlope = slopeSender(ride.erg, totalMass(profile.weightKg))
   let manual = false
   let auto = false
   let finished = false
@@ -90,6 +89,7 @@ export function runDrill(
     profile.maxHr,
   )
   if (!plan.test) void loadGhost(plan.name).then((g) => view.setGhost(g))
+  const slope = slopeGears(ride.erg, totalMass(profile.weightKg), view.root)
   show(view.root)
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
@@ -109,11 +109,11 @@ export function runDrill(
     mode = next
     if (kind === 'erg') ride.erg.setErg()
     else if (kind === 'res') ride.erg.setResistance(mode.level)
-    else sendSlope(mode, ride.live.cadence, true)
+    else slope.send(mode, ride.live.cadence, true)
   }
   const gear = (d: number) =>
     mode.kind === 'slope' &&
-    ((mode = { ...mode, gear: shiftGear(mode.gear, d) }), sendSlope(mode, ride.live.cadence, true))
+    ((mode = { ...mode, gear: shiftGear(mode.gear, d) }), slope.send(mode, ride.live.cadence, true))
   const inRamp = (i: number | undefined) =>
     spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
   function rampDone() {
@@ -242,7 +242,7 @@ export function runDrill(
         reconnecting: ride.trainerStatus === 'reconnecting',
       })
     }
-    if (mode.kind === 'slope') sendSlope(mode, live.cadence)
+    slope.frame(mode, live.cadence)
     tally.record(ride.rec, el, live)
     if (now >= splashUntil || overlay[2] === 'pause') {
       view.overlay(...overlay)

@@ -14,6 +14,8 @@ export interface Settings {
   announcer: boolean
   /** Chainring teeth on the bike on the trainer (with a 14T Zwift Cog), for virtual gears. */
   chainring: number
+  /** Multiplies how much each virtual gear changes the trainer gradient (0.5 to 3). */
+  shiftStrength: number
 }
 
 const KEY = 'cranky.settings'
@@ -24,6 +26,7 @@ const DEFAULTS: Settings = {
   colourBlind: false,
   announcer: true,
   chainring: CFG.gears.chainring,
+  shiftStrength: CFG.gears.strength.start,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

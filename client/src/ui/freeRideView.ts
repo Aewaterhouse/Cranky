@@ -1,10 +1,10 @@
 import '../solo.css'
 import '../freeride.css'
-import { gearText } from '../core/gears'
 import { ascentFrom, routeStats, type Route } from '../core/route'
 import type { Live } from '../modes/rideController'
 import { fmt, h } from './dom'
 import { gradeColour, profileChart } from './freeRideChart'
+import { gearTile, strengthSlider } from './gearTile'
 
 export interface FreeHandlers {
   pause: () => void
@@ -62,6 +62,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
   const pow = num('Power · 3 s', 'W')
   const cad = num('Cadence', 'rpm')
   const hr = num('HR', 'bpm')
+  const gearT = gearTile()
   const dist = num('Distance', 'km', 'sm')
   const togo = num('To go', 'km', 'sm')
   const up = num('Climbed', 'm', 'sm')
@@ -75,8 +76,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
   const whole = profileChart(route)
   const next = profileChart(route, { behind: 100, ahead: 900 })
   const gv = h('b', {}, '0.0')
-  const gsub = h('small', {})
-  const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, gsub)
+  const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, h('small', {}, '%'))
   const mapBox = h('div', { class: 'fr-map' })
   mapBox.hidden = true
   let mapUpdate: ((d: number) => void) | undefined
@@ -154,6 +154,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
         'Trainer difficulty',
         h('div', { class: 'diff' }, diff, diffVal),
       ),
+      strengthSlider(),
       h(
         'div',
         { class: 'ctl' },
@@ -161,7 +162,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
         h('button', { class: 'danger', onclick: confirmEnd }, 'End ride'),
       ),
     ),
-    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, hr.el),
+    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, gearT.el, hr.el),
     h(
       'section',
       { class: 'fr-mid' },
@@ -213,7 +214,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
       set(wkg, (l.avg / s.weightKg).toFixed(2))
       gv.textContent = s.grade.toFixed(1)
       gbox.style.setProperty('--g', gradeColour(s.grade))
-      gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
+      gearT.set(s.gear, s.trainerGrade)
       whole.set(s.dist)
       next.set(s.dist)
       mapUpdate?.(s.dist)

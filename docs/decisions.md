@@ -254,3 +254,13 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Click in solo ERG mode: ±1% intensity; Resistance mode: ±1 level step (5%). Zombie Bus, FTP tests and the spectator view ignore it.
 - Chainring (20 to 60 teeth, default 34) is a per-device setting on the Settings screen.
 - Not confirmed from the references: whether every Click v1 firmware advertises the Zwift service UUID (we also filter on the name), and whether the trainer feels right with our physics. Needs a real Click and trainer.
+
+## Virtual gears: offset and shift strength (13/11/2026)
+- The gear effect is now an offset worked out from the real road gradient: `gearOffset` = gear-matched gradient − road. The trainer gets road × difficulty + offset × shift strength, clamped to the mode's range. At 100% difficulty and 100% strength this equals the first gear model exactly (tested against its outputs).
+- Why: before, the gear maths ran on the difficulty-scaled road, so at low difficulty a gear felt different on the same hill. Now difficulty only softens the hill and each gear always moves the trainer by the same amount.
+- Solo Slope mode has no difficulty, so it uses 100%.
+- Shift strength: 50 to 300% in 10% steps, default 100%, one per-device setting (Settings, free ride header, Slope mode header) read on every trainer update. It exists because the trainer's own sim model differs from ours, so a real ride may need gears to bite harder.
+- Below 20 rpm the offset is 0, so the trainer gets road × difficulty.
+- The gear is shown as a big tile with the gradient actually sent to the trainer; it flashes red and nudges up on a harder gear, green and down on an easier one. The small gear text in the gradient box and the Slope stepper is gone, and the gradient box no longer repeats the trainer gradient.
+- `trainerGrade` in `core/physics.ts` and `gearText` had no callers left and were deleted; their difficulty test now runs through `gearGrade` at zero cadence.
+- Hardware: Click v1 firmware 1.1.0 works; 1.0.0 ignores RideOn. On 1.1.0 a handshake write with response fails, so the driver keeps writing without response.
