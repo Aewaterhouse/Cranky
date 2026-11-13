@@ -59,11 +59,27 @@ Pick a plan and length on the Ride tab, then the solo setup screen. Controls (bu
 | Space or `P` | pause or resume (ERG drops to 40% FTP while paused) |
 | `N` or Right | skip to the next interval (Right is left to the simulated trainer) |
 | `+` / `-` | intensity +/- 1% (50 to 150%, scales every ERG target) |
+| `Z` / `X` | virtual gear down / up (Slope mode only) |
 | Esc | end the ride (asks first) |
 
 Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes after 1.5 s of pedalling. Sprints never auto-pause. The results screen shows NP, IF and TSS.
 
-## URL params
+## Free ride keys
+
+| Key | Effect |
+| --- | --- |
+| Space or `P` | pause or resume |
+| `+` / `-` | trainer difficulty +/- 5% |
+| `Z` / `X` | virtual gear down / up |
+| Esc | end the ride (asks first) |
+
+## Zwift Click and virtual gears
+
+Free ride and solo Slope mode have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T).
+
+Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (optional)". Plus shifts up and minus shifts down in free ride and Slope mode. In ERG mode they change intensity by 1%, and in Resistance mode they step the level. Zombie Bus, FTP tests and the TV view ignore the Click. To check a Click without riding, open `/spike.html` and use "Pair Zwift Click"; every raw message is logged to the browser console as `[Click]`.
+
+
 
 - `?debug` shows the visual debug panel (colours, fog, camera). The backtick key toggles it too.
 - `?fast=N` speeds up the solo clock by N for dev (use `ZB_TIME_SCALE` for multiplayer).

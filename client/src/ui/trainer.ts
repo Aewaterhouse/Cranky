@@ -2,6 +2,7 @@ import { FtmsTrainer } from '../trainer/ftms'
 import { BleHr, currentHr, hrSource, onHrChange, setHr, SimHr } from '../trainer/heartRate'
 import { bindKeys, SimTrainer } from '../trainer/simTrainer'
 import type { Trainer, TrainerStatus } from '../types'
+import { clickSection } from './clickPair'
 import { h } from './dom'
 import { modal, toast } from './toast'
 
@@ -248,6 +249,7 @@ export function openTrainer(then?: () => void) {
       ),
     ),
     hrSection(),
+    clickSection(),
   )
 }
 

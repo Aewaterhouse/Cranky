@@ -17,6 +17,12 @@ export function settingsTab() {
     saveSettings({ volume: +vol.value })
     SFX.GREAT()
   })
+  const ring = h('input', { type: 'number', min: 20, max: 60, step: 1, value: settings.chainring })
+  ring.addEventListener('change', () => {
+    const v = Math.round(+ring.value)
+    if (v >= 20 && v <= 60) saveSettings({ chainring: v })
+    else ring.value = String(settings.chainring)
+  })
   const swatches = h('div', { class: 'set-zones' })
   const paint = () =>
     swatches.replaceChildren(
@@ -73,6 +79,11 @@ export function settingsTab() {
           String(settings.hudScale),
           (v) => saveSettings({ hudScale: +v }),
         ),
+      ),
+      row(
+        'Chainring (teeth)',
+        'The front ring on the bike on your trainer, with a 14T Zwift Cog. Virtual gears use it.',
+        ring,
       ),
       row(
         'Zone colours',

@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { setZonePalette } from '../ui/planGraph'
 
 export interface Settings {
@@ -11,6 +12,8 @@ export interface Settings {
   colourBlind: boolean
   /** Spoken commentary during bus rides. */
   announcer: boolean
+  /** Chainring teeth on the bike on the trainer (with a 14T Zwift Cog), for virtual gears. */
+  chainring: number
 }
 
 const KEY = 'cranky.settings'
@@ -20,6 +23,7 @@ const DEFAULTS: Settings = {
   hudScale: 0,
   colourBlind: false,
   announcer: true,
+  chainring: CFG.gears.chainring,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

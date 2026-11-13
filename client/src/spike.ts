@@ -2,6 +2,7 @@ import './style.css'
 import { FtmsTrainer } from './trainer/ftms'
 import { ErgController } from './trainer/ergController'
 import { SimTrainer } from './trainer/simTrainer'
+import { BleClick } from './trainer/zwiftClick'
 import type { Trainer } from './types'
 import { h, show } from './ui/dom'
 
@@ -25,6 +26,28 @@ const use = (t: Trainer) => {
   erg = new ErgController(t, +ftp.value)
   setInterval(() => erg!.tick(), 250)
   status.textContent = `Connected: ${t.name}`
+}
+const clickStatus = h(
+  'p',
+  { class: 'dim' },
+  'Not paired. Raw messages go to the console as [Click].',
+)
+const presses = h('div', { class: 'big' }, '–')
+let ups = 0
+let downs = 0
+async function pairClick() {
+  try {
+    const c = new BleClick()
+    c.onShift = (d) => {
+      if (d > 0) ups++
+      else downs++
+      presses.textContent = `${d > 0 ? 'UP ▲' : 'DOWN ▼'} · up ${ups} · down ${downs}`
+    }
+    c.onStatus = () => (clickStatus.textContent = `${c.name}: ${c.status}`)
+    await c.connect()
+  } catch (e) {
+    clickStatus.textContent = String(e)
+  }
 }
 show(
   h(
@@ -81,6 +104,14 @@ show(
       ),
       h('button', { onclick: () => erg?.setTarget(null) }, 'ERG off (sim 0%)'),
       h('button', { onclick: () => erg?.failsafe() }, 'Release'),
+    ),
+    h(
+      'div',
+      { class: 'card' },
+      h('h2', {}, 'Zwift Click test'),
+      clickStatus,
+      presses,
+      h('button', { onclick: () => void pairClick() }, 'Pair Zwift Click'),
     ),
     h('p', { class: 'dim' }, 'Record results per device in docs/testing.md (iPad: try Bluefy).'),
   ),

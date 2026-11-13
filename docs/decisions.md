@@ -228,3 +228,17 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 
 ## Dockerfile without VOLUME (13/11/2026)
 - Removed `VOLUME /data` from the Dockerfile because Railway rejects the Dockerfile `VOLUME` instruction. Persistence now comes from a Railway volume attached at `/data` in the dashboard. `ZB_DB=/data/zombie_bus.db` and `mkdir -p /data` stay, so other hosts can still mount a volume there.
+
+## Zwift Click v1 and virtual gears (13/11/2026)
+- Protocol sources (facts only, no code copied): [jat255/zwift_click_handling](https://github.com/jat255/zwift_click_handling) (MIT) and [OpenBikeControl/bikecontrol](https://github.com/OpenBikeControl/bikecontrol), formerly jonasbark/swiftcontrol. Both trace back to ajchellew/zwiftplay.
+- Click v1: service `00000001-19ca-4651-86e5-fa29dcdd09d1`; notifications on Async `…0002` and Sync TX `…0004` (indicate); write the 6 bytes `RideOn` (`52 69 64 65 4f 6e`) to Sync RX `…0003` to start the unencrypted mode. The Click answers `RideOn 01 03` plus a key, which we ignore. Button messages are `0x37` then protobuf fields 1 (plus) and 2 (minus), value 0 pressed and 1 released; a missing field counts as pressed (protobuf default). Battery `0x19` and empty `0x15` messages are ignored. A press is a released-to-pressed change on one button; repeats and releases give nothing.
+- Pairing filters on name prefix "Zwift Click" or the Zwift service. The handshake is sent without response if the characteristic allows it (bikecontrol does), else with response (jat255). Reconnect uses the heart-rate strap's backoff. Every raw notification is logged as `[Click]`. The driver never touches the trainer.
+- Plus is shift up (harder), minus is shift down.
+- Gears: 24 ratios from 0.75 to 5.49 in `CFG.gears`, spaced like Zwift's published spread (from memory of community tables, not checked against Zwift). Start in gear 12 (2.40), which is close to the default physical ratio 34/14 = 2.43, so the middle gear feels like the real bike on the flat.
+- Gear model: virtual speed = cadence × gear ratio × 2.1 m; real wheel speed = cadence × chainring / 14 × 2.1 m. Using `core/physics.ts` `resistance`, bisect for the gradient at which the real speed costs the same power as the virtual speed on the road gradient. Below 20 rpm the road gradient is sent unchanged. The result is clamped to the mode's range (free ride −10 to 20%, Slope −5 to 15%). This assumes the trainer's own sim model (mass, Crr, CdA) is close to ours; it will not be exact.
+- Free ride: the "road gradient" fed to the gear maths is the difficulty-scaled one, so the difficulty slider still works. Game speed is from power, as before. Gear does not persist between rides.
+- Slope mode: the gear-adjusted gradient is resent when it moves by more than 0.2% (the free-ride step), so cadence wobble does not flood the trainer. All writes go through `ergController.setGrade`.
+- Keys: `Z` down, `X` up, in free ride and Slope mode. Both were free in every handler (solo keys, free ride, simulated trainer, main, scene dev, spectator).
+- Click in solo ERG mode: ±1% intensity; Resistance mode: ±1 level step (5%). Zombie Bus, FTP tests and the spectator view ignore it.
+- Chainring (20 to 60 teeth, default 34) is a per-device setting on the Settings screen.
+- Not confirmed from the references: whether every Click v1 firmware advertises the Zwift service UUID (we also filter on the name), and whether the trainer feels right with our physics. Needs a real Click and trainer.
