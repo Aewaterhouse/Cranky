@@ -2,6 +2,7 @@ import { buy, COSMETICS, equip, SLOT_NAMES, type Cosmetic, type Slot } from '../
 import type { Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import { h } from './dom'
+import { shopPreview } from './shopPreview'
 import { toast } from './toast'
 
 const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱' }
@@ -29,14 +30,16 @@ export function garageTab(p: Profile, changed: () => void) {
       saveProfile(p)
       changed()
     }
+    const sw = h(
+      'div',
+      { class: 'sw', style: c.colour ? `--sw:${c.colour}` : '' },
+      c.colour ? '' : (ICON[c.slot] ?? '★'),
+    )
+    shopPreview(c, (src) => sw.replaceChildren(h('img', { src, alt: '' })))
     return h(
       'div',
       { class: `item${on ? ' on' : owned ? ' owned' : ''}` },
-      h(
-        'div',
-        { class: 'sw', style: c.colour ? `--sw:${c.colour}` : '' },
-        c.colour ? '' : (ICON[c.slot] ?? '★'),
-      ),
+      sw,
       h('b', {}, c.name),
       h(
         'span',

@@ -43,7 +43,7 @@ Already in the code when the notes were written (built in a hurry, never tested,
 
 ## 5. Garage and shop
 
-- [ ] **3D previews in the shop** for every item.
+- [x] **3D previews in the shop** for every item. Done: every Garage item shows the real 3D model wearing it (paint, bull bars and roof gear on the bus, hats close up on the rider, outfits on the rider), drawn one per frame by one shared offscreen renderer that is released afterwards (ui/shopPreview.ts). Without WebGL the flat swatches stay.
 - [ ] **Bike skins.** Custom bikes as a new cosmetic slot. The first aftermarket skin is your bike on its indoor trainer, so you ride around outside on a trainer.
 - [ ] **Prices up, and rarer fun items.** Rework the price curve, add rarity tiers, and add a batch of rare, silly items.
 

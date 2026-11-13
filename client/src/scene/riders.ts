@@ -235,5 +235,5 @@ export function makeRider(colour: string, seed: number, road = false) {
     }
     tag.position.set(side * 0.9, sy + 0.9 + (0.35 * (TAG_H - 80)) / 80, -sf)
   }
-  return { root, person, bike, label, setLook, fade, pose, heat, tag }
+  return { root, person, head, bike, label, setLook, fade, pose, heat, tag }
 }

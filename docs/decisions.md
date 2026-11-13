@@ -770,3 +770,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Route sections (2026-11-14)
 - A route is a "real ride" when its spec in scripts/routes/routes.json has a recording (`gpx`, which also takes FIT files). The flag sits in the index, not hard-coded in the client, so a new recorded route lands in the right section by itself. The map-data section is called "Classic climbs and roads".
+
+## Shop previews (2026-11-14)
+- Previews are still images (240×150 PNG), not live spinning models: one WebGL context draws them all once, caches them for the session and then lets the context go, so the Garage costs nothing while open and stays light on the iPad.
