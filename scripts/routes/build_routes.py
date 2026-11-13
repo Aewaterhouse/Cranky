@@ -249,9 +249,8 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
         if "features" in old and same:
             pack["features"] = old["features"]
             grid["cover"] = old["terrain"].get("cover")
-        print(
-            f"     {spec['id']}: map server refused ({err}); kept {'old' if 'features' in pack else 'no'} features"
-        )
+        kept = "old" if "features" in pack else "no"
+        print(f"     {spec['id']}: map server refused ({err}); kept {kept} features")
     return pack, {**head, **s, "smoothM": window}, problems
 
 
