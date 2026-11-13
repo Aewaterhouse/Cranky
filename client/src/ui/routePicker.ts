@@ -2,11 +2,13 @@ import type { Profile } from '../core/curve'
 import { CFG } from '../config'
 import {
   ROUTE_INDEX,
+  loadRoute,
   difficulty,
   estimateSeconds,
   lengthClass,
   type RouteSummary,
 } from '../core/routeLibrary'
+import { keepShell, offlineCapable, offlineRoutes } from '../core/offline'
 import { featuredRoute } from '../core/weekly'
 import { h, seg } from './dom'
 import { svgEl } from './svg'
@@ -36,7 +38,52 @@ export function miniProfile(pts: number[]) {
   return svg
 }
 
-function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void, feat = false) {
+/** "✓ offline" for a route this device has kept, or the button that keeps it; nothing without a service worker. */
+function offlineTag(r: RouteSummary, repaint: () => void) {
+  if (!offlineCapable()) return ''
+  if (offlineRoutes().includes(r.id))
+    return h(
+      'span',
+      { class: 'off-tag', title: 'Saved on this device: rides with no network' },
+      '✓ offline',
+    )
+  const b: HTMLButtonElement = h(
+    'button',
+    {
+      class: 'ghost off-save',
+      title: 'Keep this route and the 3D world on this device, to ride with no network',
+      onclick: async (e: Event) => {
+        e.stopPropagation()
+        b.disabled = true
+        b.textContent = 'Saving…'
+        try {
+          // The pack, the world's code and the app itself, all fetched through the service worker.
+          await Promise.all([
+            loadRoute(r.id),
+            import('../scene/route/routeWorld'),
+            import('../scene/route/camShots'),
+            import('../scene/route/worldDev'),
+            keepShell(),
+          ])
+        } catch {
+          b.textContent = 'Could not save'
+        }
+        repaint()
+      },
+    },
+    'Save for offline',
+  )
+  return b
+}
+
+function card(
+  p: Profile,
+  r: RouteSummary,
+  on: boolean,
+  pick: () => void,
+  feat: boolean,
+  repaint: () => void,
+) {
   const power = p.ftp * CFG.freeRide.ftpFrac
   const d = difficulty(r.gainM, r.avgGrade)
   return h(
@@ -61,6 +108,7 @@ function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void, feat =
       { class: 'dim' },
       `About ${hm(estimateSeconds(r.km, r.gainM, power, p.weightKg))} h at ${Math.round(CFG.freeRide.ftpFrac * 100)}% FTP`,
     ),
+    offlineTag(r, repaint),
   )
 }
 
@@ -81,7 +129,7 @@ export function routePicker(
     )
     list.replaceChildren(
       ...(shown.length
-        ? shown.map((r) => card(p, r, r.id === selected(), () => pick(r), r.id === feat))
+        ? shown.map((r) => card(p, r, r.id === selected(), () => pick(r), r.id === feat, paint))
         : [
             h(
               'p',

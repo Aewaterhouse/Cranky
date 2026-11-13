@@ -98,7 +98,7 @@ Built against simulated trainers and one PC only: not yet ridden by two people o
 - [x] Summit moment: arch, confetti, announcer line, and a postcard photo at the lookout.
 - [x] Settings: units, camera distance, HUD size, colour-blind gradient colours.
 - [ ] Performance pass with frame-rate numbers on real devices; iPad and phone layout.
-- [ ] Offline packs through the service worker.
+- [x] Offline packs through the service worker.
 - [ ] Manual test notes in `docs/testing.md` and owner checks in `docs/owner-checks.md`.
 
 ### Later: games on the road (not in this plan)

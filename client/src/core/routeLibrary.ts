@@ -1,3 +1,4 @@
+import { packLoaded } from './offline'
 import { CFG } from '../config'
 import { rideSeconds, totalMass } from './physics'
 import {
@@ -66,7 +67,9 @@ export function packToRoute(pack: RoutePack): Route {
 export async function loadRoute(id: string): Promise<Route> {
   const load = packs[`../../../content/routes/${id}.json`]
   if (!load) throw new Error(`No bundled route called ${id}`)
-  return packToRoute(await load())
+  const pack = await load()
+  packLoaded(id)
+  return packToRoute(pack)
 }
 
 /** Difficulty 1 to 5 from total climb, plus one for a steep average gradient. */

@@ -282,3 +282,19 @@
   min-height: 2.75rem;
   font-size: 1.25rem;
 }
+
+/* Route cards: kept on this device for riding with no network (production builds only) */
+.off-tag {
+  align-self: flex-start;
+  padding: 1px 8px;
+  border: 1px solid var(--tox);
+  border-radius: 99px;
+  color: var(--tox);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.off-save {
+  align-self: flex-start;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
