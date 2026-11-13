@@ -12,7 +12,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocke
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError
 
-from . import config, efforts, ladder
+from . import config, efforts, files, ladder
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
 from .session import Room
@@ -56,6 +56,7 @@ def user(authorization: str = Header(default="")) -> dict:
 
 User = Annotated[dict, Depends(user)]
 app.include_router(efforts.router(store, User))
+app.include_router(files.router(User))
 
 
 class Login(BaseModel):

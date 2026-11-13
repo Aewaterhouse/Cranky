@@ -1,6 +1,7 @@
 import type { RideSummary } from '../core/ride'
 import { segClock } from '../core/segments'
 import { climbLabel, distLabel, type Units } from '../core/units'
+import { saveFile } from './saveFile'
 
 const W = 1200
 const H = 800
@@ -102,10 +103,8 @@ export async function ridePostcard(
   return c
 }
 
-/** Downloads a canvas as a PNG. */
-export function savePng(c: HTMLCanvasElement, name: string) {
-  const a = document.createElement('a')
-  a.href = c.toDataURL('image/png')
-  a.download = `${name}.png`
-  a.click()
-}
+/** Saves a canvas as a PNG through the server link (see `saveFile`). */
+export const savePng = (c: HTMLCanvasElement, name: string) =>
+  new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/png')).then(
+    (b) => b && saveFile(b, `${name}.png`),
+  )

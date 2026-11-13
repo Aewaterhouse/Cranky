@@ -113,3 +113,7 @@ Results: `time` is null for a rider who did not finish; `dist` is what they rode
 
 A road tick never carries a power target (`tgt`): the trainer only ever gets a gradient from the rider's own
 position, through `ErgController.setGrade`.
+
+## Downloads
+- `PUT /api/rides/files/<name>` (logged in; body is the file, a .fit, .json or .png up to 8 MB) returns `{"url": "/api/rides/files/<key>/<name>"}`.
+- `GET /api/rides/files/<key>/<name>` (no login) serves it as an attachment for 10 minutes; `?inline=1` serves it inline.

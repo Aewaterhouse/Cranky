@@ -1,5 +1,6 @@
 import { fmt, h, pctStr } from './dom'
 import type { GroupSummary } from './results'
+import { savePng } from './ridePostcard'
 
 const TROPHY =
   '<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M7 3h10v6a5 5 0 0 1-10 0V3z"/><path d="M3 4h4v2H5a2 2 0 0 0 2 3v2a4 4 0 0 1-4-4V4zm18 0h-4v2h2a2 2 0 0 1-2 3v2a4 4 0 0 0 4-4V4z"/><rect x="11" y="14" width="2" height="4"/><rect x="8" y="18" width="8" height="3" rx="1"/></svg>'
@@ -125,8 +126,5 @@ export async function postcard(g: GroupSummary, planName: string) {
         680 + Math.floor(i / 2) * 36,
       ),
     )
-  const a = document.createElement('a')
-  a.href = c.toDataURL('image/png')
-  a.download = `zombie-bus-${new Date().toISOString().slice(0, 10)}.png`
-  a.click()
+  return savePng(c, `zombie-bus-${new Date().toISOString().slice(0, 10)}`)
 }
