@@ -6,7 +6,6 @@ import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
 import { busAim } from '../core/aim'
-import { settings } from '../core/settings'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
 import type { ShopItem, Tick } from '../net/protocol'
@@ -17,7 +16,7 @@ import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
 import { eventOf, FX_DEFAULT, madEvents } from './hudKit'
 import { makeMadPanel } from './hudMad'
-import { hudMenu, hudToast } from './hudParts'
+import { hudMenu, hudToast, hudUnit } from './hudParts'
 import { powerPanel } from './hudPower'
 import { makeRoster } from './hudRoster'
 import { makeShop } from './hudShop'
@@ -108,7 +107,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
               : []),
           ),
         ),
-        h('div', { class: 'glass strip' }, header.tl),
+        ...(mad ? [] : [h('div', { class: 'glass strip' }, header.tl)]),
       ),
     ),
     toast.el,
@@ -123,10 +122,10 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     ),
   )
   // The game's panels are drawn at a 720 px design height and zoomed to the same unit as the shared HUD.
+  let gz = 0
   const fit = () => {
-    if (!root.isConnected) return removeEventListener('resize', fit)
-    const u = Math.max(6, Math.min(18, innerHeight / 100)) * (settings.hudScale || 1)
-    root.style.setProperty('--gz', String(u / CFG.hud.designU))
+    const z = hudUnit() / CFG.hud.designU
+    if (z !== gz) root.style.setProperty('--gz', String((gz = z)))
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
@@ -141,9 +140,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       ? root.classList.remove('hud-clean')
       : removeEventListener('pointerdown', onTap)
   addEventListener('pointerdown', onTap)
-  addEventListener('resize', fit)
   addEventListener('keydown', onKey)
-  setTimeout(fit)
+  fit()
   let lastI = -2
   let lastCount = 0
   let rbProg: number | null = null
@@ -171,6 +169,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (!f) return
       const e = ev ?? (f.type === 'sprint' ? 'roadblock' : (f.event ?? 'longhaul'))
       root.classList.remove('pre')
+      fit()
       setPower(f, live)
       sprint.hidden = f.type !== 'sprint'
       header.update(f, e, f.el, total, rbProg, mask)
@@ -200,6 +199,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     /** Before the bus leaves: show live power and a big countdown. */
     countdown(n: number, live: Live) {
       root.classList.add('pre')
+      fit()
       setPower(null, live)
       sp.splash('sp-count sp-pre', `${n}`, mad ? 'MADNESS STARTS IN' : 'BUS LEAVES IN', 1100, 0)
     },

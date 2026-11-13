@@ -47,6 +47,9 @@ export const ROAD_CFG = {
     sprintBarOver: 1.15,
     designU: 7.2,
     fallbackFtp: 200,
+    /** Solo: a screen narrower than this many HUD units (a phone, a tablet, a big display size) gets the
+     *  slimmer interval list and loses the elapsed total. */
+    tightBelowU: 150,
     /** A PR or crew-best toast stays this long. */
     toastBigS: 7,
     /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */

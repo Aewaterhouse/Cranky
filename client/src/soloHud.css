@@ -135,16 +135,22 @@
   bottom: calc(24 * var(--u));
 }
 
+/* A narrow screen in HUD units (CFG.hud.tightBelowU): a slimmer list, and only the time to go under the clock */
+.tight.hud-riders .solo-stage {
+  right: calc(var(--edge) + 38 * var(--u));
+}
+.tight .rhud .ilist .irow {
+  grid-template-columns: 12ch 5ch 10ch;
+}
+.tight .irow .rg,
+.tight .totals span:first-child {
+  display: none;
+}
+.tight .totals span + span::before {
+  content: none;
+}
+
 @media (max-height: 500px) {
-  .hud-riders .solo-stage {
-    right: calc(var(--edge) + 38 * var(--u));
-  }
-  .rhud .ilist .irow {
-    grid-template-columns: 12ch 5ch 10ch;
-  }
-  .irow .rg {
-    display: none;
-  }
   .solo-stage {
     inset: calc(26 * var(--u)) max(var(--edge), env(safe-area-inset-right)) calc(17 * var(--u))
       calc(var(--edge) + 38 * var(--u));

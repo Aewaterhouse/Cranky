@@ -10,7 +10,7 @@ import type { BlockStat } from '../core/ride'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
 import { clock, fmt, h } from './dom'
-import { hudToast } from './hudParts'
+import { hudUnit } from './hudParts'
 import { powerPanel } from './hudPower'
 import { ZONE_COLOURS } from './planGraph'
 import { soloActions, type SoloAction } from './soloExtras'
@@ -70,7 +70,6 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
   const summary = h('div', { class: 'glass summary off' })
   const strip = workoutChart(ftp, 0, true)
   const zoom = workoutChart(ftp, 60)
-  const toast = hudToast()
   const ov = h('div', { class: 'overlay' })
   const media = mediaCorner()
   const acts = soloActions()
@@ -164,7 +163,6 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         h('div', { class: 'glass strip' }, strip.el),
       ),
     ),
-    toast.el,
     ov,
     media.panel,
   )
@@ -173,7 +171,6 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     root,
     panel,
     toggle,
-    toast: toast.show,
     /** Big centred message over the chart: countdown digit, sprint prompt, pause notice or grade splash. */
     overlay(big: string | null, sub = '', cls = '') {
       if (dialog || key === `${big}|${sub}|${cls}`) return
@@ -233,6 +230,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       c.modes.set(s.mode)
       root.classList.toggle('noerg', s.mode.kind !== 'erg')
       root.classList.toggle('paused', !!s.paused)
+      root.classList.toggle('tight', innerWidth / hudUnit() < CFG.hud.tightBelowU)
       power.set({
         power: f.type === 'sprint' ? live.power : live.avg,
         ftp,

@@ -17,6 +17,11 @@
   visibility: hidden;
 }
 
+/* Toasts clear the taller clock panel and the sprint chip */
+.bus-ride .fr-toast {
+  top: calc(var(--edge) + 21 * var(--u));
+}
+
 /* Top centre: the event, the time left in the block, what is next */
 .bhud .eh {
   position: static;
@@ -231,6 +236,10 @@
   right: auto;
   left: 22px;
   bottom: 110px;
+}
+.bus-ride .md {
+  min-width: 0;
+  padding: 10px 12px 12px;
 }
 /* VO2 Madness has no bus: its box and effort board sit in the left column, under the power panel */
 .bus-ride .hud-left.mad {

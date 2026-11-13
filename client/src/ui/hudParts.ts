@@ -1,6 +1,10 @@
 import { CFG } from '../config'
+import { settings } from '../core/settings'
 import { h } from './dom'
 import { hudSizeRow } from './hudSize'
+
+/** One HUD unit in px right now: the `--u` of rideHud.css (1% of the height, 6 to 18 px, times the display size). */
+export const hudUnit = () => Math.max(6, Math.min(18, innerHeight / 100)) * (settings.hudScale || 1)
 
 /** A number with its unit small after it. */
 export const hudVal = (cls: string, unit: string, lead = '') => {
