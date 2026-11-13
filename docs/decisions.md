@@ -538,6 +538,6 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Only free-ride and group-ride climbing counts; workouts and the bus have no hills.
 
 ### Ride history
-- A free or group ride's row in History shows a small line map of its route, the route name, the distance and "free ride" or "group ride". The ride's detail gets a route card (the map with the part ridden drawn brighter and the start marked, distance, climbing, finished or not) and the same segments card as the end-of-ride summary.
+- A free or group ride's row in History shows a small line map of its route, the route name, the distance and "free ride" or "group ride". The ride's detail gets a route card (the map with the part ridden drawn brighter and the start marked, distance, climbing, whether it was finished) and the same segments card as the end-of-ride summary.
 - The map is an SVG line drawn from the bundled pack (or the imported route if this browser still has it), not Leaflet: no tiles, no network, and cheap enough for a list. A ride on a route this device no longer has shows no map.
 - The list endpoint gained `route` (the route id) and `distance`; both are null for other rides and for rides from before Phase F.

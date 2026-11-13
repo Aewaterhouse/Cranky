@@ -93,7 +93,7 @@ function body(s: RideSummary) {
               { class: 'res-tiles' },
               tile('Distance', `${kmStr(s.distance ?? 0)} km`),
               tile('Climbed', `${s.ascent ?? 0} m`),
-              tile('Route', s.route.done ? 'Finished' : 'Not finished'),
+              tile('Finished', s.route.done ? 'Yes' : 'No'),
             ),
           ),
         )
