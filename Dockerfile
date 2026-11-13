@@ -20,6 +20,5 @@ WORKDIR /app/server
 RUN uv sync --no-dev --frozen
 RUN mkdir -p /data
 ENV ZB_DB=/data/zombie_bus.db PATH="/app/server/.venv/bin:$PATH"
-VOLUME /data
 EXPOSE 8000
 CMD ["sh", "-c", "exec uvicorn zombie_bus_server.app:app --host 0.0.0.0 --port ${PORT:-8000}"]

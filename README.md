@@ -36,7 +36,7 @@ cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless 
 | `ZB_DB` | `server/zombie_bus.db` | SQLite file path |
 | `ZB_TIME_SCALE` | `1` | Server clock speed multiplier (e.g. `10` to run a 45 min ride in about 4.5 min) |
 
-Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profiles. `PORT` sets the listen port in the container (Railway sets it).
+Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profiles. On Railway, attach the volume at `/data` in the dashboard, because Railway does not allow `VOLUME` in a Dockerfile. `PORT` sets the listen port in the container (Railway sets it).
 
 ## Simulated trainer
 

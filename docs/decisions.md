@@ -225,3 +225,6 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Steam uses the shared 500-particle smoke pool (exhaust, dust, horde dust), which recycles its oldest particles; six riders steaming hard add roughly 150 live particles.
 - Name tags are taller to fit the chip, so tags overlap a little more when riders bunch up on screen.
 - Passes server and client tests, type-check and lint. Chip, reddening and steam were checked in the scene dev page with made-up heart rates. Not tested with a real chest strap, and the roster and TV board read-outs have not been seen in a real ride.
+
+## Dockerfile without VOLUME (13/11/2026)
+- Removed `VOLUME /data` from the Dockerfile because Railway rejects the Dockerfile `VOLUME` instruction. Persistence now comes from a Railway volume attached at `/data` in the dashboard. `ZB_DB=/data/zombie_bus.db` and `mkdir -p /data` stay, so other hosts can still mount a volume there.
