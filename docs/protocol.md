@@ -59,7 +59,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 | t | Fields |
 | --- | --- |
 | `lobby` | `code, host, difficulty, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot}]`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`) |
-| `tick` | `el, i, bel, ev, riders: {id: {name, tier, tgt, w, cad, s, st}}, bus, fx` |
+| `tick` | `el, i, bel, ev, riders: {id: {name, tier, tgt, w, cad, s, st}}, bus, fx, load` |
 | `end` | `summary` (GroupSummary, see `client/src/ui/results.ts`) |
 | `error` | `msg` |
 
@@ -67,7 +67,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 `{t:'game', game:'bus'|'madness'}` (host, not while running) picks the crew game; the lobby carries `game`. In VO2 Madness the plan is dealt by the server and `bus.mad` holds `{pts, red, crown, lead, round, rounds, work, box, next, twist}`; extra fx kinds are `go, rest, box, crown, lead, sandbag`.
 
-`tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
+`tick.load` is what the targets of riders still on the bus are multiplied by while others have fallen off (1 when nobody has). `tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
 `st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.
 

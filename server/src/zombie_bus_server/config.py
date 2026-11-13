@@ -79,8 +79,8 @@ SCRAP_PER_M = 1 / 100
 
 # Difficulty: shifts every event's neutral compliance, closes the gap at `creep` m/s whatever the crew does,
 # scales armour damage and the final score, and sets the compliance a rider falls off under. Tuned on
-# simulated ERG crews (compliance 0.9 to 1.0, cadences out of sync) over every bus plan: easy never loses armour, normal ends
-# near half armour (often less), hard is doomed without streak air support, nightmare is doomed.
+# simulated ERG crews (compliance 0.9 to 1.0, cadences out of sync) over every bus plan: easy never loses
+# armour, normal ends near half (often less), hard is doomed without streak air support, nightmare is doomed.
 DIFFICULTY = {
     "easy": {"neutral": -0.08, "damage": 0.6, "score": 0.8, "creep": 0.5, "fell": 0.5},
     "normal": {"neutral": 0.0, "damage": 1.0, "score": 1.0, "creep": 1.1, "fell": 0.6},

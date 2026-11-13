@@ -6,7 +6,7 @@ import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
 import { busAim } from '../core/aim'
-import { busWarn } from '../core/hud'
+import { busWarn, loadBanner } from '../core/hud'
 import { SFX } from './audio'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
@@ -101,6 +101,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     m.size(),
   )
   const nextChip = h('div', { class: 'glass nchip off' })
+  const loadBar = h('div', { class: 'glass load-banner off' })
   const count = h('div', { class: 'count off' })
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
   const root: HTMLElement = h(
@@ -110,7 +111,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       'div',
       { class: 'rhud bhud' },
       h('div', { class: 'hud-tl' }, power.el, ...(stats ? [stats.root] : [])),
-      h('div', { class: 'hud-tc' }, header.root, sprint, nextChip, count),
+      h('div', { class: 'hud-tc' }, header.root, loadBar, sprint, nextChip, count),
       h('div', { class: 'hud-tr' }, roster.root),
       h(
         'div',
@@ -252,6 +253,13 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (ms) mad?.update(ms, m.riders, meId)
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m.riders, meId, m.el)
+      const fallen = Object.values(m.riders).filter((r) => r.st === 'fell')
+      const banner = loadBanner(
+        m.load,
+        fallen.map((r) => r.name),
+      )
+      loadBar.classList.toggle('off', !banner)
+      if (banner) loadBar.textContent = `⚠ ${banner}`
       shop.update(m.bus.shop, m.bus.scrap)
       for (const fx of m.fx) {
         if (fx.id !== meId || fx.k === 'fell')

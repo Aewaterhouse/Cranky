@@ -144,3 +144,24 @@ export function busWarn(
 /** The bus's score to send: none in a block with no target, or in the first `busGraceS` seconds of a block. */
 export const busScore = (f: { tgt: number | null; bel: number } | null, c: number | null) =>
   f?.tgt && f.bel >= CFG.hud.busGraceS ? c : null
+
+/**
+ * Each riding rider's share of the crew's watts, and who is carrying the most while anyone is off the bus
+ * (nobody when everyone is on it).
+ */
+export function crewShares(riders: Record<string, { w: number; st: string }>) {
+  const on = Object.entries(riders).filter(([, r]) => r.st === 'riding')
+  const sum = on.reduce((a, [, r]) => a + r.w, 0)
+  const share: Record<string, number> = {}
+  for (const [id, r] of on) share[id] = sum > 0 ? r.w / sum : 0
+  const fell = Object.values(riders).some((r) => r.st === 'fell')
+  const top = on.length > 1 && sum > 0 ? on.reduce((a, b) => (b[1].w > a[1].w ? b : a))[0] : null
+  return { share, carrier: fell ? top : null }
+}
+
+/** The banner while targets are raised: who is off and what it costs everyone else. */
+export function loadBanner(load: number | undefined, fallen: string[]) {
+  if (!load || load <= 1 || !fallen.length) return ''
+  const who = fallen.length === 1 ? `${fallen[0]} is` : `${fallen.length} riders are`
+  return `${who} off the bus: everyone else +${Math.round((load - 1) * 100)}% until they're hauled back`
+}

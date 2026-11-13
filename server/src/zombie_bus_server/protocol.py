@@ -155,3 +155,4 @@ class Tick(BaseModel):
     riders: dict[str, RiderTick]
     bus: Bus
     fx: list[Fx]
+    load: float = 1.0  # targets of riders still on the bus are multiplied by this while others have fallen

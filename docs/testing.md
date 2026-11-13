@@ -304,3 +304,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with the scrap count and "Open shop", which brings the cards back. At the next servo stop it opens in full.
 - Rear-view mirror: `/scene-dev.html?riders=3&gap=60` shows a framed strip top centre with the horde in it; `gap=none` hides it; `mad=1` has none. Debug panel (`g`), Rear-view mirror folder, changes its size and place.
 - Difficulty: in the bus lobby, each Horde level shows a line saying what it means. A sped-up Normal ride with bots should see the horde catch the bus several times; Easy should rarely see it close.
+- Fallen riders: a bus ride with three bots. The crew list shows `212 W 31%` per rider. When a bot falls off, a red banner "X is off the bus: everyone else +5% …" shows under the event header, the top rider gets 💪, and both go when they are hauled back.

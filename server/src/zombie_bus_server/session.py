@@ -385,7 +385,16 @@ class Room:
             }
             for r in self.riders.values()
         }
-        tick = Tick(el=self.el, i=i, bel=bel, ev=ev, riders=riders, bus=self.mode.state(self, i, bel), fx=fx)
+        tick = Tick(
+            el=self.el,
+            i=i,
+            bel=bel,
+            ev=ev,
+            riders=riders,
+            bus=self.mode.state(self, i, bel),
+            fx=fx,
+            load=load,
+        )
         return tick.model_dump()
 
     async def finish(self) -> None:

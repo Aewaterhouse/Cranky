@@ -1,4 +1,5 @@
 import type { RiderTick } from '../net/protocol'
+import { crewShares } from '../core/hud'
 import { h } from './dom'
 import { compColour, hrColour, set } from './hudKit'
 
@@ -13,7 +14,7 @@ interface Row {
 }
 
 /**
- * The crew, on the right edge in the rider list's rows: name and tier, watts, compliance (or what happened to
+ * The crew, on the right edge in the rider list's rows: name and tier, watts and share of the crew's, compliance (or what happened to
  * them) and heart rate. Rows are kept and updated in place; mine is the highlighted one.
  */
 export function makeRoster() {
@@ -23,6 +24,7 @@ export function makeRoster() {
   return {
     root,
     update(riders: Record<string, RiderTick>, meId: string, el: number) {
+      const { share, carrier } = crewShares(riders)
       for (const [id, r] of Object.entries(riders)) {
         let row = rows.get(id)
         if (!row) {
@@ -53,7 +55,15 @@ export function makeRoster() {
         row.root.dataset.st = r.st
         set(row.tier, r.tier[0].toUpperCase())
         row.tier.title = `${r.tier} tier`
-        set(row.watts, r.st === 'riding' ? `${Math.round(r.w)} W` : '–')
+        // watts and this rider's share of the crew's; 💪 on whoever carries most while someone is off
+        const pct = `${Math.round((share[id] ?? 0) * 100)}%`
+        row.watts.replaceChildren(
+          ...(r.st === 'riding'
+            ? [`${id === carrier ? '💪' : ''}${Math.round(r.w)} W`, h('small', {}, pct)]
+            : ['–']),
+        )
+        row.watts.title =
+          id === carrier ? 'Carrying the crew' : "Watts, and share of the crew's work"
         set(row.hr, r.hr && r.st !== 'spectator' ? `♥ ${r.hr}` : '')
         row.hr.style.color = hrColour(r.hrp)
         set(

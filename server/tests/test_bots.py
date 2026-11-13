@@ -132,3 +132,21 @@ def test_heart_rate_reaches_the_crew_for_humans_and_bots(monkeypatch):
     assert (riders["h0"]["hr"], riders["h0"]["hrp"]) == (162, 0.88)
     bot = next(r for i, r in riders.items() if i != "h0")
     assert 60 < bot["hr"] < config.BOT_HR_MAX and 0.3 < bot["hrp"] <= 1
+
+
+def test_tick_says_how_much_a_fallen_rider_loads_the_rest():
+    async def main():
+        room, ws = await lobby_with(2, "LOAD")
+        await room.handle("h0", ws, {"t": "start"})
+        room.task.cancel()  # step by hand
+        room.el = 25.0  # in the 90% block
+        base = room.step(0.5)
+        room.riders["h1"].st = "fell"
+        room.riders["h1"].low_s = 0
+        raised = room.step(0.5)
+        return base, raised
+
+    base, raised = asyncio.run(main())
+    assert base["load"] == 1.0
+    assert raised["load"] == pytest.approx(1 + config.FELL_LOAD)
+    assert raised["riders"]["h0"]["tgt"] > base["riders"]["h0"]["tgt"]

@@ -92,7 +92,7 @@
 
 /* Right edge: the crew, in the rider list's rows */
 .rhud .crew .rrow {
-  grid-template-columns: 12ch 5.5ch 8.5ch 5ch;
+  grid-template-columns: 12ch 9.5ch 8.5ch 5ch;
   align-items: baseline;
 }
 .crew .rn {
@@ -110,6 +110,11 @@
 .crew .rw {
   font-weight: 700;
   opacity: 1;
+}
+.crew .rw small {
+  margin-left: 0.4em;
+  font-size: 0.7em;
+  opacity: 0.75;
 }
 .crew .rg {
   font-weight: 700;
@@ -282,4 +287,13 @@
     right: 14px;
     width: 262px;
   }
+}
+
+/* While someone is off the bus and everyone else's target is raised */
+.rhud .load-banner {
+  padding: calc(0.6 * var(--u)) calc(1.6 * var(--u));
+  font: 800 calc(2 * var(--u)) var(--ui);
+  color: #fff;
+  background: color-mix(in srgb, var(--bad) 75%, transparent);
+  animation: sp-rise 0.4s;
 }

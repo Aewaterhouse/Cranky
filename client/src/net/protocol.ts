@@ -114,6 +114,8 @@ export interface Tick {
   riders: Record<string, RiderTick>
   bus: BusState
   fx: Fx[]
+  /** Targets of riders still on the bus are multiplied by this while others have fallen off (1 when none). */
+  load?: number
 }
 
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
