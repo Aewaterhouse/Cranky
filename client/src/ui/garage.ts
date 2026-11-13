@@ -39,9 +39,10 @@ export function garageTab(p: Profile, changed: () => void) {
     shopPreview(c, (src) => sw.replaceChildren(h('img', { src, alt: '' })))
     return h(
       'div',
-      { class: `item${on ? ' on' : owned ? ' owned' : ''}` },
+      { class: `item ${c.rarity}${on ? ' on' : owned ? ' owned' : ''}` },
       sw,
       h('b', {}, c.name),
+      h('span', { class: `rarity ${c.rarity}` }, c.rarity),
       h(
         'span',
         { class: 'meta' },

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bankScrap, buy, COSMETICS, equip, TRAINER_SKIN } from '../src/core/cosmetics'
+import { bankScrap, buy, COSMETICS, equip, RARITIES, TRAINER_SKIN } from '../src/core/cosmetics'
 import { newProfile, type Profile } from '../src/core/curve'
 
 describe('cosmetics', () => {
@@ -10,10 +10,19 @@ describe('cosmetics', () => {
     )
     expect(COSMETICS.find((c) => c.id === TRAINER_SKIN)?.slot).toBe('bike')
   })
+  it('every item has a rarity, rarer never cheaper, and every tier has items', () => {
+    for (const c of COSMETICS) expect(RARITIES).toContain(c.rarity)
+    const top = (r: string) =>
+      Math.max(...COSMETICS.filter((c) => c.rarity === r).map((c) => c.price))
+    const low = (r: string) =>
+      Math.min(...COSMETICS.filter((c) => c.rarity === r).map((c) => c.price))
+    for (let i = 1; i < RARITIES.length; i++)
+      expect(low(RARITIES[i])).toBeGreaterThan(top(RARITIES[i - 1]))
+  })
   it('buys, spends scrap and equips', () => {
     const p = { ...newProfile('a'), scrap: 100 }
     const q = buy(p, 'hat-cap') as Profile
-    expect(q.scrap).toBe(70)
+    expect(q.scrap).toBe(100 - COSMETICS.find((c) => c.id === 'hat-cap')!.price)
     expect(q.owned).toEqual(['hat-cap'])
     expect(q.look.hat).toBe('hat-cap')
     expect(buy(q, 'hat-cap')).toBe('Already owned')

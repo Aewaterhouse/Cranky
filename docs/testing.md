@@ -311,3 +311,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Drafting: in a group-ride lobby the host sees Drafting Off / Realistic / Strong; a guest sees the level and what it means. In the ride on Strong behind bots, the HUD's drafting watts climb as more riders are close ahead.
 - Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.
 - Bike skins: with scrap (or a test profile), buy and equip Indoor Escapee in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
+- Rarity: the Garage shows a Common / Rare / Epic / Legendary badge on every item, epic and legendary cards have a coloured frame, and the four new silly items have 3D previews.

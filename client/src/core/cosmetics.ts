@@ -8,7 +8,11 @@ export interface Cosmetic {
   name: string
   price: number
   colour?: string
+  rarity: Rarity
 }
+/** Rarity tiers, commonest first: they set the badge and frame of an item in the Garage. */
+export const RARITIES = ['common', 'rare', 'epic', 'legendary'] as const
+export type Rarity = (typeof RARITIES)[number]
 /** Equipped item ids by slot; what other riders see. */
 export type Look = Partial<Record<Slot, string>>
 

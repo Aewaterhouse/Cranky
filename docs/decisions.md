@@ -776,3 +776,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Bike skins (2026-11-14)
 - New cosmetic slot `bike`. A skin sets the frame colour; `bike-trainer` (Indoor Escapee) shows the orange trainer under the bike on the road too. The debug panel's `VIS.trainerOnRoad` still puts it on everyone. Prices invented: 80, 100, 160 for frames, 350 for the trainer.
+
+## Prices and rarity (2026-11-14)
+- Prices × 1.5, rounded to 10 (Python's round-half-even, so the 30-scrap cap went to 40, not 50). Rarity is stored per item in content/cosmetics.json, set from price: common < 100, rare < 250, epic < 500, legendary otherwise; a test keeps every tier dearer than the last. Already-owned items stay owned; nothing is refunded or recharged.

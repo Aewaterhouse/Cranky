@@ -55,6 +55,25 @@ export function makeHat(id: string | undefined): THREE.Object3D | null {
     } else if (id === 'hat-shark') {
       m.add(dome, col, [0, 0.03, 0])
       m.add(cone(0.16, 0.5, 4), col, [0, 0.42, 0.05], [-0.35, Math.PI / 4, 0], [0.35, 1, 1])
+    } else if (id === 'hat-traffic') {
+      m.add(box(0.5, 0.05, 0.5), col, [0, 0.1, 0])
+      m.add(cone(0.2, 0.6, 8), col, [0, 0.42, 0])
+      m.add(cyl(0.12, 0.15, 0.1, 8), '#ffffff', [0, 0.4, 0])
+    } else if (id === 'hat-snag') {
+      m.add(box(0.5, 0.12, 0.2), '#f0d8a0', [0, 0.1, 0])
+      m.add(cyl(0.06, 0.06, 0.62, 6), col, [0, 0.2, 0], [0, 0, Math.PI / 2])
+      m.add(box(0.5, 0.02, 0.04), '#e03030', [0, 0.27, 0])
+    } else if (id === 'hat-ibis') {
+      m.add(
+        new THREE.IcosahedronGeometry(0.22, 0),
+        col,
+        [0, 0.22, 0.05],
+        [0, 0, 0],
+        [0.9, 0.7, 1.4],
+      )
+      m.add(cyl(0.05, 0.06, 0.25, 5), '#1a1a1a', [0, 0.42, -0.2], [0.4, 0, 0])
+      m.add(new THREE.IcosahedronGeometry(0.08, 0), '#1a1a1a', [0, 0.56, -0.26])
+      m.add(cone(0.03, 0.4, 4), '#1a1a1a', [0, 0.5, -0.48], [-1.9, 0, 0])
     } else {
       m.add(cyl(0.25, 0.23, 0.2, 8), col, [0, 0.2, 0])
       for (let i = 0; i < 6; i++) {

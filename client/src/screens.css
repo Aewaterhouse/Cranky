@@ -562,3 +562,32 @@ kbd {
   height: 100%;
   object-fit: cover;
 }
+/* Rarity: a badge, and a coloured frame for the rarer items */
+.item .rarity {
+  align-self: flex-start;
+  padding: 0 7px;
+  border-radius: 99px;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--dim);
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.item .rarity.rare {
+  color: #4aa8ff;
+}
+.item .rarity.epic {
+  color: #c06bff;
+}
+.item .rarity.legendary {
+  color: #ffb020;
+}
+.item.epic:not(.on) {
+  box-shadow: inset 0 0 0 1px rgb(192 107 255 / 0.5);
+}
+.item.legendary:not(.on) {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 176 32 / 0.7),
+    0 0 18px rgb(255 176 32 / 0.15);
+}
