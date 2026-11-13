@@ -126,3 +126,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Difficulty: ride Normal in ERG and say whether the crew was close to failing by the end; then Hard, and whether the air strikes and gunships felt like the only way through.
 - [ ] Fallen riders: on a bus ride, when someone falls off, the red banner shows, everyone else's target goes up 5% (ERG follows), the crew list shows each share % and the 💪 carrier, and the extra feels fair. Answer in `docs/questions.md`.
 - [ ] Cables on the bus: visible from the chase camera on a real screen, brighter when riding hard, dark when someone falls off.
+- [ ] Bus on gears: pick Gears in the lobby, ride a bus with ERG off on a real trainer. Shifting with the Click (or Z X) should let you hold the target at a normal cadence; say if the 2% base road feels right.

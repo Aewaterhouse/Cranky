@@ -79,14 +79,16 @@ export const VIS = {
   servoStop: -12,
   servoBrake: 40,
   servoPullAway: 0.6,
-  /** Rear-view mirror on the bus (1 on): width as a share of the screen, top edge as a share of its height, camera height. */
   /** Trainer power cables into the bus: cable colour, glow colour and the glow at full effort. */
   cableColour: '#1d1f24',
   cableGlow: '#7dff4a',
   cableGlowMax: 1.4,
+  /** Rear-view mirror on the bus (1 on): width and centre as shares of the screen width, top edge as a share
+   *  of its height, camera height. Top right by default, clear of the event header and its cues. */
   mirror: 1,
   mirrorW: 0.26,
-  mirrorY: 0.15,
+  mirrorX: 0.83,
+  mirrorY: 0.03,
   mirrorHeight: 3.6,
   moodBlend: 1.6,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */

@@ -33,7 +33,7 @@ export function soloAim(f: Frame, mode: string | null): Aim {
 }
 
 /** The bus's power panel: power leads, the target beneath. A sprint shows the rider's best so far, never a target. */
-export function busAim(f: Frame | null, power: number, best: number): Aim {
+export function busAim(f: Frame | null, power: number, best: number, erg = true): Aim {
   if (!f) return { cap: 'Power · 3 s', note: 'Get ready' }
   if (f.type === 'sprint')
     return {
@@ -43,6 +43,6 @@ export function busAim(f: Frame | null, power: number, best: number): Aim {
       fill: power / best / CFG.hud.sprintBarOver,
     }
   return f.tgt
-    ? { cap: 'Power · 3 s', chip: '🔒 ERG', target: f.tgt, cad: f.cad }
+    ? { cap: 'Power · 3 s', chip: erg ? '🔒 ERG' : '⚙ Gears', target: f.tgt, cad: f.cad }
     : { cap: 'Power · 3 s', chip: 'ERG off', note: 'Free ride', cad: f.cad }
 }

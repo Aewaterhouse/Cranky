@@ -94,6 +94,12 @@ describe('what the power panel is told', () => {
       expect(aim.chip).toBe('ERG off')
     }
   })
+  it('says ERG or gears on the bus, and keeps the target either way', () => {
+    expect(busAim(frame('steady', 200), 190, 640).chip).toBe('🔒 ERG')
+    const gears = busAim(frame('steady', 200), 190, 640, false)
+    expect(gears.chip).toBe('⚙ Gears')
+    expect(gears.target).toBe(200)
+  })
   it('shows the best sprint so far, and says when it is beaten', () => {
     expect(busAim(frame('sprint', null), 300, 640).note).toBe('All out · best 640 W')
     expect(busAim(frame('sprint', null), 700, 640).note).toBe('All out · new best!')

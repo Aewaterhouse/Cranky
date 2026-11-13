@@ -748,3 +748,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Power cables on the bus (2026-11-14)
 - Each rider's cable glows with power over target (capped at 1.5), times `VIS.cableGlowMax` (1.4), pulsing at twice the crank rate between 65% and 100% of that. With no target (a sprint or free block) any pedalling counts as 1. Colours `VIS.cableColour` and `VIS.cableGlow` (green, the bus game's toxic colour) are in the debug panel's Trainer folder. Not in VO2 Madness, where riders are on the road.
+
+## Gears on the bus (2026-11-14)
+- With ERG off the bus has no road, so the gears sit on a flat road at `CFG.ride.gradeStart` (2%, the old hand-set starting gradient): the trainer gets 2% plus the gear offset times shift strength, clamped to the solo slope range, through `ergController.setGrade`. The ↑ ↓ hand gradient is gone; the arrows now shift like Z and X. The block target is still shown and scored.
+- Each rider's choice is per device (`settings.busErg`) and is sent to the server as `{t: 'erg', on}` on joining and whenever it changes; the lobby shows "ERG" or "⚙ Gears" on each seat. Bots always show as ERG.
+- The rear-view mirror moved to the top right (`VIS.mirrorX` 0.83, `mirrorY` 0.03): at the top centre it sat over the event header and the countdown and banner under it.

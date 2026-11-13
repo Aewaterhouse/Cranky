@@ -41,6 +41,7 @@ export type ClientMsg =
       hrp?: number | null
     }
   | { t: 'buy'; item: ShopItem }
+  | { t: 'erg'; on: boolean }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
 export type ShopItem = 'plating' | 'repellent' | 'sync'
@@ -52,6 +53,8 @@ export interface LobbyRider {
   connected: boolean
   look: Look
   bot?: boolean
+  /** ERG holds this rider's target; false means they ride on virtual gears. */
+  erg?: boolean
 }
 export interface Lobby {
   t: 'lobby'
@@ -78,6 +81,7 @@ export interface RiderTick {
   /** Heart rate in bpm, and as a fraction of the rider's max (null without a strap or a max). */
   hr?: number | null
   hrp?: number | null
+  erg?: boolean
 }
 export interface BusState {
   speed: number

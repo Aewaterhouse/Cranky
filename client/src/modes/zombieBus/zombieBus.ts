@@ -17,6 +17,9 @@ import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
 import type { Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { busGears } from './busGears'
+import { totalMass } from '../../core/physics'
+import { onClickShift } from '../../trainer/zwiftClick'
 
 const FX_SOUND: Record<string, () => void> = {
   buy: SFX.scrap,
@@ -67,9 +70,9 @@ export function startBusRide(
   const isHost = () => l.host === profile.id
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
-  // Non-ERG riding: the trainer gets a gradient the rider sets; targets still score. All writes stay in ergController.
-  let busGrade: number = CFG.ride.gradeStart
-  const applyErg = () => (settings.busErg ? ride.erg.setErg() : ride.erg.setGrade(busGrade))
+  // Non-ERG riding: virtual gears, the trainer gets a gradient; targets still score. All writes stay in ergController.
+  const gears = busGears(ride.erg, totalMass(profile.weightKg))
+  const applyErg = () => (settings.busErg ? ride.erg.setErg() : gears.send(ride.live.cadence, true))
   const hud = makeHud(
     (t) => {
       profile.tier = t
@@ -85,21 +88,18 @@ export function startBusRide(
         on: () => settings.busErg,
         toggle: () => {
           saveSettings({ busErg: !settings.busErg })
+          net.send({ t: 'erg', on: settings.busErg })
           applyErg()
           hud.toast(
             settings.busErg
               ? 'ERG on: the trainer holds your target'
-              : 'ERG off: hold the target yourself. ↑ ↓ change the gradient',
+              : 'ERG off: shift to hold the target. Z X or ↓ ↑ change gear',
           )
         },
-        slope: (d) => {
-          busGrade = Math.min(
-            CFG.ride.grade[1],
-            Math.max(CFG.ride.grade[0], busGrade + d * CFG.ride.gradeStep),
-          )
-          applyErg()
-          return busGrade
-        },
+        shift: (d) => gears.shift(d, ride.live.cadence),
+        strength: (d) => gears.strength(d, ride.live.cadence),
+        tile: gears.tile,
+        slider: gears.slider,
       },
       plan,
       tier: profile.tier,
@@ -128,8 +128,10 @@ export function startBusRide(
     )
   ride.start()
   if (!settings.busErg) applyErg()
+  const offClick = onClickShift((d) => !settings.busErg && gears.shift(d, ride.live.cadence))
   const sender = setInterval(() => {
     const v = ride.live
+    gears.send(v.cadence)
     const hr = currentHr()
     net.send({
       t: 'data',
@@ -227,6 +229,7 @@ export function startBusRide(
   }
 
   const cleanup = async () => {
+    offClick()
     clearInterval(sender)
     clearInterval(saver)
     clearInterval(scheduler)

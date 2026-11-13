@@ -21,6 +21,7 @@ from .protocol import (
     Data,
     Difficulty,
     End,
+    Erg,
     Game,
     Join,
     Setup,
@@ -70,10 +71,19 @@ class Rider:
     sprints: list[str] = field(default_factory=list)
     look: dict[str, str] = field(default_factory=dict)
     bot: bool = False
+    erg: bool = True
 
     def reset_stats(self) -> None:
         fresh = Rider(
-            self.id, self.name, self.ftp, self.tier, self.ws, self.connected, look=self.look, bot=self.bot
+            self.id,
+            self.name,
+            self.ftp,
+            self.tier,
+            self.ws,
+            self.connected,
+            look=self.look,
+            bot=self.bot,
+            erg=self.erg,
         )
         self.__dict__.update(
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}
@@ -218,6 +228,7 @@ class Room:
                     "connected": r.connected,
                     "look": r.look,
                     "bot": r.bot,
+                    "erg": r.erg,
                 }
                 for r in self.riders.values()
             ],
@@ -283,6 +294,9 @@ class Room:
         if isinstance(msg, Data):
             r.p, r.w, r.cad, r.s, r.last_data = msg.p, msg.w, msg.cad, msg.s, time.monotonic()
             r.hr, r.hrp = msg.hr or None, msg.hrp if msg.hr else None
+        elif isinstance(msg, Erg):
+            r.erg = msg.on
+            await self.lobby()
         elif isinstance(msg, Sprint):
             self.mode.on_sprint(r, msg.blk, msg.grade, msg.combo)
         elif isinstance(msg, Buy) and self.state == "running":
@@ -382,6 +396,7 @@ class Room:
                 "st": r.st,
                 "hr": r.hr,
                 "hrp": None if r.hrp is None else round(r.hrp, 2),
+                "erg": r.erg,
             }
             for r in self.riders.values()
         }

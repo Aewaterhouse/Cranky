@@ -3,7 +3,7 @@ import { VIS } from './params'
 
 /**
  * A rear-view mirror: a second camera on the back of the bus looking down the road behind, drawn into a strip at
- * the top of the screen with a DOM frame, so the horde stays in sight however far back it is.
+ * the top right of the screen with a DOM frame, so the horde stays in sight however far back it is.
  */
 export class Mirror {
   readonly camera = new THREE.PerspectiveCamera(24, 3, 0.5, 700)
@@ -25,7 +25,7 @@ export class Mirror {
     const size = renderer.getSize(new THREE.Vector2())
     const w = Math.round(size.x * VIS.mirrorW)
     const h = Math.round(w / 3)
-    const x = Math.round((size.x - w) / 2)
+    const x = Math.round(Math.min(size.x - w, Math.max(0, size.x * VIS.mirrorX - w / 2)))
     const top = Math.round(size.y * VIS.mirrorY)
     Object.assign(this.frame.style, {
       left: `${x}px`,

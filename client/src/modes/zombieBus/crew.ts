@@ -1,6 +1,7 @@
 import type { Profile } from '../../core/curve'
 import { api } from '../../core/api'
 import { saveProfile } from '../../core/profile'
+import { saveSettings, settings } from '../../core/settings'
 import { forgetBus, rememberBus } from '../../core/snapshot'
 import type { Lobby, ServerMsg } from '../../net/protocol'
 import { WsClient } from '../../net/wsClient'
@@ -34,7 +35,7 @@ export async function crew(
   let inResults = false
   const status = h('span', { class: 'dim' }, 'connecting…')
   net.onStatus = (up) => (status.textContent = up ? '' : 'reconnecting…')
-  net.onOpen = () =>
+  net.onOpen = () => {
     net.send({
       t: 'join',
       name: profile.name,
@@ -42,6 +43,8 @@ export async function crew(
       tier: profile.tier,
       look: profile.look,
     })
+    net.send({ t: 'erg', on: settings.busErg })
+  }
   const leave = () => {
     net.close()
     ride?.abort()
@@ -54,6 +57,10 @@ export async function crew(
     profile: () => profile,
     status,
     setup: (plan, minutes) => net.send({ t: 'setup', plan, minutes }),
+    erg: (on) => {
+      saveSettings({ busErg: on })
+      net.send({ t: 'erg', on })
+    },
     tier: (tier) => {
       profile.tier = tier
       saveProfile(profile)

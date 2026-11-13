@@ -82,6 +82,13 @@ class Sprint(BaseModel):
     combo: int = 0
 
 
+class Erg(BaseModel):
+    """The rider's trainer mode: ERG holds the target, off means virtual gears. Shown to the crew."""
+
+    t: Literal["erg"]
+    on: bool
+
+
 class Buy(BaseModel):
     t: Literal["buy"]
     item: Literal["plating", "repellent", "sync"]
@@ -101,6 +108,7 @@ ClientMsg = TypeAdapter(
         | TierMsg
         | Data
         | Sprint
+        | Erg
         | Buy,
         Field(discriminator="t"),
     ]
@@ -117,6 +125,7 @@ class RiderTick(BaseModel):
     st: Literal["riding", "fell", "spectator"]
     hr: int | None = None
     hrp: float | None = None
+    erg: bool = True
 
 
 class Bus(BaseModel):

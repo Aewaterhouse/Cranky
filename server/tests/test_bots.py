@@ -150,3 +150,18 @@ def test_tick_says_how_much_a_fallen_rider_loads_the_rest():
     assert base["load"] == 1.0
     assert raised["load"] == pytest.approx(1 + config.FELL_LOAD)
     assert raised["riders"]["h0"]["tgt"] > base["riders"]["h0"]["tgt"]
+
+
+def test_each_riders_erg_choice_reaches_the_lobby_and_ticks():
+    async def main():
+        room, ws = await lobby_with(2, "ERGS")
+        await room.handle("h1", ws, {"t": "erg", "on": False})
+        lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        await room.handle("h0", ws, {"t": "start"})
+        room.task.cancel()
+        room.el = 25.0
+        return lobby, room.step(0.5)
+
+    lobby, tick = asyncio.run(main())
+    assert {r["id"]: r["erg"] for r in lobby["riders"]} == {"h0": True, "h1": False}
+    assert tick["riders"]["h1"]["erg"] is False and tick["riders"]["h0"]["erg"] is True

@@ -746,3 +746,12 @@
 .ghost-pick:empty {
   display: none;
 }
+/* Bus lobby: each rider's trainer mode */
+.erg-badge {
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--dim);
+}

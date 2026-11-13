@@ -6,8 +6,7 @@ import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
 import { busAim } from '../core/aim'
-import { busWarn, loadBanner } from '../core/hud'
-import { SFX } from './audio'
+import { hudCues } from './hudCues'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
 import type { ShopItem, Tick } from '../net/protocol'
@@ -35,7 +34,15 @@ export interface HudOpts {
   quitLabel?: () => string
   onBuy?: (item: ShopItem) => void
   /** ERG switch: `erg` is the state to show; `slope(d)` steps the gradient when ERG is off and returns it. */
-  erg?: { on: () => boolean; toggle: () => void; slope: (d: number) => number }
+  /** ERG on or off; off, the rider shifts virtual gears (`tile` and `slider` are the gear tile and strength). */
+  erg?: {
+    on: () => boolean
+    toggle: () => void
+    shift: (d: number) => number
+    strength: (d: number) => void
+    tile: HTMLElement
+    slider: HTMLElement
+  }
   /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
   mad?: string[]
 }
@@ -78,14 +85,16 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const ergItems = o.erg
     ? [
         m.item(ergLabel, 'E', () => (o.erg!.toggle(), paintErg())),
-        m.item('Easier', '↓', () => toast.show(`Gradient ${o.erg!.slope(-1).toFixed(0)}%`)),
-        m.item('Harder', '↑', () => toast.show(`Gradient ${o.erg!.slope(1).toFixed(0)}%`)),
+        m.item('Gear down', 'Z', () => o.erg!.shift(-1)),
+        m.item('Gear up', 'X', () => o.erg!.shift(1)),
+        o.erg.slider,
       ]
     : []
   const paintErg = () => {
     const on = o.erg?.on() ?? true
     ergLabel.textContent = on ? 'ERG: on' : 'ERG: off'
     ergItems.slice(1).forEach((b) => (b.hidden = on))
+    if (o.erg) o.erg.tile.hidden = on
   }
   paintErg()
   m.el.append(
@@ -100,9 +109,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     ),
     m.size(),
   )
-  const nextChip = h('div', { class: 'glass nchip off' })
-  const loadBar = h('div', { class: 'glass load-banner off' })
-  const count = h('div', { class: 'count off' })
+  const cues = hudCues()
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
   const root: HTMLElement = h(
     'div',
@@ -110,8 +117,14 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     h(
       'div',
       { class: 'rhud bhud' },
-      h('div', { class: 'hud-tl' }, power.el, ...(stats ? [stats.root] : [])),
-      h('div', { class: 'hud-tc' }, header.root, loadBar, sprint, nextChip, count),
+      h(
+        'div',
+        { class: 'hud-tl' },
+        power.el,
+        ...(o.erg ? [o.erg.tile] : []),
+        ...(stats ? [stats.root] : []),
+      ),
+      h('div', { class: 'hud-tc' }, header.root, cues.load, sprint, cues.next, cues.count),
       h('div', { class: 'hud-tr' }, roster.root),
       h(
         'div',
@@ -154,11 +167,13 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     const part = KEYS[e.key.toLowerCase()]
     const typing = e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT'
     if (o.erg && !typing) {
-      // E switches ERG; with it off the arrows set the gradient.
-      const step = e.key === 'ArrowUp' ? 1 : e.key === 'ArrowDown' ? -1 : 0
-      if (e.key.toLowerCase() === 'e') return (e.preventDefault(), o.erg.toggle(), paintErg())
-      if (step && !o.erg.on())
-        return (e.preventDefault(), toast.show(`Gradient ${o.erg.slope(step).toFixed(0)}%`))
+      // E switches ERG; with it off Z X (or the arrows) shift gear and ; ' set the shift strength.
+      const k = e.key.toLowerCase()
+      const step = k === 'arrowup' || k === 'x' ? 1 : k === 'arrowdown' || k === 'z' ? -1 : 0
+      const str = k === "'" ? 1 : k === ';' ? -1 : 0
+      if (k === 'e') return (e.preventDefault(), o.erg.toggle(), paintErg())
+      if (step && !o.erg.on()) return (e.preventDefault(), o.erg.shift(step))
+      if (str && !o.erg.on()) return (e.preventDefault(), o.erg.strength(str))
     }
     if (!part || typing) return
     e.preventDefault()
@@ -174,7 +189,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   fit()
   let lastI = -2
   let lastCount = 0
-  let lastWarn = 0
   let rbProg: number | null = null
   const bestSprint = (live: Live) => {
     const best = Math.max(0, ...(o.rec?.sprints.map((s) => s.avg) ?? []))
@@ -187,7 +201,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       weightKg: o.weightKg || CFG.freeRide.defaultKg,
       cadence: live.cadence,
       hr: live.hr,
-      aim: busAim(f, live.power, bestSprint(live)),
+      aim: busAim(f, live.power, bestSprint(live), o.erg?.on() ?? true),
     })
   const api = {
     root,
@@ -226,16 +240,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (toSprint !== lastCount && toSprint > 0 && toSprint <= 3)
         sp.splash('sp-count', `${toSprint}`, 'SPRINT INCOMING', 1000, 2)
       lastCount = toSprint
-      // 5-4-3-2-1 with the solo player's tone before the target changes
-      const warn = busWarn(f)
-      nextChip.classList.toggle('off', !warn)
-      count.classList.toggle('off', !warn)
-      if (warn && warn.s !== lastWarn) {
-        nextChip.textContent = warn.text
-        count.textContent = String(warn.s)
-        SFX.countdown()
-      }
-      lastWarn = warn?.s ?? 0
+      cues.frame(f)
     },
     /** Before the bus leaves: show live power and a big countdown. */
     countdown(n: number, live: Live) {
@@ -253,13 +258,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (ms) mad?.update(ms, m.riders, meId)
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m.riders, meId, m.el)
-      const fallen = Object.values(m.riders).filter((r) => r.st === 'fell')
-      const banner = loadBanner(
-        m.load,
-        fallen.map((r) => r.name),
-      )
-      loadBar.classList.toggle('off', !banner)
-      if (banner) loadBar.textContent = `⚠ ${banner}`
+      cues.tick(m)
       shop.update(m.bus.shop, m.bus.scrap)
       for (const fx of m.fx) {
         if (fx.id !== meId || fx.k === 'fell')

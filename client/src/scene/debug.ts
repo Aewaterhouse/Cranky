@@ -36,6 +36,7 @@ export async function debugPanel(onRoute?: () => void) {
   const mir = gui.addFolder('Rear-view mirror').close()
   mir.add(VIS, 'mirror', 0, 1, 1)
   mir.add(VIS, 'mirrorW', 0.1, 0.6)
+  mir.add(VIS, 'mirrorX', 0, 1)
   mir.add(VIS, 'mirrorY', 0, 0.8)
   mir.add(VIS, 'mirrorHeight', 1, 10)
   const sv = gui.addFolder('Servo stop').close()

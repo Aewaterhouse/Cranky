@@ -1,6 +1,7 @@
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby } from '../net/protocol'
 import { TIERS, type Tier } from '../types'
+import { settings } from '../core/settings'
 import { avatar, h, seg } from './dom'
 import { planGraph } from './planGraph'
 import { mainWatts, minsLabel, planPicker, tagEls } from './planPicker'
@@ -15,6 +16,8 @@ export interface LobbyCtx {
   status: HTMLElement
   setup(plan: string, minutes: number): void
   tier(t: Tier): void
+  /** This rider's trainer mode: ERG, or virtual gears with ERG off. */
+  erg(on: boolean): void
   bots(n: number): void
   difficulty(level: Difficulty): void
   game(game: Game): void
@@ -42,6 +45,19 @@ export function lobbyView(c: LobbyCtx) {
     (t) => c.tier(t),
   )
   const tierNote = h('p', { class: 'dim' })
+  const ergSeg = seg<'erg' | 'gears'>(
+    [
+      ['erg', 'ERG'],
+      ['gears', 'Gears'],
+    ],
+    settings.busErg ? 'erg' : 'gears',
+    (v) => c.erg(v === 'erg'),
+  )
+  const ergNote = h(
+    'p',
+    { class: 'dim' },
+    'ERG holds your target for you. Gears: ERG off, you shift (Z X, the arrows or a Zwift Click) to hold it.',
+  )
   const botN = h('b', {}, '0')
   const botBtn = (d: number, label: string) =>
     h(
@@ -111,6 +127,13 @@ export function lobbyView(c: LobbyCtx) {
           h('span', { class: `tier-badge ${r.tier}` }, r.tier),
           h('small', {}, `${r.ftp} W`),
           r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
+          r.bot
+            ? ''
+            : h(
+                'span',
+                { class: 'erg-badge', title: r.erg === false ? 'ERG off, on gears' : 'ERG on' },
+                r.erg === false ? '⚙ Gears' : 'ERG',
+              ),
           r.id === host ? h('span', { class: 'driver' }, 'Driver') : '',
         )
       : h(
@@ -248,6 +271,8 @@ export function lobbyView(c: LobbyCtx) {
           h('h2', { class: 'label' }, 'Your effort'),
           tierSeg,
           tierNote,
+          ergSeg,
+          ergNote,
         ),
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Trainer'), trainerCheck()),
         startSlot,
