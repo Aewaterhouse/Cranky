@@ -470,3 +470,45 @@ a {
 .ladder .card {
   margin-bottom: 16px;
 }
+
+/* Settings: the sound mix sliders, the calm-camera tick and the gradient swatches */
+.set-mix {
+  display: grid;
+  gap: 6px;
+  min-width: min(260px, 100%);
+}
+.set-mix label {
+  display: grid;
+  grid-template-columns: 7.5em 1fr;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+}
+.set-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+}
+.set-check input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--acc);
+}
+.set-zones .set-gap {
+  width: 10px;
+}
+.set-zones {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.set-zones i.grade {
+  width: auto;
+  height: 20px;
+  min-width: 2.6em;
+  padding: 0 4px;
+  font: 700 0.7rem/20px var(--ui);
+  font-style: normal;
+  text-align: center;
+  color: #111;
+}

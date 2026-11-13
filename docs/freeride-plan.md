@@ -94,12 +94,12 @@ Built against simulated trainers and one PC only: not yet ridden by two people o
 - [x] Ride history shows the route map and segment results.
 
 ### Phase G: production (M)
-- [ ] Pre-ride flyover of the route and a loading card with a fact about the place.
-- [ ] Summit moment: arch, confetti, announcer line, and a postcard photo at the lookout.
-- [ ] Settings: units, camera distance, HUD size, colour-blind gradient colours.
-- [ ] Performance pass with frame-rate numbers on real devices; iPad and phone layout.
-- [ ] Offline packs through the service worker.
-- [ ] Manual test notes in `docs/testing.md` and owner checks in `docs/owner-checks.md`.
+- [x] Pre-ride flyover of the route and a loading card with a fact about the place.
+- [x] Summit moment: arch, confetti, announcer line, and a postcard photo at the lookout.
+- [x] Settings: units, camera distance, HUD size, colour-blind gradient colours.
+- [ ] Performance pass with frame-rate numbers on real devices; iPad and phone layout. *(Done as far as this PC allows: frame-time monitor, fixes and a Low power level with software-renderer numbers, and the layouts checked at phone and tablet sizes in headless Chromium. Still needed: numbers and a look on real devices, see `docs/owner-checks.md`.)*
+- [x] Offline packs through the service worker.
+- [x] Manual test notes in `docs/testing.md` and owner checks in `docs/owner-checks.md`.
 
 ### Later: games on the road (not in this plan)
 Each of these becomes a rule set on top of Phases B and E:

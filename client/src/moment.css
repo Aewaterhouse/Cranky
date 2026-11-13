@@ -1,0 +1,122 @@
+/* Summit and finish: the stats flash over the ride, and the podium and postcard on the results screen. */
+.moment {
+  position: fixed;
+  top: 22vh;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: min(560px, calc(100vw - 32px));
+  padding: 14px 20px 16px;
+  border-radius: 16px;
+  background: rgb(17 18 20 / 0.72);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 0 0 2px var(--acc);
+  text-align: center;
+  transform: translateX(-50%);
+  animation: moment-in 0.5s cubic-bezier(0.2, 1.4, 0.4, 1);
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+.moment.out {
+  opacity: 0;
+}
+@keyframes moment-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.7);
+  }
+}
+.mo-head {
+  font: 400 clamp(1.8rem, 6vw, 3.4rem) / 1 var(--display);
+  color: var(--acc);
+  text-transform: uppercase;
+}
+.moment p {
+  margin: 0;
+  font-style: italic;
+}
+.mo-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 22px;
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.mo-tiles div {
+  display: flex;
+  flex-direction: column;
+}
+.mo-tiles span {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.mo-tiles b {
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .moment {
+    animation: none;
+  }
+}
+.reduced-motion .moment {
+  animation: none;
+}
+
+/* Group ride podium: second, first, third */
+.podium {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  margin: 6px 0 16px;
+}
+.podium .step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: min(30%, 150px);
+  text-align: center;
+}
+.podium .step b {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.podium .step small {
+  color: var(--dim);
+  font-variant-numeric: tabular-nums;
+}
+.podium .block {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  background: var(--card2);
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  font: 400 1.6rem var(--display);
+  color: var(--dim);
+}
+.podium .p1 .block {
+  height: 84px;
+  background: var(--hazard);
+  color: var(--acc-ink);
+  text-shadow: 0 0 6px var(--acc);
+}
+.podium .p2 .block {
+  height: 58px;
+}
+.podium .p3 .block {
+  height: 40px;
+}
+.podium .me b {
+  color: var(--acc);
+}

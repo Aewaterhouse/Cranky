@@ -15,8 +15,10 @@ import type { Stamp } from '../core/passport'
 import { ROUTE_INDEX } from '../core/routeLibrary'
 import { segClock } from '../core/segments'
 import { h } from './dom'
+import { openLeaderboards } from './leaderboards'
 import { badgeGrid } from './riderBadges'
 import { svgEl } from './svg'
+import { UNIT } from './units'
 import { weekCard } from './weekCard'
 
 const line = (pts: [number, number][], close = false) =>
@@ -28,7 +30,7 @@ const line = (pts: [number, number][], close = false) =>
           .join(' ')}`,
     )
     .join('') + (close ? 'Z' : '')
-const metres = (m: number) => `${Math.round(m).toLocaleString('en-AU')} m`
+const metres = (m: number) => UNIT.climb(m)
 
 /** The map: land, state lines and a numbered dot per bundled route, filled once the route has been finished. */
 function ausMap(stamps: Record<string, Stamp>) {
@@ -96,6 +98,11 @@ export function passportTab(p: Profile) {
         done.length
           ? `${done.length} of ${ROUTE_INDEX.length} routes stamped · ${sum((s) => s.n)} finishes · ${metres(sum((s) => s.vertM))} climbed`
           : 'Nothing stamped yet. Finish a free ride on any route and its dot fills in.',
+      ),
+      h(
+        'button',
+        { class: 'lb-open', onclick: () => openLeaderboards(p.id) },
+        '🏆 Crew leaderboards',
       ),
       h(
         'div',

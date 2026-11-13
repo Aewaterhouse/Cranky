@@ -1,4 +1,5 @@
 import { FEEL } from './route/feelVis'
+import { FLY, ORBIT, PARTY } from './route/shotVis'
 import { PLACE } from './route/placeVis'
 import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
 
@@ -26,6 +27,16 @@ export interface MoodDef {
 }
 
 export const VIS = {
+  /** Automatic quality: frame-rate windows of `windowS` seconds; under `verySlowFps` drops `verySlowDrop` levels at once, `slowWindows` windows under `slowFps` drop one, `fastWindows` over `fastFps` climb one. */
+  quality: {
+    windowS: 2,
+    slowFps: 40,
+    verySlowFps: 20,
+    verySlowDrop: 2,
+    slowWindows: 2,
+    fastFps: 57,
+    fastWindows: 10,
+  },
   camHeight: 7.2,
   camDist: 11.5,
   camLook: -8,
@@ -75,7 +86,10 @@ export const VIS = {
     behind: 150,
     /** Road this close as the crow flies is built too, however far along the route it is. */
     nearby: 600,
+    /** The share of `nearby` used at each quality level: a slow device builds less of a loop's other side. */
+    nearbyShare: { lowpower: 0.2, potato: 0.5, low: 0.75, medium: 1, high: 1 },
     /** How far ahead chunks are built, per quality level. */
+    aheadLowpower: 200,
     aheadPotato: 350,
     aheadLow: 500,
     aheadMedium: 800,
@@ -100,6 +114,12 @@ export const VIS = {
     lane: -1.7,
     /** Ghost riders (a best effort ridden again): how solid, how far towards white, and metres right of the rider's lane. */
     ghost: { opacity: 0.4, pale: 0.55, lanes: [1.2, 2.3] },
+    /** The camera-distance setting: scales `camBack` and `camHeight` (1 is standard). */
+    camDist: 1,
+    /** A hidden tab draws no more often than this (ms). */
+    hiddenFrameMs: 1000,
+    /** Smooth edges, for a world that starts at medium quality or better (read when the world is made). */
+    antialias: 1,
     camBack: 9,
     camHeight: 3.7,
     camSide: 0,
@@ -159,6 +179,9 @@ export const VIS = {
     mainStreet: '#96938c',
     place: PLACE,
     feel: FEEL,
+    fly: FLY,
+    orbit: ORBIT,
+    party: PARTY,
     mood: MOOD,
     signs: {
       post: '#8d949a',

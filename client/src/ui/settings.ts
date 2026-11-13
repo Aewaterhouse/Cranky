@@ -1,6 +1,8 @@
+import { gradeColour } from '../core/hud'
 import { saveSettings, settings, type Settings } from '../core/settings'
 import { SFX } from './audio'
 import { h, seg } from './dom'
+import { hudSizeSeg } from './hudSize'
 import { ZONE_COLOURS } from './planGraph'
 
 /** Per-device preferences: sound, graphics, HUD size, colours. */
@@ -23,10 +25,31 @@ export function settingsTab() {
     if (v >= 20 && v <= 60) saveSettings({ chainring: v })
     else ring.value = String(settings.chainring)
   })
+  const onOff = (on: boolean, set: (on: boolean) => void) =>
+    seg(
+      [
+        ['on', 'On'],
+        ['off', 'Off'],
+      ],
+      on ? 'on' : 'off',
+      (v) => set(v === 'on'),
+    )
+  /** One slider of the sound mix. */
+  const mix = (label: string, key: 'mixRide' | 'mixAmbience' | 'mixVoice') => {
+    const i = h('input', { type: 'range', min: 0, max: 1, step: 0.05, value: settings[key] })
+    i.setAttribute('aria-label', label)
+    i.addEventListener('change', () => saveSettings({ [key]: +i.value }))
+    return h('label', {}, h('span', {}, label), i)
+  }
   const swatches = h('div', { class: 'set-zones' })
+  // Zones, then the gradient bands with their numerals: colour is never the only signal.
   const paint = () =>
     swatches.replaceChildren(
       ...ZONE_COLOURS.map((c, i) => h('i', { style: `background:${c}`, title: `Zone ${i + 1}` })),
+      h('span', { class: 'set-gap' }),
+      ...[-5, 0, 3, 6, 9, 13, 16].map((g) =>
+        h('i', { class: 'grade', style: `background:${gradeColour(g)}` }, `${g}%`),
+      ),
     )
   paint()
   return h(
@@ -37,37 +60,47 @@ export function settingsTab() {
     h(
       'section',
       { class: 'card' },
-      row('Sound', 'Beeps, splashes and the event drone.', vol),
+      row('Sound', 'Master volume: beeps, splashes, the event drone and everything below.', vol),
+      row(
+        'Sound mix',
+        'Free ride, under the master volume: the bike (freehub, wind, tyres, gears), the place (birds, surf, traffic) and the voice.',
+        h(
+          'div',
+          { class: 'set-mix' },
+          mix('Ride sounds', 'mixRide'),
+          mix('Ambience', 'mixAmbience'),
+          mix('Voice', 'mixVoice'),
+        ),
+      ),
+      row(
+        'Units',
+        'Speed, distance, climb and weight as shown. Everything is stored in metric either way.',
+        seg<Settings['units']>(
+          [
+            ['metric', 'km · m · kg'],
+            ['imperial', 'mi · ft · lb'],
+          ],
+          settings.units,
+          (units) => saveSettings({ units }),
+        ),
+      ),
       row(
         'Announcer',
         'A dry voice calling the action on bus rides.',
-        seg(
-          [
-            ['on', 'On'],
-            ['off', 'Off'],
-          ],
-          settings.announcer ? 'on' : 'off',
-          (v) => saveSettings({ announcer: v === 'on' }),
-        ),
+        onOff(settings.announcer, (announcer) => saveSettings({ announcer })),
       ),
       row(
         'Free ride remarks',
         'Dry comments about the road, the wildlife and your riding. Spoken too when the announcer is on.',
-        seg(
-          [
-            ['on', 'On'],
-            ['off', 'Off'],
-          ],
-          settings.quips ? 'on' : 'off',
-          (v) => saveSettings({ quips: v === 'on' }),
-        ),
+        onOff(settings.quips, (quips) => saveSettings({ quips })),
       ),
       row(
         'Graphics',
-        'Auto drops the quality if the 3D scene runs slowly.',
+        'Auto drops the quality if the 3D scene runs slowly, and remembers where it settled. Low power is the floor: little scenery, a short view, for a struggling device.',
         seg<Settings['gfx']>(
           [
             ['auto', 'Auto'],
+            ['lowpower', 'Low power'],
             ['potato', 'Potato'],
             ['low', 'Low'],
             ['medium', 'Medium'],
@@ -92,25 +125,47 @@ export function settingsTab() {
       row(
         'Free ride sounds',
         'Freehub, wind, tyres, gear clunks and the birds, surf or traffic of the place. All made up on the spot, no recordings.',
-        seg(
-          [
-            ['on', 'On'],
-            ['off', 'Off'],
-          ],
-          settings.rideSounds ? 'on' : 'off',
-          (v) => saveSettings({ rideSounds: v === 'on' }),
+        onOff(settings.rideSounds, (rideSounds) => saveSettings({ rideSounds })),
+      ),
+      row(
+        'Free ride camera',
+        'How far back the camera sits, and Calm for a steady one: no shake, lean, tuck or widening view.',
+        h(
+          'div',
+          { class: 'set-cb' },
+          seg<Settings['camDist']>(
+            [
+              ['near', 'Near'],
+              ['standard', 'Standard'],
+              ['far', 'Far'],
+            ],
+            settings.camDist,
+            (camDist) => saveSettings({ camDist }),
+          ),
+          h(
+            'label',
+            { class: 'set-check' },
+            h('input', {
+              type: 'checkbox',
+              checked: settings.calmCamera,
+              onchange: (e: Event) =>
+                saveSettings({ calmCamera: (e.target as HTMLInputElement).checked }),
+            }),
+            'Calm camera',
+          ),
         ),
       ),
       row(
-        'Calm camera',
-        'Free ride with a steady camera: no shake, lean, tuck or widening view. Turn it on if the motion bothers you.',
-        seg(
+        'Reduced motion',
+        'No camera shake, no flyover or turn round the rider, no confetti. Auto follows this device\'s own "reduce motion" setting.',
+        seg<Settings['reducedMotion']>(
           [
+            ['auto', 'Auto'],
             ['on', 'On'],
             ['off', 'Off'],
           ],
-          settings.calmCamera ? 'on' : 'off',
-          (v) => saveSettings({ calmCamera: v === 'on' }),
+          settings.reducedMotion,
+          (reducedMotion) => saveSettings({ reducedMotion }),
         ),
       ),
       row(
@@ -128,18 +183,8 @@ export function settingsTab() {
       ),
       row(
         'In-ride display size',
-        'How big the numbers are during a ride. Auto suits most screens; go Large or Huge if the telly is across the room.',
-        seg(
-          [
-            ['0', 'Auto'],
-            ['0.85', 'Small'],
-            ['1', 'Normal'],
-            ['1.3', 'Large'],
-            ['1.6', 'Huge'],
-          ],
-          String(settings.hudScale),
-          (v) => saveSettings({ hudScale: +v }),
-        ),
+        'How big the numbers are during a ride. Auto suits most screens; go Large or Huge if the telly is across the room. Also in the ride menu (☰).',
+        hudSizeSeg(),
       ),
       row(
         'Chainring (teeth)',
@@ -147,8 +192,8 @@ export function settingsTab() {
         ring,
       ),
       row(
-        'Zone colours',
-        'A palette that is easier to tell apart with colour blindness.',
+        'Zone and gradient colours',
+        'A second palette that is easier to tell apart with colour blindness, for power zones and for the gradient colours of the elevation strip and climb panel. The numbers are always there too.',
         h(
           'div',
           { class: 'set-cb' },

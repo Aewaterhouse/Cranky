@@ -52,8 +52,9 @@ export interface Place {
 /** Builds road, terrain and what stands on it a chunk at a time around the rider and throws away what falls behind. */
 export class Chunks {
   group = new THREE.Group()
-  /** Milliseconds the last chunk took to build, for the harness. */
+  /** Milliseconds the last chunk took to build, for the harness; `onBuild` hears about every one. */
   lastMs = 0
+  onBuild?: (ms: number) => void
   private live = new Map<number, THREE.Group>()
   private patches = new Map<number, Patch[]>()
   private at = NaN
@@ -93,7 +94,7 @@ export class Chunks {
       if (k < first || k > last) return false
       if (k >= lo && k <= hi) return true
       const c = path.poseAt((k + 0.5) * L, pose)
-      return Math.hypot(c.x - x, c.z - z) < R.nearby
+      return Math.hypot(c.x - x, c.z - z) < R.nearby * R.nearbyShare[level]
     }
     for (const [k, g] of this.live) if (!wanted(k)) this.drop(k, g)
     this.pending = false
@@ -107,7 +108,7 @@ export class Chunks {
   }
 
   private build(k: number, level: Level) {
-    const far = level !== 'potato'
+    const far = level !== 'potato' && level !== 'lowpower'
     const t0 = performance.now()
     const { field, cover, features, signs, furniture, landmarks, odd } = this.place
     const d0 = k * R.chunk
@@ -157,6 +158,7 @@ export class Chunks {
     this.live.set(k, g)
     this.patches.set(k, patches)
     this.lastMs = performance.now() - t0
+    this.onBuild?.(this.lastMs)
   }
 
   private drop(k: number, g: THREE.Group) {

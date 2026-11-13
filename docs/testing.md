@@ -196,3 +196,64 @@ Everything here was built against the simulated trainer and looked at in still s
 15. Rider tab, History: a free ride's row has a small route line, the route name, distance and "free ride". Open it: route card with the map (the part ridden is brighter), distance, climbing, then the Segments card.
 16. A ride from before this phase, or an ERG workout, looks as it did.
 
+## Free ride Phase G: production
+
+Built against the simulated trainer and looked at in still screenshots from headless Chromium (software rendering). Nobody has ridden it, heard it or held it on a phone. Use a throwaway database (`ZB_DB=/tmp/x.db`). Dev aids: `?fast=N` speeds a solo ride up, `?at=7000` starts it that many metres in, `?intro=0` skips the flyover, `?perf=1` shows the frame-time overlay.
+
+**Leaderboards**
+
+1. Free ride setup, pick a route with times on it, press "🏆 Leaderboards". The dialog opens on that route with the whole route (or lap) picked; the other segments are chips. Your row is highlighted, "You are 2nd of 3" sits above the table, and a dry line names the leader.
+2. Switch to "By W/kg": the order follows W/kg. Pick another route from the list. Rider tab, Passport, "🏆 Crew leaderboards" opens the same dialog.
+3. In a ride, press S (Stats): the drawer ends with "Top three" for the climb or sprint you are on, or the whole route between them. Beat a time and "You" moves up at once.
+4. Stop the server and open the dialog: it says the boards are not answering rather than showing an empty table.
+
+**2D layout**
+
+5. Settings, Free ride view: Charts. Ride the Nundah crit for two laps with a best already on it: between the charts and the map a column shows "Lap 2 / 10" with last and best lap, the sprint's panel when it comes up, "This lap −0:03 vs PR", the top three, and "◌ Your PR" with its gap.
+6. A first ride on a point-to-point route with nobody else's times: the column is not there at all until there is something to say.
+
+**Offline ride history**
+
+7. Log in, start a free ride, stop the server (or pull the network), finish the ride. The summary shows as usual. Start the server, reload and log in: the ride is in History once. Reload again: still once.
+8. `POST /api/rides` twice with the same summary answers `saved: true` then `saved: false`.
+
+**Flyover and loading card**
+
+9. Start a 3D free ride. A dark card shows the route name, distance, climb, a small profile and a line about the place; then the camera sweeps a stretch of the route with the same card as a caption and "The summit", "The hairpins", "The steep bit" or "The road" above it; then it cuts to behind the rider and "Start pedalling" appears. The clock must not start during the sweep, however hard you pedal.
+10. Press any key or tap during the sweep: it ends at once and the key does nothing else (Space must not pause).
+11. Ben Lomond should show "The hairpins" (Jacob's Ladder); Coot-tha "The summit"; Beach Road "The road".
+12. Charts layout: the card alone for about 3.5 s. Group ride: the sweep fits inside the countdown and the camera is behind you for the last 3 s.
+
+**Summit and finish**
+
+13. `?at=7150&intro=0` on the Coot-tha loop: ride 90 m to the top. Confetti and streamers go up, the camera turns once round the rider and comes back in behind, a "Summit" card shows time, average power, W/kg and PRs for 7 s, and the line is spoken if the announcer is on.
+14. Ride to the finish (or `?at=11900`): the same at the line, the ride holds for 6 s, then the results. Nothing is added to the ride's time or power during the hold.
+15. Results, "Save postcard": a PNG with the still (rider from the front, arms up), route name, date and the numbers. In the Charts layout the picture is the ride's power as a line of hills.
+16. Willunga Hill gets one moment (the finish), not two.
+17. Group ride with bots: the results show a podium (2nd, 1st, 3rd) above the table.
+
+**Settings**
+
+18. Units, "mi · ft · lb": the HUD shows mph, mi and ft; route cards, the loading card, results, postcard and passport follow; Rider settings asks for weight in lb and W/kg does not change. Back to metric: the weight reads what it did.
+19. Free ride camera: Near, Standard, Far visibly change how far back the camera sits. Calm camera still removes the shake and lean.
+20. In a ride, ☰ has "Display size": Large makes the HUD bigger at once.
+21. Zone and gradient colours, Colour-blind: the swatches change; in a ride the elevation strip, the climb panel and the gradient readout use blue, grey, yellow, orange, vermilion, purple and white. The number is always there.
+22. Reduced motion, On: no flyover (card only), no turn of the camera, no confetti, no shake. Auto with the operating system's "reduce motion" on behaves the same.
+23. Sound mix: with a ride going, Ride sounds at zero silences freehub, wind and tyres but not the birds; Ambience at zero does the reverse; Voice at zero silences the spoken lines.
+
+**Performance**
+
+24. `/route-dev.html?route=mondo&d=3000`: the overlay at the top shows average fps, 1% low, draw calls, triangles, chunks, level and chunk build times. `?perf=1` on a ride shows the same.
+25. Graphics on Auto on a slow machine: the level in the overlay falls to "lowpower" within a few seconds, and the next ride starts there. Settings, Graphics, Low power pins it.
+26. Switch to another tab for a minute and back: the ride has carried on and the fan has not.
+
+**Phone and tablet**
+
+27. Phone, landscape: setup, lobby, ride, results, passport and leaderboards fit with no sideways scroll; every button is at least a thumb wide.
+28. Phone, portrait: the ride is usable and a "Turn the phone sideways for the full view" hint shows until tapped or the phone is turned; the speed sits low, and the minimap and rider list are hidden.
+29. A phone with a notch: nothing sits under the notch or the home bar.
+
+**Offline routes**
+
+30. Production build (`scripts/run.sh`, or the installed app): every route card has "Save for offline"; press it and the card shows "✓ offline" (picking a card does the same). Turn the network off and reload: the app opens, a kept route starts and rides in 3D, the minimap is hidden. After an app update the marks are gone until saved again.
+31. The dev server (`pnpm dev`) shows no offline marks and registers no service worker.

@@ -63,7 +63,10 @@ export class RouteCam {
     // On a circuit the road behind the start is the end of the lap, and the road past the end is the start.
     const len = field.path.length
     const on = (x: number) => (this.loop ? ((x % len) + len) % len : x)
-    const b = field.path.poseAt(on(d - R.camBack * (1 - C.tuckIn * this.tuck)), this.back)
+    const b = field.path.poseAt(
+      on(d - R.camBack * R.camDist * (1 - C.tuckIn * this.tuck)),
+      this.back,
+    )
     const a = field.path.poseAt(on(d + R.camLook), this.ahead)
     const side = offset * SIDE_FOLLOW + R.camSide
     const rx = me.x + me.rx * offset
@@ -81,7 +84,7 @@ export class RouteCam {
     const tx = b.x + b.rx * side
     const tz = b.z + b.rz * side
     this.x += (tx - this.x) * k
-    this.y += (b.y + R.camHeight - C.tuckDown * this.tuck - this.y) * k
+    this.y += (b.y + R.camHeight * R.camDist - C.tuckDown * this.tuck - this.y) * k
     this.z += (tz - this.z) * k
     const lag = Math.hypot(tx - this.x, tz - this.z)
     if (lag > LAG_MAX_M) {

@@ -7,7 +7,7 @@ import { CFG } from '../config'
 import type { ListRider } from '../core/hud'
 import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
-import type { SegLive } from '../modes/freeRide/segmentRun'
+import type { SegBoard, SegLive } from '../modes/freeRide/segmentRun'
 import type { Live } from '../modes/rideController'
 import { h } from './dom'
 import { freeRideFlat } from './freeRideFlat'
@@ -34,6 +34,8 @@ export interface FreeState {
   paused: 'manual' | 'auto' | null
   /** Waiting for the first pedal stroke. */
   starting: boolean
+  /** The pre-ride card or flyover is up: no "start pedalling" yet. */
+  intro?: boolean
   avgPower: number
   np: number
   ftp: number
@@ -48,6 +50,8 @@ export interface FreeState {
   /** The climb or sprint segment being ridden or coming up, and the splits for the whole route or lap. */
   seg?: SegLive
   whole?: string[]
+  /** The top three of that segment (of the whole route or lap between segments). */
+  board?: SegBoard
   /** Headwind in m/s (a tailwind is negative), when the wind setting is on. */
   wind?: number
   /** Group rides: watts saved by drafting right now, and the keep-together scale on my speed (1 is none). */
@@ -152,6 +156,13 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     toastBox,
   )
   if (world) root.append(ov)
+  // Upright on a phone the ride is a letterbox (touch.css shows this only then); a tap puts the hint away.
+  const rotate: HTMLElement = h(
+    'button',
+    { class: 'rotate-hint', onclick: () => rotate.remove() },
+    '↻ Turn the phone sideways for the full view',
+  )
+  root.append(rotate)
   // In clean view a tap anywhere brings the HUD back (there is no H key on a phone).
   stage.addEventListener('click', () => root.classList.remove('hud-clean'))
 
@@ -184,13 +195,15 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       if (dialog) return
       const msg = s.banner
         ? [...s.banner, 'count']
-        : s.starting
-          ? ['Start pedalling', 'The clock starts when you do', 'count']
-          : s.paused === 'manual'
-            ? ['Paused', 'Press Space to carry on', 'pause']
-            : s.paused === 'auto'
-              ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
-              : null
+        : s.intro
+          ? null
+          : s.starting
+            ? ['Start pedalling', 'The clock starts when you do', 'count']
+            : s.paused === 'manual'
+              ? ['Paused', 'Press Space to carry on', 'pause']
+              : s.paused === 'auto'
+                ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
+                : null
       const key = msg?.join('|') ?? ''
       if (ov.dataset.k === key) return
       ov.dataset.k = key

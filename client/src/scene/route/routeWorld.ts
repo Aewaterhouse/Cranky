@@ -2,10 +2,13 @@ import * as THREE from 'three'
 import type { Route } from '../../core/route'
 import type { Place } from '../../core/soundMix'
 import { MoodBlend } from '../moods'
+import type { PerfMon } from '../perfMon'
 import { VIS } from '../params'
-import { Quality, type Level } from '../quality'
+import { LEVELS, Quality, startLevel, type Level } from '../quality'
 import { Sky } from '../sky'
+import type { CamShot } from './camShots'
 import { Chunks } from './chunks'
+import { Confetti } from './confetti'
 import { Features } from './features'
 import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
 import { planFurniture } from './furniture'
@@ -17,26 +20,26 @@ import { LifePlan } from './lifePlan'
 import { Oddities, jokeCover, seedOf } from './oddPlan'
 import { Signs } from './signs'
 import { Rain } from './rain'
-import { RoadPath } from './roadPath'
+import { RoadPath, newPose } from './roadPath'
 import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
 import { Skyline } from './skyline'
+import { aimSun, setUpSun } from './sun'
 import { TerrainGrid } from './terrainGrid'
 
 export type { RoadRider } from './roadRiders'
 
 const R = VIS.route
-const AHEAD: Record<Level, 'aheadPotato' | 'aheadLow' | 'aheadMedium' | 'aheadHigh'> = {
+const AHEAD = {
+  lowpower: 'aheadLowpower',
   potato: 'aheadPotato',
   low: 'aheadLow',
   medium: 'aheadMedium',
   high: 'aheadHigh',
-}
-/** Move the floating origin once the rider is this far from it; shadow box half-size and sun distance. */
+} as const satisfies Record<Level, string>
+/** Move the floating origin once the rider is this far from it. */
 const RECENTRE_M = 300
-const SHADOW_HALF = 26
-const SUN_DIST = 80
 
 /** What any road game hands the scene: everyone on the road, and which one the camera follows. */
 export interface RoadState {
@@ -50,16 +53,22 @@ export class RouteWorld {
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(R.fov, 1, 0.5, 8000)
   state: RoadState = { me: '', riders: [] }
+  /** A set piece that has the camera until it is over; `onShotEnd` is told when it ends by itself. */
+  shot?: CamShot
+  onShotEnd?: () => void
+  private focus = newPose()
+  /** The frame-time monitor, when asked for (`watchPerf` in worldDev.ts). */
+  perf?: PerfMon
   quality: Quality
   readonly field: HeightField
   readonly chunks: Chunks
   readonly riders: RoadRiders
   readonly odd: Oddities
   private landmarks: Map<number, Landmark[]>
-  private lifePlan: LifePlan
+  readonly lifePlan: LifePlan
   private cover: Pick<LandCover, 'at'>
   private life: Life
-  private things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
+  readonly things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
   /** Works out the funny signs and chalk again, for when their tunables change. */
   private replan: () => void
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
@@ -74,6 +83,7 @@ export class RouteWorld {
   private skyline = new Skyline()
   private rig = new RouteCam()
   private rain = new Rain()
+  private confetti = new Confetti()
   private seed: number
   private hour = 12
   private hourAt = -Infinity
@@ -89,7 +99,9 @@ export class RouteWorld {
     private host: HTMLElement,
     route: Route,
   ) {
-    this.renderer = new THREE.WebGLRenderer({ antialias: true })
+    // Smoothing edges is the dearest thing a weak device does, so a world that starts low goes without.
+    const smooth = R.antialias > 0 && LEVELS.indexOf(startLevel()) >= LEVELS.indexOf('medium')
+    this.renderer = new THREE.WebGLRenderer({ antialias: smooth })
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowMap
     host.prepend(this.renderer.domElement)
@@ -128,21 +140,25 @@ export class RouteWorld {
     this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.life = new Life(this.lifePlan, path, this.chunks.height)
     path.poseAt(0, this.riders.me)
-    const k = this.key
-    k.castShadow = true
-    k.shadow.mapSize.set(1536, 1536)
-    const c = k.shadow.camera
-    c.left = c.bottom = -SHADOW_HALF
-    c.right = c.top = SHADOW_HALF
-    c.near = 1
-    c.far = SUN_DIST * 2
-    k.shadow.bias = -0.0004
-    k.shadow.normalBias = 0.06
+    const k = setUpSun(this.key)
     this.scene.fog = this.fog
-    this.root.add(this.chunks.group, this.riders.group, this.life.group, this.skyline.mesh)
+    this.root.add(
+      this.chunks.group,
+      this.riders.group,
+      this.life.group,
+      this.skyline.mesh,
+      this.confetti.mesh,
+    )
     this.scene.add(this.root, this.sky.group, this.rain.lines, k, k.target, this.hemi, this.camera)
     addEventListener('resize', this.resize)
-    this.quality = new Quality(this.renderer, () => this.resize())
+    let was: number = LEVELS.indexOf(startLevel())
+    this.quality = new Quality(this.renderer, () => {
+      // Scenery built for a better level is what was too slow: a drop rebuilds it thinner straight away.
+      const now = this.quality ? LEVELS.indexOf(this.quality.level) : was
+      if (now < was) this.chunks.clear()
+      was = now
+      this.resize()
+    })
     this.resize()
     this.loop()
   }
@@ -159,9 +175,14 @@ export class RouteWorld {
   private loop = () => {
     this.raf = requestAnimationFrame(this.loop)
     const now = performance.now()
-    const dt = Math.min(0.1, (now - this.last) / 1000)
+    // A hidden tab that still gets frames (some browsers, a covered window) draws once a second at most.
+    if (document.hidden && now - this.last < R.hiddenFrameMs) return
+    const real = (now - this.last) / 1000
+    this.perf?.frame(real)
+    const dt = Math.min(0.1, real)
     this.last = now
-    this.quality.frame(dt)
+    // The quality steps on the real frame time: capped, a crawl of two frames a second read as ten.
+    this.quality.frame(real)
     this.t += dt
     this.step(dt)
     this.renderer.render(this.scene, this.camera)
@@ -191,8 +212,10 @@ export class RouteWorld {
     this.key.castShadow = VIS.shadow > 0
 
     this.riders.update(this.state.riders, this.state.me, dt)
-    const me = this.riders.me
-    const d = this.riders.meD
+    // During a set piece the world is built and lit around what the camera is looking at, not the rider.
+    const shot = this.shot
+    const d = shot?.d ?? this.riders.meD
+    const me = shot ? this.field.path.poseAt(d, this.focus) : this.riders.me
     this.chunks.update(d, ahead, this.quality.level, all)
     this.life.update(dt, this.t, d, me, this.quality.level)
     if (Math.hypot(me.x - this.ox, me.y - this.oy, me.z - this.oz) > RECENTRE_M) {
@@ -202,17 +225,16 @@ export class RouteWorld {
       this.root.position.set(-this.ox, -this.oy, -this.oz)
     }
     const { ox, oy, oz } = this
-    this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
+    if (!shot) this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
+    else if (shot.update(this.camera, this.field, this.riders, ox, oy, oz)) {
+      this.shot = undefined
+      this.onShotEnd?.()
+    }
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
+    this.confetti.update(dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt)
-    const el = THREE.MathUtils.degToRad(env.sunElev)
-    const az = THREE.MathUtils.degToRad(env.sunAz)
-    this.key.target.position.set(me.x - ox, me.y - oy, me.z - oz)
-    this.key.position
-      .set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el))
-      .multiplyScalar(SUN_DIST)
-      .add(this.key.target.position)
+    aimSun(this.key, env, me.x - ox, me.y - oy, me.z - oz)
   }
 
   /** The kind of oddity, landmark or animal the rider is passing right now, for the commentator. */
@@ -238,22 +260,10 @@ export class RouteWorld {
     return { cover: at(R.roadHalf + R.verge + 6), y, coast }
   }
 
-  /** Where the next thing of a sort is after `d` metres (optionally of one kind), for the harness. */
-  nextThing(sort: string, d: number, kind?: string): number | undefined {
-    if (sort === 'life') return this.lifePlan.next(d, kind)?.d
-    const map = (this.things as Record<string, Map<number, { d: number }[]> | undefined>)[sort]
-    if (map)
-      return [...map.values()]
-        .flat()
-        .map((t) => t.d)
-        .filter((t) => t > d)
-        .sort((a, b) => a - b)[0]
-    for (let at = d, n = 0; n < 400; n++) {
-      const o = sort === 'odd' ? this.odd.next(at) : undefined
-      if (!o || !kind || o.kind === kind) return o?.d
-      at = o.d
-    }
-    return undefined
+  /** Confetti and streamers over the rider: a summit, the finish. */
+  party() {
+    const { x, y, z } = this.riders.me
+    this.confetti.burst(x, y, z)
   }
 
   /** Drops the built chunks so visual settings changed in the debug panel show up. */
@@ -277,6 +287,7 @@ export class RouteWorld {
     this.chunks.clear()
     this.life.dispose()
     this.rain.dispose()
+    this.confetti.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }

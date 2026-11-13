@@ -9,9 +9,11 @@ import './ui.css'
 import './screens.css'
 import './setup.css'
 import './builder.css'
+import './touch.css'
 import { logout, me, type Me } from './core/api'
 import type { Profile } from './core/curve'
 import { flushEfforts } from './core/efforts'
+import { flushRides } from './core/rideQueue'
 import { loadProfile, syncProfile } from './core/profile'
 import { runDrill } from './modes/drill/drill'
 import { keepAwake } from './ui/wakeLock'
@@ -54,7 +56,10 @@ async function enter(u: Me) {
   const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
   if (watch?.length === 4) return spectate(watch, () => home())
   home()
-  void flushEfforts(profile.id)
+  // Anything ridden while the server was out of reach goes up now, and again whenever the network returns.
+  const sync = () => (void flushEfforts(u.id), void flushRides(u.id))
+  sync()
+  addEventListener('online', sync)
   const p = await syncProfile(profile)
   if (p !== profile) home(p)
   maybeWelcome(profile, () => home())

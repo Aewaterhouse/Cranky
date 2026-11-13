@@ -213,3 +213,15 @@
     font-size: 0.75em;
   }
 }
+
+/* The display-size control in the ride menu */
+.fhud .hmenu .menu-size {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.6 * var(--u));
+}
+.fhud .hmenu .hud-size button {
+  min-height: max(44px, calc(4.4 * var(--u)));
+  padding: 0 calc(1.2 * var(--u));
+  font-size: calc(1.8 * var(--u));
+}

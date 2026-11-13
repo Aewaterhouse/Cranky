@@ -5,12 +5,16 @@ import { gradeColour, powerZone, riderRows, windText } from '../core/hud'
 import { steadySpeed, totalMass } from '../core/physics'
 import { ascentFrom, routeAt } from '../core/route'
 import { settings } from '../core/settings'
-import { clock, h, kmStr } from './dom'
+import { clock, h } from './dom'
 import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
 import { ZONE_COLOURS } from './planGraph'
 import { riderList } from './riderList'
+import { hudSizeRow } from './hudSize'
+import { UNIT } from './units'
+import { segBoard } from './segBoard'
+import { segPanel } from './segPanel'
 
 const C = CFG.hud
 
@@ -30,7 +34,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const bar = h('i', { class: 'pw-bar' })
   const cad = val('sub off', 'rpm')
   const hr = val('sub off', 'bpm', '♥ ')
-  const spd = val('spd', 'km/h')
+  const spd = val('spd', UNIT.names().speed)
   const dist = h('span', {})
   const el = h('span', {})
   const up = h('span', { class: 'up' })
@@ -54,17 +58,18 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     ...(settings.wind === 'off' ? {} : { wind: stat('Wind') }),
   }
 
+  const board = segBoard()
   const whole = profileChart(route, undefined, true)
   const next = profileChart(route, { behind: C.climb.behindM, ahead: C.climb.aheadM }, true)
   const climbs = findClimbs(route)
   const grade = h('div', { class: 'glass grade off' })
   const climbHead = h('span', {})
-  const toTop = val('', 'km to top')
-  const gain = val('', 'm', '+')
+  const toTop = val('', `${UNIT.names().dist} to top`)
+  const gain = val('', UNIT.names().climb, '+')
   const topEta = val('', 'ETA')
   // The segment being timed: a column of the climb panel on a climb, a panel of its own for a sprint.
-  const segName = h('span', { class: 'seg-name' })
-  const segLines = h('div', { class: 'seg-lines' })
+  const sp = segPanel()
+  const [segName, segLines] = [sp.name, sp.lines]
   const segCol = h('div', { class: 'seg-col' }, segName, segLines)
   const segBox = h('div', { class: 'glass segbox' })
   const climb = h(
@@ -116,6 +121,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       item('Riders', 'R', () => toggle('riders')),
       item('Clean view', 'H', () => toggle('clean')),
     ),
+    hudSizeRow(),
   )
 
   const root = h(
@@ -131,7 +137,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         bar,
         h('div', { class: 'pw-sub' }, cad.el, hr.el),
       ),
-      h('div', { class: 'glass hstats' }, ...Object.values(stats).map((s) => s.el)),
+      h('div', { class: 'glass hstats' }, ...Object.values(stats).map((s) => s.el), board.el),
     ),
     h(
       'div',
@@ -189,23 +195,24 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       cad.el.classList.toggle('off', !hadCadence)
       hr.v.textContent = String(l.hr ?? '')
       hr.el.classList.toggle('off', l.hr == null)
-      spd.v.textContent = (s.speed * 3.6).toFixed(1)
+      spd.v.textContent = UNIT.speed(s.speed)
       const upLeft = ascentFrom(route, s.dist)
-      dist.textContent = `${kmStr(s.dist)} km`
+      dist.textContent = UNIT.dist(s.dist, s.dist < 10000 ? 2 : 1)
       el.textContent = clock(s.el)
-      up.textContent = `+${Math.round(route.ascent - upLeft)} m`
+      up.textContent = `+${UNIT.climb(route.ascent - upLeft)}`
 
       stats.avg.v.textContent = `${Math.round(s.avgPower)} W`
       stats.np.v.textContent = `${Math.round(s.np)} W`
-      stats.togo.v.textContent = `${kmStr(Math.max(0, route.distance - s.dist))} km`
-      stats.upLeft.v.textContent = `${Math.round(upLeft)} m`
+      stats.togo.v.textContent = UNIT.dist(Math.max(0, route.distance - s.dist))
+      stats.upLeft.v.textContent = UNIT.climb(upLeft)
       stats.eta.v.textContent = clock(s.etaS)
       stats.arrive.v.textContent = new Date(Date.now() + s.etaS * 1000).toLocaleTimeString(
         'en-AU',
         { hour: 'numeric', minute: '2-digit' },
       )
       stats.trainer.v.textContent = `${s.trainerGrade.toFixed(1)}%`
-      if (stats.wind && s.wind !== undefined) stats.wind.v.textContent = windText(s.wind)
+      if (stats.wind && s.wind !== undefined)
+        stats.wind.v.textContent = windText(s.wind, settings.units)
       if (s.lap && stats.lastLap && stats.bestLap) {
         lap.textContent = `Lap ${s.lap.n} / ${s.lap.of}`
         stats.lastLap.v.textContent = s.lap.lastS === undefined ? '–' : clock(s.lap.lastS)
@@ -225,8 +232,8 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
           s.dist < c.start
             ? `Climb in ${Math.ceil((c.start - s.dist) / 10) * 10} m`
             : `Climb · ${c.avg.toFixed(1)}% avg`
-        toTop.v.textContent = kmStr(left)
-        gain.v.textContent = String(Math.max(0, Math.round(rise)))
+        toTop.v.textContent = UNIT.distNum(left)
+        gain.v.textContent = UNIT.climbNum(Math.max(0, rise))
         topEta.v.textContent = s.speed < C.etaMinMs || v < C.etaMinMs ? '–' : clock(left / v)
         next.set(s.dist)
       }
@@ -236,16 +243,11 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       segCol.hidden = !inClimb
       segBox.hidden = !sg || !!c
       if (sg) {
-        const lead = sg.inM === undefined ? '' : ` in ${Math.ceil(sg.inM / 10) * 10} m`
-        segName.textContent = inClimb ? sg.name : `${sg.name}${lead}`
-        segLines.replaceChildren(
-          ...sg.lines.map((t) =>
-            h('span', { class: t[0] === '−' ? 'up' : t[0] === '+' ? 'down' : '' }, t),
-          ),
-        )
+        sp.set(sg, inClimb)
         const home = inClimb ? segCol : segBox
         if (segName.parentElement !== home) home.replaceChildren(segName, segLines)
       }
+      board.set(s.board)
       stats.whole.el.hidden = !s.whole?.length
       stats.whole.v.textContent = s.whole?.join(' · ') ?? ''
       gearChip.hidden = !s.gears

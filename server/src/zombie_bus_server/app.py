@@ -152,8 +152,7 @@ def crew_curves(u: User) -> list[dict]:
 
 @app.post("/api/rides")
 def post_ride(body: dict, u: User) -> dict:
-    store.add_ride(u["id"], body.get("summary") or {})
-    return {"ok": True}
+    return {"ok": True, "saved": store.add_ride(u["id"], body.get("summary") or {})}
 
 
 @app.get("/api/ladder")

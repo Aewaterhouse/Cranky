@@ -1,4 +1,5 @@
 import { CFG } from '../config'
+import { speedIn, unitNames, type Units } from './units'
 
 /** Power zone 1..6 for a fraction of FTP, on Zwift's boundaries. */
 export function powerZone(frac: number) {
@@ -6,8 +7,13 @@ export function powerZone(frac: number) {
   return i < 0 ? CFG.hud.zones.length + 1 : i + 1
 }
 
-/** Colour of the gradient band `pct` falls in. */
-export const gradeColour = (pct: number) => CFG.hud.gradeBands.find((b) => pct < b.lt)!.colour
+let cbGrades = false
+/** Switches the gradient colours to the colour-blind-safe set (the Settings screen's colour switch). */
+export const setGradePalette = (colourBlind: boolean) => (cbGrades = colourBlind)
+
+/** Colour of the gradient band `pct` falls in, from the standard or the colour-blind-safe palette. */
+export const gradeColour = (pct: number, colourBlind = cbGrades) =>
+  (colourBlind ? CFG.hud.gradeBandsCb : CFG.hud.gradeBands).find((b) => pct < b.lt)!.colour
 
 const mss = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 
@@ -65,7 +71,7 @@ export function riderRows(riders: ListRider[], meId: string, c = CFG.hud.riders)
 }
 
 /** Wind along the road for the stats drawer: "Head 11 km/h", "Tail 6 km/h" or "Still". */
-export function windText(ms: number) {
-  const kmh = Math.round(Math.abs(ms) * 3.6)
-  return kmh < 1 ? 'Still' : `${ms > 0 ? 'Head' : 'Tail'} ${kmh} km/h`
+export function windText(ms: number, units: Units = 'metric') {
+  const v = Math.round(speedIn(Math.abs(ms), units))
+  return v < 1 ? 'Still' : `${ms > 0 ? 'Head' : 'Tail'} ${v} ${unitNames(units).speed}`
 }

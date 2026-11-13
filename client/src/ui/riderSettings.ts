@@ -1,6 +1,8 @@
 import { CFG } from '../config'
 import { ftpSuggestion, recordFtp, type Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
+import { settings } from '../core/settings'
+import { unitNames, weightIn, weightToKg } from '../core/units'
 import {
   ftpSeries,
   hrZones,
@@ -180,12 +182,14 @@ export function riderSettings(p: Profile, changed: () => void) {
     hist.replaceChildren(ftpChart(p))
   }
   ftp.addEventListener('change', setFtp)
-  const weight = num(p.weightKg, 30, 250, 'optional')
+  const wu = settings.units
+  const shown = (kg?: number) => (kg ? +weightIn(kg, wu).toFixed(1) : undefined)
+  const weight = num(shown(p.weightKg), 30, 560, 'optional')
   weight.setAttribute('step', '0.1')
   weight.addEventListener('change', () => {
-    const v = Math.round(+weight.value * 10) / 10
+    const v = Math.round(weightToKg(+weight.value, wu) * 10) / 10
     p.weightKg = v >= 30 && v <= 250 ? v : undefined
-    weight.value = p.weightKg ? String(p.weightKg) : ''
+    weight.value = String(shown(p.weightKg) ?? '')
     kg.textContent = wkgStr(p.ftp, p.weightKg)
     save()
   })
@@ -225,7 +229,7 @@ export function riderSettings(p: Profile, changed: () => void) {
       ),
       panel(
         'Weight',
-        field(weight, 'kg'),
+        field(weight, unitNames(wu).weight),
         h('p', { class: 'dim' }, 'Optional. Gives you W/kg on your power curve.'),
       ),
       panel('Default tier', tiers, help),

@@ -8,25 +8,25 @@ import { draftSaving, stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
 import type { RoadSummary } from '../../net/protocol'
-import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
+import type { RoadRider } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
 import { clickSource, onClickShift } from '../../trainer/zwiftClick'
 import { SFX } from '../../ui/audio'
 import { clock, show } from '../../ui/dom'
 import { freeRideView } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
-import { rideSound } from '../../ui/rideSound'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
-import { RoadFeel, cheering, trainerTarget } from './feel'
+import { RoadFeel, trainerTarget } from './feel'
 import { freeKeys } from './keys'
-import { Quipper, recentPct, speak } from './quips'
+import { Moments, momentCard } from './moments'
+import { PauseState } from './pauseState'
+import { recentPct } from './quips'
 import { rideExtras } from './rideExtras'
+import { rideWorld } from './rideWorld'
 import type { RoadLink } from './roadLink'
 
-const STOP_S = 3
-const GO_S = 1.5
 const F = CFG.freeRide
 
 /** The plan recorded for a free ride: one open block named for the route, with a duration estimate at ~75% FTP. */
@@ -58,15 +58,12 @@ export function runFreeRide(
   const plan = freePlan(route, profile.ftp, profile.weightKg)
   const ride = new RideController(trainer, profile, plan)
   let difficulty = loadDifficulty()
-  let dist = 0
+  // `?at=7000` starts a solo ride that many metres in (a dev aid for looking at a summit or the finish).
+  let dist = link ? 0 : Math.min(route.distance - 1, Math.max(0, +(params.get('at') ?? 0)))
   let speed = 0
   let el = 0
-  let manual = false
-  let auto = true
-  let starting = true
   let finished = false
-  let idleFor = 0
-  let activeFor = 0
+  const pause = new PauseState()
   let last = performance.now()
   let sent = 0
   let sentAt = -Infinity
@@ -104,31 +101,16 @@ export function runFreeRide(
     ghosts: ghostSpecs,
     mates: link ? 0 : +(params.get('ghosts') ?? 0),
   })
-  let world: RouteWorld | undefined
   const feel = new RoadFeel(route)
-  const sound = rideSound()
+  const scene = rideWorld(route, view, me, params.get('intro') !== '0')
   let wind = 0
-  // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
-  const quipper = new Quipper()
-  const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
-  const climbs = top.ele - route.points[0].ele >= F.quips.summitGainM
-  const onQuip = (text: string) => (view.toast(text), speak(text))
-  if (settings.freeRideView === '3d')
-    import('../../scene/route/routeWorld')
-      .then((m) => {
-        if (finished) return
-        VIS.route.feel.cam.calm = settings.calmCamera ? 1 : 0
-        world = new m.RouteWorld(view.stage, route.lapOf ?? route)
-        world.state = { me: me.id, riders: [me] }
-      })
-      .catch(() => view.flat())
+  const moments = new Moments(scene.topD, route.distance)
+  let finishing = false
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
   function togglePause() {
     if (link) return view.toast('No pausing in a group ride. Stop pedalling and you stop.')
-    if (starting) return
-    manual = !manual
-    if (!manual) auto = false
+    pause.toggle()
   }
   const nudge = (d: number) => {
     difficulty = Math.min(1, Math.max(0, +(difficulty + d).toFixed(2)))
@@ -137,7 +119,7 @@ export function runFreeRide(
   }
   const shift = (d: number) => {
     const to = shiftGear(gear, d)
-    if (to !== gear) sound?.clunk()
+    if (to !== gear) scene.clunk()
     shifted = true
     gear = to
   }
@@ -158,25 +140,20 @@ export function runFreeRide(
     last = now
     const live = ride.live
     const stopped = live.power === 0 || live.cadence === 0
-    // A coasting descent is not a stop: only count idle time once the rider has nearly halted.
-    idleFor = stopped && speed < 2 ? idleFor + dt : 0
-    activeFor = stopped ? 0 : activeFor + dt
-    if (!manual && !auto && idleFor >= STOP_S) auto = true
-    else if (auto && activeFor >= GO_S) {
-      auto = false
-      starting = false
-    }
     const count = link?.countdown() ?? 0
+    if (link && count <= CFG.intro.settleS) scene.skipIntro()
+    // The clock cannot start while the flyover is still showing the place off.
+    if (!scene.intro) pause.step(stopped, speed, dt)
     const home = link?.mine()?.st === 'finished'
-    if (link) manual = auto = starting = false
-    const paused = link ? count > 0 || home : manual || auto
+    if (link) pause.never()
+    const paused = link ? count > 0 || home : pause.paused || finishing
     ride.paused = paused
     const p = routeAt(route, dist)
     let draft = 1
     let band = 1
     if (paused) speed = 0
     else {
-      wind = link ? 0 : feel.wind(dist, settings.wind, world?.moodName, el)
+      wind = link ? 0 : feel.wind(dist, settings.wind, scene.mood, el)
       draft = link?.draft(dist) ?? 1
       band = link?.band(dist, speed >= 0.5 || live.power > 0) ?? 1
       const lim = feel.limit(dist, speed)
@@ -208,14 +185,7 @@ export function runFreeRide(
       sentAt = now / 1000
       ride.erg.setGrade(sent, F.grade)
     }
-    sound?.update({
-      speed,
-      coasting: live.power === 0,
-      paused,
-      headwind: wind,
-      place: world?.place(CFG.sound.ride.coastM) ?? { cover: 'b', y: p.ele, coast: false },
-      mood: world?.moodName ?? 'route',
-    })
+    scene.sound({ speed, coasting: live.power === 0, paused, headwind: wind, ele: p.ele })
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })
     me.d = dist
     me.speed = speed * band * fast
@@ -223,7 +193,7 @@ export function runFreeRide(
     me.cadence = paused ? 0 : live.cadence
     me.power = paused ? 0 : live.power
     me.effort = live.power / profile.ftp
-    me.cheer = !starting && cheering(dist, route.distance, climbs ? top.d : undefined)
+    me.cheer = !pause.starting && scene.cheer(dist)
     // The lap toast goes first, so a PR lap's fanfare (from the segments, just below) is what stays up.
     const lap = lapTimer?.info(dist)
     if (lap && lapTimer?.update(dist, el, speed) !== undefined) {
@@ -234,11 +204,11 @@ export function runFreeRide(
     }
     const { riders, ...seg } = extras.tick(dist, el, paused ? 0 : live.power, { paused, fast, dt })
     const others = [...(link?.others() ?? []), ...riders]
-    // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
-    if (world) world.state.riders = [me, ...others].map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
+    scene.draw([me, ...others])
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
+    const avgPower = pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0
     view.frame({
       live,
       speed: speed * band,
@@ -248,9 +218,10 @@ export function runFreeRide(
       gears: shifted || !!clickSource(),
       dist,
       el,
-      paused: manual ? 'manual' : auto ? 'auto' : null,
-      starting,
-      avgPower: pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0,
+      paused: pause.why,
+      starting: pause.starting,
+      intro: scene.intro,
+      avgPower,
       np: normalisedPower(pw),
       ftp: profile.ftp,
       weightKg: kg,
@@ -263,23 +234,26 @@ export function runFreeRide(
       group: link && { draftW: draftSaving(speed, draft), band },
       banner: link?.banner(),
     })
-    const quip =
-      settings.quips &&
-      !starting &&
-      quipper.next({
+    if (!pause.starting)
+      scene.quip({
         now: now / 1000,
         t: el,
         dist,
-        total: route.distance,
         grade: p.grade,
         speed,
         ftpPct: recentPct(pw, live.power, profile.ftp),
         stopped: paused,
-        summit: climbs && dist >= top.d,
-        near: world?.near(),
       })
-    if (quip) onQuip(quip)
-    if (dist >= route.distance && !link) void end()
+    // Over the top and at the line: a moment each. A solo ride holds at the line for it before the results.
+    const moment = moments.next(home ? route.distance : dist)
+    if (moment) {
+      const prs = extras.results.filter((r) => r.pr).length
+      scene.celebrate(momentCard(moment, { el, avgPower, kg, prs }))
+      if (moment === 'finish' && !link) {
+        finishing = true
+        setTimeout(() => void end(), fast > 1 ? 1500 : CFG.moments.finishHoldS * 1000)
+      }
+    }
   }
   const timer = setInterval(tick, 200)
   tick()
@@ -291,8 +265,8 @@ export function runFreeRide(
     clearInterval(timer)
     removeEventListener('keydown', onKey)
     offClick()
-    world?.dispose()
-    sound?.stop()
+    const still = scene.still
+    scene.dispose()
     await ride.stop()
     extras.finish(dist)
     finishRide(
@@ -302,6 +276,7 @@ export function runFreeRide(
       undefined,
       road ? 'Back to the lobby' : 'Done',
       road,
+      still,
     )
   }
   return { end }

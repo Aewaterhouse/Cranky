@@ -1,5 +1,6 @@
 import { CFG } from '../../config'
 import type { Best, Bests } from '../../core/efforts'
+import { topThree, type BoardRow } from '../../core/leaderboard'
 import type { Route } from '../../core/route'
 import {
   baseRoute,
@@ -20,6 +21,12 @@ export interface SegLive {
   inM?: number
   /** Time so far and the splits, or the times to beat before the start. */
   lines: string[]
+}
+
+/** The top three of the segment in play, for the stats drawer. */
+export interface SegBoard {
+  name: string
+  rows: BoardRow[]
 }
 
 /**
@@ -94,13 +101,16 @@ export function segmentRun(
       tracker.update(dist, el, joules, teleport).forEach(finish)
       const d = dist >= route.distance ? base.distance : dist % lapM
       let seg: SegLive | undefined
+      let at = whole
       for (const s of segs) {
         if (s === whole) continue
         const t = tracker.elapsed(s, el)
         const lead = s.kind === 'climb' ? CFG.hud.climb.leadM : CFG.segments.sprint.leadM
-        if (t !== undefined && d < s.end)
+        if (t !== undefined && d < s.end) {
+          at = s
           seg = { name: s.name, kind: s.kind, lines: [segClock(t), ...splits(s, t, d)] }
-        else if (!seg && d < s.start && d >= s.start - lead) {
+        } else if (!seg && d < s.start && d >= s.start - lead) {
+          at = s
           const b = bests[s.id]
           seg = {
             name: s.name,
@@ -114,7 +124,10 @@ export function segmentRun(
         }
       }
       const t = tracker.elapsed(whole, el)
-      return { seg, whole: t === undefined ? [] : splits(whole, t, d) }
+      const b = bests[at.id]
+      const rows = topThree(b?.top ?? [], { id: rider.id, name: 'You' }, b?.pr?.secs)
+      const board: SegBoard | undefined = rows.length ? { name: at.name, rows } : undefined
+      return { seg, whole: t === undefined ? [] : splits(whole, t, d), board }
     },
   }
 }
