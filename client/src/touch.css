@@ -131,9 +131,10 @@ body {
     top: auto;
     bottom: calc(var(--sb) + 22 * var(--u));
   }
-  .fr3d .hud-tr .rlist,
-  .fr3d .minimap {
-    display: none;
+  /* The HUD's own sheet loads later and switches these on by class, so this has to insist. */
+  .fr3d .fhud .rlist,
+  .fr3d .fhud .minimap {
+    display: none !important;
   }
   .fr3d .dock {
     flex-wrap: wrap;
