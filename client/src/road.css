@@ -1,0 +1,91 @@
+/* Group rides: lobby, results table and the TV view */
+.road-riders {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.6rem;
+  margin-bottom: 0.8rem;
+}
+.road-rider {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.7rem;
+  background: rgba(255, 255, 255, 0.05);
+}
+.road-rider.me {
+  box-shadow: inset 0 0 0 2px var(--accent, #f2b705);
+}
+.road-rider.away {
+  opacity: 0.5;
+}
+.road-rider b,
+.road-rider small {
+  display: block;
+}
+.road-rider small {
+  opacity: 0.75;
+}
+.road-rider .driver {
+  margin-left: 0.5rem;
+  font-size: 0.7em;
+}
+.road-opts select {
+  width: 100%;
+  margin-bottom: 0.6rem;
+  padding: 0.5rem;
+  font: inherit;
+}
+.road-opts label.bot-row {
+  cursor: pointer;
+}
+.road-table small {
+  opacity: 0.7;
+}
+.road-table td:first-child {
+  font-weight: 800;
+}
+
+/* TV: who is where, top right, and who the camera is on */
+.tv-road .rlist {
+  position: absolute;
+  top: 5.5rem;
+  right: 1.5rem;
+  display: block;
+  min-width: 17rem;
+  padding: 0.7rem 1rem;
+  font-size: 1.25rem;
+  color: #fff;
+  background: rgba(10, 16, 20, 0.6);
+  border-radius: 0.8rem;
+}
+.tv-road .rrow {
+  display: grid;
+  grid-template-columns: 1fr 3.2rem 5rem;
+  gap: 0.6rem;
+  padding: 0.15rem 0;
+}
+.tv-road .rrow.me {
+  color: #f2b705;
+  font-weight: 800;
+}
+.tv-road .rrow .rw,
+.tv-road .rrow .rg {
+  text-align: right;
+}
+.tv-road .tv-head {
+  position: absolute;
+  top: 1.2rem;
+  left: 1.5rem;
+  padding: 0.7rem 1.1rem;
+  color: #fff;
+  background: rgba(10, 16, 20, 0.6);
+  border-radius: 0.8rem;
+}
+.tv-road .tv-head b {
+  display: block;
+  font-size: 1.5rem;
+}
+.tv-road .tve table {
+  margin: 1rem auto;
+}

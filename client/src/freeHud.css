@@ -258,3 +258,23 @@
   background: rgba(255, 255, 255, 0.2);
   border-left-color: var(--acc);
 }
+
+/* Group rides: the drafting and keep-together chip under the speed */
+.fhud .gchip {
+  display: flex;
+  justify-content: center;
+  gap: calc(1.4 * var(--u));
+  margin-top: calc(0.8 * var(--u));
+  padding: calc(0.5 * var(--u)) calc(1.4 * var(--u));
+  font-weight: 600;
+  white-space: nowrap;
+}
+.fhud .gchip[hidden] {
+  display: none;
+}
+.fhud .gchip.on {
+  box-shadow: inset 0 0 0 calc(0.25 * var(--u)) #5ec8f2;
+}
+.fhud .gchip b {
+  color: #5ec8f2;
+}

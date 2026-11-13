@@ -97,6 +97,9 @@ export function draftFactor(gaps: number[]) {
   return 1 - Math.min(D.cap, D.wheel * fade * (1 + D.bunchX * (near.length - 1)))
 }
 
+/** Watts drafting is saving at physics speed `v` (m/s) with drag multiplier `draft`. */
+export const draftSaving = (v: number, draft: number) => 0.5 * P.rho * P.cda * (1 - draft) * v ** 3
+
 /** Keep-together: the scale on distance covered for a rider `gap` metres ahead of the middle of the group. */
 export function bandFactor(gap: number) {
   const B = CFG.road.band

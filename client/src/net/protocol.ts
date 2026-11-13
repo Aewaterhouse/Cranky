@@ -30,14 +30,15 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
+  | { t: 'road'; route: string; laps: number; style: RoadStyle; together?: boolean }
   | {
       t: 'data'
       p: number
       w: number
       cad: number
-      s: number | null
+      s?: number | null
       hr: number | null
-      hrp: number | null
+      hrp?: number | null
     }
   | { t: 'buy'; item: ShopItem }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
@@ -54,6 +55,8 @@ export interface LobbyRider {
 }
 export interface Lobby {
   t: 'lobby'
+  /** `road` means this code is a group ride and the message is really a RoadLobby: hand over to that flow. */
+  kind?: 'bus' | 'road'
   code: string
   host: string
   state: 'lobby' | 'running' | 'done'
@@ -112,6 +115,86 @@ export interface Tick {
   bus: BusState
   fx: Fx[]
 }
+
+/** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
+export type RoadStyle = 'social' | 'race'
+export interface RoadLobbyRider {
+  id: string
+  name: string
+  ftp: number
+  kg: number
+  connected: boolean
+  look: Look
+  bot: boolean
+  /** A bot's one-line character. */
+  line: string | null
+}
+export interface RoadLobby {
+  t: 'lobby'
+  kind: 'road'
+  code: string
+  host: string
+  state: 'lobby' | 'running' | 'done'
+  route: string
+  laps: number
+  /** Metres, all laps. */
+  distance: number
+  style: RoadStyle
+  together: boolean
+  riders: RoadLobbyRider[]
+}
+export interface RoadRiderTick {
+  /** Metres along the whole ride, and ground speed in m/s. */
+  d: number
+  v: number
+  w: number
+  cad: number
+  hr: number | null
+  /** Metres right of the centre line. */
+  lane: number
+  /** Drag multiplier (1 is clean air) and the keep-together scale on distance covered (1 is off). */
+  draft: number
+  band: number
+  st: 'riding' | 'stopped' | 'away' | 'finished'
+  /** The rider's time in seconds once finished. */
+  fin: number | null
+}
+export interface RoadTick {
+  t: 'tick'
+  kind: 'road'
+  el: number
+  riders: Record<string, RoadRiderTick>
+  game: Record<string, unknown> | null
+  fx: Fx[]
+}
+export interface RoadSummary {
+  kind: 'road'
+  route: string
+  name: string
+  laps: number
+  distance: number
+  secs: number
+  style: RoadStyle
+  together: boolean
+  riders: {
+    id: string
+    name: string
+    bot: boolean
+    place: number
+    /** Null for a rider who did not finish. */
+    time: number | null
+    dist: number
+    late: boolean
+    avgPower: number
+    wkg: number
+    /** Average watts saved by drafting. */
+    saved: number
+  }[]
+}
+/** What a road room's socket sends. */
+export type RoadMsg =
+  RoadLobby | RoadTick | { t: 'end'; summary: RoadSummary } | { t: 'error'; msg: string }
+
 export type ServerMsg =
   | Lobby
   | Tick

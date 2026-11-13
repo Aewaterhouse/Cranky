@@ -9,6 +9,7 @@ import { lobbyView } from '../../ui/lobby'
 import { finishRide } from '../../ui/results'
 import { toast } from '../../ui/toast'
 import type { Trainer } from '../../types'
+import { groupRide } from '../freeRide/group'
 import { startBusRide, type BusRide } from './zombieBus'
 
 /** Crew session: lobby, ride and results over one WebSocket. */
@@ -71,6 +72,12 @@ export async function crew(
 
   net.onMsg = (m: ServerMsg) => {
     if (m.t === 'lobby') {
+      if (m.kind === 'road') {
+        // The code is a group ride, not a bus: the free-ride flow takes it from here.
+        net.close()
+        sessionStorage.removeItem('zombiebus.code')
+        return void groupRide(code, null, profile, trainer, home)
+      }
       lobby = m
       ride?.lobby(m)
       if (m.state === 'running' && !ride) {

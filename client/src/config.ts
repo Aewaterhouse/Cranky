@@ -289,6 +289,7 @@ export const CFG = {
     /** The saving is shown on the HUD from this many watts. */
     showW: 5,
     lapsMax: 20,
-    botsMax: 5,
+    /** Places on the road (the server's ROAD_MAX_RIDERS). */
+    seats: 8,
   },
 }

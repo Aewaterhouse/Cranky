@@ -22,14 +22,29 @@ export function routeMap(box: HTMLElement, route: Route) {
     fillColor: '#fff',
     fillOpacity: 1,
   }).addTo(map)
+  const dots: L.CircleMarker[] = []
   let fitted = false
   const step = route.points[1].d - route.points[0].d
   return {
     map,
-    update(d: number) {
+    /** `others` are the distances of everyone else on the road, each drawn as a small dot. */
+    update(d: number, others: number[] = []) {
       if (!fitted) return
       const p = routeAt(route, d)
       const at: L.LatLngTuple = [p.lat!, p.lon!]
+      while (dots.length > others.length) dots.pop()!.remove()
+      others.forEach((od, i) => {
+        const q = routeAt(route, od)
+        dots[i] ??= L.circleMarker(at, {
+          radius: 5,
+          color: '#1d2b33',
+          weight: 2,
+          fillColor: '#5ec8f2',
+          fillOpacity: 1,
+        }).addTo(map)
+        dots[i].setLatLng([q.lat!, q.lon!])
+      })
+      me.bringToFront()
       me.setLatLng(at)
       done.setLatLngs([...line.slice(0, Math.floor(d / step) + 1), at])
       if (!map.getBounds().pad(-0.2).contains(at)) map.panTo(at)
