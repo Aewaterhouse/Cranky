@@ -1,0 +1,241 @@
+/* The ride HUD every mode shares (free ride, solo workout, the bus): glass panels, the power panel top left,
+   the clock or speed top centre, the list on the right edge, toasts. Every size is in --u: 1% of the screen
+   height, with a floor so a phone stays readable, times the in-ride display size from Settings.
+   The dock, strip, menu and phone rules are in rideHudDock.css. */
+.fr,
+.rh {
+  --u: calc(clamp(6px, 1vh, 18px) * var(--hud-scale, 1));
+  --glass: rgba(10, 11, 14, 0.48);
+  --edge: calc(3 * var(--u));
+  --ok: var(--tox);
+  --warn: #ffb020;
+}
+.rhud {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  color: #fff;
+  font: 600 calc(2.2 * var(--u)) / 1.2 var(--ui);
+  font-variant-numeric: tabular-nums lining-nums;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  --st: max(var(--edge), env(safe-area-inset-top));
+  --sr: max(var(--edge), env(safe-area-inset-right));
+  --sb: max(calc(2 * var(--u)), env(safe-area-inset-bottom));
+  --sl: max(var(--edge), env(safe-area-inset-left));
+}
+.hud-clean .rhud,
+.hud-clean .fr-toast,
+.rhud [hidden] {
+  display: none !important;
+}
+.rhud .off {
+  visibility: hidden;
+}
+.rhud .glass {
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  border-radius: var(--u);
+}
+.rhud small {
+  font: 500 0.4em var(--ui);
+  margin-left: 0.25em;
+  opacity: 0.8;
+}
+.rhud b {
+  font-weight: 700;
+}
+.rhud button {
+  pointer-events: auto;
+  font: inherit;
+  color: inherit;
+  border: 0;
+  padding: calc(0.8 * var(--u)) calc(1.6 * var(--u));
+  min-width: 0;
+  cursor: pointer;
+}
+.rhud kbd {
+  font: 700 0.7em var(--ui);
+  margin-left: 0.6em;
+  padding: 0 0.4em;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 0.3em;
+  opacity: 0.7;
+}
+
+/* Top left: power, the hero */
+.hud-tl {
+  position: absolute;
+  top: var(--st);
+  left: var(--sl);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--u);
+}
+.rhud .power {
+  padding: calc(1.2 * var(--u)) calc(1.8 * var(--u)) calc(1.4 * var(--u));
+}
+.pw-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: calc(2 * var(--u));
+}
+.rhud .hpw {
+  min-width: 4.4ch;
+  font-size: calc(7 * var(--u));
+  line-height: 0.95;
+}
+.rhud .hpw b,
+.rhud .spd b {
+  font: 400 1em / 1 var(--display);
+}
+.pw-side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: calc(2.5 * var(--u));
+}
+.pw-side small {
+  font-size: 0.6em;
+}
+.rhud .zone {
+  font-size: 0.8em;
+  opacity: 0.75;
+}
+.pw-bar {
+  display: block;
+  height: calc(0.6 * var(--u));
+  margin: calc(0.7 * var(--u)) 0 calc(1 * var(--u));
+  border-radius: 99px;
+}
+.pw-sub {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(2 * var(--u));
+  font-size: calc(3 * var(--u));
+}
+.pw-sub small {
+  font-size: 0.5em;
+}
+
+/* Stats drawer: under the power panel, only when asked for */
+.rhud .hstats {
+  display: none;
+  min-width: 100%;
+  padding: calc(1 * var(--u)) calc(1.8 * var(--u));
+  font-size: calc(2.1 * var(--u));
+}
+.hud-stats .rhud .hstats {
+  display: block;
+}
+.rhud .hstats div {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(3 * var(--u));
+  line-height: 1.5;
+}
+.rhud .hstats span {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Top centre: speed (or the interval clock) and the quiet totals; toasts under them */
+.hud-tc {
+  position: absolute;
+  top: var(--st);
+  left: 50%;
+  transform: translateX(-50%);
+}
+.rhud .speed {
+  padding: calc(0.8 * var(--u)) calc(2.2 * var(--u)) calc(1 * var(--u));
+  text-align: center;
+}
+.rhud .spd {
+  display: inline-block;
+  min-width: 7ch;
+  font-size: calc(4.4 * var(--u));
+}
+.rhud .totals {
+  display: flex;
+  justify-content: center;
+  margin-top: calc(0.4 * var(--u));
+  font-weight: 500;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.78);
+}
+.rhud .totals span + span::before {
+  content: '·';
+  margin: 0 0.6em;
+  opacity: 0.6;
+}
+.fr-toast {
+  position: fixed;
+  z-index: 2;
+  top: calc(var(--edge) + 12.5 * var(--u));
+  left: 50%;
+  max-width: 70vw;
+  transform: translate(-50%, -0.6em);
+  padding: calc(0.8 * var(--u)) calc(2 * var(--u));
+  border-radius: var(--u);
+  background: var(--glass);
+  backdrop-filter: blur(8px);
+  color: var(--acc);
+  font: 700 calc(2.6 * var(--u)) / 1.25 var(--ui);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s,
+    transform 0.3s;
+}
+.fr-toast.on {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* Right edge: the list (riders nearby, the crew, the intervals), centred in the space under the corner */
+.hud-tr {
+  position: absolute;
+  top: var(--st);
+  right: var(--sr);
+  bottom: calc(var(--sb) + 16 * var(--u));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--u);
+}
+.rhud .rlist {
+  display: none;
+  margin-block: auto;
+  padding: calc(0.5 * var(--u));
+  font-size: calc(2 * var(--u));
+}
+.hud-riders .rhud .rlist {
+  display: block;
+}
+.rrow {
+  display: grid;
+  grid-template-columns: 10.5ch 3.5ch 6ch;
+  gap: calc(1 * var(--u));
+  padding: calc(0.35 * var(--u)) calc(1 * var(--u));
+  border-left: calc(0.4 * var(--u)) solid transparent;
+  border-radius: calc(0.5 * var(--u));
+  white-space: nowrap;
+}
+.rrow .rw,
+.rrow .rg {
+  text-align: right;
+}
+.rrow .rw {
+  font-weight: 500;
+  opacity: 0.8;
+}
+.rrow.ahead {
+  background: rgba(120, 170, 255, 0.1);
+}
+.rrow.me {
+  background: rgba(255, 255, 255, 0.2);
+  border-left-color: var(--acc);
+}

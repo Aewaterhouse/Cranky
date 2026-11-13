@@ -34,6 +34,14 @@ export const ROAD_CFG = {
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
     toastS: 3,
+    /** Tolerance bar: green inside the compliance band, amber out to `warn` off target, red beyond; the bar spans ±`span`. */
+    tol: { warn: 0.1, span: 0.3 },
+    /** Workouts: the "Next" chip shows this many seconds before a change; the countdown starts this many seconds out. */
+    nextS: 10,
+    countS: 3,
+    /** The interval summary stays this long (real seconds), and the interval list shows this many rows. */
+    summaryS: 5,
+    intervalRows: 7,
     /** A PR or crew-best toast stays this long. */
     toastBigS: 7,
     /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */

@@ -1,0 +1,132 @@
+/* The shared ride HUD, bottom half: dock, strip, menu and the phone rules (see rideHud.css). */
+.hud-bot {
+  position: absolute;
+  left: var(--sl);
+  right: var(--sr);
+  bottom: var(--sb);
+  display: flex;
+  flex-direction: column;
+  gap: var(--u);
+}
+.dock {
+  display: flex;
+  align-items: flex-end;
+  gap: calc(1.5 * var(--u));
+}
+.dock-l,
+.dock-c,
+.dock-r {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--u);
+}
+/* Equal sides keep the middle centred; when a big display size runs out of room the climb profile gives way. */
+.dock-l,
+.dock-r {
+  flex: 1 1 0;
+}
+.dock-l {
+  position: relative;
+}
+.dock-c,
+.rhud .climb {
+  min-width: 0;
+}
+.dock-l > button {
+  font-size: calc(2 * var(--u));
+  opacity: 0.85;
+}
+.dock-r {
+  justify-content: flex-end;
+}
+.rhud .strip {
+  position: relative;
+  height: calc(5 * var(--u));
+  margin: 0 calc(5 * var(--u));
+  overflow: hidden;
+}
+
+/* Menu: trainer difficulty, pause, end ride and the toggles */
+.rhud .hmenu {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + var(--u));
+  width: max-content;
+  max-width: 80vw;
+  padding: calc(1.6 * var(--u));
+  display: flex;
+  flex-direction: column;
+  gap: calc(1.2 * var(--u));
+  background: rgba(10, 11, 14, 0.82);
+  pointer-events: auto;
+}
+.rhud .hmenu h2 {
+  margin: 0;
+  font: 400 calc(2.6 * var(--u)) var(--display);
+}
+.rhud .hmenu label {
+  font: 500 calc(2 * var(--u)) var(--ui);
+  letter-spacing: 0;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.8);
+}
+.rhud .hmenu .diff input {
+  width: calc(24 * var(--u));
+}
+.rhud .hmenu .diff .pct {
+  font-size: calc(2.8 * var(--u));
+  min-width: 4ch;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(0.8 * var(--u));
+}
+.menu-grid button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: calc(0.8 * var(--u));
+}
+
+@media (pointer: coarse) {
+  .rhud button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+/* The display-size control in the ride menu */
+.rhud .hmenu .menu-size {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.6 * var(--u));
+}
+.rhud .hmenu .hud-size button {
+  min-height: max(44px, calc(4.4 * var(--u)));
+  padding: 0 calc(1.2 * var(--u));
+  font-size: calc(1.8 * var(--u));
+}
+
+/* Phone landscape (the same height as CFG.hud.phoneMaxH): tighter panels and a slimmer strip */
+@media (max-height: 500px) {
+  .fr,
+  .rh {
+    --edge: max(4vh, calc(2 * var(--u)));
+  }
+  .rhud .hpw {
+    font-size: calc(6 * var(--u));
+  }
+  .rhud .strip {
+    height: calc(3.5 * var(--u));
+    margin: 0;
+  }
+  .rhud small,
+  .rhud .pw-side small,
+  .rhud .pw-sub small {
+    font-size: 0.6em;
+  }
+  .rhud .hpw small {
+    font-size: 0.4em;
+  }
+}
