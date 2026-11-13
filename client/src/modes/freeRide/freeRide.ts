@@ -100,7 +100,7 @@ export function runFreeRide(
     mates: link ? 0 : +(params.get('ghosts') ?? 0),
   })
   const feel = new RoadFeel(route)
-  const scene = rideWorld(route, view, me)
+  const scene = rideWorld(route, view, me, params.get('intro') !== '0')
   let wind = 0
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
@@ -136,8 +136,10 @@ export function runFreeRide(
     last = now
     const live = ride.live
     const stopped = live.power === 0 || live.cadence === 0
-    pause.step(stopped, speed, dt)
     const count = link?.countdown() ?? 0
+    if (link && count <= CFG.intro.settleS) scene.skipIntro()
+    // The clock cannot start while the flyover is still showing the place off.
+    if (!scene.intro) pause.step(stopped, speed, dt)
     const home = link?.mine()?.st === 'finished'
     if (link) pause.never()
     const paused = link ? count > 0 || home : pause.paused
@@ -213,6 +215,7 @@ export function runFreeRide(
       el,
       paused: pause.why,
       starting: pause.starting,
+      intro: scene.intro,
       avgPower: pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0,
       np: normalisedPower(pw),
       ftp: profile.ftp,

@@ -34,6 +34,8 @@ export interface FreeState {
   paused: 'manual' | 'auto' | null
   /** Waiting for the first pedal stroke. */
   starting: boolean
+  /** The pre-ride card or flyover is up: no "start pedalling" yet. */
+  intro?: boolean
   avgPower: number
   np: number
   ftp: number
@@ -186,13 +188,15 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       if (dialog) return
       const msg = s.banner
         ? [...s.banner, 'count']
-        : s.starting
-          ? ['Start pedalling', 'The clock starts when you do', 'count']
-          : s.paused === 'manual'
-            ? ['Paused', 'Press Space to carry on', 'pause']
-            : s.paused === 'auto'
-              ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
-              : null
+        : s.intro
+          ? null
+          : s.starting
+            ? ['Start pedalling', 'The clock starts when you do', 'count']
+            : s.paused === 'manual'
+              ? ['Paused', 'Press Space to carry on', 'pause']
+              : s.paused === 'auto'
+                ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
+                : null
       const key = msg?.join('|') ?? ''
       if (ov.dataset.k === key) return
       ov.dataset.k = key

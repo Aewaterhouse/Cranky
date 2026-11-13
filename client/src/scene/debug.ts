@@ -51,6 +51,8 @@ function routeFolder(f: GUI, rebuild: () => void) {
   cam.add(R, 'camStiff', 0.5, 12)
   cam.add(R, 'fov', 30, 100)
   addAll(f.addFolder('feel: camera extras and rider poses').close(), R.feel)
+  addAll(f.addFolder('fly: the pre-ride flyover').close(), R.fly)
+  addAll(f.addFolder('orbit: summit and finish flourish').close(), R.orbit)
   const ghost = f.addFolder('Ghost riders (next ride)').close()
   ghost.add(R.ghost, 'opacity', 0.05, 1)
   ghost.add(R.ghost, 'pale', 0, 1)

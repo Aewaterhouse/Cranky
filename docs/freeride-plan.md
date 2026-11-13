@@ -94,7 +94,7 @@ Built against simulated trainers and one PC only: not yet ridden by two people o
 - [x] Ride history shows the route map and segment results.
 
 ### Phase G: production (M)
-- [ ] Pre-ride flyover of the route and a loading card with a fact about the place.
+- [x] Pre-ride flyover of the route and a loading card with a fact about the place.
 - [ ] Summit moment: arch, confetti, announcer line, and a postcard photo at the lookout.
 - [ ] Settings: units, camera distance, HUD size, colour-blind gradient colours.
 - [ ] Performance pass with frame-rate numbers on real devices; iPad and phone layout.

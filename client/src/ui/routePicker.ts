@@ -16,7 +16,7 @@ const LENGTHS = { all: 'Any length', short: 'Short', medium: 'Medium', long: 'Lo
 const hm = (s: number) =>
   `${Math.floor(s / 3600)}:${String(Math.round((s % 3600) / 60) % 60).padStart(2, '0')}`
 
-function miniProfile(pts: number[]) {
+export function miniProfile(pts: number[]) {
   const lo = Math.min(...pts)
   const span = Math.max(1, Math.max(...pts) - lo)
   const xy = pts.map(

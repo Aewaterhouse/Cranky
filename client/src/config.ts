@@ -1,3 +1,4 @@
+import { PROD_CFG } from './configProd'
 import { ROAD_CFG } from './configRoad'
 import type { Tier } from './types'
 
@@ -151,4 +152,5 @@ export const CFG = {
   /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
   tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
   ...ROAD_CFG,
+  ...PROD_CFG,
 }

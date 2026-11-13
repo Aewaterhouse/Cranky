@@ -1,4 +1,5 @@
 import { FEEL } from './route/feelVis'
+import { FLY, ORBIT } from './route/shotVis'
 import { PLACE } from './route/placeVis'
 import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
 
@@ -159,6 +160,8 @@ export const VIS = {
     mainStreet: '#96938c',
     place: PLACE,
     feel: FEEL,
+    fly: FLY,
+    orbit: ORBIT,
     mood: MOOD,
     signs: {
       post: '#8d949a',

@@ -1,8 +1,10 @@
 import { CFG } from '../../config'
+import { flyStretch } from '../../core/flyover'
 import type { Route } from '../../core/route'
 import { settings } from '../../core/settings'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
+import { rideIntro } from '../../ui/rideIntro'
 import { rideSound } from '../../ui/rideSound'
 import { cheering } from './feel'
 import { Quipper, speak, type QuipState } from './quips'
@@ -15,8 +17,9 @@ const F = CFG.freeRide
  */
 export function rideWorld(
   route: Route,
-  view: { stage: HTMLElement; flat(): void; toast(text: string): void },
+  view: { root: HTMLElement; stage: HTMLElement; flat(): void; toast(text: string): void },
   me: RoadRider,
+  withIntro = true,
 ) {
   let world: RouteWorld | undefined
   let gone = false
@@ -24,17 +27,39 @@ export function rideWorld(
   const quipper = new Quipper()
   const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
   const climbs = top.ele - route.points[0].ele >= F.quips.summitGainM
+  const base = route.lapOf ?? route
+  // The card is up while the world loads, then captions the flyover; any key or tap ends both.
+  let intro = withIntro ? rideIntro(base, () => endIntro()) : undefined
+  const endIntro = () => {
+    if (world) world.shot = undefined
+    intro?.done()
+    intro = undefined
+    view.root.classList.remove('intro-on')
+  }
+  if (intro) view.root.append(intro.el)
+  view.root.classList.toggle('intro-on', !!intro)
+  const cardOnly = () => setTimeout(endIntro, CFG.intro.cardS * 1000)
   if (settings.freeRideView === '3d')
-    import('../../scene/route/routeWorld')
-      .then((m) => {
+    Promise.all([import('../../scene/route/routeWorld'), import('../../scene/route/camShots')])
+      .then(([m, sp]) => {
         if (gone) return
         VIS.route.feel.cam.calm = settings.calmCamera ? 1 : 0
-        world = new m.RouteWorld(view.stage, route.lapOf ?? route)
+        world = new m.RouteWorld(view.stage, base)
         world.state = { me: me.id, riders: [me] }
+        if (!intro) return
+        const st = flyStretch(base, sp.hairpinsOf(world))
+        world.shot = new sp.FlyShot(st.from, st.to, CFG.intro.secs, () => intro?.fly(st.what))
+        world.onShotEnd = endIntro
       })
-      .catch(() => view.flat())
+      .catch(() => (view.flat(), cardOnly()))
+  else cardOnly()
 
   return {
+    /** The pre-ride card or flyover is still up. */
+    get intro() {
+      return !!intro
+    },
+    skipIntro: () => intro && endIntro(),
     /** The sky over the ride, for the wind. */
     get mood() {
       return world?.moodName
@@ -69,6 +94,7 @@ export function rideWorld(
     },
     dispose() {
       gone = true
+      endIntro()
       world?.dispose()
       sound?.stop()
     },

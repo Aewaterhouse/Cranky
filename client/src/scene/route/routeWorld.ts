@@ -5,6 +5,7 @@ import { MoodBlend } from '../moods'
 import { VIS } from '../params'
 import { Quality, type Level } from '../quality'
 import { Sky } from '../sky'
+import type { CamShot } from './camShots'
 import { Chunks } from './chunks'
 import { Features } from './features'
 import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
@@ -17,7 +18,7 @@ import { LifePlan } from './lifePlan'
 import { Oddities, jokeCover, seedOf } from './oddPlan'
 import { Signs } from './signs'
 import { Rain } from './rain'
-import { RoadPath } from './roadPath'
+import { RoadPath, newPose } from './roadPath'
 import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
@@ -50,6 +51,10 @@ export class RouteWorld {
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(R.fov, 1, 0.5, 8000)
   state: RoadState = { me: '', riders: [] }
+  /** A set piece that has the camera until it is over; `onShotEnd` is told when it ends by itself. */
+  shot?: CamShot
+  onShotEnd?: () => void
+  private focus = newPose()
   quality: Quality
   readonly field: HeightField
   readonly chunks: Chunks
@@ -191,8 +196,10 @@ export class RouteWorld {
     this.key.castShadow = VIS.shadow > 0
 
     this.riders.update(this.state.riders, this.state.me, dt)
-    const me = this.riders.me
-    const d = this.riders.meD
+    // During a set piece the world is built and lit around what the camera is looking at, not the rider.
+    const shot = this.shot
+    const d = shot?.d ?? this.riders.meD
+    const me = shot ? this.field.path.poseAt(d, this.focus) : this.riders.me
     this.chunks.update(d, ahead, this.quality.level, all)
     this.life.update(dt, this.t, d, me, this.quality.level)
     if (Math.hypot(me.x - this.ox, me.y - this.oy, me.z - this.oz) > RECENTRE_M) {
@@ -202,7 +209,11 @@ export class RouteWorld {
       this.root.position.set(-this.ox, -this.oy, -this.oz)
     }
     const { ox, oy, oz } = this
-    this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
+    if (!shot) this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
+    else if (shot.update(this.camera, this.field, this.riders, ox, oy, oz)) {
+      this.shot = undefined
+      this.onShotEnd?.()
+    }
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt)
