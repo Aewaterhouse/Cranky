@@ -53,3 +53,10 @@ def test_near_cells_is_a_disc() -> None:
 def test_runs_split_on_gaps() -> None:
     cells = {(0, 2): 5, (0, 3): 6, (0, 7): 9, (2, 0): 1}
     assert terrain.to_runs(cells, 3) == [[[2, [5, 6]], [7, [9]]], None, [[0, [1]]]]
+
+
+def test_short_spurs_are_dropped_and_long_ones_kept() -> None:
+    pos = {n: (-27.0, 153.0 + n * 0.001) for n in range(1, 8)}  # about 99 m apart
+    assert br.drop_spurs([1, 2, 3, 4, 3, 2, 5], {**pos, 5: (-27.001, 153.002)}) == [1, 2, 5]
+    long = [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1]
+    assert br.drop_spurs(long, pos) == long

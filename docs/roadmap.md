@@ -96,7 +96,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Elevation profile and map | Live position on an elevation chart and an OpenStreetMap map. Checked by type-check, unit tests and build only; not yet looked at in a browser | M |
 | Group free ride | Ride a route together with drafting and an optional keep-together rubber band | L |
 | Segments | Timed climbs and sprints on each route with personal and crew leaderboards | M |
-| 3D route view | Low-poly road that follows the real bends and gradient, reusing the scene engine | L |
+| ✅ 3D route view | Low-poly road that follows the real bends and gradient through real terrain, with the rider, a chase camera and a slim HUD (Phase B of `docs/freeride-plan.md`). Seen only in headless screenshots; bare until Phase C adds trees and buildings | L |
 | Virtual gears | Shift from the keyboard or a Bluetooth remote for trainers without gears. Built: 24 gears in free ride and Slope mode, Z/X keys, Zwift Click v1. Awaits a hardware test with a real Click and trainer. | M |
 
 ## 5. Zombie Bus: more game

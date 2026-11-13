@@ -29,6 +29,7 @@ AGENT = "route-pack-builder"
 ROADS = "motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|road"
 PAD_DEG = 0.02
 SNAP_MAX_M = 300
+SPUR_MAX_M = 250  # out-and-back stubs up to this long (each way) are dropped
 SPACING_M = 10  # matches CFG.freeRide.spacingM on the client
 SMOOTH_M = 100  # matches CFG.freeRide.smoothM
 MAX_STORED = 4000  # matches CFG.freeRide.maxStored
@@ -117,15 +118,34 @@ def shortest(adj: dict[int, list], start: int, goal: int) -> list[int]:
     return path[::-1]
 
 
+def drop_spurs(nodes: list[int], pos: dict[int, Point]) -> list[int]:
+    """Removes short out-and-back stubs left when a waypoint snaps just off the through road."""
+    out = list(nodes)
+    c = 1
+    while c < len(out) - 1:
+        k = 0
+        while c - k > 0 and c + k < len(out) - 1 and out[c - k - 1] == out[c + k + 1]:
+            k += 1
+        stub = out[c : c + k + 1]
+        length = sum(haversine(pos[a], pos[b]) for a, b in zip(stub, stub[1:], strict=False))
+        if k and length <= SPUR_MAX_M:
+            del out[c - k + 1 : c + k + 1]
+            c = max(1, c - k)
+        else:
+            c += 1
+    return out
+
+
 def trace(waypoints: list[Point]) -> tuple[list[Point], float]:
     """Routes along roads through the waypoints; returns the line and the worst snap in metres."""
     pos, adj = road_graph(waypoints)
     snaps = [min(adj, key=lambda n: haversine(pos[n], w)) for w in waypoints]
     worst = max(haversine(pos[n], w) for n, w in zip(snaps, waypoints, strict=False))
-    line: list[Point] = []
+    nodes: list[int] = []
     for a, b in zip(snaps, snaps[1:], strict=False):
-        leg = [pos[n] for n in shortest(adj, a, b)]
-        line += leg[1:] if line else leg
+        leg = shortest(adj, a, b)
+        nodes += leg[1:] if nodes else leg
+    line = [pos[n] for n in drop_spurs(nodes, pos)]
     return line, worst
 
 

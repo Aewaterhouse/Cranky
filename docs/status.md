@@ -20,6 +20,8 @@
 - `Steven` branch only: every rider and zombie has a huge chest (`VIS.bust`), as a joke. Zombies checked in the scene dev page; riders not yet seen from the front.
 
 - Free ride Phase A (`docs/freeride-plan.md`): ten bundled Australian routes and a card picker (not yet seen in a browser).
+- Free ride Phase B: the 3D road world (road, terrain, rider, chase camera, slim HUD, `/route-dev.html` harness, 2D fallback setting). Seen only in software-rendered screenshots.
+- Workout builder (solo picker, My workouts).
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
@@ -34,6 +36,7 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Free ride 3D world: no trees or buildings yet (Phase C), thin see-through cracks where terrain strips meet on stacked hairpins, sliver triangles in far terrain, and a true out-and-back U-turn folds the road on itself. Frame rate on a real GPU is unmeasured.
 - Most features are tested only against the simulated trainer and headless Chromium.
 - Icons are emoji, so they vary by device.
 - Scene performance is unmeasured on real GPUs (auto quality should cope).

@@ -328,4 +328,4 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 ## 2026-11-13 Free ride 3D road world (Phase B): polish
 - Sea: the height data reads zero over water, so ground below 0.5 m is drawn flat blue. It is a stand-in until Phase C paints water from the map; low-lying land right at sea level would also turn blue. Tunable (`seaLevel`, `sea`).
 - The camera eases to its spot behind the rider but never trails it by more than 4 m, so a fast descent or a slow frame rate cannot leave the rider a dot in the distance.
-
+- Route builder: when a waypoint snaps just off the through road the path made a short out-and-back stub (Mount Coot-tha had one at 1.3 km). Stubs up to 250 m each way are now removed; longer out-and-backs (Akuna Bay's spurs) are kept as intended.
