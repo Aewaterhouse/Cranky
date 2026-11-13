@@ -9,5 +9,7 @@ certs/
 .claude/
 scripts/routes/.cache/
 .shots/
+# Bot tokens
+.env
 # Owner ride recordings: they start and end at home, so they never go in git.
 /*.gpx

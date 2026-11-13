@@ -689,3 +689,11 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - The free-ride look-ahead still applies: the road gradient fed into that sum is the one a second or two up the road (`trainerTarget` in `modes/freeRide/feel.ts`).
 - His gear tile and shift-strength slider were written for the old tile layout. They now sit in the 2D free-ride layout (tile in the top row, slider beside trainer difficulty), the 3D HUD's menu (slider; the HUD already has a gear chip) and the solo player's mode switch for Slope mode. Settings has the slider too. None of these placements has been looked at in a browser.
 - `gearText` is kept for the solo mode switch's read-out.
+
+## Ideas bot and the agent polling script (2026-11-14)
+- Ideas flow: Discord idea, two crew votes, GitHub issue, agent pull request, human review. The bot (`bot/`, discord.py) is separate from the game server and has its own `requirements.txt`, so the game does not gain a dependency.
+- Vote rules: 👍 only, voter must have the team role (default `Crew`), bots and the author do not count, and the author must have the role too. Two votes by default. The bot keeps no database: it recounts from the message each time and marks a filed idea with ✅.
+- Issues get the labels `idea` and `agent-ready`. `@` in the Discord text is broken with a zero-width space so it cannot ping GitHub users.
+- Nothing builds on its own. `scripts/agent-poll.sh` turns polling on for a limited time (2 hours, 3 issues by default) on whichever crew PC runs it. It uses the GitHub REST API through curl, not the `gh` CLI. The script pushes and opens the pull request; the agent is told not to and `git push` is on its denied list. The GitHub token is removed from the agent's environment.
+- The per-issue cap is spend (`--max-budget-usd`, default 5) because the installed Claude Code lists no turn cap.
+- Not tested: anything against real Discord or GitHub, and a real headless agent run. Only the vote rules have unit tests; the script has had a syntax check, `--help` and the missing-token check.
