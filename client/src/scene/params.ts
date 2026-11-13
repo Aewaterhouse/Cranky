@@ -34,6 +34,8 @@ export const VIS = {
   fogNear: 25,
   gapScale: 0.3,
   hordeSize: 220,
+  /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
+  bust: 0.17,
   sun: 1,
   shadow: 1,
   shake: 1,

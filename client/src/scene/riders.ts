@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
 import { makeHat } from './hats'
+import { VIS } from './params'
 import { box, clamp, ico, span } from './util'
 
 const SKINS = ['#f0c8a0', '#d9a577', '#b07a50', '#7a4e32', '#f3d2b8', '#e0b088']
@@ -63,6 +64,11 @@ export function makeRider(colour: string, seed: number) {
     mats.jersey,
     true,
   )
+  for (const s of [-1, 1]) {
+    const b = new THREE.Mesh(ico(VIS.bust, 1), mats.jersey)
+    b.position.set(s * 0.13, 0.4, -0.2)
+    torso.add(b)
+  }
   const hips = mesh(box(0.34, 0.2, 0.26), mats.shorts)
   const head = new THREE.Group()
   const skull = new THREE.Mesh(ico(0.23, 1), mats.skin)

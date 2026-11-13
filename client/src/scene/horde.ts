@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { VIS } from './params'
 import { pick, smooth, rand } from './util'
 
@@ -54,8 +55,11 @@ export class Horde {
     const mat = () => new THREE.MeshLambertMaterial({ flatShading: true })
     const g = (w: number, h: number, d: number, y = 0, z = 0) =>
       new THREE.BoxGeometry(w, h, d).translate(0, y, z)
+    const bust = (s: number) =>
+      new THREE.IcosahedronGeometry(VIS.bust, 1).translate(s * 0.13, 0.42, -0.17)
+    const torso = mergeGeometries([g(0.5, 0.66, 0.3, 0.33).toNonIndexed(), bust(-1), bust(1)])
     this.parts = [
-      new THREE.InstancedMesh(g(0.5, 0.66, 0.3, 0.33), mat(), n),
+      new THREE.InstancedMesh(torso, mat(), n),
       new THREE.InstancedMesh(
         new THREE.IcosahedronGeometry(0.2, 0).translate(0, 0.14, 0),
         mat(),
