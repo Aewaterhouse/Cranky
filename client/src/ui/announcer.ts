@@ -70,7 +70,7 @@ export function announce(kind: string, name = 'Someone') {
     if (v) u.voice = v
     u.rate = 1.05
     u.pitch = 0.85
-    u.volume = settings.volume
+    u.volume = settings.volume * settings.mixVoice
     speechSynthesis.speak(u)
   } catch {
     /* no speech on this device */

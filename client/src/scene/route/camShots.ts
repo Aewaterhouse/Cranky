@@ -93,7 +93,13 @@ export class OrbitShot implements CamShot {
   d = 0
   private clock: ShotClock
 
-  constructor(secs: number) {
+  private snapped = false
+
+  /** `onFront` is called once, half-way round, when the camera is in front of the rider (the postcard). */
+  constructor(
+    secs: number,
+    private onFront?: () => void,
+  ) {
     this.clock = new ShotClock(secs)
   }
 
@@ -119,6 +125,10 @@ export class OrbitShot implements CamShot {
     const y = Math.max(me.y + O.heightM, field.ground(x, z) + R.camClear)
     cam.position.set(x - ox, y - oy, z - oz)
     cam.lookAt(mx - ox, me.y + O.aimUpM - oy, mz - oz)
+    if (k >= O.snapAt && !this.snapped) {
+      this.snapped = true
+      setTimeout(() => this.onFront?.())
+    }
     return k >= 1
   }
 }

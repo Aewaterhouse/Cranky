@@ -4,6 +4,7 @@ import { ROUTE_INDEX, type RouteSummary } from '../core/routeLibrary'
 import { featuredRoute, weekState } from '../core/weekly'
 import { h } from './dom'
 import { scrapIcon } from './garage'
+import { UNIT } from './units'
 
 const W = CFG.weekly
 
@@ -42,7 +43,7 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
               h(
                 'small',
                 {},
-                ` ${feat.region} · ${feat.km.toFixed(feat.km < 10 ? 1 : 0)} km${feat.loop ? ' lap' : ''} · ${Math.round(feat.gainM)} m up`,
+                ` ${feat.region} · ${UNIT.dist(feat.km * 1000, feat.km < 10 ? 1 : 0)}${feat.loop ? ' lap' : ''} · ${UNIT.climb(feat.gainM)} up`,
               ),
             ),
             h(
@@ -62,11 +63,7 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
         'div',
         { class: 'wk-item' },
         h('span', { class: 'dim' }, 'Weekly climb'),
-        h(
-          'b',
-          {},
-          `${Math.round(s.vertM).toLocaleString('en-AU')} of ${s.targetM.toLocaleString('en-AU')} m`,
-        ),
+        h('b', {}, `${UNIT.climbNum(s.vertM)} of ${UNIT.climb(s.targetM)}`),
         h(
           'div',
           { class: 'wk-bar', role: 'progressbar', 'aria-valuenow': Math.round(frac * 100) },

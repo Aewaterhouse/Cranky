@@ -20,6 +20,7 @@ import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
 import { RoadFeel, trainerTarget } from './feel'
 import { freeKeys } from './keys'
+import { Moments, momentCard } from './moments'
 import { PauseState } from './pauseState'
 import { recentPct } from './quips'
 import { rideExtras } from './rideExtras'
@@ -57,7 +58,8 @@ export function runFreeRide(
   const plan = freePlan(route, profile.ftp, profile.weightKg)
   const ride = new RideController(trainer, profile, plan)
   let difficulty = loadDifficulty()
-  let dist = 0
+  // `?at=7000` starts a solo ride that many metres in (a dev aid for looking at a summit or the finish).
+  let dist = link ? 0 : Math.min(route.distance - 1, Math.max(0, +(params.get('at') ?? 0)))
   let speed = 0
   let el = 0
   let finished = false
@@ -102,6 +104,8 @@ export function runFreeRide(
   const feel = new RoadFeel(route)
   const scene = rideWorld(route, view, me, params.get('intro') !== '0')
   let wind = 0
+  const moments = new Moments(scene.topD, route.distance)
+  let finishing = false
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
   function togglePause() {
@@ -142,7 +146,7 @@ export function runFreeRide(
     if (!scene.intro) pause.step(stopped, speed, dt)
     const home = link?.mine()?.st === 'finished'
     if (link) pause.never()
-    const paused = link ? count > 0 || home : pause.paused
+    const paused = link ? count > 0 || home : pause.paused || finishing
     ride.paused = paused
     const p = routeAt(route, dist)
     let draft = 1
@@ -204,6 +208,7 @@ export function runFreeRide(
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
+    const avgPower = pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0
     view.frame({
       live,
       speed: speed * band,
@@ -216,7 +221,7 @@ export function runFreeRide(
       paused: pause.why,
       starting: pause.starting,
       intro: scene.intro,
-      avgPower: pw.length ? pw.reduce((a, b) => a + b, 0) / pw.length : 0,
+      avgPower,
       np: normalisedPower(pw),
       ftp: profile.ftp,
       weightKg: kg,
@@ -239,7 +244,16 @@ export function runFreeRide(
         ftpPct: recentPct(pw, live.power, profile.ftp),
         stopped: paused,
       })
-    if (dist >= route.distance && !link) void end()
+    // Over the top and at the line: a moment each. A solo ride holds at the line for it before the results.
+    const moment = moments.next(home ? route.distance : dist)
+    if (moment) {
+      const prs = extras.results.filter((r) => r.pr).length
+      scene.celebrate(momentCard(moment, { el, avgPower, kg, prs }))
+      if (moment === 'finish' && !link) {
+        finishing = true
+        setTimeout(() => void end(), fast > 1 ? 1500 : CFG.moments.finishHoldS * 1000)
+      }
+    }
   }
   const timer = setInterval(tick, 200)
   tick()
@@ -251,6 +265,7 @@ export function runFreeRide(
     clearInterval(timer)
     removeEventListener('keydown', onKey)
     offClick()
+    const still = scene.still
     scene.dispose()
     await ride.stop()
     extras.finish(dist)
@@ -261,6 +276,7 @@ export function runFreeRide(
       undefined,
       road ? 'Back to the lobby' : 'Done',
       road,
+      still,
     )
   }
   return { end }

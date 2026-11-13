@@ -43,6 +43,11 @@ export function rideSound() {
   const master = c.createGain()
   master.gain.value = 0
   master.connect(c.destination)
+  // Two buses under the master: the bike (freehub, wind, tyres, gears) and the place (birds, surf, traffic).
+  const bike = c.createGain()
+  const place = c.createGain()
+  bike.connect(master)
+  place.connect(master)
   const noise = c.createBuffer(1, c.sampleRate * 2, c.sampleRate)
   const data = noise.getChannelData(0)
   for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1
@@ -57,7 +62,14 @@ export function rideSound() {
   const running: AudioScheduledSourceNode[] = []
 
   /** A bed of filtered noise at zero gain, its loudness swelling slowly if `lfoHz` is given. */
-  const bed = (type: BiquadFilterType, hz: number, q: number, lfoHz = 0, depth = 0) => {
+  const bed = (
+    out: AudioNode,
+    type: BiquadFilterType,
+    hz: number,
+    q: number,
+    lfoHz = 0,
+    depth = 0,
+  ) => {
     const src = c.createBufferSource()
     src.buffer = noise
     src.loop = true
@@ -69,7 +81,7 @@ export function rideSound() {
     const swell = c.createGain()
     const gain = c.createGain()
     gain.gain.value = 0
-    src.connect(filter).connect(swell).connect(gain).connect(master)
+    src.connect(filter).connect(swell).connect(gain).connect(out)
     src.start()
     running.push(src)
     if (lfoHz) {
@@ -85,13 +97,13 @@ export function rideSound() {
     return { filter, gain }
   }
   const B = S.bed
-  const wind = bed('bandpass', S.wind.hz, S.wind.q)
-  const tyre = bed('lowpass', S.tyre.hz, S.tyre.q)
+  const wind = bed(bike, 'bandpass', S.wind.hz, S.wind.q)
+  const tyre = bed(bike, 'lowpass', S.tyre.hz, S.tyre.q)
   const amb: Record<'cicadas' | 'highWind' | 'surf' | 'traffic', ReturnType<typeof bed>> = {
-    cicadas: bed('bandpass', B.cicadas[0], B.cicadas[1], B.cicadas[2], B.cicadas[3]),
-    highWind: bed('bandpass', B.highWind[0], B.highWind[1], B.highWind[2], B.highWind[3]),
-    surf: bed('lowpass', B.surf[0], B.surf[1], B.surf[2], B.surf[3]),
-    traffic: bed('lowpass', B.traffic[0], B.traffic[1], B.traffic[2], B.traffic[3]),
+    cicadas: bed(place, 'bandpass', B.cicadas[0], B.cicadas[1], B.cicadas[2], B.cicadas[3]),
+    highWind: bed(place, 'bandpass', B.highWind[0], B.highWind[1], B.highWind[2], B.highWind[3]),
+    surf: bed(place, 'lowpass', B.surf[0], B.surf[1], B.surf[2], B.surf[3]),
+    traffic: bed(place, 'lowpass', B.traffic[0], B.traffic[1], B.traffic[2], B.traffic[3]),
   }
 
   /** One short note sliding from `f0` to `f1` Hz. */
@@ -102,6 +114,7 @@ export function rideSound() {
     dur: number,
     gain: number,
     type: OscillatorType = 'sine',
+    out: AudioNode = place,
   ) => {
     const o = c.createOscillator()
     const g = c.createGain()
@@ -111,7 +124,7 @@ export function rideSound() {
     g.gain.setValueAtTime(0.0001, at)
     g.gain.exponentialRampToValueAtTime(Math.max(0.0002, gain), at + dur * 0.2)
     g.gain.exponentialRampToValueAtTime(0.0001, at + dur)
-    o.connect(g).connect(master)
+    o.connect(g).connect(out)
     o.start(at)
     o.stop(at + dur + 0.02)
   }
@@ -122,7 +135,7 @@ export function rideSound() {
     s.buffer = click
     s.playbackRate.value = rate
     g.gain.value = gain
-    s.connect(g).connect(master)
+    s.connect(g).connect(bike)
     s.start(at)
   }
   /** A few quick notes from a small bird somewhere in the trees. */
@@ -161,6 +174,8 @@ export function rideSound() {
       const dt = Math.min(1, now - lastAt)
       lastAt = now
       set(master.gain, settings.rideSounds ? settings.volume * L.master : 0)
+      set(bike.gain, settings.mixRide)
+      set(place.gain, settings.mixAmbience)
       const v = s.paused ? 0 : s.speed
       set(wind.gain.gain, windGain(v, s.headwind) * L.wind)
       set(wind.filter.frequency, windHz(v, s.headwind))
@@ -184,7 +199,7 @@ export function rideSound() {
     clunk() {
       if (stopped || !settings.rideSounds) return
       const at = c.currentTime + 0.01
-      note(at, S.clunk.hz, S.clunk.hz * 0.45, S.clunk.thunkS, L.clunk)
+      note(at, S.clunk.hz, S.clunk.hz * 0.45, S.clunk.thunkS, L.clunk, 'sine', bike)
       tick(at, L.clunk * 0.9, 0.6)
       tick(at + S.clunk.settleS, L.clunk * 0.5, 0.8)
     },

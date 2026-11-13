@@ -7,6 +7,7 @@ import { Quality, type Level } from '../quality'
 import { Sky } from '../sky'
 import type { CamShot } from './camShots'
 import { Chunks } from './chunks'
+import { Confetti } from './confetti'
 import { Features } from './features'
 import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
 import { planFurniture } from './furniture'
@@ -23,6 +24,7 @@ import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
 import { Skyline } from './skyline'
+import { aimSun, setUpSun } from './sun'
 import { TerrainGrid } from './terrainGrid'
 
 export type { RoadRider } from './roadRiders'
@@ -34,10 +36,8 @@ const AHEAD: Record<Level, 'aheadPotato' | 'aheadLow' | 'aheadMedium' | 'aheadHi
   medium: 'aheadMedium',
   high: 'aheadHigh',
 }
-/** Move the floating origin once the rider is this far from it; shadow box half-size and sun distance. */
+/** Move the floating origin once the rider is this far from it. */
 const RECENTRE_M = 300
-const SHADOW_HALF = 26
-const SUN_DIST = 80
 
 /** What any road game hands the scene: everyone on the road, and which one the camera follows. */
 export interface RoadState {
@@ -79,6 +79,7 @@ export class RouteWorld {
   private skyline = new Skyline()
   private rig = new RouteCam()
   private rain = new Rain()
+  private confetti = new Confetti()
   private seed: number
   private hour = 12
   private hourAt = -Infinity
@@ -133,18 +134,15 @@ export class RouteWorld {
     this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.life = new Life(this.lifePlan, path, this.chunks.height)
     path.poseAt(0, this.riders.me)
-    const k = this.key
-    k.castShadow = true
-    k.shadow.mapSize.set(1536, 1536)
-    const c = k.shadow.camera
-    c.left = c.bottom = -SHADOW_HALF
-    c.right = c.top = SHADOW_HALF
-    c.near = 1
-    c.far = SUN_DIST * 2
-    k.shadow.bias = -0.0004
-    k.shadow.normalBias = 0.06
+    const k = setUpSun(this.key)
     this.scene.fog = this.fog
-    this.root.add(this.chunks.group, this.riders.group, this.life.group, this.skyline.mesh)
+    this.root.add(
+      this.chunks.group,
+      this.riders.group,
+      this.life.group,
+      this.skyline.mesh,
+      this.confetti.mesh,
+    )
     this.scene.add(this.root, this.sky.group, this.rain.lines, k, k.target, this.hemi, this.camera)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
@@ -216,14 +214,9 @@ export class RouteWorld {
     }
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
+    this.confetti.update(dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt)
-    const el = THREE.MathUtils.degToRad(env.sunElev)
-    const az = THREE.MathUtils.degToRad(env.sunAz)
-    this.key.target.position.set(me.x - ox, me.y - oy, me.z - oz)
-    this.key.position
-      .set(Math.sin(az) * Math.cos(el), Math.sin(el), -Math.cos(az) * Math.cos(el))
-      .multiplyScalar(SUN_DIST)
-      .add(this.key.target.position)
+    aimSun(this.key, env, me.x - ox, me.y - oy, me.z - oz)
   }
 
   /** The kind of oddity, landmark or animal the rider is passing right now, for the commentator. */
@@ -267,6 +260,12 @@ export class RouteWorld {
     return undefined
   }
 
+  /** Confetti and streamers over the rider: a summit, the finish. */
+  party() {
+    const { x, y, z } = this.riders.me
+    this.confetti.burst(x, y, z)
+  }
+
   /** Drops the built chunks so visual settings changed in the debug panel show up. */
   rebuild() {
     this.replan()
@@ -288,6 +287,7 @@ export class RouteWorld {
     this.chunks.clear()
     this.life.dispose()
     this.rain.dispose()
+    this.confetti.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }

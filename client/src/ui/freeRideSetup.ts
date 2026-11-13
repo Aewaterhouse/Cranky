@@ -18,10 +18,11 @@ import type { HomeActions } from './home'
 import { toast } from './toast'
 import { routePicker } from './routePicker'
 import { needTrainer } from './trainer'
+import { UNIT } from './units'
 import { weekCard } from './weekCard'
 import '../passport.css'
 
-const km = (m: number) => `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`
+const km = (m: number) => UNIT.dist(m, m < 10000 ? 1 : 0)
 
 const hm = (s: number) =>
   `${Math.floor(s / 3600)}:${String(Math.round((s % 3600) / 60) % 60).padStart(2, '0')}`
@@ -32,7 +33,11 @@ function routeCard(p: Profile, r: Route, selected: boolean, pick: () => void, de
     'div',
     { class: `route-card${selected ? ' on' : ''}`, onclick: pick },
     h('b', {}, r.name),
-    h('span', { class: 'dim' }, `${km(r.distance)} · ${r.ascent} m up · avg ${s.avgGrade}%`),
+    h(
+      'span',
+      { class: 'dim' },
+      `${km(r.distance)} · ${UNIT.climb(r.ascent)} up · avg ${s.avgGrade}%`,
+    ),
     h(
       'span',
       { class: 'dim' },

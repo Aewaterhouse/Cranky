@@ -10,6 +10,7 @@ import {
 import { featuredRoute } from '../core/weekly'
 import { h, seg } from './dom'
 import { svgEl } from './svg'
+import { UNIT } from './units'
 
 const LENGTHS = { all: 'Any length', short: 'Short', medium: 'Medium', long: 'Long' }
 
@@ -48,7 +49,7 @@ function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void, feat =
     h(
       'span',
       { class: 'dim' },
-      `${r.km.toFixed(r.km < 10 ? 1 : 0)} km${r.loop ? ' lap' : ''} · ${Math.round(r.gainM)} m up${r.loop ? '' : ` · avg ${r.avgGrade}%`}`,
+      `${UNIT.dist(r.km * 1000, r.km < 10 ? 1 : 0)}${r.loop ? ' lap' : ''} · ${UNIT.climb(r.gainM)} up${r.loop ? '' : ` · avg ${r.avgGrade}%`}`,
     ),
     h(
       'span',

@@ -128,7 +128,7 @@ export function speak(text: string) {
     const v = vs.find((x) => x.lang === 'en-AU') ?? vs.find((x) => x.lang.startsWith('en'))
     if (v) u.voice = v
     u.pitch = 0.85
-    u.volume = settings.volume
+    u.volume = settings.volume * settings.mixVoice
     speechSynthesis.speak(u)
   } catch {
     /* no speech on this device */

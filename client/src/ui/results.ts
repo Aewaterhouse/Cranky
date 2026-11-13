@@ -1,18 +1,23 @@
 import '../results.css'
+import { CFG } from '../config'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
 import { postRide, saveProfile } from '../core/profile'
 import { ROUTE_INDEX } from '../core/routeLibrary'
+import { settings } from '../core/settings'
 import { weeklyRewards } from '../core/weekly'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { groupSection, postcard } from './resultsGroup'
+import { blocksCard } from './resultsBlocks'
 import { downloadFit, downloadJson } from './rideExport'
+import { ridePostcard, savePng } from './ridePostcard'
 import { roadSection } from './roadResults'
 import type { RoadSummary } from '../net/protocol'
 import { segmentSection } from './segResults'
+import { UNIT } from './units'
 import { segsFromSeries } from './soloSegs'
 import { workoutChart } from './workoutChart'
 
@@ -70,6 +75,7 @@ export function finishRide(
   group?: GroupSummary,
   doneLabel = 'Done',
   road?: RoadSummary,
+  still?: string,
 ) {
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
@@ -181,10 +187,7 @@ export function finishRide(
                 s.compliance >= 0.9 ? 'good' : '',
               ),
             ]
-          : [
-              tile('Distance', `${(s.distance / 1000).toFixed(1)} km`),
-              tile('Climbed', `${s.ascent ?? 0} m`),
-            ]),
+          : [tile('Distance', UNIT.dist(s.distance)), tile('Climbed', UNIT.climb(s.ascent ?? 0))]),
       ),
       prs.length
         ? h(
@@ -262,52 +265,32 @@ export function finishRide(
             ` banked${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. Balance: ${p.scrap}. Spend it in the garage.`,
           )
         : '',
-      h(
-        'div',
-        { class: 'card' },
-        h('h2', {}, 'Blocks'),
-        h(
-          'table',
-          {},
-          h(
-            'tr',
-            {},
-            ...['Block', 'Time', 'Target', 'Avg', 'Compliance', 'In zone'].map((x) =>
-              h('th', {}, x),
-            ),
-          ),
-          ...s.blocks.map((b) => {
-            const scored = b.type !== 'sprint' && b.type !== 'free'
-            return h(
-              'tr',
-              {},
-              h('td', {}, b.label),
-              h('td', {}, fmt(b.secs)),
-              h('td', {}, b.avgTarget ? `${b.avgTarget} W` : '–'),
-              h('td', {}, `${b.avgPower} W`),
-              h(
-                'td',
-                {},
-                scored
-                  ? h(
-                      'span',
-                      { class: `res-comp ${b.compliance >= 0.85 ? 'good' : 'miss'}` },
-                      h('i', { style: `width:${b.compliance * 100}%` }),
-                      pctStr(b.compliance),
-                    )
-                  : '–',
-              ),
-              h('td', {}, fmt(b.inBandSecs)),
-            )
-          }),
-        ),
-      ),
+      blocksCard(s),
       h(
         'div',
         { class: 'row res-actions' },
         h('button', { onclick: () => void downloadFit(s) }, 'Download .fit'),
         h('button', { onclick: () => downloadJson(s) }, 'Export JSON'),
         group ? h('button', { onclick: () => postcard(group, s.planName) }, 'Postcard') : '',
+        s.route
+          ? h(
+              'button',
+              {
+                title: 'A PNG of the ride for the group chat',
+                onclick: async () =>
+                  savePng(
+                    await ridePostcard(
+                      s,
+                      p.weightKg || CFG.freeRide.defaultKg,
+                      still,
+                      settings.units,
+                    ),
+                    `cranky-${s.route!.id}-${new Date(s.record.date).toLocaleDateString('en-CA')}`,
+                  ),
+              },
+              'Save postcard',
+            )
+          : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),
     ),

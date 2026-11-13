@@ -1,12 +1,15 @@
 import { CFG } from '../../config'
 import { flyStretch } from '../../core/flyover'
 import type { Route } from '../../core/route'
-import { settings } from '../../core/settings'
+import { lessMotion, settings } from '../../core/settings'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
+import { SFX } from '../../ui/audio'
 import { rideIntro } from '../../ui/rideIntro'
+import { momentFlash } from '../../ui/rideMoment'
 import { rideSound } from '../../ui/rideSound'
 import { cheering } from './feel'
+import type { MomentCard } from './moments'
 import { Quipper, speak, type QuipState } from './quips'
 
 const F = CFG.freeRide
@@ -23,6 +26,10 @@ export function rideWorld(
 ) {
   let world: RouteWorld | undefined
   let gone = false
+  // Less motion: a steady camera, no flyover, no turn round the rider, no confetti.
+  const still = lessMotion()
+  let orbit: ((secs: number, onFront: () => void) => void) | undefined
+  const stills: Partial<Record<MomentCard['kind'], string>> = {}
   const sound = rideSound()
   const quipper = new Quipper()
   const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
@@ -43,10 +50,14 @@ export function rideWorld(
     Promise.all([import('../../scene/route/routeWorld'), import('../../scene/route/camShots')])
       .then(([m, sp]) => {
         if (gone) return
-        VIS.route.feel.cam.calm = settings.calmCamera ? 1 : 0
+        VIS.route.feel.cam.calm = settings.calmCamera || still ? 1 : 0
+        VIS.route.camDist = CFG.camDist[settings.camDist]
         world = new m.RouteWorld(view.stage, base)
         world.state = { me: me.id, riders: [me] }
+        const w = world
+        orbit = (secs, onFront) => (w.shot = new sp.OrbitShot(secs, onFront))
         if (!intro) return
+        if (still) return void cardOnly()
         const st = flyStretch(base, sp.hairpinsOf(world))
         world.shot = new sp.FlyShot(st.from, st.to, CFG.intro.secs, () => intro?.fly(st.what))
         world.onShotEnd = endIntro
@@ -60,6 +71,30 @@ export function rideWorld(
       return !!intro
     },
     skipIntro: () => intro && endIntro(),
+    /** Where the main climb tops out, when the route has one worth a moment. */
+    topD: climbs ? top.d : undefined,
+    /** The still for the postcard: the lookout if there was one, else the finish. */
+    get still() {
+      return stills.summit ?? stills.finish
+    },
+    /** A summit or the finish: confetti, a turn of the camera, the announcer and the numbers so far. */
+    celebrate(card: MomentCard) {
+      view.root.append(momentFlash(card))
+      speak(card.line)
+      ;(card.kind === 'finish' ? SFX.MEGA : SFX.GREAT)()
+      if (!world || intro) return
+      const w = world
+      const snap = () => {
+        try {
+          stills[card.kind] = w.snapshot()
+        } catch {
+          /* no still: the postcard draws without one */
+        }
+      }
+      if (!still) w.party()
+      if (settings.calmCamera || still || !orbit) snap()
+      else orbit(CFG.moments.orbitS, snap)
+    },
     /** The sky over the ride, for the wind. */
     get mood() {
       return world?.moodName

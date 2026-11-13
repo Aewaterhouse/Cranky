@@ -17,6 +17,16 @@ export const ROAD_CFG = {
       { lt: 15, colour: '#ff5a4e' },
       { lt: Infinity, colour: '#b0174f' },
     ],
+    /** The same bands in colours that stay apart with red-green colour blindness (the Okabe-Ito set), light to strong. */
+    gradeBandsCb: [
+      { lt: -3, colour: '#56b4e9' },
+      { lt: 2, colour: '#a9a9a9' },
+      { lt: 5, colour: '#f0e442' },
+      { lt: 8, colour: '#e69f00' },
+      { lt: 11, colour: '#d55e00' },
+      { lt: 15, colour: '#cc79a7' },
+      { lt: Infinity, colour: '#ffffff' },
+    ],
     /** The gradient readout shows at or beyond this many % either way. */
     gradeShowPct: 2,
     /** A climb averages `minPct` or more for at least `minM`; dips below `minPct` shorter than `dipM` do not end it. */

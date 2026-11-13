@@ -51,6 +51,8 @@ export function rideExtras(
     ghost: true,
   }))
   return {
+    /** Segment results so far. */
+    results: segs.results,
     /**
      * Every tick: the segment panel's state, the whole-route splits and the riders that are not really there
      * (ghosts and dev mates). `fast` is the dev speed-up, so the scene carries a ghost on at the right pace.

@@ -4,6 +4,7 @@ import type { Route } from '../core/route'
 import { routeLine } from '../fun/routeLines'
 import { h } from './dom'
 import { miniProfile } from './routePicker'
+import { UNIT } from './units'
 
 /**
  * The card before a ride: route name, distance, climb, a small profile and a line about the place. It covers
@@ -24,8 +25,8 @@ export function rideIntro(route: Route, skip: () => void) {
       h(
         'p',
         { class: 'in-nums' },
-        h('b', {}, `${(route.distance / 1000).toFixed(1)} km`),
-        h('b', {}, `${Math.round(route.ascent)} m up`),
+        h('b', {}, UNIT.dist(route.distance)),
+        h('b', {}, `${UNIT.climb(route.ascent)} up`),
       ),
       miniProfile(profileSample(route)),
       h('p', { class: 'in-line' }, routeLine(route.id)),
