@@ -4,6 +4,8 @@ import { gearGrade, shiftGear } from '../../core/gears'
 import { normalisedPower } from '../../core/ride'
 import { stepSpeed, totalMass, trainerGrade } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
+import { VIS } from '../../scene/params'
+import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
 import { onClickShift } from '../../trainer/zwiftClick'
 import { show } from '../../ui/dom'
@@ -71,6 +73,7 @@ export function runFreeRide(
       difficulty: (v) => ((difficulty = v), save()),
     },
     difficulty,
+    settings.freeRideView === '3d',
   )
   const save = () => {
     try {
@@ -80,6 +83,25 @@ export function runFreeRide(
     }
   }
   show(view.root)
+  // The 3D world is one rider on the road for now; group rides will hand it more.
+  const me: RoadRider = {
+    id: profile.id,
+    name: profile.name,
+    d: 0,
+    offset: VIS.route.lane,
+    speed: 0,
+    cadence: 0,
+    look: profile.look,
+  }
+  let world: RouteWorld | undefined
+  if (settings.freeRideView === '3d')
+    import('../../scene/route/routeWorld')
+      .then((m) => {
+        if (finished) return
+        world = new m.RouteWorld(view.stage, route)
+        world.state = { me: me.id, riders: [me] }
+      })
+      .catch(() => view.flat())
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
   function togglePause() {
@@ -150,6 +172,9 @@ export function runFreeRide(
       ride.erg.setGrade(sent, F.grade)
     }
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })
+    me.d = dist
+    me.speed = speed * fast
+    me.cadence = paused ? 0 : live.cadence
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
@@ -179,6 +204,7 @@ export function runFreeRide(
     clearInterval(timer)
     removeEventListener('keydown', onKey)
     offClick()
+    world?.dispose()
     await ride.stop()
     finishRide(profile, ride.rec.summary(), done)
   }

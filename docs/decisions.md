@@ -318,3 +318,10 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - A sibling page, `/route-dev.html` (`src/routeDev.ts`), rather than more switches on the bus harness. It is dev-server only, like `scene-dev.html`.
 - The debug panel gains a Route world folder when the route world opens it. Road, ground and colour settings are baked into chunks, so changing one drops the chunks and they rebuild over the next few frames.
 
+## 2026-11-13 Free ride 3D road world (Phase B): in the real ride
+- Free ride opens in the 3D world by default. A per-device setting, Free ride view (3D world or Charts), is on the Settings screen. If the scene cannot start (no WebGL, or its code fails to load) the ride carries on in the flat layout without a message.
+- The 3D layout is the same view with a different stylesheet: the scene fills the screen and the header, numbers, next-kilometre elevation strip, stats row and map sit over it as translucent panels. Gear and gradient get their own tiles (trainer gradient under the gradient); the whole-route profile is hidden; the map is a square minimap top right, still Leaflet with online tiles.
+- The scene is loaded only when a 3D ride starts. Free ride gives it one rider (you, in your equipped hat and outfit); the list form is there for group rides.
+- Quality levels are the bus scene's (`Quality`, same Graphics setting): pixel ratio and shadows as before, plus how far ahead the road is built (350, 500, 800, 1000 m) and, on potato, no terrain beyond 90 m from the road. Fog closes in to match.
+- Nothing here writes to the trainer. Free ride still sends gradient only, through `ergController.ts`.
+

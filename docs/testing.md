@@ -77,4 +77,9 @@ Run `pnpm dev` in `client/` and open `/route-dev.html` (no server or trainer nee
 - `?route=nomap` (no coordinates) and `&terrain=0` (no height grid): a gently wandering road with made-up hills, still following the real gradient.
 - Ride any route for a few kilometres at `speed=15`: the chunk count in the help line stays roughly steady and there are no hitches as chunks arrive.
 - Look for: road buried or floating, see-through cracks, flicker where two strips overlap. Note them in the results log with the route and distance.
+- In the app: Ride, Free ride, pick Mount Coot-tha, Start with the simulated trainer. The 3D world should fill the screen behind the numbers, your rider's legs should turn at your cadence and stop when you stop, and the elevation strip and minimap should track you. Pause, End ride and the difficulty slider still work.
+- Settings, Free ride view, Charts: the next free ride uses the flat layout. Set it back to 3D world afterwards.
+- Settings, Graphics, Potato then High: the view distance and sharpness change on the next ride.
+- On a device or browser with WebGL turned off, free ride should fall back to the flat layout by itself.
+- Not yet checked on a real graphics card: frame rate. The target is 60 fps at Medium on a mid laptop.
 

@@ -40,8 +40,11 @@ const clock = (s: number) => {
   return t >= 3600 ? `${Math.floor(t / 3600)}:${fmt(t % 3600).padStart(5, '0')}` : fmt(t)
 }
 
-/** Free ride player: big numbers, whole-route and next-km elevation profiles, optional map, controls. */
-export function freeRideView(route: Route, on: FreeHandlers, difficulty: number) {
+/**
+ * Free ride player: big numbers, whole-route and next-km elevation profiles, optional map, controls. With `world`
+ * the same parts become a slim HUD over the 3D scene, which is drawn into `stage`.
+ */
+export function freeRideView(route: Route, on: FreeHandlers, difficulty: number, world = false) {
   const num = (label: string, unit = '', cls = '') => {
     const v = h('b', {}, '–')
     const sub = h('i', {})
@@ -62,6 +65,9 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
   const pow = num('Power · 3 s', 'W')
   const cad = num('Cadence', 'rpm')
   const hr = num('HR', 'bpm')
+  const gearN = num('Gear', '', 'only3d')
+  const gradN = num('Gradient', '%', 'only3d')
+  const stage = h('div', { class: 'fr-stage' })
   const dist = num('Distance', 'km', 'sm')
   const togo = num('To go', 'km', 'sm')
   const up = num('Climbed', 'm', 'sm')
@@ -138,7 +144,8 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
   const kbd = (t: string) => h('kbd', {}, t)
   const root = h(
     'div',
-    { class: 'fr' },
+    { class: world ? 'fr fr3d' : 'fr' },
+    stage,
     h(
       'header',
       { class: 'solo-head' },
@@ -161,7 +168,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
         h('button', { class: 'danger', onclick: confirmEnd }, 'End ride'),
       ),
     ),
-    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, hr.el),
+    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, hr.el, gearN.el, gradN.el),
     h(
       'section',
       { class: 'fr-mid' },
@@ -191,6 +198,9 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
 
   return {
     root,
+    stage,
+    /** Drops back to the flat layout (no WebGL, or the scene failed to start). */
+    flat: () => root.classList.remove('fr3d'),
     confirmEnd,
     setDifficulty: setDiff,
     frame(s: FreeState) {
@@ -212,6 +222,10 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
       set(np, String(Math.round(s.np)))
       set(wkg, (l.avg / s.weightKg).toFixed(2))
       gv.textContent = s.grade.toFixed(1)
+      set(gearN, String(s.gear))
+      set(gradN, s.grade.toFixed(1))
+      gradN.v.style.color = gradeColour(s.grade)
+      gradN.sub.textContent = `trainer ${s.trainerGrade.toFixed(1)}%`
       gbox.style.setProperty('--g', gradeColour(s.grade))
       gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
       whole.set(s.dist)

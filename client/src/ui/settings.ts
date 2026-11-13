@@ -52,7 +52,7 @@ export function settingsTab() {
       ),
       row(
         'Graphics',
-        'Auto drops the quality if the bus scene runs slowly.',
+        'Auto drops the quality if the 3D scene runs slowly.',
         seg<Settings['gfx']>(
           [
             ['auto', 'Auto'],
@@ -63,6 +63,18 @@ export function settingsTab() {
           ],
           settings.gfx,
           (gfx) => saveSettings({ gfx }),
+        ),
+      ),
+      row(
+        'Free ride view',
+        '3D rides the road in a low-poly world. Charts is the flat layout, used anyway if this device cannot draw 3D.',
+        seg<Settings['freeRideView']>(
+          [
+            ['3d', '3D world'],
+            ['2d', 'Charts'],
+          ],
+          settings.freeRideView,
+          (freeRideView) => saveSettings({ freeRideView }),
         ),
       ),
       row(
