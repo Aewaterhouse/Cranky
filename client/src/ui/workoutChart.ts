@@ -20,6 +20,7 @@ export interface ChartData {
 }
 
 const PAD = { l: 46, r: 12, t: 10, b: 22 }
+const BARE = { l: 0, r: 0, t: 3, b: 0 }
 const CAD = [40, 140]
 const HR = [60, 200]
 const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim()
@@ -28,9 +29,10 @@ const niceStep = (span: number, max: number, steps: number[]) =>
 
 /**
  * Canvas workout chart: zone-coloured target blocks, rider power over the top, optional cadence,
- * now-cursor, FTP line and time ticks. `zoom` (seconds each side of now) makes it a close-up strip.
+ * now-cursor, FTP line and time ticks. `zoom` (seconds each side of now) makes it a close-up strip;
+ * `bare` drops the axes and labels for the thin whole-workout strip.
  */
-export function workoutChart(ftp: number, zoom = 0) {
+export function workoutChart(ftp: number, zoom = 0, bare = false) {
   const canvas = h('canvas', { class: 'wchart' })
   const ctx = canvas.getContext('2d')!
   let data: ChartData | null = null
@@ -47,7 +49,7 @@ export function workoutChart(ftp: number, zoom = 0) {
       canvas.height = Math.round(hh * dpr)
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    paint(ctx, w, hh, data, ftp, zoom)
+    paint(ctx, w, hh, data, ftp, zoom, bare)
   }
   const redraw = () => raf || (raf = requestAnimationFrame(draw))
   new ResizeObserver(redraw).observe(canvas)
@@ -67,11 +69,13 @@ function paint(
   d: ChartData,
   ftp: number,
   zoom: number,
+  bare: boolean,
 ) {
   const now = d.now ?? d.total
   const v0 = zoom ? now - zoom : 0
   const v1 = zoom ? now + zoom : d.total
-  const [L, R, T, B] = [PAD.l, w - PAD.r, PAD.t, hh - PAD.b]
+  const P = bare ? BARE : PAD
+  const [L, R, T, B] = [P.l, w - P.r, P.t, hh - P.b]
   const x = (t: number) => L + ((t - v0) / (v1 - v0)) * (R - L)
   const maxTgt = Math.max(0, ...d.segs.map((s) => Math.max(s.w0, s.w1)))
   const maxPow = d.power.length ? Math.max(...d.power) : 0
@@ -89,7 +93,7 @@ function paint(
   const gs = niceStep(yMax, 6, [25, 50, 100, 200, 250, 500])
   ctx.textAlign = 'right'
   ctx.textBaseline = 'middle'
-  for (let v = 0; v <= yMax; v += gs) {
+  for (let v = 0; v <= yMax && !bare; v += gs) {
     ctx.strokeStyle = 'rgba(255,255,255,0.06)'
     ctx.beginPath()
     ctx.moveTo(L, Math.round(y(v)) + 0.5)
@@ -103,7 +107,7 @@ function paint(
   ctx.textAlign = 'center'
   ctx.textBaseline = 'top'
   for (let t = Math.ceil(Math.max(0, v0) / ts) * ts; t <= Math.min(v1, d.total); t += ts) {
-    if (x(t) > R - 14) break
+    if (bare || x(t) > R - 14) break
     ctx.strokeStyle = 'rgba(255,255,255,0.05)'
     ctx.beginPath()
     ctx.moveTo(Math.round(x(t)) + 0.5, T)
@@ -164,7 +168,7 @@ function paint(
   ctx.fillStyle = css('--acc') || '#f2b705'
   ctx.textAlign = 'right'
   ctx.textBaseline = 'bottom'
-  ctx.fillText(`FTP ${ftp} W`, R - 4, y(ftp) - 3)
+  if (!bare) ctx.fillText(`FTP ${ftp} W`, R - 4, y(ftp) - 3)
 
   // series, split into runs wherever the ride jumped (skipped intervals)
   const runs = (vals: number[], map: (v: number) => number, smooth: number, idx?: number[]) => {
@@ -221,12 +225,13 @@ function paint(
     ctx.lineWidth = 4.5
     ctx.strokeStyle = 'rgba(0,0,0,0.55)'
     ctx.stroke()
+    // The glow is a wide faint stroke: a real shadow blur costs most of a frame on a software canvas.
+    ctx.lineWidth = 7
+    ctx.strokeStyle = 'rgba(255,255,255,0.16)'
+    ctx.stroke()
     ctx.lineWidth = 2.2
     ctx.strokeStyle = '#fff'
-    ctx.shadowColor = 'rgba(255,255,255,0.7)'
-    ctx.shadowBlur = 8
     ctx.stroke()
-    ctx.shadowBlur = 0
   }
   if (d.showCadence && d.cadence) {
     const cy = (v: number) => B - ((v - CAD[0]) / (CAD[1] - CAD[0])) * (B - T)

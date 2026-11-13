@@ -32,24 +32,25 @@ export function modeSwitch(on: { set: (k: RideMode) => void; nudge: (dir: number
     h('button', { 'data-mode': k, onclick: () => on.set(k), title: `${label} (${key})` }, label),
   )
   const val = h('b', { class: 'pct' })
+  const lab = h('span', {})
   const step = h(
     'div',
-    { class: 'stepper' },
+    { class: 'glass stepper' },
+    lab,
     h('button', { onclick: () => on.nudge(-1), title: 'Lower (,)' }, '−'),
     val,
     h('button', { onclick: () => on.nudge(1), title: 'Higher (.)' }, '+'),
   )
-  const root = h(
-    'div',
-    { class: 'field modesw' },
-    'Mode',
-    h('div', { class: 'ctl' }, ...btns, step),
-  )
+  const root = h('label', { class: 'modesw' }, 'Mode', h('div', { class: 'seg' }, ...btns))
   return {
+    /** The switch, for the menu. */
     root,
+    /** The level or gradient stepper, for the dock; hidden in ERG. */
+    step,
     set(m: ModeState) {
       btns.forEach((b) => b.classList.toggle('on', b.dataset.mode === m.kind))
-      step.style.display = m.kind === 'erg' ? 'none' : ''
+      step.hidden = m.kind === 'erg'
+      lab.textContent = m.kind === 'res' ? 'Resistance' : 'Slope'
       val.textContent =
         m.kind === 'res' ? `${m.level}%` : `${signed(m.grade)} · ${gearText(m.gear)}`
     },

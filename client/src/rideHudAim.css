@@ -1,0 +1,188 @@
+/* The ride HUD in a workout (solo player and the bus): the power panel with a target and tolerance bar, the
+   interval clock, the coach's line, the "Next" chip, the 3-2-1 and the interval summary. Sizes in --u. */
+.pw-cap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: calc(2 * var(--u));
+  margin-bottom: calc(0.5 * var(--u));
+  font: 700 calc(1.7 * var(--u)) var(--ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+}
+.pw-chip {
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: var(--acc);
+}
+/* Tolerance bar: the green band in the middle is on target; the needle is the rider. With no target it is the
+   zone bar (or, in a sprint, a bar filling towards the rider's best). */
+.tol {
+  position: relative;
+  height: calc(1.2 * var(--u));
+  margin: calc(1.1 * var(--u)) 0 calc(1.1 * var(--u));
+  border-radius: 99px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--bad) 55%, transparent) 0 calc(50% - var(--w)),
+    color-mix(in srgb, var(--warn) 55%, transparent) calc(50% - var(--w)) calc(50% - var(--b)),
+    color-mix(in srgb, var(--ok) 60%, transparent) calc(50% - var(--b)) calc(50% + var(--b)),
+    color-mix(in srgb, var(--warn) 55%, transparent) calc(50% + var(--b)) calc(50% + var(--w)),
+    color-mix(in srgb, var(--bad) 55%, transparent) calc(50% + var(--w))
+  );
+}
+.tol-band {
+  position: absolute;
+  inset: calc(-0.3 * var(--u)) calc(50% - var(--b));
+  border: calc(0.2 * var(--u)) solid var(--ok);
+  border-radius: calc(0.5 * var(--u));
+}
+.tol-needle {
+  position: absolute;
+  top: calc(-0.7 * var(--u));
+  bottom: calc(-0.7 * var(--u));
+  width: calc(0.8 * var(--u));
+  margin-left: calc(-0.4 * var(--u));
+  border-radius: 99px;
+  background: var(--ok);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  transition: left 0.25s;
+}
+.tol[data-s='warn'] .tol-needle {
+  background: var(--warn);
+}
+.tol[data-s='bad'] .tol-needle {
+  background: var(--bad);
+}
+.tol[data-s='zone'],
+.tol[data-s='fill'] {
+  background: linear-gradient(90deg, var(--zc) var(--fill), rgba(255, 255, 255, 0.14) var(--fill));
+}
+.tol[data-s='zone'] i,
+.tol[data-s='fill'] i {
+  display: none;
+}
+.pw-2 {
+  display: flex;
+  align-items: baseline;
+  gap: calc(1.2 * var(--u));
+  min-height: calc(4.6 * var(--u));
+  margin-bottom: calc(0.8 * var(--u));
+  font-size: calc(3.8 * var(--u));
+  white-space: nowrap;
+}
+.pw-2l {
+  font: 500 calc(1.9 * var(--u)) var(--ui);
+  opacity: 0.8;
+}
+.pw-2 .hv b {
+  font: 400 1em / 1 var(--display);
+}
+.pw-delta {
+  margin-left: auto;
+  font: 700 calc(2 * var(--u)) var(--ui);
+  color: var(--ok);
+}
+.pw-delta[data-s='warn'] {
+  color: var(--warn);
+}
+.pw-delta[data-s='bad'] {
+  color: var(--bad);
+}
+.rhud .aimed .pw-sub small {
+  font-size: 0.45em;
+}
+
+/* Top centre: what is on, the time left in it, the quiet totals and the coach's line */
+.rhud .blockname {
+  font: 700 calc(1.9 * var(--u)) var(--ui);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acc);
+  white-space: nowrap;
+}
+.rhud .clock {
+  font-size: calc(6 * var(--u));
+  min-width: 4.5ch;
+}
+.cue-line {
+  min-height: 1.3em;
+  width: calc(64 * var(--u));
+  max-width: 60vw;
+  margin-top: calc(0.5 * var(--u));
+  font: 600 calc(2.1 * var(--u)) / 1.3 var(--ui);
+  color: rgba(255, 255, 255, 0.7);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.4s;
+}
+.cue-line.show {
+  color: var(--acc);
+}
+.hud-tc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--u);
+}
+.rhud .nchip {
+  padding: calc(0.6 * var(--u)) calc(1.8 * var(--u));
+  font: 700 calc(2.3 * var(--u)) var(--ui);
+  white-space: nowrap;
+}
+.rhud .count {
+  font: 400 calc(9 * var(--u)) / 1 var(--display);
+  color: var(--acc);
+  text-shadow: 0 0.3vh 2vh rgba(0, 0, 0, 0.7);
+}
+
+/* Interval summary: top right for a few seconds after an effort */
+.rhud .summary {
+  min-width: calc(26 * var(--u));
+  padding: calc(1 * var(--u)) calc(1.6 * var(--u));
+  font-size: calc(2.1 * var(--u));
+  box-shadow: inset 0 0 0 calc(0.25 * var(--u)) color-mix(in srgb, var(--acc) 70%, transparent);
+}
+.rhud .summary h3 {
+  margin: 0 0 calc(0.4 * var(--u));
+  font: 700 calc(1.7 * var(--u)) var(--ui);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.rhud .summary div {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(3 * var(--u));
+  line-height: 1.45;
+}
+.rhud .summary span {
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Steppers in the dock (intensity, resistance level, gradient) */
+.rhud .stepper {
+  gap: 0;
+  padding: 0 calc(0.4 * var(--u));
+  font-size: calc(2 * var(--u));
+  pointer-events: auto;
+}
+.rhud .stepper > span {
+  padding-left: calc(1 * var(--u));
+  font-weight: 500;
+  opacity: 0.75;
+}
+.rhud .stepper button {
+  width: auto;
+  background: none;
+  font-size: calc(2.6 * var(--u));
+  line-height: 1;
+}
+.rhud .stepper .pct {
+  min-width: 5ch;
+  font: 400 calc(2.4 * var(--u)) var(--display);
+}

@@ -90,6 +90,22 @@
   border-radius: calc(0.8 * var(--u));
 }
 
+/* Pause, end-ride and countdown messages sit over everything; only a dialog takes clicks */
+.fr3d > .overlay,
+.rh > .overlay {
+  position: fixed;
+  z-index: 3;
+  border-radius: 0;
+  background: rgba(17, 18, 20, 0.35);
+  backdrop-filter: none;
+  pointer-events: none;
+}
+.fr3d > .overlay.dialog,
+.rh > .overlay.dialog {
+  background: rgba(17, 18, 20, 0.7);
+  pointer-events: auto;
+}
+
 @media (pointer: coarse) {
   .rhud button {
     min-width: 44px;
@@ -102,7 +118,7 @@
   flex-direction: column;
   gap: calc(0.6 * var(--u));
 }
-.rhud .hmenu .hud-size button {
+.rhud .hmenu .seg button {
   min-height: max(44px, calc(4.4 * var(--u)));
   padding: 0 calc(1.2 * var(--u));
   font-size: calc(1.8 * var(--u));

@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { powerZone, tolerance, tolText } from '../core/hud'
 import { inCadBand } from '../modes/drill/cadence'
 import { h } from './dom'
@@ -14,7 +15,7 @@ export interface Aim {
   target?: number | null
   /** The target is the big number and power sits beneath it; otherwise the other way round. */
   targetLeads?: boolean
-  /** The second line when there is no target: "All out", "Resistance 40%". */
+  /** The second line in place of the other number: "All out", "Resistance 40%". */
   note?: string
   /** Sprint: how full the bar is against the rider's best, 0..1. */
   fill?: number
@@ -28,6 +29,8 @@ export interface PowerState {
   weightKg: number
   cadence: number
   hr?: number | null
+  /** Colour of the heart-rate number (its zone), when known. */
+  hrColour?: string
   aim?: Aim
 }
 
@@ -48,6 +51,9 @@ export function powerPanel(workout = false) {
   const chip = h('span', { class: 'pw-chip' })
   const needle = h('i', { class: 'tol-needle' })
   const tol = h('div', { class: 'tol' }, h('i', { class: 'tol-band' }), needle)
+  // Half-widths of the green and amber stretches, as a share of the bar.
+  tol.style.setProperty('--b', `${(CFG.compliance.band / CFG.hud.tol.span) * 50}%`)
+  tol.style.setProperty('--w', `${(CFG.hud.tol.warn / CFG.hud.tol.span) * 50}%`)
   const label2 = h('span', { class: 'pw-2l' })
   const second = hudVal('', 'W')
   const delta = h('span', { class: 'pw-delta' })
@@ -80,6 +86,7 @@ export function powerPanel(workout = false) {
       cadUnit.textContent = a?.cad ? `${a.cad[0]}–${a.cad[1]} rpm` : 'rpm'
       cad.v.style.color = a?.cad ? `var(--${inCadBand(a.cad, s.cadence) ? 'ok' : 'warn'})` : ''
       hr.v.textContent = String(s.hr ?? '')
+      hr.v.style.color = s.hrColour ?? ''
       hr.el.classList.toggle('off', s.hr == null)
       if (!a) return
       cap.textContent = a.cap
@@ -89,8 +96,8 @@ export function powerPanel(workout = false) {
       tol.style.setProperty('--zc', colour)
       tol.style.setProperty('--fill', `${Math.min(1, a.fill ?? 1) * 100}%`)
       needle.style.left = `${(state?.pos ?? 0.5) * 100}%`
-      label2.textContent = t ? (lead ? 'Power' : 'Target') : (a.note ?? '')
-      second.el.hidden = !t
+      label2.textContent = a.note ?? (t ? (lead ? 'Power' : 'Target') : '')
+      second.el.hidden = !t || !!a.note
       second.v.textContent = String(lead ? watts : (t ?? ''))
       second.v.style.color = lead ? colour : ''
       delta.textContent = t ? tolText(s.power, t) : ''

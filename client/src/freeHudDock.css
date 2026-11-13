@@ -1,5 +1,5 @@
 /* Free-ride HUD, bottom half: the gradient chip, climb panel and gear chip in the shared dock (rideHudDock.css),
-   the overlay and the free ride's own phone rules. */
+   and the free ride's own phone rules. */
 .fhud .grade {
   padding: calc(0.5 * var(--u)) calc(1.6 * var(--u));
   font: 400 calc(4 * var(--u)) / 1.15 var(--display);
@@ -57,19 +57,6 @@
 .fhud .gear small {
   font-size: 0.55em;
   margin-left: 0;
-}
-/* Pause and end-ride messages sit over everything; only the dialog takes clicks */
-.fr3d > .overlay {
-  position: fixed;
-  z-index: 3;
-  border-radius: 0;
-  background: rgba(17, 18, 20, 0.35);
-  backdrop-filter: none;
-  pointer-events: none;
-}
-.fr3d > .overlay.dialog {
-  background: rgba(17, 18, 20, 0.7);
-  pointer-events: auto;
 }
 
 /* Phone landscape (the same height as CFG.hud.phoneMaxH): fewer totals, a slim climb strip */

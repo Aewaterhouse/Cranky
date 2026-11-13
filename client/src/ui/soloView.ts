@@ -1,13 +1,21 @@
-import { mediaCorner } from './soloMedia'
+import '../rideHud.css'
+import '../rideHudDock.css'
+import '../rideHudAim.css'
+import '../soloHud.css'
 import { CFG } from '../config'
 import { hrZone } from '../core/curve'
+import { effortSummary, isRest, nextText } from '../core/hud'
+import type { BlockStat } from '../core/ride'
 import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
-import { inCadBand } from '../modes/drill/cadence'
-import { fmt, h } from './dom'
+import { clock, fmt, h } from './dom'
+import { hudToast } from './hudParts'
+import { powerPanel, type Aim } from './hudPower'
 import { ZONE_COLOURS } from './planGraph'
 import { soloActions, type SoloAction } from './soloExtras'
-import { modeSwitch, modeText, type ModeState, type RideMode } from './soloMode'
+import { mediaCorner } from './soloMedia'
+import { soloMenu } from './soloMenu'
+import { modeText, type ModeState, type RideMode } from './soloMode'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
@@ -21,6 +29,8 @@ export interface SoloHandlers {
   mode: (k: RideMode) => void
   nudge: (dir: number) => void
 }
+/** HUD parts that can be switched on and off (the interval list sits where the other modes list riders). */
+export type SoloPart = 'clean' | 'stats' | 'riders'
 
 export interface ViewState {
   fast: number
@@ -37,134 +47,53 @@ export interface ViewState {
   actions: SoloAction[]
   cadPct: (number | null)[]
   mode: ModeState
+  weightKg: number
+  /** 3, 2, 1 before the interval changes; 0 otherwise. */
+  count: number
 }
 
-const TIERS: Tier[] = ['hard', 'medium', 'easy']
-const BAND = 0.05
-const SPAN = 0.3
+/** What the power panel says for this moment of the workout. A sprint or a free block never has a target. */
+export function soloAim(f: Frame, mode: ModeState): Aim {
+  const erg = mode.kind === 'erg'
+  if (f.type === 'sprint') return { cap: 'Sprint', chip: 'ERG off', note: 'All out', cad: f.cad }
+  if (f.tgt == null) return { cap: 'Power · 3 s', chip: 'ERG off', note: 'Free ride', cad: f.cad }
+  return erg
+    ? { cap: 'Target', chip: '🔒 ERG', target: f.tgt, targetLeads: true, cad: f.cad }
+    : {
+        cap: 'Power · 3 s',
+        chip: `aim ${f.tgt} W`,
+        target: f.tgt,
+        note: modeText(mode),
+        cad: f.cad,
+      }
+}
 
-/** Solo workout player layout: header controls, big numbers, band gauge, charts, interval list and overlays. */
+/**
+ * Solo workout player, laid out like the other ride screens: power (the target, in a workout) top left, the
+ * interval clock top centre, the interval list on the right edge, the whole workout as a strip along the
+ * bottom, and the close-up chart where the other modes have the road.
+ */
 export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, maxHr?: number) {
-  const num = (label: string, cls = '') => {
-    const v = h('b', {}, '–')
-    return { v, el: h('div', { class: `sbig ${cls}` }, h('span', {}, label), v) }
-  }
-  const tgt = num('Target')
-  const pow = num('Power · 3 s')
-  const cad = num('Cadence')
-  const hr = num('HR')
-  const left = num('Interval left', 'clock')
-  const unit = (n: { el: HTMLElement }, u: string) => n.el.append(h('small', {}, u))
-  unit(tgt, 'W')
-  unit(pow, 'W')
-  unit(cad, 'rpm')
-  const cadUnit = cad.el.lastElementChild!
-  unit(hr, 'bpm')
+  const power = powerPanel(true)
   const blockName = h('div', { class: 'blockname' })
-  const next = h('div', { class: 'next' })
-  left.el.append(next)
-  left.el.prepend(blockName)
-
-  const needle = h('i', { class: 'needle' })
-  const dev = h('span', { class: 'dev' })
-  const gauge = h(
-    'div',
-    { class: 'gauge' },
-    h('div', {
-      class: 'band',
-      style: `left:${50 - (BAND / SPAN / 2) * 100}%;width:${(BAND / SPAN) * 100}%`,
-    }),
-    needle,
-    h('span', { class: 'gl' }, `-${SPAN * 100}%`),
-    h('span', { class: 'gc' }, 'on target'),
-    h('span', { class: 'gr' }, `+${SPAN * 100}%`),
-  )
-
-  const main = workoutChart(ftp)
+  const left = h('b', {}, '–')
+  const elapsed = h('span', {})
+  const togo = h('span', {})
+  const cueEl = h('div', { class: 'cue-line' })
+  const next = h('div', { class: 'glass nchip off' })
+  const count = h('div', { class: 'count off' })
+  const summary = h('div', { class: 'glass summary off' })
+  const strip = workoutChart(ftp, 0, true)
   const zoom = workoutChart(ftp, 60)
-  let showCad = false
-  let showHr = false
-  let ghost: number[] | null = null
-  const toggle = (label: string, on: (v: boolean) => void) => {
-    let v = false
-    const b = h(
-      'button',
-      { class: 'ghost', onclick: () => (on((v = !v)), b.classList.toggle('cad-on', v)) },
-      label,
-    )
-    return b
-  }
-  const cadBtn = toggle('Cadence line', (v) => (showCad = v))
-  const hrBtn = toggle('HR line', (v) => (showHr = v))
-  const pauseBtn = h('button', { onclick: on.pause })
-  const intens = h('b', { class: 'pct' }, '100%')
-  const tierSel = h(
-    'select',
-    {
-      onchange: (e: Event) => on.tier((e.target as HTMLSelectElement).value as Tier),
-      title: 'Tier',
-    },
-    ...TIERS.map((t) => h('option', { value: t }, t)),
-  )
-  tierSel.value = tier
+  const toast = hudToast()
   const ov = h('div', { class: 'overlay' })
-  const cueEl = h('div', { class: 'cue' })
-  let cueTimer: ReturnType<typeof setTimeout> | undefined
-  const panel = soloPanel(plan, () => tierSel.value as Tier, ftp)
-  const acts = soloActions()
-  const modes = modeSwitch({ set: on.mode, nudge: on.nudge })
-  const tgtLabel = tgt.el.firstElementChild as HTMLElement
-  const kbd = (t: string) => h('kbd', {}, t)
-
   const media = mediaCorner()
-  const root = h(
-    'div',
-    { class: `erg${plan.test ? ' testing' : ''}` },
-    h(
-      'header',
-      { class: 'solo-head' },
-      h('h1', {}, plan.name),
-      modes.root,
-      h('label', { class: 'field' }, 'Tier', tierSel),
-      h(
-        'div',
-        { class: 'field' },
-        'Intensity',
-        h(
-          'div',
-          { class: 'stepper' },
-          h('button', { onclick: () => on.intensity(-0.01), title: 'Intensity down (-)' }, '−'),
-          intens,
-          h('button', { onclick: () => on.intensity(0.01), title: 'Intensity up (+)' }, '+'),
-        ),
-      ),
-      h(
-        'div',
-        { class: 'ctl' },
-        cadBtn,
-        hrBtn,
-        media.button,
-        pauseBtn,
-        h('button', { onclick: on.skip, title: 'Skip interval (→ or N)' }, 'Skip ', kbd('N')),
-        h('button', { class: 'danger', onclick: () => confirmEnd() }, 'End ride'),
-      ),
-      acts.root,
-    ),
-    h(
-      'section',
-      { class: 'solo-main' },
-      h('div', { class: 'bigrow' }, tgt.el, pow.el, cad.el, hr.el, left.el),
-      h('div', { class: 'gwrap' }, gauge, dev),
-      h('div', { class: 'chartbox main' }, main.el, ov, cueEl),
-      h(
-        'div',
-        { class: 'chartbox zoom' },
-        h('span', { class: 'ctag' }, 'Current interval ±60 s'),
-        zoom.el,
-      ),
-    ),
-    panel.root,
-  )
+  const acts = soloActions()
+  let ghost: number[] | null = null
+  let cueTimer = 0
+  let cueNew = false
+  let cueI = -1
+  let sumTimer = 0
 
   let dialog = false
   let key = ''
@@ -174,29 +103,92 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     ov.className = `overlay${html ? ` open ${cls}` : ''}`
     if (html) ov.replaceChildren(...html)
   }
-  const confirmEnd = () =>
+  const dlg = (title: string, lines: string[], ...buttons: Node[]) =>
     say(
       [
         h(
           'div',
           { class: 'dlg' },
-          h('h2', {}, 'End ride?'),
-          h('p', { class: 'dim' }, 'Your ride so far will be saved.'),
-          h(
-            'div',
-            { class: 'row' },
-            h('button', { onclick: () => say(null) }, 'Keep riding'),
-            h('button', { class: 'primary', onclick: on.end }, 'End ride'),
-          ),
+          h('h2', {}, title),
+          ...lines.map((l) => h('p', { class: 'dim' }, l)),
+          h('div', { class: 'row' }, ...buttons),
         ),
       ],
       'dialog',
     )
+  const confirmEnd = () =>
+    dlg(
+      'End ride?',
+      ['Your ride so far will be saved.'],
+      h('button', { onclick: () => say(null) }, 'Keep riding'),
+      h('button', { class: 'primary', onclick: on.end }, 'End ride'),
+    )
+  const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
+  const toggle = (part: SoloPart) => root.classList.toggle(`hud-${part}`)
+  const c = soloMenu(plan, tier, on, {
+    toggle,
+    confirmEnd,
+    media: () => (media.panel.hidden = !media.panel.hidden),
+  })
+  const panel = soloPanel(plan, c.tier, ftp)
+  const stage = h(
+    'div',
+    { class: 'solo-stage', onclick: () => root.classList.remove('hud-clean') },
+    h('span', { class: 'ctag' }, 'Current interval ±60 s'),
+    zoom.el,
+  )
+  const root: HTMLElement = h(
+    'div',
+    { class: `solo-ride rh${plan.test ? ' testing' : ''}${phone ? '' : ' hud-riders'}` },
+    stage,
+    h(
+      'div',
+      { class: 'rhud shud' },
+      h('div', { class: 'hud-tl' }, power.el, panel.drawer),
+      h(
+        'div',
+        { class: 'hud-tc' },
+        h(
+          'div',
+          { class: 'glass speed' },
+          blockName,
+          h('span', { class: 'hv spd clock' }, left),
+          h('div', { class: 'totals' }, elapsed, togo),
+          cueEl,
+        ),
+        next,
+        count,
+      ),
+      h('div', { class: 'hud-tr' }, summary, panel.list),
+      h(
+        'div',
+        { class: 'hud-bot' },
+        h(
+          'div',
+          { class: 'dock' },
+          h(
+            'div',
+            { class: 'dock-l' },
+            c.menu.el,
+            c.menu.button,
+            h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats'),
+            acts.root,
+          ),
+          h('div', { class: 'dock-r' }, c.modes.step, c.intens.el),
+        ),
+        h('div', { class: 'glass strip' }, strip.el),
+      ),
+    ),
+    toast.el,
+    ov,
+    media.panel,
+  )
 
-  root.append(media.panel)
   return {
     root,
     panel,
+    toggle,
+    toast: toast.show,
     /** Big centred message over the chart: countdown digit, sprint prompt, pause notice or grade splash. */
     overlay(big: string | null, sub = '', cls = '') {
       if (dialog || key === `${big}|${sub}|${cls}`) return
@@ -210,103 +202,91 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       key = k
     },
     confirmEnd,
-    /** Non-blocking coach banner, gone after CFG.cueS seconds. */
+    /** The coach's line under the clock: bright for CFG.cueS seconds, then quiet until the interval ends. */
     cue(text: string) {
       clearTimeout(cueTimer)
       cueEl.textContent = text
       cueEl.classList.add('show')
-      cueTimer = setTimeout(() => cueEl.classList.remove('show'), CFG.cueS * 1000)
+      cueNew = true
+      cueTimer = window.setTimeout(() => cueEl.classList.remove('show'), CFG.cueS * 1000)
+    },
+    /** How the effort just finished went, top right for a few seconds. */
+    summary(b: BlockStat, cadPct?: number | null) {
+      const s = effortSummary(b)
+      const row = (label: string, v: string) => h('div', {}, h('span', {}, label), h('b', {}, v))
+      summary.replaceChildren(
+        h('h3', {}, b.label),
+        row('Average', `${s.avg} W`),
+        row('Off target', `${s.off > 0 ? '+' : s.off < 0 ? '−' : ''}${Math.abs(s.off)} W`),
+        row('In band', `${Math.round(s.inBand * 100)}%`),
+        ...(cadPct == null ? [] : [row('Cadence in band', `${Math.round(cadPct * 100)}%`)]),
+      )
+      summary.classList.remove('off')
+      clearTimeout(sumTimer)
+      sumTimer = window.setTimeout(() => summary.classList.add('off'), CFG.hud.summaryS * 1000)
     },
     /** Modal question over the chart; resolves with the index of the button pressed. */
     prompt(title: string, lines: string[], buttons: string[]) {
       return new Promise<number>((res) =>
-        say(
-          [
-            h(
-              'div',
-              { class: 'dlg' },
-              h('h2', {}, title),
-              ...lines.map((l) => h('p', { class: 'dim' }, l)),
-              h(
-                'div',
-                { class: 'row' },
-                ...buttons.map((b, n) =>
-                  h('button', { class: n === 0 ? 'primary' : '', onclick: () => res(n) }, b),
-                ),
-              ),
-            ),
-          ],
-          'dialog',
+        dlg(
+          title,
+          lines,
+          ...buttons.map((b, n) =>
+            h('button', { class: n === 0 ? 'primary' : '', onclick: () => res(n) }, b),
+          ),
         ),
       )
     },
     /** Shows an earlier attempt behind the live trace. */
     setGhost(g: number[] | null) {
       ghost = g
-      if (g)
-        media.button.before(h('span', { class: 'dim ghost-note' }, 'Dashed blue: last attempt'))
+      if (g) panel.note('Dashed blue on the charts: your last attempt')
     },
     frame(s: ViewState) {
       const { f, live } = s
       acts.set(s.actions)
-      modes.set(s.mode)
-      const noErg = s.mode.kind !== 'erg'
-      root.classList.toggle('noerg', noErg)
-      tgtLabel.textContent = noErg ? 'Aim for · ERG off' : 'Target'
-      tgtLabel.title = noErg
-        ? `${modeText(s.mode)}. You set the effort; the plan is only scored.`
-        : ''
-      const t = f.tgt
-      tgt.v.textContent = t == null ? (f.type === 'sprint' ? 'ALL OUT' : 'FREE') : String(t)
-      tgt.el.classList.toggle('word', t == null)
-      pow.v.textContent = String(Math.round(f.type === 'sprint' ? live.power : live.avg))
-      cad.v.textContent = String(Math.round(live.cadence))
-      cadUnit.textContent = f.cad ? `${f.cad[0]}–${f.cad[1]} rpm` : 'rpm'
-      cad.v.style.color = f.cad
-        ? inCadBand(f.cad, live.cadence)
-          ? 'var(--tox)'
-          : 'var(--acc)'
-        : ''
-      panel.cadence(s.cadPct)
-      hr.v.textContent = live.hr ? String(live.hr) : '–'
-      hr.v.style.color = live.hr && maxHr ? (ZONE_COLOURS[hrZone(live.hr, maxHr)] ?? '') : ''
-      left.v.textContent = fmt(f.dur - f.bel)
-      blockName.textContent = f.label
-      next.textContent = f.next
-        ? `Next: ${f.next.label}${f.next.tgt ? ` @ ${f.next.tgt} W` : ''} in ${fmt(f.next.in)}`
-        : 'Last interval'
-      intens.textContent = `${Math.round(s.intensity * 100)}%`
-      pauseBtn.replaceChildren(s.paused ? 'Resume ' : 'Pause ', kbd('Space'))
+      c.modes.set(s.mode)
+      root.classList.toggle('noerg', s.mode.kind !== 'erg')
       root.classList.toggle('paused', !!s.paused)
-      // gauge: needle position and colour from deviation against the target
-      const d = t ? (live.avg - t) / t : 0
-      gauge.classList.toggle('off', !t)
-      needle.style.left = `${50 + (Math.max(-SPAN, Math.min(SPAN, d)) / SPAN) * 50}%`
-      const a = Math.abs(d)
-      needle.style.background = a <= BAND ? 'var(--tox)' : a <= 0.1 ? 'var(--acc)' : 'var(--bad)'
-      pow.v.style.color = !t
-        ? ''
-        : a <= BAND
-          ? 'var(--tox)'
-          : a <= 0.1
-            ? 'var(--acc)'
-            : 'var(--bad)'
-      dev.textContent = t ? `${live.avg - t >= 0 ? '+' : ''}${Math.round(live.avg - t)} W` : ''
-      const segs = segsFromBlocks(plan.blocks, tierSel.value as Tier, ftp, s.intensity)
+      power.set({
+        power: f.type === 'sprint' ? live.power : live.avg,
+        ftp,
+        weightKg: s.weightKg,
+        cadence: live.cadence,
+        hr: live.hr,
+        hrColour: live.hr && maxHr ? ZONE_COLOURS[hrZone(live.hr, maxHr)] : undefined,
+        aim: soloAim(f, s.mode),
+      })
+      panel.cadence(s.cadPct)
+      blockName.textContent = `${f.label} · ${f.i + 1} of ${plan.blocks.length}`
+      left.textContent = fmt(f.dur - f.bel)
+      elapsed.textContent = `${clock(s.stats.elapsed)} gone`
+      togo.textContent = `${clock(s.stats.remaining)} to go`
+      // The coach's line belongs to the interval it was said in.
+      if (cueNew) cueI = f.i
+      else if (f.i !== cueI) cueEl.textContent = ''
+      cueNew = false
+      const soon = f.next && f.next.in / s.fast <= CFG.hud.nextS
+      next.classList.toggle('off', !f.next || !(soon || isRest(f.type, f.tgt, ftp)))
+      if (f.next) next.textContent = nextText(f.next, plan.blocks[f.i + 1]?.dur ?? 0)
+      count.classList.toggle('off', !s.count)
+      if (s.count) count.textContent = String(s.count)
+      c.intens.val.textContent = `${Math.round(s.intensity * 100)}%`
+      c.paused(!!s.paused)
       const data = {
         gap: s.fast * 3 + 3,
-        segs,
+        segs: segsFromBlocks(plan.blocks, c.tier(), ftp, s.intensity),
         total: s.total,
         power: s.power,
         xs: s.xs,
         cadence: s.cadence,
         hr: s.hr,
         now: f.el,
-        showCadence: showCad,
-        showHr,
+        showCadence: c.lines.cadence,
+        showHr: c.lines.hr,
         ghost,
       }
-      main.set(data)
+      strip.set(data)
       zoom.set(data)
       panel.frame(f.i, s.intensity)
       panel.stats(s.stats)
