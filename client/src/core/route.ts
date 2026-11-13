@@ -15,6 +15,8 @@ export interface Route {
   name: string
   desc?: string
   country?: string
+  /** Australian state code for bundled routes. */
+  region?: string
   /** Hand-built from published gradients rather than a recorded track. */
   approx?: boolean
   points: RoutePoint[]

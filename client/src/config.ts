@@ -89,5 +89,12 @@ export const CFG = {
     maxGradePct: 20,
     maxStored: 4000,
     ftpFrac: 0.75,
+    library: {
+      /** Length filter bounds in km: short below `short`, long from `long`. */
+      lengthKm: { short: 25, long: 60 },
+      /** Climb in metres needed for difficulty 2 to 5; an average gradient of `steepPct` or more adds one. */
+      gainForLevel: [150, 400, 800, 1400],
+      steepPct: 6,
+    },
   },
 }

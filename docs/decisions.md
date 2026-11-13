@@ -254,3 +254,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Click in solo ERG mode: ±1% intensity; Resistance mode: ±1 level step (5%). Zombie Bus, FTP tests and the spectator view ignore it.
 - Chainring (20 to 60 teeth, default 34) is a per-device setting on the Settings screen.
 - Not confirmed from the references: whether every Click v1 firmware advertises the Zwift service UUID (we also filter on the name), and whether the trainer feels right with our physics. Needs a real Click and trainer.
+
+## 2026-11-13 Route library client (Phase A)
+
+- Bundled routes load through `core/routeLibrary.ts`: `content/routes/index.json` eagerly, `<id>.json` lazily. Packs go through the same `buildRoute` as GPX imports.
+- Card time estimate needs no pack: flat riding for the distance at 75% FTP (`rideSeconds`) plus climb work `gain x mass x 9.81 / power`. Descents are treated as free, so loops come out a little slow. Good enough for a card.
+- Difficulty 1 to 5: one level per climb threshold passed (150, 400, 800, 1400 m), plus one for an average gradient of 6% or more. Length filter: short under 25 km, long from 60 km. All in `CFG.freeRide.library`.
+- Choosing a card loads the pack and selects it; Start begins the ride as for an imported route. Bundled routes are not copied into localStorage. Load failures show a toast.
+- `content/routes/index.json` is `[]` until the generator lands; the Routes section then says "No bundled routes yet."
