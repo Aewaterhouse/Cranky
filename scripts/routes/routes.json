@@ -366,5 +366,111 @@
    "source": "https://www.lavelocita.cc/la-velocita-rides/melbourne-victoria-beach-road"
   },
   "notes": "One way from Beaconsfield Parade, St Kilda, along Beach Road to Mordialloc. La Velocita gives 46 km return (so 23 km); Bikemap gives about 22 km. Routed length 22.9 km. Gain not published (essentially flat, tens of metres), so gainM is null. Waypoints along Beach Road at Brighton, Sandringham, Black Rock, Beaumaris, Mentone, Parkdale, all snapped within 1 m. Nepean Highway runs parallel inland; vias are close enough to keep routing on Beach Road, but check geometry."
+ },
+ {
+  "id": "mondo",
+  "name": "Mondo",
+  "region": "QLD",
+  "blurb": "The Monday bunch: roll out from 99 Bikes in Ashgrove, do the rounds, and finish the hard way at the top of the Coot-tha front side. Coffee is not included.",
+  "gpx": "Mondo.gpx",
+  "cutKm": [
+   6.39,
+   35.36
+  ],
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "Cut from the meeting stop at 99 Bikes Ashgrove to the stop at the top of the front climb."
+ },
+ {
+  "id": "full-gas-friday",
+  "name": "Full Gas Friday",
+  "region": "QLD",
+  "blurb": "FGF. Starts at the Go Between Bridge, ends at South Bank, and the bit in the middle is exactly what it says on the tin.",
+  "gpx": "FGF.gpx",
+  "cutKm": [
+   9.58,
+   39.69
+  ],
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "Cut from the stop at the Go Between Bridge to the long stop at South Bank."
+ },
+ {
+  "id": "mount-coot-tha-back",
+  "name": "Mount Coot-tha Back",
+  "region": "QLD",
+  "blurb": "Coot-tha the other way round: straight up the steep back side from the bottom of Sir Samuel Griffith Drive, roll over the top past the towers and the lookout, then drop down the front. One lap is plenty. Most people do more.",
+  "gpx": "MountCoothaBacks.gpx",
+  "cutKm": [
+   12.3,
+   21.75
+  ],
+  "loop": true,
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "First of two laps in the recording; a loop, so laps can be chosen."
+ },
+ {
+  "id": "darren-smith",
+  "name": "Darren Smith Road Race",
+  "region": "QLD",
+  "blurb": "One lap of the Darren Smith road race circuit in the Scenic Rim: lumpy country roads, nowhere to hide, and a finish line that arrives later than you would like. Pick your number of laps.",
+  "gpx": "DarrenSmith.gpx",
+  "cutKm": [
+   26.33,
+   52.69
+  ],
+  "loop": true,
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "Middle lap of three, start/finish line to start/finish line."
+ },
+ {
+  "id": "metros-road-race",
+  "name": "Metros Road Race",
+  "region": "QLD",
+  "blurb": "One lap of the Metros road race course out past Peak Crossing: long open drags, a few sharp kicks, and wind that is always in your face somehow.",
+  "gpx": "MetrosRoadRace.gpx",
+  "cutKm": [
+   0.45,
+   31.67
+  ],
+  "loop": true,
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "First of two laps."
+ },
+ {
+  "id": "nundah-crit",
+  "name": "Nundah Crit Track",
+  "region": "QLD",
+  "blurb": "The Nundah criterium circuit: 1.2 km, a handful of corners, no hills and no excuses. Ride it until someone rings a bell.",
+  "gpx": "NundahCritTrack.gpx",
+  "cutKm": [
+   20.35,
+   21.56
+  ],
+  "loop": true,
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's ride recording, November 2026"
+  },
+  "notes": "One clean lap from the middle of the session."
  }
 ]

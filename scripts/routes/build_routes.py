@@ -8,24 +8,22 @@ A route whose length or climb is too far from its published figures is not writt
 unless --force is given. Network replies are cached in scripts/routes/.cache.
 """
 
-import hashlib
 import heapq
 import json
 import math
 import sys
-import time
-import urllib.parse
-import urllib.request
 from pathlib import Path
 
+import features
+import gpx
 import terrain
+from net import fetch
 
 HERE = Path(__file__).parent
-OUT = HERE.parent.parent / "content" / "routes"
-CACHE = HERE / ".cache"
+ROOT = HERE.parent.parent
+OUT = ROOT / "content" / "routes"
 OVERPASS = "https://overpass-api.de/api/interpreter"
 ELEVATION = "https://api.opentopodata.org/v1/srtm30m"
-AGENT = "route-pack-builder"
 ROADS = "motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|road"
 PAD_DEG = 0.02
 SNAP_MAX_M = 300
@@ -39,6 +37,7 @@ ELE_BATCH = 100
 DIST_TOL = 0.05
 GAIN_TOL = 0.10
 PROFILE_N = 60
+GPX_SMOOTH_M = 100
 # SRTM is noisy on roads cut into hillsides, so heights are averaged along the road first.
 # 300 m removes most of it; wider windows are tried only when the climb is still over.
 SMOOTH_TRY_M = [300, 400, 600, 800]
@@ -52,29 +51,6 @@ def haversine(a: Point, b: Point) -> float:
     dp, dl = p2 - p1, math.radians(b[1] - a[1])
     h = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
     return 2 * 6371000 * math.asin(math.sqrt(h))
-
-
-def fetch(url: str, data: dict[str, str] | None = None, pause: float = 1.0) -> dict:
-    """Fetches JSON, caching the reply on disk and pausing after a real request."""
-    body = urllib.parse.urlencode(data).encode() if data else None
-    key = hashlib.sha1(url.encode() + (body or b"")).hexdigest()
-    hit = CACHE / f"{key}.json"
-    if hit.exists():
-        return json.loads(hit.read_text())
-    req = urllib.request.Request(url, data=body, headers={"User-Agent": AGENT})
-    for attempt in range(4):
-        try:
-            with urllib.request.urlopen(req, timeout=180) as r:
-                text = r.read().decode()
-            break
-        except OSError:
-            if attempt == 3:
-                raise
-            time.sleep(10 * (attempt + 1))
-    CACHE.mkdir(exist_ok=True)
-    hit.write_text(text)
-    time.sleep(pause)
-    return json.loads(text)
 
 
 def road_graph(waypoints: list[Point]) -> tuple[dict[int, Point], dict[int, list]]:
@@ -136,7 +112,7 @@ def drop_spurs(nodes: list[int], pos: dict[int, Point]) -> list[int]:
     return out
 
 
-def trace(waypoints: list[Point]) -> tuple[list[Point], float]:
+def trace(waypoints: list[Point]) -> tuple[list[Point], float, set[int]]:
     """Routes along roads through the waypoints; returns the line and the worst snap in metres."""
     pos, adj = road_graph(waypoints)
     snaps = [min(adj, key=lambda n: haversine(pos[n], w)) for w in waypoints]
@@ -145,8 +121,9 @@ def trace(waypoints: list[Point]) -> tuple[list[Point], float]:
     for a, b in zip(snaps, snaps[1:], strict=False):
         leg = shortest(adj, a, b)
         nodes += leg[1:] if nodes else leg
-    line = [pos[n] for n in drop_spurs(nodes, pos)]
-    return line, worst
+    nodes = drop_spurs(nodes, pos)
+    line = [pos[n] for n in nodes]
+    return line, worst, set(nodes)
 
 
 def resample(line: list[Point], step: float) -> list[Point]:
@@ -225,11 +202,9 @@ def stats(ele: list[float]) -> dict:
     }
 
 
-def build(spec: dict) -> tuple[dict, dict, list[str]]:
-    """Builds one pack; returns (pack, index entry, problems)."""
-    line, snap = trace([tuple(w) for w in spec["waypoints"]])
-    coarse = resample(line, ELE_STEP_M)
-    heights = elevations(coarse)
+def road_heights(line: list[Point]) -> tuple[list[Point], list[float]]:
+    """Returns the 10 m centreline of a traced road and its SRTM heights."""
+    heights = elevations(resample(line, ELE_STEP_M))
     fine = resample(line, SPACING_M)
     ratio = SPACING_M / ELE_STEP_M
     ele = []
@@ -237,8 +212,20 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
         x = min(i * ratio, len(heights) - 1)
         j = min(int(x), len(heights) - 2)
         ele.append(heights[j] + (heights[j + 1] - heights[j]) * (x - j))
+    return fine, ele
+
+
+def build(spec: dict) -> tuple[dict, dict, list[str]]:
+    """Builds one pack; returns (pack, index entry, problems)."""
+    if "gpx" in spec:
+        nodes, snap = None, 0.0
+        fine, ele = gpx.route(ROOT / spec["gpx"], *spec["cutKm"], spec.get("loop", False))
+    else:
+        line, snap, nodes = trace([tuple(w) for w in spec["waypoints"]])
+        fine, ele = road_heights(line)
     pub = spec["published"]
-    ele, window = calibrate(ele, pub["gainM"])
+    # A recorded ride's altimeter is far smoother than SRTM, so it needs only a light pass.
+    ele, window = (smooth(ele, GPX_SMOOTH_M), GPX_SMOOTH_M) if nodes is None else calibrate(ele, pub["gainM"])
     s = {**stats(ele), "smoothM": window}
     problems = []
     if snap > SNAP_MAX_M:
@@ -247,10 +234,16 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
         problems.append(f"length {s['km']} km vs published {pub['km']} km")
     if pub["gainM"] and abs(s["gainM"] - pub["gainM"]) > GAIN_TOL * pub["gainM"]:
         problems.append(f"climb {s['gainM']} m vs published {pub['gainM']} m")
-    head = {k: spec[k] for k in ("id", "name", "region", "blurb")}
+    head = {k: spec[k] for k in ("id", "name", "region", "blurb", "loop") if k in spec}
     pts = [[round(la, 5), round(lo, 5), round(e, 1)] for (la, lo), e in zip(fine, ele, strict=False)]
     s.pop("smoothM")
-    pack = {**head, "published": pub, "pts": pts, "terrain": terrain.grid(fine)}
+    grid = terrain.grid(fine)
+    pack = {**head, "published": pub, "pts": pts, "terrain": grid}
+    try:
+        pack["features"] = features.build(fine, nodes, grid, fetch)
+    except OSError as err:
+        # The scene has defaults for a pack with no map features; rebuild later to add them.
+        print(f"     {spec['id']}: no map features yet ({err})")
     return pack, {**head, **s, "smoothM": window}, problems
 
 

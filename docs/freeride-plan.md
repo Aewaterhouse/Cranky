@@ -38,6 +38,9 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] First ten routes: Mount Coot-tha loop, Ben Lomond (Jacob's Ladder), Mount Buffalo, Falls Creek, Mount Hotham, Mount Wellington (kunanyi), Willunga Hill, Akuna Bay / West Head, Great Ocean Road (Lorne to Apollo Bay), Beach Road (Melbourne).
 - [x] Route picker: cards with a mini profile, distance, climb, difficulty, and an estimated time at your FTP; filter by state and length.
 - [x] Credits on the route screen and in `CREDITS.md`.
+- [x] Six routes from the owner's ride recordings: Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith and Metros road race laps, Nundah crit track.
+- [ ] Lap routes: choose a number of laps (or ride until you stop) for the loop courses.
+- [ ] Backfill map features for the routes the map server refused (see `docs/decisions.md`).
 
 ### Phase B: 3D road world (L) — built 2026-11-13, seen only in software-rendered screenshots
 - [x] Road curve, banking and chunk streaming from a pack.
