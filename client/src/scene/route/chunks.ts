@@ -5,13 +5,17 @@ import { VC } from '../util'
 import { dropBuildingGeos } from './buildingGeo'
 import { buildBuildings, buildPlants } from './chunkProps'
 import type { Features } from './features'
+import { buildChalk, buildFunSigns } from './funSignGeo'
+import type { Chalk, FunSign } from './funSigns'
 import type { Furn } from './furniture'
 import { buildFurniture, buildRails, dropFurnitureGeos } from './furnitureGeo'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
 import { buildLandmarks, dropLandmarkGeos } from './landmarkGeo'
 import type { Landmark } from './landmarkPlan'
-import { Patch } from './patch'
+import { buildOddities, dropOddGeos } from './oddGeo'
+import type { Oddities } from './oddPlan'
+import { Patch, drawnHeight } from './patch'
 import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
 import { newPose } from './roadPath'
@@ -23,6 +27,7 @@ import { buildTerrain } from './terrainGeo'
 const R = VIS.route
 const P = R.place
 const pose = newPose()
+const NONE: Patch[] = []
 /** Water catches the sun; streets lie on the ground and win the depth test against it by a growing margin. */
 const WATER = new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true })
 const STREET = new THREE.MeshLambertMaterial({
@@ -39,6 +44,9 @@ export interface Place {
   signs: Signs
   furniture: Map<number, Furn[]>
   landmarks: Map<number, Landmark[]>
+  odd: Oddities
+  funSigns: Map<number, FunSign[]>
+  chalk: Map<number, Chalk[]>
 }
 
 /** Builds road, terrain and what stands on it a chunk at a time around the rider and throws away what falls behind. */
@@ -47,6 +55,7 @@ export class Chunks {
   /** Milliseconds the last chunk took to build, for the harness. */
   lastMs = 0
   private live = new Map<number, THREE.Group>()
+  private patches = new Map<number, Patch[]>()
   private at = NaN
   private pending = true
   private span = 0
@@ -55,6 +64,13 @@ export class Chunks {
 
   get count() {
     return this.live.size
+  }
+
+  /** Height of the ground as drawn under (x, z), for things that move about on it. */
+  height = (x: number, z: number) => {
+    const { field } = this.place
+    const k = field.fine.nearest(x, z, 100) < Infinity ? Math.floor(field.fine.at / R.chunk) : -9
+    return drawnHeight(field, this.patches.get(k) ?? NONE, x, z)
   }
 
   /** Call every frame with the rider's distance. Builds at most one chunk per call, nearest first, unless `all`. */
@@ -93,7 +109,7 @@ export class Chunks {
   private build(k: number, level: Level) {
     const far = level !== 'potato'
     const t0 = performance.now()
-    const { field, cover, features, signs, furniture, landmarks } = this.place
+    const { field, cover, features, signs, furniture, landmarks, odd } = this.place
     const d0 = k * R.chunk
     const d1 = d0 + R.chunk
     field.path.poseAt(d0, pose)
@@ -107,12 +123,20 @@ export class Chunks {
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)
     if (cf) for (const m of buildStreets(cf, field, patches, strips, solid, signs)) g.add(m)
-    const spots = scatter(k, patches, cover, features, P.detail[level], P.reach[level])
+    const odds = odd.chunk(k).filter((o) => o.rank < P.fun.odd.share[level])
+    // Nothing grows through the couch.
+    const spots = scatter(k, patches, cover, features, P.detail[level], P.reach[level]).filter(
+      (s) => !odds.some((o) => Math.hypot(o.x - s.x, o.z - s.z) < o.r + P.fun.odd.plantClear),
+    )
     for (const m of buildPlants(spots, solid)) g.add(m)
     if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
     for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
+    for (const m of buildOddities(odds, field, patches, solid, signs)) g.add(m)
+    const { funSigns, chalk } = this.place
+    for (const m of buildFunSigns(funSigns.get(k) ?? [], field, patches, solid, signs)) g.add(m)
+    for (const m of buildChalk(chalk.get(k) ?? [], field.path, solid, signs)) g.add(m)
     WATER.color.set(R.waterTint)
     WATER.specular.set(R.waterGlint)
     WATER.shininess = R.waterShine
@@ -130,6 +154,7 @@ export class Chunks {
     }
     this.group.add(g)
     this.live.set(k, g)
+    this.patches.set(k, patches)
     this.lastMs = performance.now() - t0
   }
 
@@ -143,6 +168,7 @@ export class Chunks {
     this.place.signs.release(g)
     this.group.remove(g)
     this.live.delete(k)
+    this.patches.delete(k)
   }
 
   /** Drops every chunk so the next update rebuilds with the current visual settings. */
@@ -153,5 +179,6 @@ export class Chunks {
     dropBuildingGeos()
     dropFurnitureGeos()
     dropLandmarkGeos()
+    dropOddGeos()
   }
 }

@@ -63,9 +63,9 @@ The fun is in the riding, but the information has to be as good as the establish
 - [x] Trees and scrub where the map says bush; low-poly houses and shops from building outlines. (Buildings seen only with made-up fixture data.)
 - [x] Road furniture: kilometre markers, gradient signs, numbered hairpins, guard rails on the drop side, edge posts on bends, start, summit and finish arches.
 - [x] Landmarks from map points (trig points and cairns on peaks, lookout platforms, lattice TV towers, kiosks) and inferred ski villages and bathing boxes. Hand-placed specials per route are still to do.
-- [ ] More stuff (owner, 2026-11-13: "funny comments, weird things on the side of the road, it's all great"): roadside oddities (big things, a couch on the nature strip, a ute on blocks, a lost shopping trolley, honesty-box fruit stalls, letterboxes made of microwaves), hand-painted and council signs with dry one-liners, chalk messages on the climbs, and announcer or toast quips tied to where you are and how you are riding.
-- [ ] Life: kangaroos, cockatoos, a swooping magpie in spring, the odd ute and caravan on the other side of the road.
-- [ ] Time of day and weather moods per ride (dawn, midday, golden hour, mist on the high routes).
+- [x] More stuff (owner, 2026-11-13: "funny comments, weird things on the side of the road, it's all great"): roadside oddities (big things, a couch on the nature strip, a ute on blocks, a lost shopping trolley, honesty-box fruit stalls, letterboxes made of microwaves), hand-painted and council signs with dry one-liners, chalk messages on the climbs, and announcer or toast quips tied to where you are and how you are riding.
+- [x] Life: kangaroos, cockatoos, a swooping magpie in spring, the odd ute and caravan on the other side of the road.
+- [x] Time of day and weather moods per ride (dawn, midday, golden hour, mist on the high routes).
 
 ### Phase D: the feel (M)
 - [ ] Physics: momentum through dips, corner speed limits and braking on descents, optional headwind.

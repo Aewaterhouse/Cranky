@@ -36,7 +36,8 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map and Click mapping; `modes/drill/slope.ts` slope mode gradient sender with gears.
-- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow.
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
+- `fun/signLines.ts`, `fun/chalkLines.ts`, `fun/quipLines.ts` the words for roadside signs, road chalk and the commentator, each tagged with when it applies.
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD); `spectate.ts` TV spectator view (`watch`, no trainer).
@@ -58,6 +59,10 @@
 - `landCover.ts` land cover at a spot from the pack grid or guessed from height (no three.js); `patch.ts` one side's terrain vertices for a chunk, clipped where another stretch of road is nearer, and the drawn height under any spot (no three.js); `features.ts` side streets, junction signs, buildings and points of interest shared out to chunks, and "is a street or building here" (no three.js).
 - `scatter.ts` which plants grow where in a chunk, seeded, never on roads, streets, buildings or water (no three.js); `plantGeo.ts` gum, scribbly gum, snow gum, tree fern, tea-tree, shrub, tussock and boulder geometry; `buildingGeo.ts` wall and roof geometry for houses, shops, the pub and the servo; `chunkProps.ts` turns plants and buildings into instanced meshes for a chunk; `placeVis.ts` tunables for all of it (`VIS.route.place`).
 - `furniture.ts` where the signs, arches and guard rails go: ramp and hairpin detection, kilometre markers, summit (no three.js); `furnitureGeo.ts` builds them (arch, sign plates, rails and edge posts into the chunk mesh).
+- `funVis.ts` tunables for the jokes (`VIS.route.place.fun`): oddities, funny signs, chalk, wildlife; `oddPlan.ts` which roadside oddity stands where, seeded by route id, chunk by chunk (no three.js); `oddGeoHome.ts` / `oddGeoBush.ts` their geometry; `oddGeo.ts` builds a chunk's oddities and their boards.
+- `funSigns.ts` where the funny signs and the chalk go and what they say (no three.js); `funSignGeo.ts` builds the boards and lays the chalk on the road.
+- `lifePlan.ts` which mob, flock, crossing animal, magpie or oncoming vehicle is where, seeded, chunk by chunk (no three.js); `lifeGeo.ts` animal and vehicle shapes; `life.ts` pooled instanced animals and traffic and how they move each frame.
+- `routeMoods.ts` the free ride's skies (dawn, golden hour, dusk, mist, shower), their tunables and `pickMood` (clock, height, showers; no three.js); `rain.ts` the shower's streaks.
 - `roadGeo.ts` road ribbon triangles, the `Tris` builder, `addBox` and `addBeam`; `terrainGeo.ts` terrain mesh from a patch, coloured by land cover, with water sheets; `streetGeo.ts` side street strips and street-name signs; `signs.ts` shared text plates; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
 - `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 

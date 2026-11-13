@@ -1,4 +1,5 @@
 import { PLACE } from './route/placeVis'
+import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
 
 /** Tunable visual parameters, exposed in the debug panel (press ` or add ?debug). */
 export interface MoodDef {
@@ -154,6 +155,7 @@ export const VIS = {
     street: '#b7b1a3',
     mainStreet: '#96938c',
     place: PLACE,
+    mood: MOOD,
     signs: {
       post: '#8d949a',
       streetW: 2.6,
@@ -291,6 +293,7 @@ export const VIS = {
       stars: 0,
       fogFar: 1100,
     },
+    ...ROUTE_MOOD_DEFS,
   } as Record<string, MoodDef>,
 }
 export type Mood = keyof typeof VIS.moods

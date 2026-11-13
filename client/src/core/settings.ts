@@ -12,6 +12,8 @@ export interface Settings {
   colourBlind: boolean
   /** Spoken commentary during bus rides. */
   announcer: boolean
+  /** Dry remarks during free rides. */
+  quips: boolean
   /** Free ride as the 3D road world, or the flat charts-and-map layout. */
   freeRideView: '3d' | '2d'
   /** Chainring teeth on the bike on the trainer (with a 14T Zwift Cog), for virtual gears. */
@@ -25,6 +27,7 @@ const DEFAULTS: Settings = {
   hudScale: 0,
   colourBlind: false,
   announcer: true,
+  quips: true,
   freeRideView: '3d',
   chainring: CFG.gears.chainring,
 }
