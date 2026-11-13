@@ -63,4 +63,5 @@
 
 ## Hardware log
 - 2026-11-12: the owner confirmed Bluetooth pairing and ERG control on a real trainer, in Brave over localhost (SSH port forward). Brave needs `brave://flags/#brave-web-bluetooth-api` enabled.
+- 13/11/2026: Zwift Click v1 on firmware 1.1.0 paired and both buttons confirmed in Brave on macOS; gears confirmed shifting in free ride; feel still to be tuned on a real ride.
 - See `docs/roadmap.md` for the backlog.

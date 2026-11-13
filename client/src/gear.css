@@ -1,0 +1,45 @@
+.gsl {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.gsl input {
+  width: 160px;
+  accent-color: var(--acc);
+}
+.gsl .pct {
+  min-width: 52px;
+  font: 400 1.25rem var(--display);
+  color: var(--acc);
+}
+.geartile i {
+  font-style: normal;
+  font-size: 0.74rem;
+  color: var(--dim);
+  min-height: 1em;
+}
+.geartile.shift-up {
+  animation: gear-up 0.45s ease-out;
+}
+.geartile.shift-down {
+  animation: gear-down 0.45s ease-out;
+}
+@keyframes gear-up {
+  0% {
+    background: color-mix(in srgb, var(--bad) 45%, var(--card));
+    transform: translateY(-4px);
+  }
+}
+@keyframes gear-down {
+  0% {
+    background: color-mix(in srgb, var(--tox) 45%, var(--card));
+    transform: translateY(4px);
+  }
+}
+.erg.slope .bigrow {
+  grid-template-columns: 1fr 1.15fr 0.9fr 0.9fr 0.9fr 1.7fr;
+}
+.geartile[hidden],
+.field[hidden] {
+  display: none;
+}

@@ -1,9 +1,9 @@
-import { gearText } from '../core/gears'
 import { gradeColour, riderRows } from '../core/hud'
 import { ascentFrom } from '../core/route'
 import { clock, h } from './dom'
 import { profileChart } from './freeRideChart'
 import type { FreeLayout, FreeParts } from './freeRideView'
+import { gearTile, strengthSlider } from './gearTile'
 import { riderList } from './riderList'
 import { segBoard } from './segBoard'
 import { segPanel } from './segPanel'
@@ -55,8 +55,8 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
   const whole = profileChart(route)
   const next = profileChart(route, { behind: 100, ahead: 900 })
   const gv = h('b', {}, '0.0')
-  const gsub = h('small', {})
-  const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, gsub)
+  const gearT = gearTile()
+  const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, h('small', {}, '%'))
   const pauseBtn = h('button', { onclick: on.pause })
   // The same lap counter, segment panel, splits, top three and rider gaps (ghosts included) as the 3D HUD.
   const lap = h('div', { class: 'fs-lap' })
@@ -87,6 +87,7 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
         'Trainer difficulty',
         diff.el,
       ),
+      strengthSlider(),
       h(
         'div',
         { class: 'ctl' },
@@ -94,7 +95,7 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
         h('button', { class: 'danger', onclick: confirmEnd }, 'End ride'),
       ),
     ),
-    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, hr.el),
+    h('div', { class: 'frrow frtop' }, speed.el, pow.el, cad.el, gearT.el, hr.el),
     h(
       'section',
       { class: 'fr-mid' },
@@ -146,7 +147,7 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
       set(wkg, (l.avg / s.weightKg).toFixed(2))
       gv.textContent = s.grade.toFixed(1)
       gbox.style.setProperty('--g', gradeColour(s.grade))
-      gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
+      gearT.set(s.gear, s.trainerGrade)
       lap.hidden = !s.lap
       if (s.lap)
         lap.replaceChildren(

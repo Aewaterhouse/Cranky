@@ -117,12 +117,6 @@ export const leadM = (v: number) => Math.min(P.lead.maxM, Math.max(0, v) * P.lea
 export const headwind = (ms: number, from: number, fx: number, fz: number) =>
   ms * (fx * Math.sin(from) - fz * Math.cos(from))
 
-/** The gradient the trainer is told: the road's, scaled by the difficulty (0..1). Physics keeps the real one. */
-export function trainerGrade(gradePct: number, difficulty: number) {
-  const [lo, hi] = P.grade
-  return Math.min(hi, Math.max(lo, +(gradePct * difficulty).toFixed(1)))
-}
-
 /** Seconds to ride `points` (each with a gradient, `space` metres apart) at a steady `power`. */
 export function rideSeconds(grades: number[], space: number, power: number, mass: number) {
   return grades.reduce((t, g) => t + space / Math.max(0.5, steadySpeed(power, g, mass)), 0)

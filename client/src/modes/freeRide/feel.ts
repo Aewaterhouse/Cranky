@@ -1,6 +1,6 @@
 import { CFG } from '../../config'
 import { gearGrade } from '../../core/gears'
-import { headwind, leadM, speedLimit, trainerGrade } from '../../core/physics'
+import { headwind, leadM, speedLimit } from '../../core/physics'
 import { routeAt, type Route } from '../../core/route'
 import { hash } from '../../scene/math'
 import { seedOf } from '../../scene/route/oddPlan'
@@ -12,8 +12,8 @@ export type WindName = keyof typeof W.ms
 
 /**
  * The gradient (%) free ride hands to `ErgController.setGrade`: flat when paused, otherwise the road a second or
- * two of travel ahead (so the resistance arrives as the road tilts), scaled by the difficulty and adjusted for the
- * virtual gear. Always inside the free-ride range; never a power target.
+ * two of travel ahead (so the resistance arrives as the road tilts), scaled by the difficulty, plus the virtual
+ * gear's offset times the shift strength. Always inside the free-ride range; never a power target.
  */
 export function trainerTarget(
   route: Route,
@@ -25,10 +25,11 @@ export function trainerTarget(
   gear: number,
   mass: number,
   chainring?: number,
+  strength = 1,
 ) {
   if (paused) return 0
   const ahead = routeAt(route, Math.min(route.distance, dist + leadM(speed))).grade
-  return gearGrade(trainerGrade(ahead, difficulty), cadence, gear, mass, F.grade, chainring)
+  return gearGrade(ahead, cadence, gear, mass, F.grade, chainring, difficulty, strength)
 }
 
 /** True while the rider should be celebrating: just over the top of a real climb, or rolling up to the finish. */

@@ -150,6 +150,8 @@ export const CFG = {
     wheelM: 2.1,
     /** Below this cadence (rpm) the trainer just gets the road's gradient. */
     minCadence: 20,
+    /** Shift strength: multiplies the gear offset. Setting range and step. */
+    strength: { min: 0.5, max: 3, step: 0.1, start: 1 },
   },
   /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
   tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },

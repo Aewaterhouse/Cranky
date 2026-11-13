@@ -179,6 +179,7 @@ export function runFreeRide(
       gear,
       mass,
       settings.chainring,
+      settings.shiftStrength,
     )
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want

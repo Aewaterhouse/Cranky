@@ -75,7 +75,9 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 
 ## Zwift Click and virtual gears
 
-Free ride and solo Slope mode have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T).
+Free ride and solo Slope mode have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 100%; slider in Settings, in free ride and in Slope mode). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T).
+
+The Click needs firmware 1.1.0 or later: 1.0.0 ignores the RideOn handshake. Update it in Zwift Companion: More > Equipment > Zwift Click > Update Firmware. On 1.1.0 the handshake write with response fails, so the driver writes it without response; keep it that way.
 
 Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (optional)". Plus shifts up and minus shifts down in free ride and Slope mode. In ERG mode they change intensity by 1%, and in Resistance mode they step the level. Zombie Bus, FTP tests and the TV view ignore the Click. To check a Click without riding, open `/spike.html` and use "Pair Zwift Click"; every raw message is logged to the browser console as `[Click]`.
 

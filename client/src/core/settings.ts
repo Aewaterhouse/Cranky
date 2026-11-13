@@ -36,6 +36,8 @@ export interface Settings {
   mixRide: number
   mixAmbience: number
   mixVoice: number
+  /** Multiplies how much each virtual gear changes the trainer gradient (0.5 to 3). */
+  shiftStrength: number
 }
 
 const KEY = 'cranky.settings'
@@ -57,6 +59,7 @@ const DEFAULTS: Settings = {
   mixRide: 1,
   mixAmbience: 1,
   mixVoice: 1,
+  shiftStrength: CFG.gears.strength.start,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

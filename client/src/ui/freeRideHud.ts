@@ -10,6 +10,7 @@ import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
 import { riderList } from './riderList'
+import { strengthSlider } from './gearTile'
 import { hudMenu, hudStat as stat, hudVal as val } from './hudParts'
 import { powerPanel } from './hudPower'
 import { UNIT } from './units'
@@ -90,6 +91,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       'Trainer difficulty',
       diff.el,
     ),
+    strengthSlider(),
     m.grid(
       pauseBtn,
       item('End ride', 'Esc', confirmEnd, 'danger'),

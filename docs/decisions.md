@@ -674,3 +674,18 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - The free ride's own ☰ menu on a phone was left alone (the brief said not to change that screen); by its sizes it is probably a little taller than a 390 px screen. Not checked.
 - Narrow screens in HUD units (under 150 units wide, `CFG.hud.tightBelowU`: a phone, a 1024 px tablet, or Large and Huge on a 1280 px screen) give the solo player a slimmer interval list (no results column) and only the time to go under the clock. The coach's line narrows to what fits between the power panel and its mirror image on the right.
 - Not solved: Huge on a 1280x720 screen, or Large on a 1024 px tablet, still lets the clock panel touch the power panel or the interval list in the solo player. I hides the list. The bus fits at Large on 1280x720 but not on a 1024 px tablet (the clock panel runs into the power panel and the status block into the corner buttons); Huge was not looked at. Auto fits on all three screen sizes tried.
+## Virtual gears: offset and shift strength (13/11/2026)
+- The gear effect is now an offset worked out from the real road gradient: `gearOffset` = gear-matched gradient − road. The trainer gets road × difficulty + offset × shift strength, clamped to the mode's range. At 100% difficulty and 100% strength this equals the first gear model exactly (tested against its outputs).
+- Why: before, the gear maths ran on the difficulty-scaled road, so at low difficulty a gear felt different on the same hill. Now difficulty only softens the hill and each gear always moves the trainer by the same amount.
+- Solo Slope mode has no difficulty, so it uses 100%.
+- Shift strength: 50 to 300% in 10% steps, default 100%, one per-device setting (Settings, free ride header, Slope mode header) read on every trainer update. It exists because the trainer's own sim model differs from ours, so a real ride may need gears to bite harder.
+- Below 20 rpm the offset is 0, so the trainer gets road × difficulty.
+- The gear is shown as a big tile with the gradient actually sent to the trainer; it flashes red and nudges up on a harder gear, green and down on an easier one. The small gear text in the gradient box and the Slope stepper is gone, and the gradient box no longer repeats the trainer gradient.
+- `trainerGrade` in `core/physics.ts` and `gearText` had no callers left and were deleted; their difficulty test now runs through `gearGrade` at zero cadence.
+- Hardware: Click v1 firmware 1.1.0 works; 1.0.0 ignores RideOn. On 1.1.0 a handshake write with response fails, so the driver keeps writing without response.
+
+## Merging the virtual-gear changes with the free-ride work (2026-11-14)
+- Luke's "shift strength, gear effect independent of difficulty, big gear tile" commit landed on GitHub while free ride was being rebuilt, and was merged by hand. His gear maths is kept as written: the trainer gets road × difficulty plus the gear offset × shift strength, and `trainerGrade` is gone from `physics.ts`.
+- The free-ride look-ahead still applies: the road gradient fed into that sum is the one a second or two up the road (`trainerTarget` in `modes/freeRide/feel.ts`).
+- His gear tile and shift-strength slider were written for the old tile layout. They now sit in the 2D free-ride layout (tile in the top row, slider beside trainer difficulty), the 3D HUD's menu (slider; the HUD already has a gear chip) and the solo player's mode switch for Slope mode. Settings has the slider too. None of these placements has been looked at in a browser.
+- `gearText` is kept for the solo mode switch's read-out.

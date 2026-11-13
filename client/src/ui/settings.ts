@@ -2,6 +2,7 @@ import { gradeColour } from '../core/hud'
 import { saveSettings, settings, type Settings } from '../core/settings'
 import { SFX } from './audio'
 import { h, seg } from './dom'
+import { strengthSlider } from './gearTile'
 import { hudSizeSeg } from './hudSize'
 import { ZONE_COLOURS } from './planGraph'
 
@@ -190,6 +191,11 @@ export function settingsTab() {
         'Chainring (teeth)',
         'The front ring on the bike on your trainer, with a 14T Zwift Cog. Virtual gears use it.',
         ring,
+      ),
+      row(
+        'Shift strength',
+        'How much each virtual gear changes the trainer gradient. 100% matches a real gear.',
+        strengthSlider(),
       ),
       row(
         'Zone and gradient colours',
