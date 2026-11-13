@@ -26,6 +26,7 @@
 - HUD research (`docs/hud-notes.md`).
 - Free ride: roadside oddities, funny signs and chalk, wildlife, traffic, location-aware quips, time of day and weather; the HUD redesign from `docs/hud-notes.md`; six routes from the owner's rides; lap rides on loop courses.
 - Free ride Phase D: bend speed limits, optional wind, trainer gradient look-ahead, camera extras with a calm setting, rider poses, synthesised ride and place sounds; lap counter, lap times and bell. Audio has never been heard and motion was judged from stills.
+- Free ride Phase E: group rides on a shared server road layer (server-run positions, drafting, keep-together, bots with characters, lobby, name tags, TV view, crew results, four-rider headless test). Tried only with headless browsers on one machine.
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
