@@ -91,6 +91,10 @@ export const CFG = {
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
     toastS: 3,
+    /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHud.css uses the same number. */
+    phoneMaxH: 500,
+    /** No ETA to the top below this speed (m/s). */
+    etaMinMs: 1,
   },
   freeRide: {
     defaultKg: 75,
@@ -111,6 +115,22 @@ export const CFG = {
     maxGradePct: 20,
     maxStored: 4000,
     ftpFrac: 0.75,
+    /** `?ghosts=N` dev riders: steady efforts spread over `ftp` (fractions of the rider's FTP), starting `gapM` apart. */
+    ghosts: {
+      names: [
+        'Bluey',
+        'Shazza',
+        'Davo',
+        'Macca',
+        'Kylie the Unstoppable',
+        'Nugget',
+        'Robbo',
+        'Jules',
+      ],
+      ftp: [0.6, 0.95],
+      gapM: 15,
+      cadence: 85,
+    },
     library: {
       /** Length filter bounds in km: short below `short`, long from `long`. */
       lengthKm: { short: 25, long: 60 },

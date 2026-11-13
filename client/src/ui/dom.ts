@@ -25,6 +25,13 @@ export const fmt = (s: number) => {
   s = Math.max(0, Math.ceil(s))
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
+/** Seconds as m:ss, or h:mm:ss from an hour. */
+export const clock = (s: number) => {
+  const t = Math.max(0, Math.round(s))
+  return t >= 3600 ? `${Math.floor(t / 3600)}:${fmt(t % 3600).padStart(5, '0')}` : fmt(t)
+}
+/** Metres as kilometres: two decimals under 10 km, then one. */
+export const kmStr = (m: number) => (m / 1000).toFixed(m < 10000 ? 2 : 1)
 export const pctStr = (c: number | null | undefined) =>
   c == null ? '–' : `${Math.round(c * 100)}%`
 

@@ -18,6 +18,7 @@
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.
 - `src/style.css` design tokens and base; `ui.css` shell, login, modal, toasts; `screens.css` tabs and trainer modal; `setup.css` plan picker, solo setup, lobby, rider stats; `solo.css` workout player; `results.css` results.
+- `src/freeride.css` free ride flat layout and setup; `freeHud.css` free-ride HUD over the 3D world (sizes in `--u`, 1% of screen height).
 - `src/hud.css` HUD base; `hudBus.css` bus status and roster; `hudPanels.css` stats, shop, feed; `hudSplash.css` splashes, responsive.
 
 ### core/
@@ -26,6 +27,7 @@
 - `cosmetics.ts` catalogue and purchase logic.
 - `badges.ts` milestone badges, PR timeline.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
+- `climbs.ts` sustained climbs on a route and the one the rider is on; `hud.ts` HUD maths with no DOM: power zone (Zwift boundaries), gradient colour, gap text, rider-list rows.
 - `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
@@ -70,12 +72,13 @@
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudMad.ts` VO2 Madness box and effort leaderboard (`hudMad.css`); `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
-- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player layout, flat or as a slim HUD over the 3D world (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
+- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player shell (map, pause overlay, toasts, part toggles) that picks a layout; `freeRideHud.ts` the HUD over the 3D world (`freeHud.css`); `freeRideFlat.ts` the flat tiles-and-charts layout (`freeride.css`); `riderList.ts` riders-nearby list any mode can feed; `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets
 - `tests/compliance|cosmetics|curve|erg|load|plan|gears|zwiftClick.test.ts` and others: vitest unit tests.
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
+- `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 
 ## server/ (FastAPI, uv)

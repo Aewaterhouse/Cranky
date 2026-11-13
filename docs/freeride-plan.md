@@ -51,7 +51,7 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 ### Phase B2: HUD pass (M) — owner request, 2026-11-13
 The fun is in the riding, but the information has to be as good as the established apps. Look closely at how Zwift, TrainerRoad and MyWhoosh lay out and style their ride screens, take the best of each, and follow the themes they share.
 - [x] Study the three HUDs (screenshots, reviews, their own help pages) and write up the recurring themes in `docs/hud-notes.md`: what sits where, what is big, what is hidden until needed, colour and type conventions, how climbs, gradient, riders nearby and intervals are shown.
-- [ ] Redesign the free-ride HUD from those notes: placement, hierarchy, sizes, zone colours, the gradient and climb displays, the rider list and the minimap. Our own look, their conventions.
+- [x] Redesign the free-ride HUD from those notes: placement, hierarchy, sizes, zone colours, the gradient and climb displays, the rider list and the minimap. Our own look, their conventions.
 - [ ] Carry the same conventions to the solo workout player and the bus HUD where they fit, so every mode reads the same way.
 - [ ] Owner look check on a real screen and on a phone or iPad.
 
