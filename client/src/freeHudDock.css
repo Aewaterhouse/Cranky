@@ -58,6 +58,13 @@
   font-size: 0.55em;
   margin-left: 0;
 }
+.fhud button.gear {
+  color: inherit;
+  cursor: pointer;
+}
+.fhud .gear .shift {
+  opacity: 0.7;
+}
 
 /* Phone landscape (the same height as CFG.hud.phoneMaxH): fewer totals, a slim climb strip */
 @media (max-height: 500px) {

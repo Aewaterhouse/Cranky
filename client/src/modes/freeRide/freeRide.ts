@@ -25,6 +25,7 @@ import { PauseState } from './pauseState'
 import { recentPct } from './quips'
 import { rideExtras } from './rideExtras'
 import { rideWorld } from './rideWorld'
+import { stepStrength, strengthPct } from '../../ui/gearTile'
 import type { RoadLink } from './roadLink'
 
 const F = CFG.freeRide
@@ -128,6 +129,7 @@ export function runFreeRide(
     end: () => view.confirmEnd(),
     nudge,
     shift,
+    strength: (d) => (stepStrength(d), view.toast(`Shift strength ${strengthPct()}`)),
     toggle: (part) => view.toggle(part),
   })
   addEventListener('keydown', onKey)

@@ -13,6 +13,8 @@ export interface KeyActions {
   step: (d: number) => void
   /** Virtual gear: +1 (X) or -1 (Z). */
   gear: (d: number) => void
+  /** Shift strength step: +1 (') or -1 (;). */
+  strength: (d: number) => void
   /** H clean view, S stats, I the interval list. */
   toggle: (part: SoloPart) => void
 }
@@ -43,6 +45,8 @@ export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
                   ? () => on.step(k === '.' ? 1 : -1)
                   : k === 'z' || k === 'Z' || k === 'x' || k === 'X'
                     ? () => on.gear(k.toLowerCase() === 'x' ? 1 : -1)
+                    : k === ';' || k === "'"
+                      ? () => on.strength(k === "'" ? 1 : -1)
                     : mode
                       ? () => on.mode(mode)
                       : part

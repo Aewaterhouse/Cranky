@@ -55,3 +55,10 @@ export function gearGrade(
   const g = roadPct * difficulty + gearOffset(roadPct, cadence, gear, mass, chainring) * strength
   return Math.min(hi, Math.max(lo, +g.toFixed(1) || 0))
 }
+
+/** Shift strength `d` steps on from `cur`, on the step grid and inside the setting's range. */
+export function nextStrength(cur: number, d: number) {
+  const S = CFG.gears.strength
+  const v = Math.round((cur + d * S.step) / S.step) * S.step
+  return +Math.min(S.max, Math.max(S.min, v)).toFixed(2)
+}

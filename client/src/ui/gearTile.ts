@@ -1,6 +1,6 @@
 import '../gear.css'
 import { CFG } from '../config'
-import { gearCount } from '../core/gears'
+import { gearCount, nextStrength } from '../core/gears'
 import { saveSettings, settings } from '../core/settings'
 import { h } from './dom'
 
@@ -20,16 +20,26 @@ export function gearTile() {
       }
       last = gear
       v.textContent = `${gear}/${gearCount}`
-      sub.textContent = `trainer ${sent.toFixed(1)}%`
+      sub.textContent = `trainer ${sent.toFixed(1)}% · shift ${strengthPct()}`
     },
   }
+}
+
+const STRENGTH_EVENT = 'cranky:shift-strength'
+export const strengthPct = () => `${Math.round(settings.shiftStrength * 100)}%`
+
+/** Steps shift strength by `d` steps (the `;` and `'` keys), clamped and saved; open sliders follow. */
+export function stepStrength(d: number) {
+  saveSettings({ shiftStrength: nextStrength(settings.shiftStrength, d) })
+  dispatchEvent(new Event(STRENGTH_EVENT))
+  return settings.shiftStrength
 }
 
 /** Shift strength slider (50 to 300%), saved to settings; rides read it on every trainer update. */
 export function strengthSlider() {
   const S = CFG.gears.strength
   const val = h('b', { class: 'pct' })
-  const show = () => (val.textContent = `${Math.round(settings.shiftStrength * 100)}%`)
+  const show = () => (val.textContent = strengthPct())
   const input = h('input', {
     type: 'range',
     min: S.min * 100,
@@ -40,6 +50,10 @@ export function strengthSlider() {
     oninput: () => (saveSettings({ shiftStrength: +input.value / 100 }), show()),
   })
   show()
+  addEventListener(STRENGTH_EVENT, () => {
+    input.value = String(Math.round(settings.shiftStrength * 100))
+    show()
+  })
   return h(
     'label',
     { class: 'field', title: 'How much each virtual gear changes the trainer gradient.' },

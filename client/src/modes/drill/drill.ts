@@ -24,6 +24,7 @@ import { soloClick, soloKeys } from './keys'
 import { slopeGears } from './slope'
 import { LiveTally } from './liveTally'
 import { pickOverlay, type Overlay } from './overlays'
+import { stepStrength } from '../../ui/gearTile'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
 
 const START_S = 5
@@ -168,6 +169,8 @@ export function runDrill(
     mode: (k: RideMode) => setMode(k),
     step: (d: number) => setMode(mode.kind, stepMode(mode, d)),
     gear,
+    strength: (d: number) =>
+      mode.kind === 'slope' && (stepStrength(d), slope.send(mode, ride.live.cadence, true)),
     toggle: view.toggle,
   }
   const onKey = soloKeys(keyActs, !isSim)

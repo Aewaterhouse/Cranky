@@ -10,7 +10,7 @@ import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
 import { riderList } from './riderList'
-import { strengthSlider } from './gearTile'
+import { strengthPct, strengthSlider } from './gearTile'
 import { hudMenu, hudStat as stat, hudVal as val } from './hudParts'
 import { powerPanel } from './hudPower'
 import { UNIT } from './units'
@@ -68,7 +68,14 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   )
   climb.hidden = segBox.hidden = true
   const gear = val('', `/${gearCount}`)
-  const gearChip = h('div', { class: 'glass gear' }, h('span', {}, 'Gear'), gear.el)
+  const shiftPct = h('small', { class: 'shift' })
+  const gearChip = h(
+    'button',
+    { class: 'glass gear', title: "Shift strength: tap for the slider, or ; and '" },
+    h('span', {}, 'Gear'),
+    gear.el,
+    shiftPct,
+  )
   gearChip.hidden = true
   const list = riderList()
   const group = h('div', { class: 'glass gchip' })
@@ -79,6 +86,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const m = hudMenu()
   const { el: menu, item } = m
   pauseBtn.onclick = () => (m.close(), on.pause())
+  gearChip.onclick = () => (menu.hidden = false)
   menu.append(
     h('h2', {}, route.name),
     route.approx ? h('span', { class: 'tag-approx' }, 'approximate profile') : '',
@@ -206,6 +214,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       stats.whole.v.textContent = s.whole?.join(' · ') ?? ''
       gearChip.hidden = !s.gears
       gear.v.textContent = String(s.gear)
+      shiftPct.textContent = strengthPct()
       list.set(riderRows(s.riders, s.me), s.speed)
       const g = s.group
       const pull = g ? Math.round((g.band - 1) * 100) : 0

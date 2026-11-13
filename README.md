@@ -60,6 +60,7 @@ Pick a plan and length on the Ride tab, then the solo setup screen. Controls (bu
 | `N` or Right | skip to the next interval (Right is left to the simulated trainer) |
 | `+` / `-` | intensity +/- 1% (50 to 150%, scales every ERG target) |
 | `Z` / `X` | virtual gear down / up (Slope mode only) |
+| `;` / `'` | shift strength down / up (Slope mode only) |
 | Esc | end the ride (asks first) |
 
 Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes after 1.5 s of pedalling. Sprints never auto-pause. The results screen shows NP, IF and TSS.
@@ -71,11 +72,12 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 | Space or `P` | pause or resume |
 | `+` / `-` | trainer difficulty +/- 5% |
 | `Z` / `X` | virtual gear down / up |
+| `;` / `'` | shift strength down / up |
 | Esc | end the ride (asks first) |
 
 ## Zwift Click and virtual gears
 
-Free ride and solo Slope mode have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 100%; slider in Settings, in free ride and in Slope mode). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T).
+Free ride and solo Slope mode have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 150%; slider in Settings, in free ride and in Slope mode, `;` and `'` while riding; the gear tile and chip show it, and tapping the chip opens the slider). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T).
 
 The Click needs firmware 1.1.0 or later: 1.0.0 ignores the RideOn handshake. Update it in Zwift Companion: More > Equipment > Zwift Click > Update Firmware. On 1.1.0 the handshake write with response fails, so the driver writes it without response; keep it that way.
 

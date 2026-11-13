@@ -115,3 +115,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 ## Ride notes plan (2026-11-14)
 - [ ] Trainers: the orange trainer shows under every rider on the bus, in VO2 Madness, on the TV view and in free ride on a real screen. Say if riding outside on a trainer in free ride is wanted or should be a skin only.
 - [ ] Gears: ride free ride or Slope mode at the default 150% shift strength and say whether each click feels right (answer in `docs/questions.md`).
+- [ ] Shift strength mid-ride: on a real screen and an iPad, the gear chip shows the strength and tapping it opens the menu with the slider; `;` and `'` step it with a keyboard.

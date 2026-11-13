@@ -295,3 +295,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 
 30. Production build (`scripts/run.sh`, or the installed app): every route card has "Save for offline"; press it and the card shows "✓ offline" (picking a card does the same). Turn the network off and reload: the app opens, a kept route starts and rides in 3D, the minimap is hidden. After an app update the marks are gone until saved again.
 31. The dev server (`pnpm dev`) shows no offline marks and registers no service worker.
+- Shift strength mid-ride: free ride (3D HUD) with the simulated trainer. The gear chip reads e.g. `12/24 150%`; tap it and the menu opens on the slider. `;` and `'` step it by 10% with a toast and the slider follows. Solo Slope mode: the gear tile's line reads `trainer x% · shift 150%` and the keys step it.
