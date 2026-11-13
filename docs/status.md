@@ -15,6 +15,7 @@
 - Free ride: ride physics, GPX routes, elevation profiles and an OpenStreetMap map (not yet looked at in a browser).
 - Streak rewards: clean group riding earns a supply drop, an air strike and a gunship view (checked in the scene dev page only, not yet in a real ride).
 - Heart rate on the bus: the crew sees each rider's bpm and % of max, and riders redden and steam as effort climbs (checked in the scene dev page only; no real strap yet).
+- VO2 Madness: a second crew game. Mystery-box VO2 intervals for the whole pack, scored on heart-rate effort, riders racing on the road (checked in a short sped-up ride with bots; results screen and TV view not yet looked at).
 - Virtual gears and Zwift Click v1: 24 gears in free ride and solo Slope mode (Z/X keys or the Click), Click also steps ERG intensity and resistance level; Click test panel on `/spike.html` (no real Click tested yet, roadmap item left unticked).
 - `Steven` branch only: every rider and zombie has a huge chest (`VIS.bust`), as a joke. Zombies checked in the scene dev page; riders not yet seen from the front.
 

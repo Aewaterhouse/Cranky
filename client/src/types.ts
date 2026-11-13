@@ -16,6 +16,9 @@ export interface Block {
   /** Coach messages shown `at` seconds into the block. */
   cues?: { at: number; text: string }[]
   blocks?: Block[]
+  /** VO2 Madness: an interval block (it scores) and its round's twist. */
+  work?: boolean
+  twist?: string | null
 }
 export interface Plan {
   id: string

@@ -174,7 +174,8 @@ export function spectate(code: string, leaveTo: () => void) {
     const b = m.bus
     world.state = {
       speed: b.speed,
-      gap: b.gap,
+      gap: b.mad ? null : b.gap,
+      mad: b.mad,
       armour: b.armour,
       mood: (m.i < 0 || m.ev === 'warmup' || m.ev === 'cooldown' ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,

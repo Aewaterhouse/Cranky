@@ -6,14 +6,25 @@ import { clamp, smooth } from './util'
 export class CamRig {
   pull = 0
   shake = 0
+  private near = 0
   private fov = VIS.fov
 
   update(
     cam: THREE.PerspectiveCamera,
     t: number,
     dt: number,
-    o: { speed: number; gap: number | null; hit: number; slow: boolean; climb?: number },
+    o: {
+      speed: number
+      gap: number | null
+      hit: number
+      slow: boolean
+      climb?: number
+      /** VO2 Madness: sit lower and closer, behind the pack. */
+      pack?: boolean
+    },
   ) {
+    this.near += ((o.pack ? 1 : 0) - this.near) * clamp(dt * 2)
+    const low = 1 - this.near * VIS.packCam
     const want = o.gap === null ? 0 : 1 - smooth(5, 45, o.gap)
     this.pull += (want - this.pull) * clamp(dt * 1.5)
     const sway = VIS.sway
@@ -26,12 +37,12 @@ export class CamRig {
         Math.sin(t * 0.25) * 1.6 * sway +
         nx * sh * 0.35 +
         Math.sin(t * 0.13) * 0.8 * sway,
-      VIS.camHeight -
+      VIS.camHeight * low -
         (o.climb ?? 0) * VIS.climbDrop +
         this.pull * 4 +
         Math.sin(t * 0.4) * 0.25 * sway +
         ny * sh * 0.3,
-      VIS.camDist + this.pull * 7 + Math.sin(t * 0.17) * 0.6 * sway - o.hit * 0.8,
+      VIS.camDist * low + this.pull * 7 + Math.sin(t * 0.17) * 0.6 * sway - o.hit * 0.8,
     )
     cam.lookAt(
       0,

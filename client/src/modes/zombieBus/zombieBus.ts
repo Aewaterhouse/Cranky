@@ -27,6 +27,11 @@ const FX_SOUND: Record<string, () => void> = {
   hauled: SFX.scrap,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
+  go: SFX.go,
+  box: SFX.MEGA,
+  crown: SFX.GREAT,
+  lead: SFX.scrap,
+  sandbag: SFX.FAIL,
   drop: SFX.scrap,
   airstrike: SFX.GREAT,
   gunship: SFX.MEGA,
@@ -76,6 +81,10 @@ export function startBusRide(
       rec: ride.rec,
       meId: profile.id,
       onBuy: (item) => net.send({ t: 'buy', item }),
+      mad:
+        l.game === 'madness'
+          ? [...new Set(plan.blocks.filter((x) => x.work).map((x) => x.label ?? ''))]
+          : undefined,
     },
   )
   hud.setTier(profile.tier)
@@ -156,7 +165,8 @@ export function startBusRide(
       FX_SOUND[fx.k]?.()
       if (fx.k === 'hit' || fx.k === 'crash') world.fx('hit')
       if (fx.k === 'smash' || fx.k === 'crash') world.fx('smash')
-      if (fx.k === 'shake') world.fx('shake')
+      if (fx.k === 'shake' || fx.k === 'go' || fx.k === 'crown') world.fx('shake')
+      if (fx.k === 'box') world.fx('slowmo')
       if (fx.k === 'drop' || fx.k === 'airstrike') world.fx(fx.k)
       if (fx.k === 'slowmo') {
         world.fx('slowmo')
@@ -164,11 +174,13 @@ export function startBusRide(
       }
     }
     const b = m.bus
+    const calm = m.i < 0 || m.ev in { warmup: 1, cooldown: 1 } || (b.mad && m.ev === 'servo')
     world.state = {
       speed: b.speed,
-      gap: b.gap,
+      gap: b.mad ? null : b.gap,
+      mad: b.mad,
       armour: b.armour,
-      mood: (m.i < 0 ? 'drill' : m.ev in { warmup: 1, cooldown: 1 } ? 'drill' : m.ev) as Mood,
+      mood: (calm ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
       gunship: b.gunship,

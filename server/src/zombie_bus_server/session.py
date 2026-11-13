@@ -11,6 +11,7 @@ from fastapi import WebSocket
 
 from . import bots, discord
 from . import config as C
+from .modes.vo2_madness import Vo2Madness, deal
 from .modes.zombie_bus import ZombieBus, weekly_mutator
 from .plan import block_target, event_for, generate, load_plans, locate, total
 from .protocol import (
@@ -20,6 +21,7 @@ from .protocol import (
     Data,
     Difficulty,
     End,
+    Game,
     Join,
     Setup,
     Sprint,
@@ -33,6 +35,7 @@ if TYPE_CHECKING:
     from .store import Store
 
 NOT_SAVED = ("ws", "connected", "last_data")
+MODES = {"bus": ZombieBus, "madness": Vo2Madness}
 
 
 @dataclass
@@ -105,6 +108,7 @@ class Room:
         self.plan_id = "bus-crew-45"
         self.minutes = 0
         self.difficulty = "normal"
+        self.game = "bus"
         self.plan = generate(load_plans()[self.plan_id], 0)
         self.el = 0.0
         self.mode = ZombieBus()
@@ -147,6 +151,7 @@ class Room:
             "plan_id": self.plan_id,
             "minutes": self.minutes,
             "difficulty": self.difficulty,
+            "game": self.game,
             "plan": self.plan,
             "el": self.el,
             "riders": [r.to_dict() for r in self.riders.values()],
@@ -161,7 +166,8 @@ class Room:
         room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
         room.difficulty = d.get("difficulty", "normal")
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
-        room.mode = ZombieBus.from_dict(d["mode"])
+        room.game = d.get("game", "bus")
+        room.mode = MODES[room.game].from_dict(d["mode"])
         room.paused = room.state == "running"
         for r in room.riders.values():
             r.connected = r.bot
@@ -185,8 +191,9 @@ class Room:
             "state": self.state,
             "plan": self.plan,
             "minutes": self.minutes,
-            "mutator": weekly_mutator() if self.difficulty != "easy" else None,
+            "mutator": weekly_mutator() if self.difficulty != "easy" and self.game == "bus" else None,
             "difficulty": self.difficulty,
+            "game": self.game,
             "riders": [
                 {
                     "id": r.id,
@@ -272,7 +279,11 @@ class Room:
                 await self.send(r, {"t": "error", "msg": f"Unknown plan {msg.plan}"})
                 return
             self.plan_id, self.minutes, self.state = msg.plan, msg.minutes, "lobby"
-            self.plan = generate(load_plans()[msg.plan], msg.minutes)
+            self.deal()
+            await self.lobby()
+        elif isinstance(msg, Game) and self.state != "running":
+            self.game, self.state = msg.game, "lobby"
+            self.deal()
             await self.lobby()
         elif isinstance(msg, Difficulty) and self.state != "running":
             self.difficulty = msg.level
@@ -286,11 +297,20 @@ class Room:
         elif isinstance(msg, End) and self.state == "running":
             await self.finish()
 
+    def deal(self) -> None:
+        """Builds the plan for the chosen game: the picked workout, or a fresh VO2 Madness deck."""
+        if self.game == "madness":
+            self.plan = deal(self.minutes)
+        else:
+            self.plan = generate(load_plans()[self.plan_id], self.minutes)
+
     def start(self) -> None:
+        if self.game == "madness":  # reshuffle so nobody has seen the order in the lobby
+            self.deal()
         self.state, self.el, self.mode, self.summary = (
             "running",
             -float(C.COUNTDOWN_S),
-            ZombieBus(self.difficulty),
+            MODES[self.game](self.difficulty),
             None,
         )
         for r in self.riders.values():
@@ -354,7 +374,7 @@ class Room:
             self.task.cancel()
         self.summary = self.mode.summary(self)
         await self.broadcast({"t": "end", "summary": self.summary})
-        if self.store:
+        if self.store and self.game == "bus":  # the season ladder ranks bus scores only
             self.store.add_result(self.plan["name"], self.summary)
         text = discord.format_summary(self.plan["name"], self.summary)
         self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))

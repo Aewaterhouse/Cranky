@@ -1,0 +1,114 @@
+/* HUD: VO2 Madness mystery box and effort leaderboard. */
+.md {
+  min-width: 270px;
+}
+.md-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.08);
+  font: 1.05rem/1.1 var(--display);
+}
+.md-box[data-s='spin'] {
+  animation: md-shake 0.12s infinite;
+  background: linear-gradient(90deg, #e040fb55, #ffd23f55);
+}
+.md-box[data-s='landed'] {
+  background: linear-gradient(90deg, #ffd23f, #ff7a1a);
+  color: #1a1420;
+  animation: md-pop 0.5s;
+}
+.md-box[data-s='go'] {
+  background: linear-gradient(90deg, #ff3b2a, #ff7a1a);
+  animation: bs-pulse 0.4s infinite alternate;
+}
+.md-twist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px dashed #e040fb;
+  font-size: 0.78rem;
+}
+.md-twist b {
+  color: #e040fb;
+}
+.md-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.md-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 8px;
+}
+.md-row.me {
+  background: rgb(255 255 255 / 0.07);
+}
+.md-row[data-crown='1'] {
+  background: linear-gradient(90deg, #ffd23f33, transparent);
+  box-shadow: inset 2px 0 0 #ffd23f;
+}
+.md-row[data-st='spectator'] {
+  opacity: 0.45;
+}
+.md-rank {
+  width: 22px;
+  text-align: center;
+  font: 1rem/1 var(--display);
+}
+.md-mid {
+  flex: 1;
+  min-width: 0;
+}
+.md-name {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+.md-hr {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.md-bar {
+  height: 9px;
+  margin: 3px 0 1px;
+  border-radius: 5px;
+  background: rgb(255 255 255 / 0.1);
+  overflow: hidden;
+}
+.md-bar i {
+  display: block;
+  height: 100%;
+  transition: width 0.5s linear;
+}
+.md-mid small {
+  font-size: 0.68rem;
+  color: var(--dim);
+}
+.md-pts {
+  min-width: 46px;
+  text-align: right;
+  font: 1.15rem/1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+@keyframes md-shake {
+  50% {
+    transform: translateX(2px) rotate(0.6deg);
+  }
+}
+@keyframes md-pop {
+  0% {
+    transform: scale(1.25);
+  }
+}

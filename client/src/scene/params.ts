@@ -36,6 +36,12 @@ export const VIS = {
   hordeSize: 220,
   /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
   bust: 0.17,
+  /** VO2 Madness pack: z of last and first place, and the gap between lanes. */
+  packBack: 1.5,
+  packFront: -11,
+  packLane: 2,
+  /** How far the camera drops and closes in on the pack (0..1). */
+  packCam: 0.3,
   /** Heart-rate effort (fraction of max) where a rider starts to redden, and where they steam. */
   heatFrom: 0.7,
   steamFrom: 0.85,

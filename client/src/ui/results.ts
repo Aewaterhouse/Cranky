@@ -11,6 +11,8 @@ import { segsFromSeries } from './soloSegs'
 import { workoutChart } from './workoutChart'
 
 export interface GroupSummary {
+  /** Set to 'madness' for a VO2 Madness ride; absent for the bus. */
+  mode?: string
   distance: number
   armour: number
   syncPct: number
@@ -23,6 +25,9 @@ export interface GroupSummary {
     inBandSecs: number
     sprints: string[]
     falls: number
+    /** VO2 Madness: effort points and seconds over 90% of max heart rate. */
+    points?: number
+    redSecs?: number
   }[]
   awards: { award: string; id: string; name: string; why: string }[]
   postcard?: string
