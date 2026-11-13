@@ -29,7 +29,7 @@ TIER_FACTOR = {"hard": 1.0, "medium": 0.9, "easy": 0.8}
 TIERS = ["hard", "medium", "easy"]
 
 # Rider states
-FELL_COMPLIANCE = 0.6
+FELL_COMPLIANCE = 0.6  # bots aim under this to fall off; riders use their level's `fell` (DIFFICULTY)
 FELL_AFTER_S = 30
 FELL_COOLDOWN_S = 60
 # While riders are off the bus everyone still on it carries them: targets rise by FELL_LOAD per fallen
@@ -77,12 +77,15 @@ HIT_DAMAGE = 5
 HIT_KNOCKBACK = 25
 SCRAP_PER_M = 1 / 100
 
-# Difficulty: shifts every event's neutral compliance, scales armour damage and the final score.
+# Difficulty: shifts every event's neutral compliance, closes the gap at `creep` m/s whatever the crew does,
+# scales armour damage and the final score, and sets the compliance a rider falls off under. Tuned on
+# simulated ERG crews (compliance 0.9 to 1.0, cadences out of sync) over every bus plan: easy never loses armour, normal ends
+# near half armour (often less), hard is doomed without streak air support, nightmare is doomed.
 DIFFICULTY = {
-    "easy": {"neutral": -0.08, "damage": 0.6, "score": 0.8},
-    "normal": {"neutral": 0.0, "damage": 1.0, "score": 1.0},
-    "hard": {"neutral": 0.05, "damage": 1.3, "score": 1.25},
-    "nightmare": {"neutral": 0.1, "damage": 1.7, "score": 1.6},
+    "easy": {"neutral": -0.08, "damage": 0.6, "score": 0.8, "creep": 0.5, "fell": 0.5},
+    "normal": {"neutral": 0.0, "damage": 1.0, "score": 1.0, "creep": 1.1, "fell": 0.6},
+    "hard": {"neutral": 0.05, "damage": 1.3, "score": 1.25, "creep": 0.8, "fell": 0.65},
+    "nightmare": {"neutral": 0.1, "damage": 1.7, "score": 1.6, "creep": 1.2, "fell": 0.7},
 }
 
 # Nitro: near-perfect group riding charges it; when full it fires by itself.

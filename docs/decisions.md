@@ -735,3 +735,13 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - In ERG mode the crew's compliance sits near 1, which beat every event's neutral (0.8 on a long haul) by enough to pull away at 3 m/s; the gap hit its 120 m cap within a minute and the horde was never on screen (the chase camera sees it only under about 30 m).
 - Now: `GAP_START` 30 m (was 50), `GAP_MAX` 70 m (was 120), and the gap moves at `GAP_K_AWAY` = 6 m/s per unit of compliance above neutral (was 15) but `GAP_K` = 20 below it (was 15). A perfect crew on a long haul gains about 1.2 m/s, a crew at 70% loses 2 m/s.
 - A rear-view mirror (`scene/mirror.ts`): a second camera on the back of the bus, 24° field of view so a horde 30 to 40 m back fills it, drawn into a framed strip at the top centre whenever the horde is out (not in VO2 Madness). Tunable as `VIS.mirror`, `mirrorW`, `mirrorY`, `mirrorHeight` in the debug panel. It is a second render of the scene each frame; on a slow machine it can be turned off with `mirror` = 0.
+
+## Difficulty levels that mean something (2026-11-14)
+- New per level in `DIFFICULTY`: `creep`, metres per second the horde closes during every event whatever the crew does (easy 0.5, normal 1.1, hard 0.8, nightmare 1.2; hard and nightmare also keep their stricter neutral and heavier damage), and `fell`, the compliance a rider falls off under (0.5, 0.6, 0.65, 0.7). `FELL_COMPLIANCE` (0.6) is now only what bots aim under.
+- Tuned with a throwaway simulation (not committed): every bus plan except the VO2 raid, two seeds each, four riders with compliance drawn from 0.9 to 1.0 every half second (an ERG crew), cadences 78 to 90 rpm so the cadence-sync bonus is mostly off, every sprint graded HIT to MEGA, fallen riders hauled back after about 25 s. Final armour (min / median / max) with streak rewards, then without:
+  - easy: 100/100/100, 100/100/100 (a crew drawn from 0.8 to 1.0 also kept 100)
+  - normal: 0/55/100, 0/0/45
+  - hard: 0/28/100, 0/0/28
+  - nightmare: 0/0/0, 0/0/0
+- Results swing hard with small changes (normal at 1.2 m/s gives a median of 25, at 1.0 a median of 80), so expect to tune after a real ride. Long plans are harder than short ones at the same level. A crew that rides in cadence sync gets the tune-up bonus (+1 m/s of gap) and finds every level easier, as before.
+- The servo stop counts too: the bus is parked and the horde closes on it at the creep rate, less what the crew earns against the servo's low neutral.

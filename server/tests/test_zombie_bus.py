@@ -27,7 +27,7 @@ def set_all(room, s=1.0, cad=90):
 
 
 def test_good_riding_pulls_away_bad_riding_gets_hit():
-    room, bus = FakeRoom(STEADY), ZombieBus()
+    room, bus = FakeRoom(STEADY), ZombieBus("easy")  # above easy the horde gains on even a perfect crew
     set_all(room, 1.0)
     run(room, bus, 30)
     assert bus.gap > C.GAP_START and bus.armour == 100
@@ -159,9 +159,9 @@ def test_difficulty_scales_gap_damage_and_score():
     gaps, scores = {}, {}
     for level in ("easy", "normal", "nightmare"):
         room, bus = FakeRoom(STEADY), ZombieBus(level)
-        set_all(room, 0.85)
+        set_all(room, 0.95)
         room.riders["r0"].cad = 120
-        run(room, bus, 20)
+        run(room, bus, 10)
         gaps[level], scores[level] = bus.gap, bus.summary(room)["score"]
         bus.damage(10, "x")
         assert bus.armour == 100 - 10 * C.DIFFICULTY[level]["damage"]
@@ -266,3 +266,19 @@ def test_gunship_opens_the_gap():
         run(room, bus, 10)
         gaps.append(bus.gap)
     assert abs(gaps[1] - gaps[0] - C.GUNSHIP_GAP * 10) < 0.01
+
+
+def test_nightmare_catches_a_perfect_crew_and_harder_levels_drop_riders_sooner():
+    room, bus = FakeRoom(STEADY), ZombieBus("nightmare")
+    set_all(room, 1.0)
+    for n, r in enumerate(room.riders.values()):
+        r.cad = 70 + 15 * n  # out of cadence sync, so no tune-up bonus
+    fx = run(room, bus, 120)
+    assert any(f["k"] == "hit" for f in fx)
+    falls = {}
+    for level in ("easy", "nightmare"):
+        room, bus = FakeRoom(STEADY), ZombieBus(level)
+        set_all(room, 0.55)  # under nightmare's line, over easy's
+        run(room, bus, C.FELL_AFTER_S + 2)
+        falls[level] = sum(r.st == "fell" for r in room.riders.values())
+    assert falls == {"easy": 0, "nightmare": 4}

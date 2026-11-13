@@ -60,6 +60,12 @@ export function lobbyView(c: LobbyCtx) {
     botMore,
   )
   let bots = 0
+  const DIFF_WHAT: Record<Difficulty, string> = {
+    easy: 'A gentle chase. Ride the plan and you will make it.',
+    normal: 'The horde keeps coming. A good crew limps home.',
+    hard: 'Doomed unless the crew earns air strikes and gunships with clean riding.',
+    nightmare: 'You will not make it. Make them work for it.',
+  }
   const DIFF: [Difficulty, string][] = [
     ['easy', 'Easy'],
     ['normal', 'Normal'],
@@ -68,7 +74,15 @@ export function lobbyView(c: LobbyCtx) {
   ]
   const diffSeg = seg(DIFF, 'normal', (v) => c.difficulty(v), 'diff')
   const diffNote = h('span', { class: 'dim' })
-  const diffRow = h('div', { class: 'bot-row' }, h('span', {}, '💀 Horde'), diffSeg, diffNote)
+  const diffWhat = h('span', { class: 'dim diff-what' })
+  const diffRow = h(
+    'div',
+    { class: 'bot-row' },
+    h('span', {}, '💀 Horde'),
+    diffSeg,
+    diffNote,
+    diffWhat,
+  )
   const mutRow = h('div', { class: 'bot-row mut-row' })
   const GAMES: [Game, string][] = [
     ['bus', '🧟 Zombie Bus'],
@@ -131,6 +145,7 @@ export function lobbyView(c: LobbyCtx) {
       )
     diffSeg.hidden = !isHost
     diffNote.textContent = isHost ? '' : DIFF.find(([d]) => d === l.difficulty)![1]
+    diffWhat.textContent = DIFF_WHAT[l.difficulty]
     botLess.disabled = bots === 0
     botMore.disabled = l.riders.length >= SEATS
     seats.replaceChildren(...Array.from({ length: SEATS }, (_, i) => seat(l.riders[i], l.host)))

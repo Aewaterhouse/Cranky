@@ -110,7 +110,8 @@ class ZombieBus:
         if neutral is not None and active:
             neutral += C.DIFFICULTY[self.level]["neutral"]
             k = C.GAP_K_AWAY if comp > neutral else C.GAP_K
-            self.gap += (k * (comp - neutral) + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
+            creep = C.DIFFICULTY[self.level]["creep"]
+            self.gap += (k * (comp - neutral) - creep + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
         self.gap = min(C.GAP_MAX, self.gap)
         if self.gap <= 0:
             self.gap = 0
@@ -253,7 +254,7 @@ class ZombieBus:
         for r in active:
             if r.s is None:
                 continue
-            r.low_s = r.low_s + dt if r.s < C.FELL_COMPLIANCE else 0.0
+            r.low_s = r.low_s + dt if r.s < C.DIFFICULTY[self.level]["fell"] else 0.0
             if r.low_s >= C.FELL_AFTER_S and room.el >= r.fell_cool_until:
                 r.low_s = 0.0
                 r.falls += 1
