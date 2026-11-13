@@ -168,12 +168,13 @@ def build(line: list[Point], route_nodes: set[int] | None, grid: dict, fetch: Fe
 
     def ask(body: str) -> list[dict]:
         # Anything at all beside the route rides along as a sentinel: a reply without it is a busy server.
-        query = f"[out:json][timeout:180];({body}way(around:60,{poly});node(around:60,{poly});>;);out geom;"
+        query = f"[out:json][timeout:300];({body}way(around:60,{poly});node(around:60,{poly});>;);out geom;"
         reply = fetch(OVERPASS, {"data": query}, pause=5, check=lambda d: d.get("elements"))
         return reply["elements"]
 
     area = f"(around:{AREA_REACH_M},{poly})"
-    areas = ask("".join(f'way{area}["{key}"];rel{area}["{key}"];' for key in AREA_KEYS))
+    # One tag at a time: a single query for every kind of area times out on the longer routes.
+    areas = [el for key in AREA_KEYS for el in ask(f'way{area}["{key}"];rel{area}["{key}"];')]
     heights = {
         (r, run[0] + i): h
         for r, row in enumerate(grid["runs"])

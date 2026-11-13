@@ -25,7 +25,7 @@ def fetch(url: str, data: dict[str, str] | None = None, pause: float = 1.0, chec
     req = urllib.request.Request(url, data=body, headers={"User-Agent": AGENT})
     for attempt in range(RETRIES):
         try:
-            with urllib.request.urlopen(req, timeout=240) as r:
+            with urllib.request.urlopen(req, timeout=330) as r:
                 text = r.read().decode()
             if check and not check(json.loads(text)):
                 raise OSError("empty reply")
