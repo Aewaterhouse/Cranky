@@ -32,7 +32,7 @@
 - One HUD across all three ride screens: the solo workout player and the Zombie Bus now use the free-ride HUD's power panel, clock, rider list, menu, toasts, clean view and display size. The end-to-end ride test passes.
 
 ## In progress
-- Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
+- Working through `docs/ride-notes-plan.md` top to bottom (started 2026-11-14). Questions for the owner go in `docs/questions.md`.
 
 ## Next
 - Compare with mates, extra ride metrics, workout builder, training plans, then watch party, the rest of free ride and deeper Zombie Bus mechanics.

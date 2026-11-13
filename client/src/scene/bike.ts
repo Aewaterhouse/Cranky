@@ -1,5 +1,13 @@
 import * as THREE from 'three'
+import { VIS } from './params'
 import { Mesher, VC, box, cyl, span } from './util'
+
+/** The trainer body's material, shared so the debug panel can recolour every trainer at once. */
+export const TRAINER_MAT = new THREE.MeshLambertMaterial({
+  vertexColors: true,
+  flatShading: true,
+  color: VIS.trainerColour,
+})
 
 export const BB = { f: -0.13, y: 0.31 }
 export const CRANK = 0.17
@@ -43,6 +51,7 @@ let shared: {
   crank: THREE.BufferGeometry
   parts: THREE.BufferGeometry
   trainer: THREE.BufferGeometry
+  trainerBody: THREE.BufferGeometry
   frame: THREE.BufferGeometry
 } | null = null
 function geos() {
@@ -66,26 +75,30 @@ function geos() {
   p.add(box(0.46, 0.035, 0.035), '#111', [0, 0.97, -0.44])
   for (const s of [-1, 1]) p.add(box(0.035, 0.035, 0.18), '#111', [s * 0.2, 0.93, -0.5])
   p.add(cyl(0.07, 0.07, 0.05, 8), '#d0d0d8', [0, BB.y, 0.13], [0, 0, Math.PI / 2])
-  // trainer: rear dropout clamp, resistance unit and legs
+  // trainer: a direct-drive unit (dark frame and feet, a body and flywheel tinted by TRAINER_MAT) and a front riser
   const tr = new Mesher(0.06)
-  tr.add(cyl(0.09, 0.09, 0.18, 8), '#3a3d44', [0.1, 0.34, 0.55], [0, 0, Math.PI / 2])
-  tr.add(box(0.06, 0.06, 0.8), '#2a2c32', [0, 0.04, 0.55])
-  tr.add(box(0.8, 0.05, 0.06), '#2a2c32', [0, 0.04, 0.82])
-  tr.add(box(0.7, 0.05, 0.06), '#2a2c32', [0, 0.04, 0.35])
-  tr.add(box(0.08, 0.3, 0.08), '#2a2c32', [0.05, 0.19, 0.55], [0, 0, 0.3])
-  tr.add(box(0.14, 0.1, 0.2), '#2a2c32', [0, 0.05, -0.55])
+  tr.add(box(0.07, 0.07, 1.25), '#26282e', [0, 0.04, 0.2])
+  tr.add(box(1.0, 0.06, 0.08), '#26282e', [0, 0.03, 0.85])
+  tr.add(box(0.9, 0.06, 0.08), '#26282e', [0, 0.03, 0.3])
+  tr.add(cyl(0.05, 0.05, 0.3, 6), '#9a9aa2', [0, 0.34, 0.55], [0, 0, Math.PI / 2])
+  tr.add(box(0.2, 0.08, 0.32), '#26282e', [0, 0.06, -0.55])
+  const body = new Mesher(0.06)
+  body.add(box(0.14, 0.34, 0.42), '#fff', [0.15, 0.2, 0.6])
+  body.add(cyl(0.21, 0.21, 0.08, 14), '#fff', [0.25, 0.34, 0.55], [0, 0, Math.PI / 2])
+  body.add(box(0.12, 0.3, 0.1), '#fff', [-0.12, 0.19, 0.55], [0.25, 0, 0])
   shared = {
     wheel: wheelGeo(),
     crank: crankGeo(),
     parts: p.build(),
     trainer: tr.build(),
+    trainerBody: body.build(),
     frame: f.build(),
   }
   return shared
 }
 
 /**
- * Bike, on a trainer unless `road`. Local origin is the surface under it; faces -z. Frame is tinted by the
+ * Bike, on a trainer unless `road` (and `VIS.trainerOnRoad` is off). Local origin is the surface under it; faces -z. Frame is tinted by the
  * material colour.
  */
 export function makeBike(colour: string, road = false) {
@@ -106,9 +119,12 @@ export function makeBike(colour: string, road = false) {
   front.position.set(0, 0.34, -0.55)
   frame.castShadow = parts.castShadow = true
   g.add(frame, parts, crank, rear, front)
-  if (!road) {
-    const trainer = new THREE.Mesh(s.trainer, VC)
-    trainer.castShadow = true
+  if (!road || VIS.trainerOnRoad) {
+    const trainer = new THREE.Group()
+    trainer.add(new THREE.Mesh(s.trainer, VC), new THREE.Mesh(s.trainerBody, TRAINER_MAT))
+    for (const m of trainer.children) m.castShadow = true
+    trainer.scale.setScalar(VIS.trainerSize)
+    trainer.position.set(0, 0, 0.55 * (1 - VIS.trainerSize))
     g.add(trainer)
   }
   return {

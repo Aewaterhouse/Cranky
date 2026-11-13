@@ -9,7 +9,7 @@ Already in the code when the notes were written (built in a hurry, never tested,
 
 ## 1. Broken or wrong on the day (do these first)
 
-- [ ] **Trainers back under the bikes, everywhere.** Riders used to sit on a trainer; it has gone missing in at least some scenes. Put it back in every scene that shows a rider: the bus, VO2 Madness, the TV view, the free-ride world, the garage and lobby previews.
+- [x] **Trainers back under the bikes, everywhere.** Riders used to sit on a trainer; it has gone missing in at least some scenes. Put it back in every scene that shows a rider: the bus, VO2 Madness, the TV view, the free-ride world, the garage and lobby previews. Done: the trainer was still there but too small and dark to see; it is now a chunky orange direct-drive unit under every rider on the bus, in VO2 Madness, the TV view and the free-ride world. The garage and lobbies have no 3D rider preview yet (see group 5).
 - [ ] **Gears about 50% stronger per click.** The default shift strength is now 150% (was 100%) as a first step. Confirm on a trainer, then settle the default.
 - [ ] **Shift-strength slider reachable while riding, in every mode with gears.** It is in the free-ride menu and solo Slope mode; check it is easy to find mid-ride on a real screen and on an iPad, show the current value on the gear tile, and add it to the bus once the bus has gears (see group 3).
 - [ ] **The servo is dragged along the left side of the road on the bus.** It should sit still beside the road and be driven past (or pulled into), not slide with the bus.

@@ -71,6 +71,10 @@ export const VIS = {
   speedLines: 1,
   vignette: 0.45,
   busColour: '#f2b705',
+  /** The smart trainer under every bike: body colour, size (read once when a bike is built) and 1 to show it in free ride too. */
+  trainerColour: '#ff6a1a',
+  trainerSize: 1,
+  trainerOnRoad: 1,
   moodBlend: 1.6,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {

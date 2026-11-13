@@ -58,7 +58,7 @@
 - `world.ts` scene owner, render loop, `SceneState`, fx entry; `debug.ts` debug panel; `params.ts` tunable visuals (`VIS`); `util.ts` clamp, lerp, smooth.
 - `camRig.ts` chase camera; `quality.ts` graphics levels and the automatic step rule; `perfMon.ts` frame-time monitor (average, 1% low, chunk builds; no DOM); `moods.ts` mood colour blending; `sky.ts` sky and sun.
 - `ground.ts` terrain and road; `props.ts` roadside props loop; `propGeo.ts` prop and vehicle geometry; `landmarks.ts` billboards and Servo station.
-- `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures and their poses; `riderTag.ts` the floating name tag; `hats.ts` hats; `crew.ts` crew on the bus.
+- `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes and the trainer under them; `riders.ts` rider figures and their poses; `riderTag.ts` the floating name tag; `hats.ts` hats; `crew.ts` crew on the bus.
 - `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `pack.ts` the VO2 Madness pack on the road (order by points, crown, medal, fire); `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
 - `math.ts` clamp, lerp, smooth, hash and value noise with no three.js import (re-exported by `util.ts`).

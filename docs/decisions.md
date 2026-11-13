@@ -702,3 +702,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Ride history stays on SQLite (2026-11-14)
 - The server runs on Railway with SQLite on a volume at `/data`, and Railway's volume backups are on (daily and weekly). Owner decision: stay on SQLite rather than move to a hosted database. A crew of six riders writes a handful of rides a day; SQLite on a volume is plenty, and it keeps local development and tests the same as production.
+
+## Trainers under the bikes (2026-11-14)
+- The trainer never left the bus or VO2 Madness; it was a few thin dark bars nobody could see from the chase camera. It is now a direct-drive unit with an orange body and flywheel, wide feet and a front riser (`VIS.trainerColour`, `VIS.trainerSize`, debug panel folder "Trainer").
+- Free-ride riders get it too, sliding along the road (`VIS.trainerOnRoad`, 1 by default). The bike-skins item in group 5 can switch that off for skins that should roll free.
+- The garage and the lobbies have no 3D rider preview, so there was nothing to add there.

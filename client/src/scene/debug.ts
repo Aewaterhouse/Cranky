@@ -1,4 +1,5 @@
 import type GUI from 'lil-gui'
+import { TRAINER_MAT } from './bike'
 import { VIS } from './params'
 import { ROUTE_MOODS } from './route/routeMoods'
 
@@ -25,6 +26,10 @@ export async function debugPanel(onRoute?: () => void) {
   air.add(VIS, 'speedLines', 0, 2)
   gui.add(VIS, 'gapScale', 0.1, 2)
   gui.addColor(VIS, 'busColour')
+  const tr = gui.addFolder('Trainer').close()
+  tr.addColor(VIS, 'trainerColour').onChange((c: string) => TRAINER_MAT.color.set(c))
+  tr.add(VIS, 'trainerSize', 0.5, 2)
+  tr.add(VIS, 'trainerOnRoad', 0, 1, 1)
   for (const [k, m] of Object.entries(VIS.moods)) {
     const f = gui.addFolder(`Mood: ${k}`).close()
     for (const c of ['sky', 'fog', 'light', 'hemi', 'ground', 'hill'] as const) f.addColor(m, c)
