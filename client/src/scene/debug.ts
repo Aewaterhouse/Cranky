@@ -30,6 +30,10 @@ export async function debugPanel(onRoute?: () => void) {
   tr.addColor(VIS, 'trainerColour').onChange((c: string) => TRAINER_MAT.color.set(c))
   tr.add(VIS, 'trainerSize', 0.5, 2)
   tr.add(VIS, 'trainerOnRoad', 0, 1, 1)
+  const sv = gui.addFolder('Servo stop').close()
+  sv.add(VIS, 'servoStop', -30, 10)
+  sv.add(VIS, 'servoBrake', 5, 120)
+  sv.add(VIS, 'servoPullAway', 0.1, 3)
   for (const [k, m] of Object.entries(VIS.moods)) {
     const f = gui.addFolder(`Mood: ${k}`).close()
     for (const c of ['sky', 'fog', 'light', 'hemi', 'ground', 'hill'] as const) f.addColor(m, c)

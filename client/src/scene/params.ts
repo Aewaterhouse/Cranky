@@ -75,6 +75,10 @@ export const VIS = {
   trainerColour: '#ff6a1a',
   trainerSize: 1,
   trainerOnRoad: 1,
+  /** Servo stop: where the servo sits beside the parked bus (z), the braking distance in metres, and how fast the bus pulls away. */
+  servoStop: -12,
+  servoBrake: 40,
+  servoPullAway: 0.6,
   moodBlend: 1.6,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {

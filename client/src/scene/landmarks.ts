@@ -1,7 +1,8 @@
 import * as THREE from 'three'
 import { groundH } from './ground'
 import { LOOP } from './props'
-import { Mesher, VC, box, canvasTex, cyl, pick, rand } from './util'
+import { VIS } from './params'
+import { Mesher, VC, box, canvasTex, clamp, cyl, pick, rand } from './util'
 
 const SLOGANS: [string, string, string, string][] = [
   ['SERVO', '5 km', '#d8302a', '#fff'],
@@ -132,11 +133,16 @@ export class Servo {
     this.group.visible = false
   }
 
-  /** Approaches while the servo mood is active and stops beside the bus. */
-  update(dz: number, servo: boolean) {
+  /** How fast the world goes by (0..1): the bus brakes into the servo, waits out the stop, then pulls away. */
+  flow = 1
+
+  /** Sits still on the roadside: comes up when the servo mood starts, the bus parks beside it and leaves it behind. */
+  update(dz: number, servo: boolean, dt: number) {
+    const stop = VIS.servoStop
     if (servo && this.z < -300) this.z = -260
-    if (!servo && this.z > -300) this.z += dz
-    else if (servo && this.z < -12) this.z = Math.min(-12, this.z + dz)
+    this.z = servo ? Math.min(stop, this.z + dz) : this.z + dz
+    if (servo && this.z > -300) this.flow = Math.sqrt(clamp((stop - this.z) / VIS.servoBrake))
+    else this.flow = Math.min(1, this.flow + (1.02 - this.flow) * clamp(dt * VIS.servoPullAway))
     if (this.z > 40) this.z = -400
     this.group.visible = this.z > -300
     this.group.position.set(-12, 0, this.z)

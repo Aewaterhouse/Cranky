@@ -203,17 +203,19 @@ export class World {
     this.key.position.set(-14 - env.sunElev * 0.1, 14 + env.sunElev * 0.85, 22)
     this.key.target.position.set(0, 0, 4)
 
-    const dz = s.speed * dt
+    // the bus parks at the servo, so the world (and the bus) slow with it while the riders keep pedalling
+    const v = s.speed * this.servo.flow
+    const dz = v * dt
     this.dist += dz
     this.ground.update(this.dist, env)
     this.props.update(dz, this.dist)
     this.boards.update(dz, this.dist)
-    this.servo.update(dz, s.mood === 'servo')
+    this.servo.update(dz, s.mood === 'servo', dt)
     this.sky.update(env, this.t, this.camera.position)
 
     // bus
-    const acc = dt > 0 ? (s.speed - this.prevSpeed) / dt : 0
-    this.prevSpeed = s.speed
+    const acc = dt > 0 ? (v - this.prevSpeed) / dt : 0
+    this.prevSpeed = v
     this.pitch += (clamp(-acc * 0.006, -0.05, 0.05) - this.pitch) * clamp(dt * 3)
     this.brake += ((acc < -0.6 ? 1 : 0) - this.brake) * clamp(dt * 8)
     this.hit = Math.max(0, this.hit - dt * 2.2)
@@ -221,7 +223,7 @@ export class World {
     this.bus.setLook(s.busLook ?? {})
     this.bus.update({
       t: this.t,
-      speed: s.speed,
+      speed: v,
       armour: s.armour,
       head: env.head,
       brake: this.brake,
@@ -253,7 +255,7 @@ export class World {
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
       this.rig.shake = Math.max(this.rig.shake, 1.6)
     this.rig.update(this.camera, this.t, dt, {
-      speed: s.speed,
+      speed: v,
       gap: g,
       hit: this.hit,
       slow: sm < 1,
@@ -266,7 +268,7 @@ export class World {
     this.sparks.update(dt, px)
     this.fxl.lines.position.z = -1
     this.fxl.lines.scale.setScalar(Math.tan((this.camera.fov * Math.PI) / 360))
-    this.fxl.update(this.t, s.speed, this.camera.aspect, this.flash * 0.8, night)
+    this.fxl.update(this.t, v, this.camera.aspect, this.flash * 0.8, night)
     this.sparks.points.visible = true
   }
 

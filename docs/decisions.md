@@ -707,3 +707,7 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - The trainer never left the bus or VO2 Madness; it was a few thin dark bars nobody could see from the chase camera. It is now a direct-drive unit with an orange body and flywheel, wide feet and a front riser (`VIS.trainerColour`, `VIS.trainerSize`, debug panel folder "Trainer").
 - Free-ride riders get it too, sliding along the road (`VIS.trainerOnRoad`, 1 by default). The bike-skins item in group 5 can switch that off for skins that should roll free.
 - The garage and the lobbies have no 3D rider preview, so there was nothing to add there.
+
+## The bus parks at the servo (2026-11-14)
+- The servo used to stop at the bus's side while the road kept scrolling, so it looked dragged along. Now the whole scene slows with it: the bus brakes over the last 40 m (`VIS.servoBrake`), sits parked beside the servo (`VIS.servoStop`) for the whole servo block, and pulls away when the block ends (`VIS.servoPullAway`). Riders keep pedalling on their trainers on the roof, so that still makes sense.
+- This is a picture only: the server's distance and the horde gap carry on as before, so zombies can still close in on a parked bus.
