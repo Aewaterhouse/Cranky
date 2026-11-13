@@ -41,6 +41,8 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Group rides: the Phase E agent saw a solo free ride (2D layout) stall for about 9 s every 23 s in headless Chromium, after which the server read zero power. It does not reproduce on the 3D harness page on master (no gap over 1.5 s in 60 s); never checked in the 2D layout or a real browser. Watch for it on the first real group ride.
+- Group rides: drafting (27% at 2 m, none by 10 m), keep-together (up to 20%) and bot strengths are invented numbers. `freeRide.ts` is a little over 300 lines.
 - Eight route packs still have no map features (the public map server kept refusing): Full Gas Friday, Metros, Mount Buffalo, Mount Hotham, kunanyi, Willunga, Akuna Bay, Great Ocean Road, Beach Road. Re-run `scripts/routes/build_routes.py <id> --force` to fill them in.
 - Free-ride frame rate swings between 2 and 14 fps in the software renderer depending on the route; never measured on a real GPU.
 - Lap rides, quips in the HUD and the new HUD have not been ridden by a person yet.
