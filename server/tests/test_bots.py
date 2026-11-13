@@ -112,3 +112,23 @@ def test_bot_names_stay_out_of_the_room_list():
     app_mod.rooms["LIST"] = asyncio.run(build())
     rows = client.get("/api/rooms", headers={"Authorization": f"Bearer {token}"}).json()
     assert next(r for r in rows if r["code"] == "LIST")["riders"] == ["H0"]
+
+
+def test_heart_rate_reaches_the_crew_for_humans_and_bots(monkeypatch):
+    monkeypatch.setattr(config, "COUNTDOWN_S", 0)
+
+    async def main():
+        room, ws = await lobby_with(1, "BEAT")
+        await room.handle("h0", ws, {"t": "bots", "n": 1})
+        await room.handle("h0", ws, {"t": "start"})
+        data = {"t": "data", "p": 250, "w": 250, "cad": 90, "s": 0.95, "hr": 162, "hrp": 0.876}
+        while room.el < 3:
+            await room.handle("h0", ws, data)
+            await asyncio.sleep(0.01)
+        room.task.cancel()
+        return [m for m in ws.sent if m["t"] == "tick"][-1]["riders"]
+
+    riders = asyncio.run(main())
+    assert (riders["h0"]["hr"], riders["h0"]["hrp"]) == (162, 0.88)
+    bot = next(r for i, r in riders.items() if i != "h0")
+    assert 60 < bot["hr"] < config.BOT_HR_MAX and 0.3 < bot["hrp"] <= 1

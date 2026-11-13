@@ -36,6 +36,9 @@ export const VIS = {
   hordeSize: 220,
   /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
   bust: 0.17,
+  /** Heart-rate effort (fraction of max) where a rider starts to redden, and where they steam. */
+  heatFrom: 0.7,
+  steamFrom: 0.85,
   /** Gunship orbit around the horde: height, radius and turn rate (rad/s). */
   gunshipHeight: 30,
   gunshipOrbit: 34,

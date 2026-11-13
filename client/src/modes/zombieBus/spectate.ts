@@ -186,6 +186,8 @@ export function spectate(code: string, leaveTo: () => void) {
         st: r.st,
         cadence: r.cad,
         look: lk[id],
+        hr: r.hr,
+        hrp: r.hrp,
       })),
     }
     bus.update(b, m.riders)

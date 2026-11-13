@@ -1,7 +1,7 @@
 import type { RiderTick } from '../net/protocol'
 import type { Grade } from '../types'
 import { avatar, h } from './dom'
-import { compColour, GRADE_COLOUR, set } from './hudKit'
+import { compColour, hrColour, hrText, GRADE_COLOUR, set } from './hudKit'
 
 interface Row {
   root: HTMLElement
@@ -10,6 +10,7 @@ interface Row {
   bar: HTMLElement
   pct: HTMLElement
   watts: HTMLElement
+  hr: HTMLElement
   grades: HTMLElement
   nGrades: number
 }
@@ -25,6 +26,7 @@ export function makeTvBoard() {
     const bar = h('i', {})
     const pct = h('small', {})
     const watts = h('b', {})
+    const hr = h('span', { class: 'tvb-hr' })
     const grades = h('div', { class: 'tvb-grades' })
     return {
       root: h(
@@ -34,7 +36,7 @@ export function makeTvBoard() {
         h(
           'div',
           { class: 'tvb-mid' },
-          h('div', { class: 'tvb-name' }, h('span', {}, r.name), tier, badge),
+          h('div', { class: 'tvb-name' }, h('span', {}, r.name), tier, badge, hr),
           h('div', { class: 'tvb-bar' }, bar, pct),
           grades,
         ),
@@ -45,6 +47,7 @@ export function makeTvBoard() {
       bar,
       pct,
       watts,
+      hr,
       grades,
       nGrades: -1,
     }
@@ -63,6 +66,8 @@ export function makeTvBoard() {
         set(row.tier, r.tier.toUpperCase())
         row.tier.dataset.t = r.tier
         set(row.watts, r.st === 'riding' ? `${Math.round(r.w)}` : '–')
+        set(row.hr, hrText(r))
+        row.hr.style.color = hrColour(r.hrp)
         set(row.badge, r.st === 'fell' ? 'FELL OFF' : r.st === 'spectator' ? 'SPECTATING' : '')
         row.bar.style.width = `${r.st === 'riding' ? Math.round((r.s ?? 0) * 100) : 0}%`
         row.bar.style.background = compColour(r.s)

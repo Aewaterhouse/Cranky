@@ -286,6 +286,15 @@
   min-width: 52px;
   text-align: right;
 }
+.rs-hr,
+.tvb-hr {
+  margin-left: auto;
+  padding-left: 6px;
+  font-size: 0.78em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .rs-foot {
   display: flex;
   gap: 6px;

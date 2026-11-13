@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { SLOTS, ROOF_Y } from './busParts'
 import { makeRider } from './riders'
 import type { SceneRider } from './world'
+import type { Particles } from './particles'
 import { clamp } from './util'
 
 const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5']
@@ -24,7 +25,14 @@ export class Crew {
     private shell: THREE.Object3D,
   ) {}
 
-  update(riders: SceneRider[], t: number, dt: number, hordeFront: number | null) {
+  update(
+    riders: SceneRider[],
+    t: number,
+    dt: number,
+    hordeFront: number | null,
+    steam?: Particles,
+    speed = 0,
+  ) {
     const live = new Set(riders.map((r) => r.id))
     for (const [id, e] of this.map)
       if (!live.has(id)) {
@@ -51,7 +59,8 @@ export class Crew {
         this.map.set(sr.id, e)
       }
       const r = e.r
-      r.label(sr.name, sr.c, sr.st)
+      r.label(sr.name, sr.c, sr.st, sr.hr, sr.hrp)
+      r.heat(sr.st === 'spectator' ? null : sr.hrp, dt, steam, speed)
       r.setLook(sr.look)
       const fell = sr.st === 'fell'
       const ph = t * (sr.cadence / 60) * Math.PI * 2 + e.seed

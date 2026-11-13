@@ -14,7 +14,15 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
-  | { t: 'data'; p: number; w: number; cad: number; s: number | null }
+  | {
+      t: 'data'
+      p: number
+      w: number
+      cad: number
+      s: number | null
+      hr: number | null
+      hrp: number | null
+    }
   | { t: 'buy'; item: ShopItem }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
@@ -47,6 +55,9 @@ export interface RiderTick {
   cad: number
   s: number | null
   st: 'riding' | 'fell' | 'spectator'
+  /** Heart rate in bpm, and as a fraction of the rider's max (null without a strap or a max). */
+  hr?: number | null
+  hrp?: number | null
 }
 export interface BusState {
   speed: number

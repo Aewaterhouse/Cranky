@@ -55,6 +55,8 @@ class Data(BaseModel):
     w: float = Field(ge=0, le=3000)
     cad: float = Field(ge=0, le=250)
     s: float | None = Field(default=None, ge=0, le=1)
+    hr: int | None = Field(default=None, ge=0, le=250)
+    hrp: float | None = Field(default=None, ge=0, le=1.5)
 
 
 class Sprint(BaseModel):
@@ -88,6 +90,8 @@ class RiderTick(BaseModel):
     cad: float
     s: float | None
     st: Literal["riding", "fell", "spectator"]
+    hr: int | None = None
+    hrp: float | None = None
 
 
 class Bus(BaseModel):
