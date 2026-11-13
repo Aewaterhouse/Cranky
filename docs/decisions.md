@@ -773,3 +773,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Shop previews (2026-11-14)
 - Previews are still images (240×150 PNG), not live spinning models: one WebGL context draws them all once, caches them for the session and then lets the context go, so the Garage costs nothing while open and stays light on the iPad.
+
+## Bike skins (2026-11-14)
+- New cosmetic slot `bike`. A skin sets the frame colour; `bike-trainer` (Indoor Escapee) shows the orange trainer under the bike on the road too. The debug panel's `VIS.trainerOnRoad` still puts it on everyone. Prices invented: 80, 100, 160 for frames, 350 for the trainer.

@@ -33,5 +33,9 @@
  { "id": "outfit-skyblue", "slot": "outfit", "name": "Sky Blue Jersey", "price": 40, "colour": "#6cb4ee" },
  { "id": "outfit-greengold", "slot": "outfit", "name": "Green and Gold", "price": 80, "colour": "#f4c20d" },
  { "id": "outfit-polka", "slot": "outfit", "name": "King of the Mountains", "price": 150, "colour": "#f2f2f2" },
- { "id": "outfit-zombie", "slot": "outfit", "name": "Zombie Disguise", "price": 200, "colour": "#7fa65a" }
+ { "id": "outfit-zombie", "slot": "outfit", "name": "Zombie Disguise", "price": 200, "colour": "#7fa65a" },
+ { "id": "bike-pink", "slot": "bike", "name": "Fairy Floss", "price": 80, "colour": "#ff8fc8" },
+ { "id": "bike-matte", "slot": "bike", "name": "Murdered Out", "price": 100, "colour": "#1c1c1e" },
+ { "id": "bike-chrome", "slot": "bike", "name": "Chrome Dome", "price": 160, "colour": "#c9ced6" },
+ { "id": "bike-trainer", "slot": "bike", "name": "Indoor Escapee", "price": 350 }
 ]

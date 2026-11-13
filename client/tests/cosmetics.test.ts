@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { bankScrap, buy, COSMETICS, equip } from '../src/core/cosmetics'
+import { bankScrap, buy, COSMETICS, equip, TRAINER_SKIN } from '../src/core/cosmetics'
 import { newProfile, type Profile } from '../src/core/curve'
 
 describe('cosmetics', () => {
   it('catalogue has unique ids and every slot', () => {
     expect(new Set(COSMETICS.map((c) => c.id)).size).toBe(COSMETICS.length)
     expect(new Set(COSMETICS.map((c) => c.slot))).toEqual(
-      new Set(['paint', 'bullbar', 'spikes', 'hat', 'outfit']),
+      new Set(['paint', 'bullbar', 'spikes', 'hat', 'outfit', 'bike']),
     )
+    expect(COSMETICS.find((c) => c.id === TRAINER_SKIN)?.slot).toBe('bike')
   })
   it('buys, spends scrap and equips', () => {
     const p = { ...newProfile('a'), scrap: 100 }

@@ -119,17 +119,21 @@ export function makeBike(colour: string, road = false) {
   front.position.set(0, 0.34, -0.55)
   frame.castShadow = parts.castShadow = true
   g.add(frame, parts, crank, rear, front)
-  if (!road || VIS.trainerOnRoad) {
-    const trainer = new THREE.Group()
-    trainer.add(new THREE.Mesh(s.trainer, VC), new THREE.Mesh(s.trainerBody, TRAINER_MAT))
-    for (const m of trainer.children) m.castShadow = true
-    trainer.scale.setScalar(VIS.trainerSize)
-    trainer.position.set(0, 0, 0.55 * (1 - VIS.trainerSize))
-    g.add(trainer)
-  }
+  const trainer = new THREE.Group()
+  trainer.add(new THREE.Mesh(s.trainer, VC), new THREE.Mesh(s.trainerBody, TRAINER_MAT))
+  for (const m of trainer.children) m.castShadow = true
+  trainer.scale.setScalar(VIS.trainerSize)
+  trainer.position.set(0, 0, 0.55 * (1 - VIS.trainerSize))
+  trainer.visible = !road || !!VIS.trainerOnRoad
+  g.add(trainer)
   return {
     group: g,
     frameMat,
+    /** A bike skin: its frame colour, and the trainer brought out on the road with `onTrainer`. */
+    skin(frameColour: string | undefined, onTrainer: boolean) {
+      frameMat.color.set(frameColour ?? colour)
+      trainer.visible = !road || !!VIS.trainerOnRoad || onTrainer
+    },
     spin(phase: number) {
       crank.rotation.x = phase
       rear.rotation.x = phase * 2.6

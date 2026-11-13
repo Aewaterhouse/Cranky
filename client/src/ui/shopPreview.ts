@@ -27,7 +27,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic) {
     obj = bus.group
     frame = bus.shell
   } else {
-    const rider = makeRider('#3d7bd9', 1)
+    const rider = makeRider('#3d7bd9', 1, c.slot === 'bike') // a road bike, so only the trainer skin shows one
     rider.setLook(look)
     rider.pose('ride', 0.3)
     obj = rider.root
@@ -40,7 +40,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic) {
   const size = box.getSize(new THREE.Vector3())
   const mid = box.getCenter(new THREE.Vector3())
   // Hats get a close-up of the head; everything else a three-quarter view from the front.
-  const reach = Math.max(size.x, size.y, size.z) * (c.slot === 'hat' ? 1.6 : onBus ? 0.8 : 1.1)
+  const reach = Math.max(size.x, size.y, size.z) * (c.slot === 'hat' ? 1.6 : onBus ? 0.8 : 0.55)
   const cam = new THREE.PerspectiveCamera(32, W / H, 0.05, 200)
   cam.position.set(
     mid.x + reach * 0.9,

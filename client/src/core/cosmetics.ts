@@ -1,7 +1,7 @@
 import CATALOGUE from '../../../content/cosmetics.json'
 import type { Profile } from './curve'
 
-export type Slot = 'paint' | 'bullbar' | 'spikes' | 'hat' | 'outfit'
+export type Slot = 'paint' | 'bullbar' | 'spikes' | 'hat' | 'outfit' | 'bike'
 export interface Cosmetic {
   id: string
   slot: Slot
@@ -20,7 +20,10 @@ export const SLOT_NAMES: Record<Slot, string> = {
   spikes: 'Roof',
   hat: 'Hat',
   outfit: 'Outfit',
+  bike: 'Bike',
 }
+/** The bike skin that brings your indoor trainer out on the road with you. */
+export const TRAINER_SKIN = 'bike-trainer'
 
 /** Returns the updated profile, or an error message. */
 export function buy(p: Profile, id: string): Profile | string {

@@ -5,13 +5,14 @@ import { h } from './dom'
 import { shopPreview } from './shopPreview'
 import { toast } from './toast'
 
-const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱' }
+const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲' }
 const WHERE: Record<Slot, string> = {
   paint: 'On the bus when you drive',
   bullbar: 'On the bus when you drive',
   spikes: 'On the bus when you drive',
   hat: 'On your rider',
   outfit: 'On your rider',
+  bike: 'Your bike, on the bus and out on the road',
 }
 
 export const scrapIcon = () => h('span', { class: 'scrap-ico', 'aria-hidden': 'true' }, '⚙')

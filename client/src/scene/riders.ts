@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
+import { TRAINER_SKIN } from '../core/cosmetics'
 import { makeHat } from './hats'
 import { VIS } from './params'
 import type { Particles } from './particles'
@@ -130,10 +131,11 @@ export function makeRider(colour: string, seed: number, road = false) {
   )
   head.add(helmet)
   const setLook = (look: Look = {}) => {
-    const key = `${look.hat}|${look.outfit}`
+    const key = `${look.hat}|${look.outfit}|${look.bike}`
     if (key === hatKey) return
     hatKey = key
     mats.jersey.color.set(cosmetic(look.outfit)?.colour ?? colour)
+    bike.skin(cosmetic(look.bike)?.colour, look.bike === TRAINER_SKIN)
     if (hat) head.remove(hat)
     hat = makeHat(look.hat)
     if (hat) head.add(hat)
