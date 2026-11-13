@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { Route } from '../../core/route'
+import type { Place } from '../../core/soundMix'
 import { MoodBlend } from '../moods'
 import { VIS } from '../params'
 import { Quality, type Level } from '../quality'
@@ -13,9 +14,8 @@ import { LandCover } from './landCover'
 import { planLandmarks, type Landmark } from './landmarkPlan'
 import { Life } from './life'
 import { LifePlan } from './lifePlan'
-import { Oddities } from './oddPlan'
+import { Oddities, jokeCover, seedOf } from './oddPlan'
 import { Signs } from './signs'
-import { seedOf } from './oddPlan'
 import { Rain } from './rain'
 import { RoadPath } from './roadPath'
 import { pickMood } from './routeMoods'
@@ -57,6 +57,7 @@ export class RouteWorld {
   readonly odd: Oddities
   private landmarks: Map<number, Landmark[]>
   private lifePlan: LifePlan
+  private cover: Pick<LandCover, 'at'>
   private life: Life
   private things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
   /** Works out the funny signs and chalk again, for when their tunables change. */
@@ -98,6 +99,7 @@ export class RouteWorld {
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))
     // Map features share the height grid's origin, so they are only usable alongside it.
     const cover = new LandCover(terrain, route.region)
+    this.cover = jokeCover(route.id, cover)
     const features = new Features(terrain && route.features, this.field)
     const furniture = planFurniture(path)
     const taken = [...furniture.values()].flat().map((f) => f.d)
@@ -122,6 +124,7 @@ export class RouteWorld {
       odd: (this.odd = new Oddities(route.id, this.field, cover, features)),
     })
     this.riders = new RoadRiders(path)
+    this.rig.loop = !!route.loop
     this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.life = new Life(this.lifePlan, path, this.chunks.height)
     path.poseAt(0, this.riders.me)
@@ -199,8 +202,7 @@ export class RouteWorld {
       this.root.position.set(-this.ox, -this.oy, -this.oz)
     }
     const { ox, oy, oz } = this
-    const { meOffset, meSpeed } = this.riders
-    this.rig.update(this.camera, this.field, me, d, meOffset, meSpeed, dt, ox, oy, oz)
+    this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt)
@@ -225,6 +227,15 @@ export class RouteWorld {
       for (const l of this.landmarks.get(Math.floor(d / R.chunk) + k) ?? [])
         if (Math.hypot(l.x - x, l.z - z) < F.landmarkM) return l.kind
     return undefined
+  }
+
+  /** The ground the rider is passing, for the sounds of the place: `coastM` either side is searched for sand or water. */
+  place(coastM: number): Place {
+    const { x, y, z, rx, rz } = this.riders.me
+    const at = (o: number) =>
+      this.cover.at(x + rx * o, z + rz * o, this.field.ground(x + rx * o, z + rz * o))
+    const coast = [0.25, 0.5, 0.75, 1].some((k) => /[aw]/.test(at(k * coastM) + at(-k * coastM)))
+    return { cover: at(R.roadHalf + R.verge + 6), y, coast }
   }
 
   /** Where the next thing of a sort is after `d` metres (optionally of one kind), for the harness. */

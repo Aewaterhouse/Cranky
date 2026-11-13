@@ -70,6 +70,69 @@ export const CFG = {
       lastRings: 3,
       gapS: 0.28,
     },
+    /** Free-ride sounds. Speeds in m/s, pitches in Hz. */
+    ride: {
+      /** Loudness of each kind of sound, 0..1, before the volume setting. `master` scales the lot. */
+      level: {
+        master: 1,
+        freehub: 0.22,
+        wind: 0.5,
+        tyre: 0.4,
+        clunk: 0.7,
+        birds: 0.12,
+        cicadas: 0.09,
+        highWind: 0.3,
+        surf: 0.5,
+        gulls: 0.1,
+        traffic: 0.35,
+      },
+      /** Seconds for bike sounds and for the sounds of the place to fade to a new level. */
+      easeS: 0.25,
+      bedEaseS: 2,
+      /** Freehub: pawl clicks per wheel turn, silent below `minMs`, at most `maxHz` clicks a second; each click rings at `ringHz` for `clickS`; booked `aheadS` ahead. */
+      freehub: { clicks: 18, minMs: 0.8, maxHz: 45, ringHz: 3400, clickS: 0.012, aheadS: 0.35 },
+      /** Wind in the ears: from `fromMs` to full at `fullMs` through the air; its pitch rises `hzPerMs`. */
+      wind: { fromMs: 3, fullMs: 20, hz: 350, hzPerMs: 45, q: 0.7 },
+      tyre: { fullMs: 14, hz: 110, hzPerMs: 14, q: 0.8 },
+      clunk: { hz: 150, thunkS: 0.07, settleS: 0.05 },
+      /** Noise beds as [filter Hz, Q, swell Hz, swell depth]: cicadas rattle fast, surf and wind swell slowly. */
+      bed: {
+        cicadas: [4800, 9, 46, 0.5],
+        highWind: [420, 0.5, 0.13, 0.35],
+        surf: [520, 0.5, 0.1, 0.45],
+        traffic: [140, 0.6, 0.07, 0.25],
+      },
+      /** Birdsong: phrases a second at full level, notes a phrase, seconds a note, pitch range. */
+      bird: { perS: 0.35, notes: [2, 5], noteS: [0.06, 0.14], hz: [2200, 4200] },
+      gull: { perS: 0.12, cries: [2, 4], cryS: 0.28, hz: [1300, 1700], fall: 0.62 },
+      /** How much birdsong, cicada and traffic each land cover has (letters as in scene/route/landCover.ts). */
+      cover: {
+        f: { birds: 1, cicadas: 0.6, traffic: 0 },
+        b: { birds: 0.8, cicadas: 1, traffic: 0 },
+        s: { birds: 0.3, cicadas: 0.5, traffic: 0 },
+        g: { birds: 0.5, cicadas: 0.3, traffic: 0 },
+        p: { birds: 0.8, cicadas: 0.3, traffic: 0.3 },
+        u: { birds: 0.2, cicadas: 0, traffic: 1 },
+        a: { birds: 0.1, cicadas: 0, traffic: 0 },
+      },
+      /** What each sky does to them: a dawn chorus, cicadas in the heat, quiet in mist and rain. */
+      mood: {
+        routeDawn: { birds: 1.6, cicadas: 0 },
+        route: { birds: 1, cicadas: 1 },
+        routeGolden: { birds: 1, cicadas: 1.3 },
+        routeDusk: { birds: 0.7, cicadas: 0.8 },
+        routeMist: { birds: 0.4, cicadas: 0 },
+        routeShower: { birds: 0.2, cicadas: 0 },
+      },
+      /** Mountain wind fades in from `highFrom` to `highFull` metres up, taking the cicadas and most birds away. */
+      highFrom: 900,
+      highFull: 1500,
+      highBirdsCut: 0.7,
+      coastCicadas: 0.5,
+      /** Sand or water within this far either side counts as the coast, for a rider below `coastBelow` metres (so not a dam in the hills). */
+      coastM: 150,
+      coastBelow: 60,
+    },
   },
   /** Virtual gears (free ride and solo slope): 24 ratios spanning Zwift's range, set on a 14T Zwift Cog. */
   gears: {

@@ -50,6 +50,7 @@ function routeFolder(f: GUI, rebuild: () => void) {
   cam.add(R, 'camAim', 0, 1)
   cam.add(R, 'camStiff', 0.5, 12)
   cam.add(R, 'fov', 30, 100)
+  addAll(f.addFolder('feel: camera extras and rider poses').close(), R.feel)
   f.add(R, 'fogNear', 0, 600)
   f.add(R.mood, 'pick', ['auto', ...ROUTE_MOODS]).name('mood')
   addAll(f.addFolder('weather').close(), R.mood)

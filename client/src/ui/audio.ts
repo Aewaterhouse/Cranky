@@ -5,6 +5,8 @@ const B = CFG.sound.bell
 
 let ctx: AudioContext | null = null
 const ac = () => (ctx ??= new AudioContext())
+/** The one audio context, made on first use. Throws where there is no audio. */
+export const audioCtx = ac
 
 export function beep(
   freq: number,

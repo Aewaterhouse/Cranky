@@ -1,3 +1,4 @@
+import { FEEL } from './route/feelVis'
 import { PLACE } from './route/placeVis'
 import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
 
@@ -155,6 +156,7 @@ export const VIS = {
     street: '#b7b1a3',
     mainStreet: '#96938c',
     place: PLACE,
+    feel: FEEL,
     mood: MOOD,
     signs: {
       post: '#8d949a',

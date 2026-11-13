@@ -28,6 +28,7 @@
 - `badges.ts` milestone badges, PR timeline.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
 - `climbs.ts` sustained climbs on a route and the one the rider is on; `hud.ts` HUD maths with no DOM: power zone (Zwift boundaries), gradient colour, gap text, rider-list rows.
+- `soundMix.ts` how loud each free-ride sound should be for the speed, the place and the sky (no audio API).
 - `laps.ts` lap counter, lap times and the lap toast for lap rides (no DOM).
 - `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
@@ -39,7 +40,7 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map and Click mapping; `modes/drill/slope.ts` slope mode gradient sender with gears.
-- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/feel.ts` what the road's shape does to the ride: bend speed limit, wind along the road, the look-ahead gradient for the trainer (`trainerTarget`) and when to cheer; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/difficulty.ts` remembered trainer difficulty; `modes/freeRide/ghosts.ts` the `?ghosts=N` dev riders; `modes/freeRide/feel.ts` what the road's shape does to the ride: bend speed limit, wind along the road, the look-ahead gradient for the trainer (`trainerTarget`) and when to cheer; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
 - `fun/signLines.ts`, `fun/chalkLines.ts`, `fun/quipLines.ts` the words for roadside signs, road chalk and the commentator, each tagged with when it applies.
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
@@ -51,7 +52,7 @@
 - `world.ts` scene owner, render loop, `SceneState`, fx entry; `debug.ts` debug panel; `params.ts` tunable visuals (`VIS`); `util.ts` clamp, lerp, smooth.
 - `camRig.ts` chase camera; `moods.ts` mood colour blending; `sky.ts` sky and sun.
 - `ground.ts` terrain and road; `props.ts` roadside props loop; `propGeo.ts` prop and vehicle geometry; `landmarks.ts` billboards and Servo station.
-- `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
+- `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures and their poses; `riderTag.ts` the floating name tag; `hats.ts` hats; `crew.ts` crew on the bus.
 - `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `pack.ts` the VO2 Madness pack on the road (order by points, crown, medal, fire); `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
 - `math.ts` clamp, lerp, smooth, hash and value noise with no three.js import (re-exported by `util.ts`).
@@ -67,10 +68,11 @@
 - `lifePlan.ts` which mob, flock, crossing animal, magpie or oncoming vehicle is where, seeded, chunk by chunk (no three.js); `lifeGeo.ts` animal and vehicle shapes; `life.ts` pooled instanced animals and traffic and how they move each frame.
 - `routeMoods.ts` the free ride's skies (dawn, golden hour, dusk, mist, shower), their tunables and `pickMood` (clock, height, showers; no three.js); `rain.ts` the shower's streaks.
 - `roadGeo.ts` road ribbon triangles, the `Tris` builder, `addBox` and `addBeam`; `terrainGeo.ts` terrain mesh from a patch, coloured by land cover, with water sheets; `streetGeo.ts` side street strips and street-name signs; `signs.ts` shared text plates; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
+- `feelVis.ts` tunables for the camera extras and rider poses (`VIS.route.feel`); `riderPose.ts` which pose a rider on the road wants (standing, coasting, tuck, cheer), lean, and the camera's shake, roll and view maths (no three.js).
 - `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 
 ### ui/
-- `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
+- `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio beeps, the lap bell and the event drone; `rideSound.ts` the synthesised free-ride sounds (freehub, wind, tyres, gear clunk, birds, cicadas, surf, gulls, mountain wind, traffic).
 - `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve with crew overlay chips; `riderCrew.ts` crew leaderboard; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `svg.ts` SVG helpers.
 - `trainer.ts` trainer pill and connect modal; `clickPair.ts` Zwift Click section of the modal; `settings.ts` Settings screen.
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
@@ -84,6 +86,7 @@
 ### tests/ and assets
 - `tests/compliance|cosmetics|curve|erg|load|plan|gears|zwiftClick.test.ts` and others: vitest unit tests.
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
+- `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.
 - `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 

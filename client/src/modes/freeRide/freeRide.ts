@@ -3,7 +3,7 @@ import type { Profile } from '../../core/curve'
 import { shiftGear } from '../../core/gears'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
-import { steadySpeed, stepSpeed, totalMass } from '../../core/physics'
+import { stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
@@ -14,27 +14,18 @@ import { clock, show } from '../../ui/dom'
 import { toast } from '../../ui/toast'
 import { freeRideView, type FreePart } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
+import { rideSound } from '../../ui/rideSound'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
+import { loadDifficulty, saveDifficulty } from './difficulty'
 import { RoadFeel, cheering, trainerTarget } from './feel'
+import { makeGhosts, stepGhosts } from './ghosts'
 import { Quipper, speak } from './quips'
 
 const STOP_S = 3
 const GO_S = 1.5
-const DIFF_KEY = 'cranky.trainerDifficulty'
 const F = CFG.freeRide
-const G = F.ghosts
 const HUD_KEYS: Record<string, FreePart> = { h: 'clean', s: 'stats', m: 'map', r: 'riders' }
-
-function loadDifficulty() {
-  try {
-    const v = parseFloat(localStorage.getItem(DIFF_KEY) ?? '')
-    if (v >= 0 && v <= 1) return v
-  } catch {
-    /* no storage */
-  }
-  return F.difficulty
-}
 
 /** The plan recorded for a free ride: one open block named for the route, with a duration estimate at ~75% FTP. */
 export function freePlan(route: Route, ftp: number, weightKg?: number): Plan {
@@ -84,13 +75,7 @@ export function runFreeRide(
     difficulty,
     settings.freeRideView === '3d',
   )
-  const save = () => {
-    try {
-      localStorage.setItem(DIFF_KEY, String(difficulty))
-    } catch {
-      /* no storage */
-    }
-  }
+  const save = () => saveDifficulty(difficulty)
   show(view.root)
   view.toast(route.name)
   // The 3D world is one rider on the road for now; group rides will hand it more.
@@ -103,11 +88,7 @@ export function runFreeRide(
     cadence: 0,
     look: profile.look,
   }
-  // Dev aid (?ghosts=N): made-up mates riding steadily at a spread of efforts, to see the rider list and a bunch.
-  const ghosts = G.names.slice(0, +(params.get('ghosts') ?? 0)).map((name, i, all) => ({
-    rider: { ...me, id: `ghost${i}`, name, look: undefined, d: G.gapM * (i + 1) },
-    watts: profile.ftp * (G.ftp[0] + ((G.ftp[1] - G.ftp[0]) * i) / all.length),
-  }))
+  const ghosts = makeGhosts(me, profile.ftp, +(params.get('ghosts') ?? 0))
   const riders = [me, ...ghosts.map((g) => g.rider)]
   // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
   const lapM = route.lapOf?.distance
@@ -115,6 +96,7 @@ export function runFreeRide(
   const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
   let world: RouteWorld | undefined
   const feel = new RoadFeel(route)
+  const sound = rideSound()
   let wind = 0
   // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
   const quipper = new Quipper()
@@ -130,6 +112,7 @@ export function runFreeRide(
     import('../../scene/route/routeWorld')
       .then((m) => {
         if (finished) return
+        VIS.route.feel.cam.calm = settings.calmCamera ? 1 : 0
         world = new m.RouteWorld(view.stage, route.lapOf ?? route)
         world.state = { me: me.id, riders: shown }
       })
@@ -168,7 +151,12 @@ export function runFreeRide(
     act()
     e.preventDefault()
   }
-  const shift = (d: number) => ((shifted = true), (gear = shiftGear(gear, d)))
+  const shift = (d: number) => {
+    const to = shiftGear(gear, d)
+    if (to !== gear) sound?.clunk()
+    shifted = true
+    gear = to
+  }
   addEventListener('keydown', onKey)
   const offClick = onClickShift(shift)
   ride.start()
@@ -214,6 +202,14 @@ export function runFreeRide(
       sentAt = now / 1000
       ride.erg.setGrade(sent, F.grade)
     }
+    sound?.update({
+      speed,
+      coasting: live.power === 0,
+      paused,
+      headwind: wind,
+      place: world?.place(CFG.sound.ride.coastM) ?? { cover: 'b', y: p.ele, coast: false },
+      mood: world?.moodName ?? 'route',
+    })
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })
     me.d = dist
     me.speed = speed * fast
@@ -221,13 +217,7 @@ export function runFreeRide(
     me.power = paused ? 0 : live.power
     me.effort = live.power / profile.ftp
     me.cheer = !starting && cheering(dist, route.distance, climbs ? top.d : undefined)
-    for (const g of ghosts) {
-      g.rider.speed = paused
-        ? 0
-        : steadySpeed(g.watts, routeAt(route, g.rider.d).grade, mass) * fast
-      g.rider.cadence = paused ? 0 : G.cadence
-      g.rider.d = Math.min(route.distance, g.rider.d + g.rider.speed * dt)
-    }
+    stepGhosts(ghosts, route, mass, paused, fast, dt)
     if (lapM) riders.forEach((r, i) => Object.assign(shown[i], r, { d: r.d % lapM }))
     const lap = lapTimer?.info(dist)
     if (lap && lapTimer?.update(dist, el, speed) !== undefined) {
@@ -295,6 +285,7 @@ export function runFreeRide(
     removeEventListener('keydown', onKey)
     offClick()
     world?.dispose()
+    sound?.stop()
     await ride.stop()
     finishRide(profile, ride.rec.summary(), done)
   }

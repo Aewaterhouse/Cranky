@@ -4,18 +4,19 @@ import { BB, CRANK, makeBike } from './bike'
 import { makeHat } from './hats'
 import { VIS } from './params'
 import type { Particles } from './particles'
-import { box, clamp, ico, rand, smooth, span } from './util'
+import { makeTag, TAG_H } from './riderTag'
+import { FEEL } from './route/feelVis'
+import type { RoadPose } from './route/riderPose'
+import { box, clamp, ico, lerp, rand, smooth, span } from './util'
 
 const SKINS = ['#f0c8a0', '#d9a577', '#b07a50', '#7a4e32', '#f3d2b8', '#e0b088']
 const SHORTS = '#23252c'
 const HOT = new THREE.Color('#ff2a1a')
 const STEAM = new THREE.Color('#f4f6f8')
-/** Tag colour by heart-rate zone (under 60, 70, 80, 90% of max, then over). */
-const HR_COLS = ['#9aa7b8', '#5aa9e6', '#6cff7a', '#ffd24a', '#ff5a4a']
-const TAG_H = 132
 const THIGH = 0.46
 const SHIN = 0.46
 const ARM = 0.32
+const P = FEEL.rider
 
 /** Two-bone IK in the (forward, up) plane; the joint bends counter-clockwise (knees and elbows forward/up). */
 function ik(
@@ -94,62 +95,8 @@ export function makeRider(colour: string, seed: number, road = false) {
   head.add(nose)
   person.add(head)
 
-  const canvas = document.createElement('canvas')
-  canvas.width = 320
-  canvas.height = TAG_H
-  const tex = new THREE.CanvasTexture(canvas)
-  tex.colorSpace = THREE.SRGBColorSpace
-  const tag = new THREE.Sprite(
-    new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }),
-  )
-  tag.scale.set(2.8, (2.8 * TAG_H) / 320, 1)
-  tag.renderOrder = 10
+  const { tag, label } = makeTag()
   person.add(tag)
-  let lastTag = ''
-  /** Name pill, with a heart-rate chip above it when the rider has a strap: bpm and % of max. */
-  const label = (
-    name: string,
-    c: number | null,
-    state: string,
-    hr?: number | null,
-    hrp?: number | null,
-  ) => {
-    const col = c == null ? '#cfcfcf' : c > 0.85 ? '#6cff7a' : c > 0.6 ? '#ffd24a' : '#ff5a4a'
-    const beat = hr ? `♥ ${hr}${hrp ? `  ${Math.round(hrp * 100)}%` : ''}` : ''
-    const key = name + col + state + beat
-    if (key === lastTag) return
-    lastTag = key
-    const g = canvas.getContext('2d')!
-    g.setTransform(1, 0, 0, 1, 0, 0)
-    g.clearRect(0, 0, 320, TAG_H)
-    g.font = '700 34px system-ui, sans-serif'
-    g.textAlign = 'center'
-    g.textBaseline = 'middle'
-    if (beat) {
-      const w = g.measureText(beat).width + 36
-      g.fillStyle = 'rgba(14,12,22,0.78)'
-      g.beginPath()
-      g.roundRect(160 - w / 2, 4, w, 46, 18)
-      g.fill()
-      g.fillStyle = hrp ? HR_COLS[[0.6, 0.7, 0.8, 0.9].filter((f) => hrp >= f).length] : '#ffffff'
-      g.fillText(beat, 160, 29)
-    }
-    g.translate(0, TAG_H - 80)
-    g.fillStyle = 'rgba(14,12,22,0.78)'
-    g.beginPath()
-    g.roundRect(6, 12, 308, 56, 22)
-    g.fill()
-    g.lineWidth = 5
-    g.strokeStyle = state === 'riding' ? col : '#888'
-    g.stroke()
-    g.fillStyle = '#fff'
-    g.fillText((state === 'fell' ? '! ' : '') + name.slice(0, 12), 160, 42)
-    g.fillStyle = col
-    g.beginPath()
-    g.arc(30, 40, 9, 0, 7)
-    g.fill()
-    tex.needsUpdate = true
-  }
 
   const skin0 = mats.skin.color.clone()
   let hot = 0
@@ -206,25 +153,38 @@ export function makeRider(colour: string, seed: number, road = false) {
     if (hat) hat.visible = o > 0.5
   }
 
-  /** Poses the rider. `phase` is crank or stride angle in radians. */
-  const pose = (mode: RiderMode, phase: number, side = 0) => {
+  /**
+   * Poses the rider. `phase` is crank or stride angle in radians. On the road `rp` adds standing on the pedals
+   * and rocking the bike, a tuck, and sitting up with both arms in the air.
+   */
+  const pose = (mode: RiderMode, phase: number, side = 0, rp?: RoadPose) => {
     const slump = mode === 'slump'
     const run = mode === 'run'
-    const hipF = run ? 0 : -0.3
-    const hipY = run ? 1.0 : slump ? 0.98 : 1.05
-    const lean = run ? 0.3 : slump ? 1.15 : 0.75
-    const bob = run ? Math.abs(Math.sin(phase)) * 0.06 : Math.sin(phase * 2) * 0.012
+    const st = rp?.stand ?? 0
+    const tk = rp?.tuck ?? 0
+    const ch = rp?.cheer ?? 0
+    const rock = Math.sin(phase) * P.rock * st
+    bike.group.rotation.z = rock
+    // Where a point at height `y` on the rocking bike has moved sideways to.
+    const sway = (y: number) => -Math.sin(rock) * y
+    const hipF = run ? 0 : -0.3 + P.standF * st
+    const hipY = run ? 1.0 : slump ? 0.98 : 1.05 + P.standUp * st
+    const sat = lerp(lerp(P.lean, P.tuckLean, tk), P.cheerLean, ch)
+    const lean = run ? 0.3 : slump ? 1.15 : sat
+    const bob = run
+      ? Math.abs(Math.sin(phase)) * 0.06
+      : Math.sin(phase * 2) * (0.012 + P.standBob * st)
     const hy = hipY + bob
+    const hx = sway(hy) * 0.5
     const sf = hipF + Math.sin(lean) * 0.6
     const sy = hy + Math.cos(lean) * 0.6
-    pt(v, 0, hipF, hy)
+    pt(v, hx, hipF, hy)
     hips.position.copy(v)
     torso.position.copy(v)
     torso.rotation.x = -lean
-    torso.rotation.z = run ? 0 : Math.sin(phase) * 0.06
-    pt(w, 0, sf, sy)
-    head.position.set(0, sy + 0.34 - (slump ? 0.1 : 0), -sf - (slump ? 0.15 : 0.1))
-    head.rotation.x = slump ? -0.7 : run ? 0 : 0.05
+    torso.rotation.z = run ? 0 : Math.sin(phase) * 0.06 - rock * 0.5
+    head.position.set(hx, sy + 0.34 - (slump ? 0.1 : 0), -sf - (slump ? 0.15 : 0.1))
+    head.rotation.x = slump ? -0.7 : run ? 0 : 0.05 + 0.4 * tk
     bike.spin(slump ? 0.5 : phase)
     for (const i of [0, 1]) {
       const s = i ? 1 : -1
@@ -242,16 +202,18 @@ export function makeRider(colour: string, seed: number, road = false) {
         fy = BB.y + Math.sin(i * Math.PI) * CRANK + 0.07
       }
       const px = s * 0.12
+      const fx = px + sway(fy)
       const [kf, ky] = ik(hipF, hy, ff, fy, THIGH, SHIN)
-      pt(v, px, hipF, hy)
-      pt(w, px * 1.2, kf, ky)
+      pt(v, px + hx, hipF, hy)
+      pt(w, px * 1.2 + (hx + sway(fy)) / 2, kf, ky)
       span(thigh[i], v, w)
-      pt(x, px, ff, fy)
+      pt(x, fx, ff, fy)
       span(shin[i], w, x)
-      shoes[i].position.set(px, fy - 0.02, -ff - 0.04)
+      shoes[i].position.set(fx, fy - 0.02, -ff - 0.04)
       // arms
-      const sx = s * 0.26
+      const sx = s * 0.26 + hx
       let hf: number, hyy: number
+      let handX = s * 0.19
       if (run) {
         hf = sf + Math.sin(ph + Math.PI) * 0.4
         hyy = sy - 0.45 + Math.max(0, Math.cos(ph + Math.PI)) * 0.25 + 0.1
@@ -259,14 +221,16 @@ export function makeRider(colour: string, seed: number, road = false) {
         hf = sf + 0.05
         hyy = sy - 0.62
       } else {
-        hf = 0.5
-        hyy = 0.95
+        // On the bars, or up in the air for a celebration.
+        hf = lerp(0.5, sf + 0.06, ch)
+        hyy = lerp(0.95, sy + P.cheerUp, ch)
+        handX = lerp(s * 0.19 + sway(0.95), s * P.cheerWide, ch)
       }
       const [ef, ey] = ik(sf, sy - 0.05, hf, hyy, ARM, ARM)
       pt(v, sx, sf, sy - 0.05)
-      pt(w, sx * 1.15, ef, ey)
+      pt(w, lerp(sx * 1.15, (sx + handX) / 2, ch), ef, ey)
       span(upper[i], v, w)
-      pt(x, s * 0.19, hf, hyy)
+      pt(x, handX, hf, hyy)
       span(fore[i], w, x)
     }
     tag.position.set(side * 0.9, sy + 0.9 + (0.35 * (TAG_H - 80)) / 80, -sf)

@@ -1,9 +1,11 @@
+import { CFG } from './config'
 import { buildRoute, routeAt, type Route } from './core/route'
 import { ROUTE_INDEX, loadRoute } from './core/routeLibrary'
 import { addFixture } from './routeDevFixture'
 import { debugPanel } from './scene/debug'
 import { VIS } from './scene/params'
 import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
+import { rideSound } from './ui/rideSound'
 
 /**
  * Route world dev harness. Open /route-dev.html with optional params:
@@ -12,6 +14,8 @@ import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
  *   riders=N (extra riders strung out around you)  terrain=0 (ignore the pack's height grid)
  *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
  *   next=odd|sign|chalk|life (start just before the next oddity, funny sign, chalk or animal after d; kind=roos)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
+ *   power=0 (coasting; left out, pedalling)  effort=1.5 (share of FTP)  cheer=1 (arms up)  calm=1 (calm camera)
+ *   sound=1 (the ride sounds, after a click or key; c for a gear clunk)
  *   mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower (default: by the clock, mist up high, showers)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel
@@ -41,6 +45,7 @@ const noMap = () =>
 async function start() {
   VIS.route.place.fun.odd.only = q.get('odd') ?? ''
   VIS.route.mood.pick = q.get('mood') ?? 'auto'
+  VIS.route.feel.cam.calm = num('calm', 0)
   const id = q.get('route') ?? 'mount-coot-tha'
   const route: Route = id === 'nomap' ? noMap() : await loadRoute(id)
   if (q.get('terrain') === '0') delete route.terrain
@@ -60,6 +65,9 @@ async function start() {
     offset: num('offset', VIS.route.lane),
     speed: st.speed,
     cadence: num('cadence', 85) + i * 3,
+    power: q.has('power') ? num('power', 0) : undefined,
+    effort: q.has('effort') ? num('effort', 0) : undefined,
+    cheer: q.get('cheer') === '1',
     look:
       i === 1
         ? { hat: 'hat-viking', outfit: 'outfit-purple' }
@@ -83,6 +91,26 @@ async function start() {
       if (i) r.offset = VIS.route.lane + ((i * 0.9) % 2.5) - 0.6
     })
   }, 50)
+
+  // Sound needs a click or a key first; then it follows the harness.
+  let sound: ReturnType<typeof rideSound>
+  const hear = () => {
+    if (!q.has('sound') || sound) return
+    sound = rideSound()
+    setInterval(() => {
+      sound?.update({
+        speed: st.speed,
+        coasting: q.get('power') === '0',
+        paused: false,
+        headwind: num('wind', 0),
+        place: world.place(CFG.sound.ride.coastM),
+        mood: world.moodName,
+      })
+    }, 200)
+    Object.assign(window, { sound })
+  }
+  addEventListener('pointerdown', hear)
+  addEventListener('keydown', (e) => (hear(), e.key === 'c' && sound?.clunk()))
 
   const openPanel = () => void debugPanel(() => world.rebuild())
   if (q.has('debug')) openPanel()
