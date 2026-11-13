@@ -116,6 +116,22 @@ describe('road path', () => {
     for (let d = 0; d < p.length; d += 5)
       expect(p.poseAt(d + 5, b).z).toBeLessThan(p.poseAt(d, a).z - 2)
   })
+  it('splits a long out-and-back into two carriageways with a loop at the turn', () => {
+    const raw: RawPoint[] = Array.from({ length: 121 }, (_, i) => ({
+      d: i * 10,
+      lat: -37 + (i <= 60 ? i * 10 : 1200 - i * 10) / 110540,
+      lon: 145,
+      ele: 100 + (i <= 60 ? i : 121 - i),
+    }))
+    const p = new RoadPath(buildRoute('oab', 'Out and back', raw))
+    // Out on the left (west when heading north), home on the other side, at the same height.
+    expect(p.x[30]).toBeCloseTo(-R.uturnShift, 1)
+    expect(p.x[90]).toBeCloseTo(R.uturnShift, 1)
+    expect(p.y[90]).toBe(p.y[30])
+    // The loop is wider than the road, and the two ends still meet.
+    expect(p.x[61] - p.x[59]).toBeGreaterThan(2 * R.roadHalf)
+    expect(Math.abs(p.x[119] - p.x[1])).toBeLessThan(0.5)
+  })
   it('uses the terrain origin when given one', () => {
     const p = new RoadPath(packToRoute(FIXTURE_PACK), { lat0: -37.001, lon0: 145 })
     expect(p.z[0]).toBeCloseTo(-110.54, 1)

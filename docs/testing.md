@@ -83,3 +83,10 @@ Run `pnpm dev` in `client/` and open `/route-dev.html` (no server or trainer nee
 - On a device or browser with WebGL turned off, free ride should fall back to the flat layout by itself.
 - Not yet checked on a real graphics card: frame rate. The target is 60 fps at Medium on a mid laptop.
 
+
+## Free ride 3D world (Phase C)
+
+Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.route.camBack=40` for a view from above.
+
+- `?route=ben-lomond&d=15000`: no see-through sheets between the legs of Jacob's Ladder; rock walls between benches are fine, thin cracks inside the tightest hairpins are known.
+- `?route=akuna-bay&d=9680`: the out-and-back to the water is two carriageways with a turning loop at the end; the rider keeps left out and back.

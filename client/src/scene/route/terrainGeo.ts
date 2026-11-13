@@ -20,6 +20,9 @@ const OVERLAP_M = 2.5
 const SKIRT_M = 30
 /** Far rows are no more than this many radians of bend apart. */
 const FAN_RAD = 0.2
+/** Fill-in triangles keep this far (plus half the road) from any road: near band, far band. */
+const FAN_CLEAR = 1
+const FAN_CLEAR_FAR = 9
 
 /** Face colour from height and steepness: grass and bush, rock on steep faces, snow up high. */
 function shade(x: number, y: number, z: number, up: number, verge: boolean) {
@@ -58,10 +61,26 @@ function face(out: Tris, p: Float64Array, a: number, b: number, c: number, verge
   else out.add(p, a, c, b, col)
 }
 
+const sk = new Float64Array(12)
+const SKIRT_TRIS = [0, 3, 9, 0, 9, 6, 0, 9, 3, 0, 6, 9]
+/** A wall straight down from the edge a-b, drawn both ways round, hiding the gap where two strips meet. */
+function skirt(out: Tris, p: Float64Array, a: number, b: number) {
+  for (let k = 0; k < 3; k++) {
+    sk[k] = sk[6 + k] = p[a + k]
+    sk[3 + k] = sk[9 + k] = p[b + k]
+  }
+  sk[7] -= SKIRT_M
+  sk[10] -= SKIRT_M
+  const col = shade((sk[0] + sk[3]) / 2, (sk[1] + sk[4]) / 2, (sk[2] + sk[5]) / 2, 0, false)
+  for (let t = 0; t < 12; t += 3)
+    out.add(sk, SKIRT_TRIS[t], SKIRT_TRIS[t + 1], SKIRT_TRIS[t + 2], col)
+}
+
 /**
  * Terrain either side of the road for d0..d1, as rows across the road. Near columns have a vertex every row; far
  * columns every `outerEvery` rows. A row stops where its ground is nearer to another bit of road (the inside of a
- * hairpin, the next leg of a switchback), so strips from different stretches meet instead of crossing.
+ * hairpin, the next leg of a switchback); the gap to a longer neighbour is filled with a fan and the open edge
+ * gets a skirt, so strips from different stretches meet instead of crossing.
  */
 export function buildTerrain(field: HeightField, d0: number, d1: number, far: boolean, out: Tris) {
   grass.set(R.grass)
@@ -78,8 +97,12 @@ export function buildTerrain(field: HeightField, d0: number, d1: number, far: bo
   const NC = offs.length
   const p = new Float64Array((rows + 1) * NC * 3)
   const at = (j: number, c: number) => (j * NC + c) * 3
+  /** Last column of each row, and whether the row stopped there because another road's ground begins. */
+  const end = new Int16Array(rows + 1)
+  const cut = new Uint8Array(rows + 1)
   // Far columns get a vertex every `outerEvery` rows, and more often round a bend so their fan stays fine.
   const full: number[] = []
+  const isFull = new Uint8Array(rows + 1)
   let turned = 0
   let heading = 0
   for (let j = 0; j <= rows; j++) {
@@ -89,27 +112,48 @@ export function buildTerrain(field: HeightField, d0: number, d1: number, far: bo
     heading = h
     if (j % R.outerEvery && j < rows && turned < FAN_RAD) continue
     full.push(j)
+    isFull[j] = 1
     turned = 0
+  }
+  /** True when the triangle a, b, c keeps `r` metres clear of every road (centre and edge midpoints). */
+  const safe = (a: number, b: number, c: number, r: number) => {
+    const any = (x: number, z: number) => field.fine.any(x, z, r)
+    return !(
+      any((p[a] + p[b] + p[c]) / 3, (p[a + 2] + p[b + 2] + p[c + 2]) / 3) ||
+      any((p[a] + p[b]) / 2, (p[a + 2] + p[b + 2]) / 2) ||
+      any((p[b] + p[c]) / 2, (p[b + 2] + p[c + 2]) / 2) ||
+      any((p[a] + p[c]) / 2, (p[a + 2] + p[c + 2]) / 2)
+    )
+  }
+  /** Rows j0 and j1 joined over columns c0..c1: quads while both have ground, then a fan to the longer one. */
+  const band = (j0: number, j1: number, c0: number, c1: number) => {
+    const e0 = Math.min(end[j0], c1)
+    const e1 = Math.min(end[j1], c1)
+    const m = Math.min(e0, e1)
+    for (let c = c0; c < m; c++) {
+      face(out, p, at(j0, c), at(j0, c + 1), at(j1, c + 1), c === 0)
+      face(out, p, at(j0, c), at(j1, c + 1), at(j1, c), c === 0)
+    }
+    const [short, long, eS, eL] = e0 < e1 ? [j0, j1, e0, e1] : [j1, j0, e1, e0]
+    const clearance = R.roadHalf + (c1 >= NI ? FAN_CLEAR_FAR : FAN_CLEAR)
+    for (let c = Math.max(m, c0); c < eL; c++)
+      if (safe(at(short, eS), at(long, c), at(long, c + 1), clearance))
+        face(out, p, at(short, eS), at(long, c), at(long, c + 1), false)
+    if (Math.max(e0, e1) >= c0 && ((cut[j0] && end[j0] <= c1) || (cut[j1] && end[j1] <= c1)))
+      skirt(out, p, at(j0, e0), at(j1, e1))
   }
   for (const s of [-1, 1]) {
     for (let j = 0; j <= rows; j++) {
       field.path.poseAt(d0 + j * step, pose)
       across(pose, s * offs[0], p, at(j, 0))
-      let stuck = 0
-      const n = full.includes(j) ? NC : NI
-      for (let c = 1; c < n; c++) {
+      const n = isFull[j] ? NC : NI
+      end[j] = n - 1
+      cut[j] = 0
+      const spot = (o: number) => field.clear(pose.x + pose.rx * s * o, pose.z + pose.rz * s * o, o)
+      for (let c = 1; c < n && !cut[j]; c++) {
         const i = at(j, c)
-        if (stuck) {
-          // Past the end of this row's ground: one vertex straight down as a skirt, then nothing.
-          p.copyWithin(i, i - 3, i)
-          if (stuck++ === 1) p[i + 1] -= SKIRT_M
-          continue
-        }
-        const spot = (o: number) =>
-          field.clear(pose.x + pose.rx * s * o, pose.z + pose.rz * s * o, o)
         let o = offs[c]
         if (!spot(o)) {
-          stuck = 1
           let lo = offs[c - 1]
           for (let k = 0; k < 5; k++) {
             const mid = (lo + o) / 2
@@ -117,27 +161,26 @@ export function buildTerrain(field: HeightField, d0: number, d1: number, far: bo
             else o = mid
           }
           o = lo + Math.min(OVERLAP_M, lo * 0.2)
+          end[j] = c
+          cut[j] = 1
         }
         p[i] = pose.x + pose.rx * s * o
         p[i + 2] = pose.z + pose.rz * s * o
         p[i + 1] = field.ground(p[i], p[i + 2])
       }
     }
-    const quad = (j0: number, j1: number, c: number) => {
-      face(out, p, at(j0, c), at(j0, c + 1), at(j1, c + 1), c === 0)
-      face(out, p, at(j0, c), at(j1, c + 1), at(j1, c), c === 0)
-    }
     for (let f = 0; f < full.length - 1 && NC > NI; f++) {
       const j0 = full[f]
       const j1 = full[f + 1]
       // Where the near band meets the far band, in-between rows sit on the far band's edge so no cracks open.
-      for (let j = j0 + 1; j < j1; j++)
-        for (let k = 0; k < 3; k++) {
-          const a = p[at(j0, NI - 1) + k]
-          p[at(j, NI - 1) + k] = a + ((p[at(j1, NI - 1) + k] - a) * (j - j0)) / (j1 - j0)
-        }
-      for (let c = NI - 1; c < NC - 1; c++) quad(j0, j1, c)
+      if (end[j0] >= NI - 1 && end[j1] >= NI - 1)
+        for (let j = j0 + 1; j < j1; j++)
+          for (let k = 0; k < 3 && end[j] >= NI - 1; k++) {
+            const a = p[at(j0, NI - 1) + k]
+            p[at(j, NI - 1) + k] = a + ((p[at(j1, NI - 1) + k] - a) * (j - j0)) / (j1 - j0)
+          }
+      band(j0, j1, NI - 1, NC - 1)
     }
-    for (let j = 0; j < rows; j++) for (let c = 0; c < NI - 1; c++) quad(j, j + 1, c)
+    for (let j = 0; j < rows; j++) band(j, j + 1, 0, NI - 1)
   }
 }

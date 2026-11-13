@@ -329,3 +329,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Sea: the height data reads zero over water, so ground below 0.5 m is drawn flat blue. It is a stand-in until Phase C paints water from the map; low-lying land right at sea level would also turn blue. Tunable (`seaLevel`, `sea`).
 - The camera eases to its spot behind the rider but never trails it by more than 4 m, so a fast descent or a slow frame rate cannot leave the rider a dot in the distance.
 - Route builder: when a waypoint snaps just off the through road the path made a short out-and-back stub (Mount Coot-tha had one at 1.3 km). Stubs up to 250 m each way are now removed; longer out-and-backs (Akuna Bay's spurs) are kept as intended.
+
+## 2026-11-13 Free ride Phase C: tidying Phase B
+- Terrain rows that stop at another stretch of road no longer dive 30 m to a skirt and drag a sheet of triangles with them. The gap to a longer neighbouring row is filled with a fan of triangles at real ground height, skipped where a fan triangle would come within 1 m of a road edge (9 m in the far band), and the open edge gets a two-sided wall 30 m deep. Thin cracks can still show on the inside of the tightest hairpins.
+- Far terrain columns are now at 130, 175, 230, 300, 380, 470, 560 and 650 m (were five, up to 200 m apart), which removes the long sliver triangles.
+- Gravel verge narrowed from 1.2 m to 0.7 m.
+- A long out-and-back (the two legs within 10 m of each other for at least 300 m, as on Akuna Bay) is drawn as two carriageways: each direction is moved 3.5 m to its left, the way home copies the way out's line and heights, and the turn is a loop up to 12 m either side of the old line, held for 25 m and narrowing over the next 40 m. The split tapers out over the last 80 m where the two legs part. Shorter out-and-backs are still cut out as spurs. The ride distance and gradient are untouched.

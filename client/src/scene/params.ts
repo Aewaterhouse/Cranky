@@ -60,7 +60,10 @@ export const VIS = {
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {
     roadHalf: 3.1,
-    verge: 1.2,
+    verge: 0.7,
+    /** Out-and-back stretches: each direction is moved this far to its left, with a wider loop at the turn. */
+    uturnShift: 3.5,
+    uturnBulb: 12,
     lineW: 0.24,
     /** Road and near-terrain rows are this far apart; a chunk is `chunk` long. */
     rowStep: 4,
@@ -87,7 +90,7 @@ export const VIS = {
     hillScale: 260,
     /** Terrain columns: metres out from the centreline, near (every row) and far (every `outerEvery` rows). */
     inner: [8, 12, 18, 27, 40, 60, 90],
-    outer: [140, 210, 310, 450, 650],
+    outer: [130, 175, 230, 300, 380, 470, 560, 650],
     outerEvery: 10,
     /** Where a rider sits across the road when the game gives no offset (we ride on the left). */
     lane: -1.7,
