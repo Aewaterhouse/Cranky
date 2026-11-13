@@ -21,6 +21,18 @@ export interface TerrainData {
   cols: number
   rows: number
   runs: ([number, number[]][] | null)[]
+  /**
+   * Land cover, parallel to `runs`: one string per run, one letter per cell. g grass, f forest, b bush, s scrub,
+   * u built-up, p park, a sand, r rock, w water.
+   */
+  cover?: (string[] | null)[]
+}
+/** Map features near a route, in the terrain grid's local metres `[east, north]`. Every part is optional. */
+export interface RouteFeatures {
+  roads?: { n: string; k: 'main' | 'street'; p: [number, number][] }[]
+  /** `[east, north, width, depth, rot, height]`; `rot` is degrees anticlockwise from east. */
+  buildings?: [number, number, number, number, number, number][]
+  pois?: { n: string; k: 'peak' | 'viewpoint' | 'tower' | 'cafe'; at: [number, number] }[]
 }
 export interface Route {
   id: string
@@ -36,6 +48,7 @@ export interface Route {
   ascent: number
   /** Bundled routes only; never stored with imported routes. */
   terrain?: TerrainData
+  features?: RouteFeatures
 }
 /** A raw track point: `d` is metres along the route. */
 export interface RawPoint {

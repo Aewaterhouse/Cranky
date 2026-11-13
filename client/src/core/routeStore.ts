@@ -16,7 +16,10 @@ export function saveMyRoute(r: Route): boolean {
   try {
     localStorage.setItem(
       KEY,
-      JSON.stringify([...myRoutes().filter((x) => x.id !== r.id), { ...r, terrain: undefined }]),
+      JSON.stringify([
+        ...myRoutes().filter((x) => x.id !== r.id),
+        { ...r, terrain: undefined, features: undefined },
+      ]),
     )
     return true
   } catch {

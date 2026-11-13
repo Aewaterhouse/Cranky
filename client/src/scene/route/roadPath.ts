@@ -72,6 +72,58 @@ function despur(x: Float64Array, z: Float64Array, space: number) {
   }
 }
 
+/** Out-and-back legs closer than this are one road ridden both ways; shorter ones than the minimum are spurs. */
+const UTURN_GAP_M = 10
+const UTURN_MIN_M = 300
+const UTURN_TAPER_M = 80
+/** The loop at the turn is full width for this far, then narrows to the carriageway gap over the next stretch. */
+const BULB_HOLD_M = 25
+const BULB_FADE_M = 40
+
+/**
+ * A long out-and-back (ride out, turn round, ride home on the same road) becomes two carriageways side by side,
+ * each direction on its left, with a loop at the turn. The way home takes the way out's line and heights.
+ */
+function splitUturns(x: Float64Array, z: Float64Array, y: Float64Array, space: number) {
+  const n = x.length
+  // `c` is the sum of a mirrored pair of indices, so the turn can fall on a point or between two.
+  const lo = (c: number, q: number) => Math.ceil(c / 2) - 1 - q
+  const hi = (c: number, q: number) => Math.floor(c / 2) + 1 + q
+  const gap = (c: number, q: number) =>
+    Math.hypot(x[hi(c, q)] - x[lo(c, q)], z[hi(c, q)] - z[lo(c, q)])
+  const fit = (c: number) => gap(c, 0) + gap(c, 1) + gap(c, 2) + gap(c, 3)
+  for (let c = 10; c < 2 * n - 12; c++) {
+    if (gap(c, 1) > UTURN_GAP_M || gap(c, 3) > UTURN_GAP_M) continue
+    // The true turning point is the one the two legs mirror about best.
+    for (let k = c + 1; k <= c + 6 && k < 2 * n - 12; k++) if (fit(k) < fit(c)) c = k
+    let m = 3
+    while (lo(c, m) > 1 && hi(c, m) < n - 2 && gap(c, m + 1) < UTURN_GAP_M) m++
+    if (m * space < UTURN_MIN_M) continue
+    const a = lo(c, m) - 1
+    const ox = x.slice(a, lo(c, 0) + 2)
+    const oz = z.slice(a, lo(c, 0) + 2)
+    for (let q = 0; q <= m; q++) {
+      const i = lo(c, q)
+      const j = hi(c, q)
+      const k = i - a
+      const fx = ox[k + 1] - ox[k - 1]
+      const fz = oz[k + 1] - oz[k - 1]
+      const s = (j - i) * space * 0.5
+      const bulb = clamp(1 - (s - BULB_HOLD_M) / BULB_FADE_M)
+      const w =
+        ((R.uturnShift + (R.uturnBulb - R.uturnShift) * bulb) *
+          clamp(((m - q) * space) / UTURN_TAPER_M)) /
+        (Math.hypot(fx, fz) || 1)
+      x[i] = ox[k] + fz * w
+      z[i] = oz[k] - fx * w
+      x[j] = ox[k] - fz * w
+      z[j] = oz[k] + fx * w
+      y[j] = y[i]
+    }
+    c = 2 * hi(c, m)
+  }
+}
+
 const cr = (a: number, b: number, c: number, d: number, t: number) =>
   0.5 *
   (2 * b + (c - a) * t + (2 * a - 5 * b + 4 * c - d) * t * t + (3 * b - a - 3 * c + d) * t ** 3)
@@ -104,6 +156,7 @@ export class RoadPath {
         x[i] = e
         z[i] = -north
       })
+      splitUturns(x, z, this.y, this.space)
       despur(x, z, this.space)
       for (let k = 0; k < R.smoothPasses; k++)
         for (const a of [x, z]) {

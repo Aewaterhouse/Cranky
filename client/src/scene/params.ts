@@ -1,3 +1,5 @@
+import { PLACE } from './route/placeVis'
+
 /** Tunable visual parameters, exposed in the debug panel (press ` or add ?debug). */
 export interface MoodDef {
   /** Sky zenith colour. */
@@ -60,7 +62,10 @@ export const VIS = {
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {
     roadHalf: 3.1,
-    verge: 1.2,
+    verge: 0.7,
+    /** Out-and-back stretches: each direction is moved this far to its left, with a wider loop at the turn. */
+    uturnShift: 3.5,
+    uturnBulb: 12,
     lineW: 0.24,
     /** Road and near-terrain rows are this far apart; a chunk is `chunk` long. */
     rowStep: 4,
@@ -87,7 +92,7 @@ export const VIS = {
     hillScale: 260,
     /** Terrain columns: metres out from the centreline, near (every row) and far (every `outerEvery` rows). */
     inner: [8, 12, 18, 27, 40, 60, 90],
-    outer: [140, 210, 310, 450, 650],
+    outer: [130, 175, 230, 300, 380, 470, 560, 650],
     outerEvery: 10,
     /** Where a rider sits across the road when the game gives no offset (we ride on the left). */
     lane: -1.7,
@@ -110,14 +115,52 @@ export const VIS = {
     tarmac: '#3f3f47',
     line: '#ecebe0',
     gravel: '#a39272',
-    grass: '#7fb24e',
-    dry: '#b9b060',
-    bush: '#4c8a47',
-    rock: '#8b8780',
     snow: '#f3f6fa',
     sea: '#3d8fc4',
     /** Ground below this height (m) is drawn as water. */
     seaLevel: 0.5,
+    /** Ground colours by land cover; each drifts towards a neighbour with slow noise. */
+    ground: {
+      grass: '#7fb24e',
+      dry: '#b9b060',
+      bush: '#5c8f4a',
+      forest: '#3f6f3c',
+      scrub: '#8c9a5c',
+      built: '#a9ad8c',
+      park: '#6fc04f',
+      sand: '#e6d49a',
+      rock: '#8b8780',
+      waterBed: '#2f6f8f',
+    },
+    /** Without a map: trees thin out above the treeline (lower in Tasmania), rock begins `alpineBand` higher. */
+    treeline: 1500,
+    treelineTas: 1200,
+    alpineBand: 200,
+    /** Without a map, ground this far above sea level is sand. */
+    sandBand: 2,
+    /** Land cover boundaries wander by this fraction of a grid cell, with noise of this wavelength (m). */
+    coverJitter: 0.35,
+    coverNoise: 28,
+    /** Water sheet: height above the bed, tint, sun glint colour and tightness. */
+    waterLift: 0.12,
+    waterTint: '#ffffff',
+    waterGlint: '#9fb8c8',
+    waterShine: 60,
+    /** Side streets: half widths, height above the ground, depth bias, colours. */
+    streetHalf: 2.4,
+    mainHalf: 3,
+    streetLift: 0.12,
+    streetBias: 2,
+    street: '#b7b1a3',
+    mainStreet: '#96938c',
+    place: PLACE,
+    signs: {
+      post: '#8d949a',
+      streetW: 2.6,
+      streetH: 3.2,
+      streetBg: '#1f6b43',
+      streetFg: '#ffffff',
+    },
   },
   moods: {
     drill: {

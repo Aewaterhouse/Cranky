@@ -83,3 +83,20 @@ Run `pnpm dev` in `client/` and open `/route-dev.html` (no server or trainer nee
 - On a device or browser with WebGL turned off, free ride should fall back to the flat layout by itself.
 - Not yet checked on a real graphics card: frame rate. The target is 60 fps at Medium on a mid laptop.
 
+
+## Free ride 3D world (Phase C)
+
+Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.route.camBack=40` for a view from above.
+
+- `?route=ben-lomond&d=15000`: no see-through sheets between the legs of Jacob's Ladder; rock walls between benches are fine, thin cracks inside the tightest hairpins are known.
+- `?route=akuna-bay&d=9680`: the out-and-back to the water is two carriageways with a turning loop at the end; the rider keeps left out and back.
+- `?route=mount-coot-tha&d=2440&fixture=1`: made-up map data. Ground changes colour by zone with soft edges, a pale side street meets the road at the tarmac edge every 250 m with a green name sign on the corner, lakes are flat blue with sand round them.
+- `?route=great-ocean-road&d=12000` and `?route=beach-road&d=8000` (no map data): sea is flat blue with a strip of sand, land is bush and grass.
+- `?route=mount-hotham&d=26500`: heath and rock above the treeline, snow on top.
+- `?route=mount-coot-tha&d=2500`: tall pale gums and white scribbly gums either side, thicker in the dark forest patches, shrubs and tussocks near the verge, tree shadows across the road. Nothing on the tarmac or verge.
+- `?route=mount-coot-tha&d=2700&fixture=1`: houses along the side streets with different walls and roofs, doors facing the road, none on a street. Look for a house half-buried or floating on steep ground.
+- `?route=mount-hotham&d=20000` then `d=24000`: snow gums, then only boulders, tussocks and shrubs above the treeline.
+- Settings, Graphics, Potato: far fewer plants and none beyond 60 m.
+- `?route=mount-coot-tha&d=0`: green START arch over the road with a readable banner; the FINISH arch of the loop is just behind it.
+- `?route=ben-lomond&d=14200` and on: a green kilometre marker each km on the left, a yellow gradient sign before the ladder, blue numbered hairpin signs counting down, grey guard rail on the drop side, white edge posts round the bends. `d=17700`: red SUMMIT arch at the end.
+- Look for: a sign or post standing on the tarmac, a rail floating above or buried in the verge, a sign facing away from the rider.

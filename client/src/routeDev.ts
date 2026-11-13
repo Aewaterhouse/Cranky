@@ -1,5 +1,6 @@
 import { buildRoute, routeAt, type Route } from './core/route'
 import { ROUTE_INDEX, loadRoute } from './core/routeLibrary'
+import { addFixture } from './routeDevFixture'
 import { debugPanel } from './scene/debug'
 import { VIS } from './scene/params'
 import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
@@ -9,6 +10,7 @@ import { RouteWorld, type RoadRider } from './scene/route/routeWorld'
  *   route=<bundled id> (default mount-coot-tha; `nomap` is a made-up climb with no coordinates)
  *   d=<metres along>  speed=<m/s, auto-rides>  cadence=rpm  offset=<metres right of the centreline>
  *   riders=N (extra riders strung out around you)  terrain=0 (ignore the pack's height grid)
+ *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   g debug panel
  */
@@ -38,6 +40,7 @@ async function start() {
   const id = q.get('route') ?? 'mount-coot-tha'
   const route: Route = id === 'nomap' ? noMap() : await loadRoute(id)
   if (q.get('terrain') === '0') delete route.terrain
+  if (q.get('fixture') === '1') addFixture(route)
   const world = new RouteWorld(document.getElementById('stage')!, route)
   const st = { d: num('d', 0), speed: num('speed', 8) }
   const extra = num('riders', 0)

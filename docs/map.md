@@ -13,7 +13,7 @@
 - `src/main.ts` bootstrap: login, shell, wiring to solo and bus.
 - `src/spike.ts` trainer test UI and Zwift Click test panel.
 - `src/sceneDev.ts` scene harness params and keys (see README).
-- `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README).
+- `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README); `src/routeDevFixture.ts` made-up map features for it (`fixture=1`).
 - `src/config.ts` client tunables (caps, bands, sprint grades, curve defaults).
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.
@@ -55,7 +55,10 @@
 ### scene/route/ (the free-ride road world; files without three.js are unit-tested)
 - `roadPath.ts` projection to local metres, the centreline curve, `poseAt(d)` with banking, spur removal, the made-up line for routes without coordinates (no three.js).
 - `terrainGrid.ts` decodes a pack's height grid and samples it with a trust weight (no three.js); `roadIndex.ts` spatial hash of centreline segments (no three.js); `heightField.ts` `ground(x, z)`: grid or made-up hills, cut and filled to the nearest road (no three.js).
-- `roadGeo.ts` road ribbon triangles and the `Tris` builder; `terrainGeo.ts` terrain rows either side of the road, clipped where another stretch of road is nearer; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
+- `landCover.ts` land cover at a spot from the pack grid or guessed from height (no three.js); `patch.ts` one side's terrain vertices for a chunk, clipped where another stretch of road is nearer, and the drawn height under any spot (no three.js); `features.ts` side streets, junction signs, buildings and points of interest shared out to chunks, and "is a street or building here" (no three.js).
+- `scatter.ts` which plants grow where in a chunk, seeded, never on roads, streets, buildings or water (no three.js); `plantGeo.ts` gum, scribbly gum, snow gum, tree fern, tea-tree, shrub, tussock and boulder geometry; `buildingGeo.ts` wall and roof geometry for houses, shops, the pub and the servo; `chunkProps.ts` turns plants and buildings into instanced meshes for a chunk; `placeVis.ts` tunables for all of it (`VIS.route.place`).
+- `furniture.ts` where the signs, arches and guard rails go: ramp and hairpin detection, kilometre markers, summit (no three.js); `furnitureGeo.ts` builds them (arch, sign plates, rails and edge posts into the chunk mesh).
+- `roadGeo.ts` road ribbon triangles, the `Tris` builder, `addBox` and `addBeam`; `terrainGeo.ts` terrain mesh from a patch, coloured by land cover, with water sheets; `streetGeo.ts` side street strips and street-name signs; `signs.ts` shared text plates; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
 - `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 
 ### ui/
