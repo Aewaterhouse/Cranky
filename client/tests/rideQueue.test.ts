@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CFG } from '../src/config'
-import { flushRides, postRide, queuedRides } from '../src/core/rideQueue'
+import { flushRides, postRide, queuedList, queuedRides } from '../src/core/rideQueue'
 
 const ride = (date: string) => ({ record: { date }, power: [1, 2, 3] })
 
@@ -41,6 +41,11 @@ describe('rides waiting for the server', () => {
     await postRide('me', ride('b'))
     expect(posted).toEqual([])
     expect(queuedRides('me')).toBe(2)
+    // History lists them with their downloads until the server has them
+    expect(queuedList<ReturnType<typeof ride>>('me').map((r) => r.power)).toEqual([
+      [1, 2, 3],
+      [1, 2, 3],
+    ])
     online = true
     await flushRides('me')
     expect(posted).toEqual(['a', 'b'])

@@ -1,5 +1,8 @@
 import { api } from '../core/api'
 import type { Profile } from '../core/curve'
+import type { RideSummary } from '../core/ride'
+import { flushRides, queuedList } from '../core/rideQueue'
+import { downloadFit, downloadJson } from './rideExport'
 import { fmt, h, kmStr, pctStr } from './dom'
 import { routeTrace } from './routeTrace'
 import { dateStr, rideDetail } from './historyDetail'
@@ -59,23 +62,52 @@ function list(rows: RideRow[], open: (n: number) => void) {
   )
 }
 
+/** Rides still on this device waiting for the server: listed with their downloads so none is ever out of reach. */
+function waiting(rider: string) {
+  const q = queuedList<RideSummary>(rider).reverse()
+  if (!q.length) return ''
+  return h(
+    'div',
+    { class: 'hl-wait' },
+    h('h3', { class: 'label' }, `Waiting to upload (${q.length})`),
+    ...q.map((s) =>
+      h(
+        'div',
+        { class: 'row' },
+        h('span', {}, `${dateStr(s.record.date)} · ${s.planName ?? 'Ride'}`),
+        h('button', { onclick: () => void downloadFit(s) }, 'Download .fit'),
+        h('button', { onclick: () => void downloadJson(s) }, 'Export JSON'),
+      ),
+    ),
+  )
+}
+
 /** History tab: every ride, newest first; a click opens the full ride. */
 export function historyTab(p: Profile) {
   const box = h('section', { class: 'panel' })
   const showList = () => {
     box.replaceChildren(h('h2', { class: 'label' }, 'Rides'), h('p', { class: 'dim' }, 'Loading…'))
-    api<RideRow[]>('/api/rides').then(
-      (rows) =>
-        box.replaceChildren(
-          h('h2', { class: 'label' }, `Rides (${rows.length})`),
-          list(rows, (n) => box.replaceChildren(rideDetail(p, n, showList))),
-        ),
-      () =>
-        box.replaceChildren(
-          h('h2', { class: 'label' }, 'Rides'),
-          h('p', { class: 'dim' }, "Couldn't reach the server. Try again when you're back online."),
-        ),
-    )
+    flushRides(p.id)
+      .catch(() => {})
+      .then(() => api<RideRow[]>('/api/rides'))
+      .then(
+        (rows) =>
+          box.replaceChildren(
+            h('h2', { class: 'label' }, `Rides (${rows.length})`),
+            waiting(p.id),
+            list(rows, (n) => box.replaceChildren(rideDetail(p, n, showList))),
+          ),
+        () =>
+          box.replaceChildren(
+            h('h2', { class: 'label' }, 'Rides'),
+            h(
+              'p',
+              { class: 'dim' },
+              "Couldn't reach the server. Try again when you're back online.",
+            ),
+            waiting(p.id),
+          ),
+      )
   }
   showList()
   return box

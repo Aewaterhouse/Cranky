@@ -31,6 +31,9 @@ function save(rider: string, q: Queued[]) {
 /** Rides waiting for the server on this device. */
 export const queuedRides = (rider: string) => load(rider).length
 
+/** The rides themselves, oldest first. */
+export const queuedList = <T extends Queued>(rider: string) => load(rider) as T[]
+
 /**
  * Keeps a finished ride on this device until the server has it, then tries to send. A ride finished offline
  * goes up at the next login or when the network comes back (see `flushRides`).
