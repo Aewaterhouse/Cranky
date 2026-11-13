@@ -72,6 +72,8 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const gearChip = h('div', { class: 'glass gear' }, h('span', {}, 'Gear'), gear.el)
   gearChip.hidden = true
   const list = riderList()
+  const group = h('div', { class: 'glass gchip' })
+  group.hidden = true
 
   const diff = diffSlider(on.difficulty, difficulty)
   const pauseBtn = h('button', {})
@@ -157,7 +159,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
           h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats'),
         ),
         h('div', { class: 'dock-c' }, grade, climb),
-        h('div', { class: 'dock-r' }, gearChip),
+        h('div', { class: 'dock-r' }, group, gearChip),
       ),
       h('div', { class: 'glass strip' }, whole.el),
     ),
@@ -224,6 +226,15 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       gearChip.hidden = !s.gears
       gear.v.textContent = String(s.gear)
       list.set(riderRows(s.riders, s.me), s.speed)
+      const g = s.group
+      const pull = g ? Math.round((g.band - 1) * 100) : 0
+      const saving = g && g.draftW >= CFG.road.showW
+      group.hidden = !saving && !pull
+      group.classList.toggle('on', !!saving)
+      group.replaceChildren(
+        saving ? h('span', {}, 'Drafting ', h('b', {}, `−${Math.round(g.draftW)} W`)) : '',
+        pull ? h('span', {}, pull > 0 ? `Tow +${pull}%` : `Held ${pull}%`.replace('-', '−')) : '',
+      )
       whole.set(s.dist)
       pauseBtn.replaceChildren(s.paused === 'manual' ? 'Resume' : 'Pause', h('kbd', {}, 'Space'))
     },

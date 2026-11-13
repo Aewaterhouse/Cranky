@@ -42,6 +42,8 @@ interface Entry {
   told: number
   err: number
   phase: number
+  /** Metres right of the centreline as drawn, eased towards the reported offset. */
+  off?: number
   seen: boolean
   /** What the rider is heading for (0 or 1 each) and where the pose has eased to. */
   want: RoadPose
@@ -75,7 +77,6 @@ export class RoadRiders {
         e = { id: s.id, r, d: s.d, told: s.d, err: 0, phase: this.map.size, seen: true } as Entry
         e.want = newRoadPose()
         e.now = newRoadPose()
-        r.tag.visible = s.id !== me
         r.tag.scale.multiplyScalar(TAG_SCALE)
         r.label(s.name, null, 'riding')
         this.group.add(r.root)
@@ -83,6 +84,9 @@ export class RoadRiders {
         this.list.push(e)
       }
       e.seen = true
+      e.r.tag.visible = s.id !== me
+      // Lane changes (the server shuffles a bunch two abreast) slide across rather than jump.
+      e.off = e.off === undefined ? s.offset : e.off + (s.offset - e.off) * clamp(dt * 2)
       // Dead reckoning at the reported speed; each new report's error is paid off smoothly.
       if (s.d !== e.told) {
         e.told = s.d
@@ -104,17 +108,13 @@ export class RoadRiders {
       if (e.look !== s.look) r.setLook((e.look = s.look))
       r.pose('ride', e.phase, 0, now)
       r.bike.roll(e.d)
-      r.root.position.set(
-        p.x + p.rx * s.offset,
-        p.y - s.offset * Math.sin(p.bank),
-        p.z + p.rz * s.offset,
-      )
+      r.root.position.set(p.x + p.rx * e.off, p.y - e.off * Math.sin(p.bank), p.z + p.rz * e.off)
       const lean = bendLean(s.speed, p.curv)
       r.root.rotation.set(Math.atan(p.grade), Math.atan2(-p.fx, -p.fz), -lean - p.bank, 'YXZ')
       if (s.id === me) {
         Object.assign(this.me, p)
         this.meD = e.d
-        this.meOffset = s.offset
+        this.meOffset = e.off
         this.meSpeed = s.speed
         this.meLean = lean
         this.meTuck = now.tuck

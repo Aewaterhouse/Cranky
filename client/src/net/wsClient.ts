@@ -3,8 +3,8 @@ import { token } from '../core/api'
 import type { ClientMsg, ServerMsg } from './protocol'
 
 /** WebSocket with automatic reconnect. `onOpen` runs on every (re)connect. */
-export class WsClient {
-  onMsg: (m: ServerMsg) => void = () => {}
+export class WsClient<M = ServerMsg> {
+  onMsg: (m: M) => void = () => {}
   onOpen: () => void = () => {}
   onStatus: (up: boolean) => void = () => {}
   private ws?: WebSocket

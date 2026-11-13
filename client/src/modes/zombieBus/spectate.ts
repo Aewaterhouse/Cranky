@@ -16,6 +16,7 @@ import { makeTvBoard } from '../../ui/hudTvBoard'
 import { tvEnd, tvLobby } from '../../ui/hudTvScreens'
 import { toast } from '../../ui/toast'
 import type { Grade } from '../../types'
+import { roadSpectate } from '../freeRide/roadSpectate'
 
 const FX_SOUND: Record<string, () => void> = {
   buy: SFX.scrap,
@@ -52,12 +53,15 @@ export function spectate(code: string, leaveTo: () => void) {
   const slot = h('div', { class: 'tv-slot' })
   const net = new WsClient(code)
   const status = h('span', { class: 'dim' })
-  const leave = () => {
+  const stop = () => {
     removeEventListener('resize', fit)
     removeEventListener('keydown', onKey)
     net.close()
     stopAudio()
     world.dispose()
+  }
+  const leave = () => {
+    stop()
     history.replaceState(null, '', location.pathname)
     leaveTo()
   }
@@ -199,6 +203,11 @@ export function spectate(code: string, leaveTo: () => void) {
   net.onOpen = () => net.send({ t: 'watch' })
   net.onMsg = (m: ServerMsg) => {
     if (m.t === 'lobby') {
+      if (m.kind === 'road') {
+        // The code is a group ride: the road spectator takes over this screen.
+        stop()
+        return roadSpectate(code, leaveTo)
+      }
       l = m
       setPlan(m)
       if (m.state === 'lobby') {

@@ -143,3 +143,20 @@ Harness as before (`/route-dev.html`). Nothing here has been heard or felt by it
 - Sound, app: free ride with the simulated trainer. Z and X change gear with a clunk. Stop pedalling on a descent: the freehub starts. Pause: bike sounds fade, the place carries on. Settings, Sound slider scales everything; Free ride sounds, Off silences these but not the beeps.
 - What to listen for, since nobody has heard any of it: is anything harsh, too loud against the beeps and the announcer, or does it sound like a fault (clicks at the loop point of the noise, a whine, a cicada that sounds like a smoke alarm)? Each kind has its own loudness in `CFG.sound.ride.level`; set one to 0 to rule it out.
 
+
+## Free ride Phase E: ride together
+
+Two people, two browsers (or two tabs logged in as different riders), simulated trainers are fine. Nobody has tried this on two real devices or real trainers yet.
+
+- Host: Ride tab, Free ride, pick the Nundah crit track, press **Group ride**, choose the simulator. The lobby shows a four-letter ride code. Add two or three bots (their one-liners appear), set 2 laps, leave it on Social.
+- Guest: on the Ride tab the room shows under the open rooms as "Alex's group ride"; press Join, or type the code in "Join by code" (the box on the Free ride page works too). Both lobbies list both riders with FTP and W/kg. Only the host can change the route, laps, style, keep-together and bots.
+- Host presses Start the ride. Both see a 10 s countdown, then ride. Look for: the others on the road two abreast with name tags, dots for everyone on the minimap, and the rider list top right with gaps.
+- Sit behind someone (ease off until you are within a few metres): a blue "Drafting −N W" chip appears bottom right and you hold their wheel on less power. Pull out and pass: the chip goes.
+- Stop pedalling: you coast to a stop, the group rides away, a toast says who dropped you. With Keep together on, start again and the chip shows "Tow +N%" while you come back. The trainer resistance should not change with the tow (real trainer needed).
+- Guest refreshes the browser mid-ride: the Ride tab offers "Rejoin ride CODE"; after rejoining they are where the server left them, not back at the start.
+- A third rider joins after the start: they appear a few metres behind the last rider and the others get a "joined" toast. Their result says "joined late".
+- TV: on a third screen open `/?watch=CODE` (any login). It follows the leader; arrow keys change rider, L returns to the leader, F is fullscreen.
+- Finish: each rider gets "Finished: 2nd" and waits; when the last human is home (or the host ends the ride) everyone gets the results with the crew table: place, time, average power, W/kg and watts saved drafting. "Back to the lobby" returns to the room for another go.
+- Race: in the lobby pick Race. Keep together turns off. Same ride, nobody is towed.
+- Look for: a rider jumping backwards or forwards (the correction should be invisible), riders drawn on top of each other, the chip flickering on and off, a rider list that disagrees with what you see, your own speed feeling laggy against the pedals.
+- Solo free ride must be unchanged: Start (not Group ride) with the server stopped still rides, pauses and finishes as before.

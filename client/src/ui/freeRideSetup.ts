@@ -9,7 +9,7 @@ import {
   withLaps,
   type Route,
 } from '../core/route'
-import { loadRoute } from '../core/routeLibrary'
+import { ROUTE_INDEX, loadRoute } from '../core/routeLibrary'
 import { myRoutes, removeMyRoute, saveMyRoute } from '../core/routeStore'
 import { h } from './dom'
 import type { HomeActions } from './home'
@@ -88,6 +88,32 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     },
     'Start',
   )
+  const bundled = () => !!sel && ROUTE_INDEX.some((r) => r.id === sel!.id)
+  const group = h(
+    'button',
+    {
+      class: 'go',
+      title: 'Ride this route with the crew: make a room, share the code, add bots',
+      onclick: needTrainer(() => sel && act.groupRide(sel.id, sel.loop ? laps : 1)),
+    },
+    'Group ride',
+  )
+  const codeIn = h('input', { maxlength: 4, placeholder: 'CODE', 'aria-label': 'Ride code' })
+  const joinForm = h(
+    'form',
+    {
+      class: 'by-code',
+      onsubmit: (e: Event) => {
+        e.preventDefault()
+        const code = codeIn.value.trim().toUpperCase()
+        if (code.length === 4) needTrainer(() => act.join(code))()
+        else toast('A ride code is four letters')
+      },
+    },
+    h('span', {}, 'Have a ride code?'),
+    codeIn,
+    h('button', { class: 'ghost' }, 'Join'),
+  )
   const paint = () => {
     const mine = myRoutes()
     if (!sel) sel = mine[0]
@@ -109,6 +135,9 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     lapsBox.hidden = !sel?.loop
     if (sel?.loop) lapsFor(sel)
     go.disabled = !sel
+    group.disabled = !bundled()
+    group.title =
+      bundled() || !sel ? 'Ride this route with the crew' : 'Group rides use the bundled routes'
   }
   const file = h('input', {
     type: 'file',
@@ -153,6 +182,17 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'dim credit' },
       'Route data © OpenStreetMap contributors (ODbL); elevation from NASA SRTM',
     ),
-    h('div', { class: 'startbar' }, startLabel, lapsBox, go),
+    h(
+      'section',
+      { class: 'panel' },
+      h('h2', { class: 'label' }, 'Ride together'),
+      h(
+        'p',
+        { class: 'dim' },
+        'Pick a bundled route and press Group ride to make a room, or join a mate with their code.',
+      ),
+      joinForm,
+    ),
+    h('div', { class: 'startbar' }, startLabel, lapsBox, group, go),
   )
 }

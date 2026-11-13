@@ -45,6 +45,10 @@ export interface FreeState {
   lap?: LapInfo
   /** Headwind in m/s (a tailwind is negative), when the wind setting is on. */
   wind?: number
+  /** Group rides: watts saved by drafting right now, and the keep-together scale on my speed (1 is none). */
+  group?: { draftW: number; band: number }
+  /** Group rides: a big line and a small one over the view (the countdown, waiting at the finish). */
+  banner?: [string, string]
 }
 
 /** HUD parts that can be switched on and off. */
@@ -74,7 +78,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
   const stage = h('div', { class: 'fr-stage' })
   const mapBox = h('div', { class: 'fr-map' })
   mapBox.hidden = true
-  let mapUpdate: ((d: number) => void) | undefined
+  let mapUpdate: ((d: number, others: number[]) => void) | undefined
   // The map is optional: no coordinates, no network or a failed load all leave the panel hidden.
   if (routeStats(route).hasMap && navigator.onLine)
     void import('./freeRideMap')
@@ -161,16 +165,21 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     },
     frame(s: FreeState) {
       layout.frame(s)
-      mapUpdate?.(s.dist)
+      mapUpdate?.(
+        s.dist,
+        s.riders.filter((r) => r.id !== s.me).map((r) => r.d),
+      )
       root.classList.toggle('paused', !!s.paused)
       if (dialog) return
-      const msg = s.starting
-        ? ['Start pedalling', 'The clock starts when you do', 'count']
-        : s.paused === 'manual'
-          ? ['Paused', 'Press Space to carry on', 'pause']
-          : s.paused === 'auto'
-            ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
-            : null
+      const msg = s.banner
+        ? [...s.banner, 'count']
+        : s.starting
+          ? ['Start pedalling', 'The clock starts when you do', 'count']
+          : s.paused === 'manual'
+            ? ['Paused', 'Press Space to carry on', 'pause']
+            : s.paused === 'auto'
+              ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
+              : null
       const key = msg?.join('|') ?? ''
       if (ov.dataset.k === key) return
       ov.dataset.k = key

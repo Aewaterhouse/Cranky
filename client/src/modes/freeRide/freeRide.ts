@@ -3,16 +3,17 @@ import type { Profile } from '../../core/curve'
 import { shiftGear } from '../../core/gears'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
-import { stepSpeed, totalMass } from '../../core/physics'
+import { draftSaving, stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
+import type { RoadSummary } from '../../net/protocol'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
 import { clickSource, onClickShift } from '../../trainer/zwiftClick'
 import { SFX } from '../../ui/audio'
 import { clock, show } from '../../ui/dom'
 import { toast } from '../../ui/toast'
-import { freeRideView, type FreePart } from '../../ui/freeRideView'
+import { freeRideView } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
 import { rideSound } from '../../ui/rideSound'
 import type { Plan, Trainer } from '../../types'
@@ -20,12 +21,13 @@ import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
 import { RoadFeel, cheering, trainerTarget } from './feel'
 import { makeGhosts, stepGhosts } from './ghosts'
+import { freeKeys } from './keys'
 import { Quipper, speak } from './quips'
+import type { RoadLink } from './roadLink'
 
 const STOP_S = 3
 const GO_S = 1.5
 const F = CFG.freeRide
-const HUD_KEYS: Record<string, FreePart> = { h: 'clean', s: 'stats', m: 'map', r: 'riders' }
 
 /** The plan recorded for a free ride: one open block named for the route, with a duration estimate at ~75% FTP. */
 export function freePlan(route: Route, ftp: number, weightKg?: number): Plan {
@@ -37,15 +39,20 @@ export function freePlan(route: Route, ftp: number, weightKg?: number): Plan {
   }
 }
 
-/** Free ride on a route: no ERG. Power moves the rider along the road and the trainer gets the gradient. */
+/**
+ * Free ride on a route: no ERG. Power moves the rider along the road and the trainer gets the gradient. With a
+ * `link` it is a group ride: the server places everyone, my rider is guessed ahead and eased onto its line, and
+ * nobody pauses. The trainer still only ever gets the gradient under my own wheels.
+ */
 export function runFreeRide(
   route: Route,
   profile: Profile,
   trainer: Trainer,
   done: (p: Profile) => void,
+  link?: RoadLink,
 ) {
   const params = new URLSearchParams(location.search)
-  const fast = +(params.get('fast') ?? 1)
+  const fast = link ? 1 : +(params.get('fast') ?? 1)
   const mass = totalMass(profile.weightKg)
   const plan = freePlan(route, profile.ftp, profile.weightKg)
   const ride = new RideController(trainer, profile, plan)
@@ -78,7 +85,6 @@ export function runFreeRide(
   const save = () => saveDifficulty(difficulty)
   show(view.root)
   view.toast(route.name)
-  // The 3D world is one rider on the road for now; group rides will hand it more.
   const me: RoadRider = {
     id: profile.id,
     name: profile.name,
@@ -88,11 +94,9 @@ export function runFreeRide(
     cadence: 0,
     look: profile.look,
   }
-  const ghosts = makeGhosts(me, profile.ftp, +(params.get('ghosts') ?? 0))
-  const riders = [me, ...ghosts.map((g) => g.rider)]
-  // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
+  const ghosts = makeGhosts(me, profile.ftp, link ? 0 : +(params.get('ghosts') ?? 0))
+  const kg = profile.weightKg || F.defaultKg
   const lapM = route.lapOf?.distance
-  const shown = lapM ? riders.map((r) => ({ ...r })) : riders
   const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
   let world: RouteWorld | undefined
   const feel = new RoadFeel(route)
@@ -114,12 +118,13 @@ export function runFreeRide(
         if (finished) return
         VIS.route.feel.cam.calm = settings.calmCamera ? 1 : 0
         world = new m.RouteWorld(view.stage, route.lapOf ?? route)
-        world.state = { me: me.id, riders: shown }
+        world.state = { me: me.id, riders: [me] }
       })
       .catch(() => view.flat())
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
   function togglePause() {
+    if (link) return view.toast('No pausing in a group ride. Stop pedalling and you stop.')
     if (starting) return
     manual = !manual
     if (!manual) auto = false
@@ -129,34 +134,19 @@ export function runFreeRide(
     view.setDifficulty(difficulty)
     save()
   }
-  const onKey = (e: KeyboardEvent) => {
-    const tag = (e.target as HTMLElement)?.tagName
-    if (tag === 'INPUT' || e.ctrlKey || e.metaKey) return
-    const k = e.key
-    const act =
-      k === ' ' || k === 'p' || k === 'P'
-        ? togglePause
-        : k === 'Escape'
-          ? view.confirmEnd
-          : k === '+' || k === '='
-            ? () => nudge(0.05)
-            : k === '-' || k === '_'
-              ? () => nudge(-0.05)
-              : k === 'z' || k === 'Z' || k === 'x' || k === 'X'
-                ? () => shift(k.toLowerCase() === 'x' ? 1 : -1)
-                : k.toLowerCase() in HUD_KEYS
-                  ? () => view.toggle(HUD_KEYS[k.toLowerCase()])
-                  : null
-    if (!act) return
-    act()
-    e.preventDefault()
-  }
   const shift = (d: number) => {
     const to = shiftGear(gear, d)
     if (to !== gear) sound?.clunk()
     shifted = true
     gear = to
   }
+  const onKey = freeKeys({
+    pause: togglePause,
+    end: () => view.confirmEnd(),
+    nudge,
+    shift,
+    toggle: (part) => view.toggle(part),
+  })
   addEventListener('keydown', onKey)
   const offClick = onClickShift(shift)
   ride.start()
@@ -175,15 +165,30 @@ export function runFreeRide(
       auto = false
       starting = false
     }
-    const paused = manual || auto
+    const count = link?.countdown() ?? 0
+    const home = link?.mine()?.st === 'finished'
+    if (link) manual = auto = starting = false
+    const paused = link ? count > 0 || home : manual || auto
     ride.paused = paused
     const p = routeAt(route, dist)
+    let draft = 1
+    let band = 1
     if (paused) speed = 0
     else {
-      wind = feel.wind(dist, settings.wind, world?.moodName, el)
-      speed = stepSpeed(speed, live.power, p.grade, mass, dt * fast, wind, feel.limit(dist, speed))
+      wind = link ? 0 : feel.wind(dist, settings.wind, world?.moodName, el)
+      draft = link?.draft(dist) ?? 1
+      band = link?.band(dist, speed >= 0.5 || live.power > 0) ?? 1
+      const lim = feel.limit(dist, speed)
+      speed = stepSpeed(speed, live.power, p.grade, mass, dt * fast, wind, lim, draft)
       el += dt * fast
-      dist = Math.min(route.distance, dist + speed * dt * fast)
+      dist = Math.min(route.distance, dist + speed * band * dt * fast)
+    }
+    if (link) {
+      ;[dist, speed] = link.correct(dist, speed, dt)
+      dist = Math.min(route.distance, Math.max(0, dist))
+      if (!paused) el = link.clock()
+      link.report(live.power, live.avg, live.cadence, live.hr ?? null)
+      link.takeNotes().forEach((n) => view.toast(n))
     }
     // Game speed comes from power and the real gradient; the trainer gets the road just ahead (see trainerTarget).
     const want = trainerTarget(
@@ -212,13 +217,16 @@ export function runFreeRide(
     })
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })
     me.d = dist
-    me.speed = speed * fast
+    me.speed = speed * band * fast
+    me.offset = link?.mine()?.lane ?? VIS.route.lane
     me.cadence = paused ? 0 : live.cadence
     me.power = paused ? 0 : live.power
     me.effort = live.power / profile.ftp
     me.cheer = !starting && cheering(dist, route.distance, climbs ? top.d : undefined)
     stepGhosts(ghosts, route, mass, paused, fast, dt)
-    if (lapM) riders.forEach((r, i) => Object.assign(shown[i], r, { d: r.d % lapM }))
+    const others = link?.others() ?? ghosts.map((g) => ({ ...g.rider, wkg: g.watts / kg }))
+    // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
+    if (world) world.state.riders = [me, ...others].map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
     const lap = lapTimer?.info(dist)
     if (lap && lapTimer?.update(dist, el, speed) !== undefined) {
       const now = lapTimer.info(dist)
@@ -229,10 +237,9 @@ export function runFreeRide(
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
-    const kg = profile.weightKg || F.defaultKg
     view.frame({
       live,
-      speed,
+      speed: speed * band,
       grade: p.grade,
       trainerGrade: sent,
       gear,
@@ -246,13 +253,12 @@ export function runFreeRide(
       ftp: profile.ftp,
       weightKg: kg,
       etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
-      riders: [
-        { ...me, wkg: live.avg / kg },
-        ...ghosts.map((g) => ({ ...g.rider, wkg: g.watts / kg })),
-      ],
+      riders: [{ ...me, wkg: live.avg / kg }, ...others],
       me: me.id,
       lap,
-      wind: settings.wind === 'off' ? undefined : wind,
+      wind: settings.wind === 'off' || link ? undefined : wind,
+      group: link && { draftW: draftSaving(speed, draft), band },
+      banner: link?.banner(),
     })
     const quip =
       settings.quips &&
@@ -273,12 +279,13 @@ export function runFreeRide(
         near: world?.near(),
       })
     if (quip) onQuip(quip)
-    if (dist >= route.distance) void end()
+    if (dist >= route.distance && !link) void end()
   }
   const timer = setInterval(tick, 200)
   tick()
 
-  async function end() {
+  /** Stops the ride and shows the results; `road` is the server's crew results at the end of a group ride. */
+  async function end(road?: RoadSummary) {
     if (finished) return
     finished = true
     clearInterval(timer)
@@ -287,6 +294,14 @@ export function runFreeRide(
     world?.dispose()
     sound?.stop()
     await ride.stop()
-    finishRide(profile, ride.rec.summary(), done)
+    finishRide(
+      profile,
+      ride.rec.summary(),
+      done,
+      undefined,
+      road ? 'Back to the lobby' : 'Done',
+      road,
+    )
   }
+  return { end }
 }

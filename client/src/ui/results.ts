@@ -7,6 +7,8 @@ import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { groupSection, postcard } from './resultsGroup'
+import { roadSection } from './roadResults'
+import type { RoadSummary } from '../net/protocol'
 import { segsFromSeries } from './soloSegs'
 import { workoutChart } from './workoutChart'
 
@@ -63,6 +65,7 @@ export function finishRide(
   onDone: (p: Profile) => void,
   group?: GroupSummary,
   doneLabel = 'Done',
+  road?: RoadSummary,
 ) {
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
@@ -70,7 +73,7 @@ export function finishRide(
   const banked = group ? bankScrap(group.scrap, myAwards) : 0
   if (banked) p = { ...p, scrap: p.scrap + banked }
   saveProfile(p)
-  if (s.record.secs >= 30) postRide({ ...s, crew: !!group })
+  if (s.record.secs >= 30) postRide({ ...s, crew: !!group || !!road })
   const prs =
     p === profile
       ? []
@@ -227,6 +230,7 @@ export function finishRide(
           )
         : '',
       group ? groupSection(group, profile.id) : '',
+      road ? roadSection(road, profile.id) : '',
       ftpBox,
       h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
       h(

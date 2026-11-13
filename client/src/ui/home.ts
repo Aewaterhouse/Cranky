@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { PLANS } from '../content'
 import { api } from '../core/api'
 import { generate, parsePlan } from '../core/plan'
@@ -13,6 +14,8 @@ import { needTrainer } from './trainer'
 export interface HomeActions {
   drill(plan: Plan): void
   freeRide(route: Route): void
+  /** Make a group-ride room on a bundled route. Joining one by code is `join`. */
+  groupRide(route: string, laps: number): void
   resume(snap: SoloSnap): void
   create(): void
   join(code: string): void
@@ -21,6 +24,8 @@ export interface HomeActions {
 }
 interface Room {
   code: string
+  /** `road` is a group ride on a route; `plan` is then the route's name. */
+  kind?: 'bus' | 'road'
   state: string
   plan: string
   host: string | null
@@ -39,15 +44,21 @@ function rejoinCard(r: Room, join: (code: string) => void) {
   return h(
     'section',
     { class: 'resume' },
-    h('span', { class: 'big-emoji' }, '🚌'),
-    h('span', {}, h('b', {}, `Rejoin bus ${r.code}`), h('small', {}, r.plan)),
+    h('span', { class: 'big-emoji' }, r.kind === 'road' ? '🚴' : '🚌'),
+    h(
+      'span',
+      {},
+      h('b', {}, `Rejoin ${r.kind === 'road' ? 'ride' : 'bus'} ${r.code}`),
+      h('small', {}, r.plan),
+    ),
     h('button', { class: 'primary', onclick: needTrainer(() => join(r.code)) }, 'Rejoin'),
   )
 }
 
 function busCard(r: Room, act: HomeActions) {
   const { join, watch } = act
-  const full = r.riders.length >= 6
+  const road = r.kind === 'road'
+  const full = r.riders.length >= (road ? CFG.road.seats : 6)
   const running = r.state === 'running'
   return h(
     'article',
@@ -55,15 +66,23 @@ function busCard(r: Room, act: HomeActions) {
     h(
       'header',
       {},
-      h('h3', {}, `${r.host ?? 'Someone'}’s bus`),
-      h('span', { class: `state${running ? ' run' : ''}` }, running ? 'On the road' : 'Boarding'),
+      h('h3', {}, `${r.host ?? 'Someone'}’s ${road ? 'group ride' : 'bus'}`),
+      h(
+        'span',
+        { class: `state${running ? ' run' : ''}` },
+        running ? 'On the road' : road ? 'Gathering' : 'Boarding',
+      ),
     ),
     h('p', { class: 'plan' }, r.plan, h('span', { class: 'code-tag' }, r.code)),
     h(
       'div',
       { class: 'aboard' },
       ...r.riders.map((n) => avatar(n, 'sm')),
-      h('span', { class: 'dim' }, `${r.riders.length}/6 on board`),
+      h(
+        'span',
+        { class: 'dim' },
+        road ? `${r.riders.length} riding` : `${r.riders.length}/6 on board`,
+      ),
     ),
     h(
       'div',
@@ -82,7 +101,7 @@ function busCard(r: Room, act: HomeActions) {
           title: 'Watch on this screen',
           onclick: () => watch(r.code),
         },
-        full ? 'Bus full · Watch' : '📺 Watch',
+        full ? 'Full · Watch' : '📺 Watch',
       ),
     ),
   )

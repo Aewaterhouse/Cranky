@@ -5,7 +5,7 @@
 - `scripts/run.sh` build client and start server on :8000; `scripts/selfsigned.sh` self-signed certs for LAN HTTPS.
 - `scripts/routes/build_routes.py` builds bundled route packs from OpenStreetMap and SRTM; `terrain.py` SRTM tile reader and the height grid around a route; `features.py` land cover, side roads, buildings and landmarks from OpenStreetMap; `gpx.py` routes cut from a recorded ride; `net.py` cached fetch; `routes.json` route definitions (waypoints, published figures); `test_build_routes.py` its tests (`cd server && uv run pytest ../scripts/routes`).
 - `content/routes/index.json` route cards; `content/routes/<id>.json` one pack per bundled route.
-- `docs/protocol.md` wire protocol; `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/freeride-plan.md` free ride 3D world plan; `docs/hud-notes.md` HUD conventions from Zwift, TrainerRoad and MyWhoosh and the layout spec drawn from them; `docs/map.md` this file.
+- `docs/protocol.md` wire protocol; `docs/road-games.md` how to add a game on top of the group ride; `content/tests/road-vectors.json` physics and route vectors both test suites run (generated, never read by hand); `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/freeride-plan.md` free ride 3D world plan; `docs/hud-notes.md` HUD conventions from Zwift, TrainerRoad and MyWhoosh and the layout spec drawn from them; `docs/map.md` this file.
 - `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
@@ -30,7 +30,7 @@
 - `climbs.ts` sustained climbs on a route and the one the rider is on; `hud.ts` HUD maths with no DOM: power zone (Zwift boundaries), gradient colour, gap text, rider-list rows.
 - `soundMix.ts` how loud each free-ride sound should be for the speed, the place and the sky (no audio API).
 - `laps.ts` lap counter, lap times and the lap toast for lap rides (no DOM).
-- `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
+- `physics.ts` free-ride speed from power, gradient and mass, plus the drafting and keep-together factors (mirrored in the server's `road_physics.py`); `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
 - `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, session generator.
@@ -40,7 +40,8 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map and Click mapping; `modes/drill/slope.ts` slope mode gradient sender with gears.
-- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/difficulty.ts` remembered trainer difficulty; `modes/freeRide/ghosts.ts` the `?ghosts=N` dev riders; `modes/freeRide/feel.ts` what the road's shape does to the ride: bend speed limit, wind along the road, the look-ahead gradient for the trainer (`trainerTarget`) and when to cheer; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`.
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow; `modes/freeRide/difficulty.ts` remembered trainer difficulty; `modes/freeRide/ghosts.ts` the `?ghosts=N` dev riders; `modes/freeRide/feel.ts` what the road's shape does to the ride: bend speed limit, wind along the road, the look-ahead gradient for the trainer (`trainerTarget`) and when to cheer; `modes/freeRide/quips.ts` the commentator: rate-limited dry remarks picked from the ride's state, and `speak`; `modes/freeRide/keys.ts` the free-ride key map.
+- `modes/freeRide/group.ts` group ride flow (make or join a road room, lobby, ride, results); `modes/freeRide/roadLink.ts` the group ride as the ride loop sees it: server positions, my rider predicted and corrected, drafting, toasts (no DOM, no socket); `modes/freeRide/roadSpectate.ts` TV view of a group ride.
 - `fun/signLines.ts`, `fun/chalkLines.ts`, `fun/quipLines.ts` the words for roadside signs, road chalk and the commentator, each tagged with when it applies.
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
@@ -80,13 +81,14 @@
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudMad.ts` VO2 Madness box and effort leaderboard (`hudMad.css`); `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
-- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player shell (map, pause overlay, toasts, part toggles) that picks a layout; `freeRideHud.ts` the HUD over the 3D world (`freeHud.css`); `freeRideFlat.ts` the flat tiles-and-charts layout (`freeride.css`); `riderList.ts` riders-nearby list any mode can feed; `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
+- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player shell (map, pause overlay, toasts, part toggles) that picks a layout; `freeRideHud.ts` the HUD over the 3D world (`freeHud.css`); `freeRideFlat.ts` the flat tiles-and-charts layout (`freeride.css`); `riderList.ts` riders-nearby list any mode can feed; `roadLobby.ts` group-ride lobby (`road.css`); `roadResults.ts` group-ride crew table, results section and TV screens; `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets
 - `tests/compliance|cosmetics|curve|erg|load|plan|gears|zwiftClick.test.ts` and others: vitest unit tests.
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.
+- `tests/roadVectors.test.ts` generates and checks the vectors shared with the server; `tests/roadLink.test.ts` group-ride prediction, drafting, toasts and no ERG target.
 - `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 
@@ -95,4 +97,6 @@
 - `config.py` tunables, env vars, `SEED_USERS`; `protocol.py` message schemas; `plan.py` plan loading, targets, generator.
 - `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete).
 - `modes/zombie_bus.py` bus, horde, events, shop, awards rules; `modes/vo2_madness.py` VO2 Madness: dealing the session, effort scoring, crown, mystery box, awards.
+- `road_physics.py` and `road_route.py` Python ports of the client's ride physics, route resampling and curvature; `modes/road.py` `RoadSim`, `Mover` and the `Rules` hook for road games; `road_room.py` road rooms (lobby, late join, rejoin, finish); `road_bots.py` road bot personalities.
+- `tests/test_road_vectors.py` the shared vectors; `test_road.py` the sim, drafting, keep-together, bots, snapshot; `test_road_multiplayer.py` four riders up Willunga Hill over sockets.
 - `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_rides.py` ride history endpoints; `test_multiplayer.py` 4-bot headless ride.

@@ -271,4 +271,25 @@ export const CFG = {
       steepPct: 6,
     },
   },
+  /**
+   * Group rides. `draft` and `band` mirror DRAFT_* and BAND_* in the server's config.py (the server decides; the
+   * client predicts with the same numbers, and content/tests/road-vectors.json fails if they drift).
+   */
+  road: {
+    draft: { wheel: 0.27, fullM: 2, reachM: 10, bunchM: 20, bunchX: 0.15, cap: 0.4, minMs: 3 },
+    band: { max: 0.2, deadM: 15, fullM: 150 },
+    /** Power, cadence and heart rate go to the server this often (s). */
+    sendS: 0.5,
+    /** My own rider: this share of the gap to the server's position is closed per second; past `snapM` it jumps. */
+    correct: 0.6,
+    snapM: 40,
+    /** A rider is "caught" or "dropped" when the gap to them crosses `nearM` inwards or `farM` outwards. */
+    nearM: 8,
+    farM: 60,
+    /** The saving is shown on the HUD from this many watts. */
+    showW: 5,
+    lapsMax: 20,
+    /** Places on the road (the server's ROAD_MAX_RIDERS). */
+    seats: 8,
+  },
 }
