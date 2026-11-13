@@ -607,3 +607,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The queue holds five rides (`CFG.rideQueueMax`): a ride carries its per-second arrays, roughly 100 kB an hour, and localStorage is small. If storage is full the oldest queued rides are dropped to make room for the new one. A ride the server refuses outright (a 4xx) is dropped; a server error or no network keeps it.
 - Idempotent on the server: `POST /api/rides` ignores a ride the rider already has with the same start time (`record.date`, to the millisecond) and answers `saved: false`. No schema change. A ride with no date (none are made any more) is never merged.
 - Not covered: the profile itself was already saved locally and synced newest-wins; group rides need the server anyway.
+
+### Phone and tablet layout
+- Checked in headless Chromium with touch on at 844 x 390 (phone sideways), 390 x 844 (phone upright) and 1024 x 768 (tablet): free-ride setup, leaderboards, passport, settings, group lobby, the ride HUD, the ride menu and the results. A script measured sideways overflow, anything tappable under 44 px and anything off the edge of the screen; after the changes below all three sizes report none, bar the logo link in the top bar (38 px tall, left alone) and Leaflet's own credit link. No real phone or tablet was used.
+- `touch.css` holds all of it. With a coarse pointer every button, select, tab, pill and text box is at least 44 px; a mouse keeps the tighter desktop sizes.
+- The start bar on the setup screens now wraps (at 844 px wide it pushed Start off the right edge) and stops being sticky when the screen is under 500 px tall or 700 px wide, where it covered most of a phone held sideways.
+- Safe areas: the page asks for the whole screen (`viewport-fit=cover`) and pads the body, the dialogs, the 2D ride layout and the page bottoms by the notch and home-bar insets. The 3D HUD and the intro card already did.
+- A ride with the phone upright is usable but not designed: the speed panel moves down above the dock, the minimap and rider list are hidden, the climb panel takes a row of its own, and a hint ("Turn the phone sideways for the full view") shows until tapped. Sideways it is the existing phone HUD.
+- Under 700 px wide: settings rows stack, results tables scroll sideways inside their card, the results buttons wrap two to a row.

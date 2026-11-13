@@ -1,0 +1,151 @@
+/* Phones and tablets: thumb-sized targets, notches and home bars, and layouts that fit a small screen. */
+
+/* Fingers: nothing tappable under 44 px. */
+@media (pointer: coarse) {
+  button,
+  select,
+  [role='radio'],
+  .tabs a,
+  .pill,
+  .back,
+  input:not([type='range'], [type='checkbox'], [type='radio'], [type='file']) {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .tabs a,
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  input[type='checkbox'] {
+    width: 24px;
+    height: 24px;
+  }
+  .x {
+    min-width: 44px;
+  }
+}
+
+/* Notches and home bars (the page asks for the whole screen with viewport-fit=cover). */
+body {
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+.page,
+.solo-setup,
+.settings {
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+}
+.fr-flat {
+  padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(14px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.backdrop {
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+}
+.modal {
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+/* The start bar wraps instead of pushing Start off the side, and on a short or narrow screen it stops sticking
+   (it would cover half of a phone held sideways). */
+.startbar {
+  flex-wrap: wrap;
+}
+.startbar .go {
+  flex: 1 1 auto;
+}
+@media (max-height: 500px), (max-width: 700px) {
+  .startbar {
+    position: static;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+  .startbar .laps .dim {
+    display: none;
+  }
+  .go {
+    padding: 10px 20px;
+    font-size: 1.1rem;
+  }
+  .top {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .lb-table td,
+  .lb-table th {
+    padding: 6px 5px;
+  }
+  .moment {
+    top: 14vh;
+    padding: 8px 12px 10px;
+  }
+}
+@media (max-width: 700px) {
+  .set-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .set-cb {
+    align-items: flex-start;
+  }
+  .pp-list small {
+    display: none;
+  }
+  .res-actions {
+    flex-wrap: wrap;
+  }
+  .res .card {
+    overflow-x: auto;
+  }
+  .res-actions button {
+    flex: 1 1 40%;
+  }
+}
+
+/* A ride on a phone held upright works, but it is a letterbox: say so once. */
+.rotate-hint {
+  display: none;
+}
+@media (orientation: portrait) and (max-width: 600px) {
+  .fr3d .rotate-hint {
+    position: fixed;
+    left: 50%;
+    top: 34vh;
+    z-index: 25;
+    display: block;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 12px;
+    background: rgb(17 18 20 / 0.8);
+    color: var(--fg);
+    font: 600 0.95rem var(--ui);
+    transform: translateX(-50%);
+  }
+  /* Upright there is no room beside the power panel: the speed sits under it and the rider list goes. */
+  .fr3d .hud-tc {
+    top: auto;
+    bottom: calc(var(--sb) + 22 * var(--u));
+  }
+  .fr3d .hud-tr .rlist,
+  .fr3d .minimap {
+    display: none;
+  }
+  .fr3d .dock {
+    flex-wrap: wrap;
+  }
+  .fr3d .dock-c {
+    order: -1;
+    flex-basis: 100%;
+  }
+  .fr3d .hmenu {
+    max-width: calc(100vw - 2 * var(--sl));
+  }
+  .fr3d .fr-toast {
+    max-width: calc(100vw - 24px);
+  }
+}

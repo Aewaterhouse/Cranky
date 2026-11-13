@@ -156,6 +156,13 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     toastBox,
   )
   if (world) root.append(ov)
+  // Upright on a phone the ride is a letterbox (touch.css shows this only then); a tap puts the hint away.
+  const rotate: HTMLElement = h(
+    'button',
+    { class: 'rotate-hint', onclick: () => rotate.remove() },
+    '↻ Turn the phone sideways for the full view',
+  )
+  root.append(rotate)
   // In clean view a tap anywhere brings the HUD back (there is no H key on a phone).
   stage.addEventListener('click', () => root.classList.remove('hud-clean'))
 
