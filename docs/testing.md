@@ -130,7 +130,7 @@ Simulated trainer throughout. `?fast=20` speeds a solo workout up; `[` and `]` c
 
 16. Two riders, Bus Quick 30. Top left: your power big with zone and W/kg, the tolerance bar, "Target 111 W on target", cadence. Top centre: the event, time left big, "Next: …". Right edge: both riders with watts and compliance, yours highlighted. Bottom centre: bus status in one block. Bottom: the plan strip with elapsed and total.
 17. Roadblock (sprint): "SPRINT · all out" chip under the clock, the panel says "Sprint · ERG off" and "All out · best … W", the bar fills as you push. No target power on screen, in the header's "Next" line beforehand either.
-18. Servo Stop: the shop opens above the bus status block and buying still works; the feed lines show bottom right.
+18. Servo Stop: the shop opens above the bus status block and buying still works; the feed lines show bottom left, above the bus status block and clear of it.
 19. A rider who stops pedalling falls off: their row says "fell · 20 s" counting down in red.
 20. ☰: tier, Stats, Crew, Clean view, End ride (Leave the bus for a guest), display size. S or Tab opens my stats under the power panel; R hides the crew; H hides the HUD and the game panels, splashes still show.
 21. VO2 Madness: the mystery box and "who's trying hardest" board are in the left column under the power panel; everything else as above.
@@ -138,7 +138,7 @@ Simulated trainer throughout. `?fast=20` speeds a solo workout up; `[` and `]` c
 
 **Everywhere**
 
-23. Settings, in-ride display size Huge: solo, bus and free ride all grow; nothing overlaps at 1280x720.
+23. In-ride display size Large (Settings, or the ☰ menu mid-ride): solo, bus and free ride all grow, the bus status block with them, and nothing overlaps at 1280x720. Huge is for big screens: at 1280x720 the solo clock panel crowds its neighbours (known).
 24. Settings, colour-blind colours on: zone colours change in the power panel, the charts, the interval list, the plan strip and heart rates; the tolerance colours become green, yellow and vermilion.
 25. Phone landscape (844x390) and tablet (1024x768): both screens fit with no overlap, the list starts hidden on the phone, every button is at least a thumb wide.
 

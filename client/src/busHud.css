@@ -160,7 +160,7 @@
   font: inherit;
 }
 
-/* The game's own panels, grouped: bus status bottom centre (two rows of three), the feed bottom left over the corner buttons */
+/* The game's own panels, grouped: bus status bottom centre (two rows of three), the feed bottom left, above it */
 .bus-ride .hud-left {
   top: auto;
   left: 50%;
@@ -235,7 +235,18 @@
   top: auto;
   right: auto;
   left: 22px;
-  bottom: 110px;
+  bottom: 190px;
+}
+@media (min-height: 741px) {
+  .bus-ride .hud-right {
+    bottom: 236px;
+  }
+}
+/* Madness has nothing bottom right, and its board fills the left column */
+.bus-ride .hud-left.mad + .hud-right {
+  left: auto;
+  right: 22px;
+  bottom: 62px;
 }
 .bus-ride .md {
   min-width: 0;

@@ -105,6 +105,10 @@
   background: rgba(17, 18, 20, 0.7);
   pointer-events: auto;
 }
+/* A sprint tints the screen without dimming the live watts */
+.rh > .overlay.sprint {
+  background: color-mix(in srgb, #e040fb 14%, rgba(17, 18, 20, 0.3));
+}
 
 @media (pointer: coarse) {
   .rhud button {
