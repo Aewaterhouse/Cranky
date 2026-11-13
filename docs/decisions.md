@@ -623,3 +623,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Neither shows without a service worker: the dev server registers none, as before.
 - Checked against a production build in headless Chromium: save the Nundah crit, cut the network, reload, start the ride; it came up in 3D with the map hidden. Not checked: an installed app on a phone, how much a browser lets the cache grow (a pack is 0.2 to 1 MB), imported GPX routes (they live in localStorage and never needed the network), and group rides (they need the server).
 - Offline the leaderboards, ghosts of mates and the weekly sync are simply missing; segment efforts and the finished ride queue up as described above.
+
+### Dev aids added in Phase G
+- `?at=7000` starts a solo free ride that many metres in, `?intro=0` skips the card and flyover, `?perf=1` shows the frame-time overlay. None of them changes what a normal ride does.
+- Not done, on purpose: a mate-ghost picker in the group lobby (the lead dropped it), riders standing on a podium in the 3D world (the podium is drawn on the results screen), and unit conversion on the History screens.
