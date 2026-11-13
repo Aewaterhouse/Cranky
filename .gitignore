@@ -8,3 +8,4 @@ __pycache__/
 certs/
 .claude/
 scripts/routes/.cache/
+.shots/

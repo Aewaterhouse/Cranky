@@ -290,3 +290,42 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Heights come straight from SRTM 1-arc-second tiles (public domain) on the AWS open terrain tile bucket, read with the standard library. Sea and data voids are 0 m.
 - The grid is not smoothed: the road's own heights win near the road (the scene cuts the ground to the road), so the two only need to agree roughly. On Mount Coot-tha the nearest grid cell is within 10 m of the road height everywhere and the median difference is 0.
 - The ten packs total 1.1 MB and are loaded one at a time.
+
+## 2026-11-13 Free ride 3D road world (Phase B): road and terrain
+- New code lives in `client/src/scene/route/`. It reuses the bus scene's sky, moods, riders, bike, quality levels and debug panel, and adds a `route` mood (blue sky, fog out to 1100 m). The world is fed a generic list of riders (`RoadState`), so later road games can use it unchanged.
+- Projection is flat local metres around the terrain grid's origin (or the route's first point): east = dlon x 111320 x cos(lat0), north = dlat x 110540. Scene x is east, z is south, y is height in metres.
+- Pack coordinates are rounded to about 1 m, which makes the heading jitter, so the centreline gets two 1-2-1 smoothing passes before a Catmull-Rom curve is run through it. Tight hairpins come out a metre or two wider than the data.
+- Short out-and-back spurs are cut out of the drawn line (a stretch that returns to within 6 m of itself inside 80 m of road). Mount Coot-tha has one at 1.3 km where the route builder snapped a waypoint onto a side road. The 15 points either side are respaced to absorb the lost distance, so the rider moves about 15% slower on screen for 300 m rather than stalling. The ride's distance and gradient are untouched. The pack itself still has the spur; fixing the builder would be better.
+- Banking: curvature x 1.2 radians, clamped to 0.1 rad (about 6 degrees). Riders lean by speed squared x curvature / g on top, clamped to 0.45 rad.
+- Road: 6.2 m of tarmac, 1.2 m gravel verges, white edge lines and a white dashed centre line (4 m on, 8 m off), one row of triangles every 4 m. Chunks are 200 m; they are built up to 800 m ahead at medium quality (350, 500, 1000 for potato, low, high) and kept 150 m behind. Any road within 600 m as the crow flies is also built, so the other legs of a switchback are there when you look across. One chunk is built per frame (about 3 to 5 ms each in software rendering).
+- The road carries straight on for 200 m before the start and 400 m after the finish so the world does not end at a cliff.
+- Ground height: the pack's 60 m grid, sampled bilinearly, trusted fully three cells in from its edge and fading to made-up ground at the edge. Made-up ground (imported GPX, or beyond the grid) is the heights of nearby road spread sideways, weighted towards the nearest, plus value noise up to 70 m scaled down on flat routes.
+- Cut and fill: the ground is level with the road for 7.5 m from the centreline and blends back to natural ground over the next 45 m. Each nearby stretch of road gets its own bench; between two stacked legs the nearer one wins, so the bank between them is steep. This is weighted over all centreline segments within range from a spatial hash, not just the nearest one.
+- Terrain mesh: rows of vertices running out from the road every 4 m, at 8, 12, 18, 27, 40, 60 and 90 m, then every 40 m (closer round bends) out to 650 m. A row stops where its ground is nearer to some other bit of road, overlaps by 2.5 m and drops a 30 m skirt, so strips from two legs meet instead of crossing. This replaced the planned "fine strip plus square tiles": one mechanism, no seams between tile sizes, and vertices land exactly on the verge. Known flaw: thin cracks and dark skirt lines can show where two strips meet on steep ground, and beyond about 600 m there can be holes where the land belongs to road that is not built.
+- Colours: grass, bush and dry grass from noise, rock on faces steeper than about 37 degrees, snow in patches above 1650 m (Hotham's top; Falls Creek gets a little). All in `VIS.route` and the debug panel; ground colours are baked per chunk, so the panel rebuilds the chunks.
+- Skyline: a ring 1500 m out, as tall as the land looks from the rider in each direction (sampled at three distances), redrawn every 80 m and eased. Beyond the pack's grid that land is made up.
+- Floating origin: everything in route metres hangs off one group that is shifted whenever the rider gets 300 m from the origin; chunk vertices are stored relative to their own anchor.
+- Imported routes are saved without terrain (`routeStore.ts` strips it).
+
+## 2026-11-13 Free ride 3D road world (Phase B): rider and camera
+- Riders reuse the bus crew figure. `makeBike` and `makeRider` take a `road` flag that leaves the trainer off and lets both wheels turn with distance. Hat and outfit come from the rider's `Look`; with no outfit the jersey is the first crew colour.
+- The scene state is `{ me, riders: [{ id, name, d, offset, speed, cadence, look }] }`. Positions may arrive only a few times a second (free ride ticks at 5 Hz), so each rider is moved at their reported speed every frame and the error at each new report is paid off smoothly. A jump of more than 60 m snaps.
+- Riders keep left: the default sideways offset is 1.7 m left of the centre line. Other riders show a name tag at about half the bus size; your own has none.
+- Camera: 9 m back along the road and 3.7 m up, so it is always over tarmac and never inside a cut bank; it is also held at least 1.3 m above the ground under it. It aims 55% of the way from the rider to a point 20 m up the road, which looks into bends and tilts with the gradient. The more the road doubles back (a hairpin), the less it looks ahead, so the rider stays in shot. Field of view 58 degrees, widening by up to 5 with speed. All in `VIS.route`.
+- A genuine U-turn in a route (ride out, turn round, ride back) is drawn as the data says: the road doubles back on itself and the camera swings round. Not pretty, not fixed.
+
+## 2026-11-13 Free ride 3D road world (Phase B): harness
+- A sibling page, `/route-dev.html` (`src/routeDev.ts`), rather than more switches on the bus harness. It is dev-server only, like `scene-dev.html`.
+- The debug panel gains a Route world folder when the route world opens it. Road, ground and colour settings are baked into chunks, so changing one drops the chunks and they rebuild over the next few frames.
+
+## 2026-11-13 Free ride 3D road world (Phase B): in the real ride
+- Free ride opens in the 3D world by default. A per-device setting, Free ride view (3D world or Charts), is on the Settings screen. If the scene cannot start (no WebGL, or its code fails to load) the ride carries on in the flat layout without a message.
+- The 3D layout is the same view with a different stylesheet: the scene fills the screen and the header, numbers, next-kilometre elevation strip, stats row and map sit over it as translucent panels. Gear and gradient get their own tiles (trainer gradient under the gradient); the whole-route profile is hidden; the map is a square minimap top right, still Leaflet with online tiles.
+- The scene is loaded only when a 3D ride starts. Free ride gives it one rider (you, in your equipped hat and outfit); the list form is there for group rides.
+- Quality levels are the bus scene's (`Quality`, same Graphics setting): pixel ratio and shadows as before, plus how far ahead the road is built (350, 500, 800, 1000 m) and, on potato, no terrain beyond 90 m from the road. Fog closes in to match.
+- Nothing here writes to the trainer. Free ride still sends gradient only, through `ergController.ts`.
+
+## 2026-11-13 Free ride 3D road world (Phase B): polish
+- Sea: the height data reads zero over water, so ground below 0.5 m is drawn flat blue. It is a stand-in until Phase C paints water from the map; low-lying land right at sea level would also turn blue. Tunable (`seaLevel`, `sea`).
+- The camera eases to its spot behind the rider but never trails it by more than 4 m, so a fast descent or a slow frame rate cannot leave the rider a dot in the distance.
+

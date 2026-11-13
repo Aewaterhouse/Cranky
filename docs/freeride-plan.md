@@ -39,14 +39,14 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] Route picker: cards with a mini profile, distance, climb, difficulty, and an estimated time at your FTP; filter by state and length.
 - [x] Credits on the route screen and in `CREDITS.md`.
 
-### Phase B: 3D road world (L)
-- [ ] Road curve, banking and chunk streaming from a pack.
-- [ ] Terrain from the height grid, cut to the road, with distant hills as a simple skyline.
-- [ ] Your rider on a bike, legs turning at your cadence, in your garage kit.
-- [ ] Chase camera that looks into corners and up climbs.
-- [ ] Slim free-ride HUD over the scene: speed, power, cadence, heart rate, gear, gradient; elevation strip along the bottom; minimap in the corner.
-- [ ] Scene harness page for routes and visual settings in the debug panel.
-- [ ] Automatic quality levels and the 2D fallback.
+### Phase B: 3D road world (L) — built 2026-11-13, seen only in software-rendered screenshots
+- [x] Road curve, banking and chunk streaming from a pack.
+- [x] Terrain from the height grid, cut to the road, with distant hills as a simple skyline.
+- [x] Your rider on a bike, legs turning at your cadence, in your garage kit.
+- [x] Chase camera that looks into corners and up climbs.
+- [x] Slim free-ride HUD over the scene: speed, power, cadence, heart rate, gear, gradient; elevation strip along the bottom; minimap in the corner.
+- [x] Scene harness page for routes and visual settings in the debug panel.
+- [x] Automatic quality levels and the 2D fallback.
 
 ### Phase C: the place (L)
 - [ ] Painted map ground: land use, water, side streets, street-name signs at junctions.

@@ -1,8 +1,11 @@
+import type GUI from 'lil-gui'
 import { VIS } from './params'
 
-export async function debugPanel() {
+/** `onRoute` is called when a route-world setting that is baked into the chunks changes. */
+export async function debugPanel(onRoute?: () => void) {
   const { default: GUI } = await import('lil-gui')
   const gui = new GUI({ title: 'Visual debug' })
+  if (onRoute) routeFolder(gui.addFolder('Route world'), onRoute)
   const cam = gui.addFolder('Camera')
   cam.add(VIS, 'camHeight', 2, 40)
   cam.add(VIS, 'camDist', 5, 60)
@@ -34,4 +37,45 @@ export async function debugPanel() {
     f.add(m, 'fogFar', 60, 500)
   }
   return gui
+}
+
+function routeFolder(f: GUI, rebuild: () => void) {
+  const R = VIS.route
+  const cam = f.addFolder('Camera')
+  cam.add(R, 'camBack', 3, 30)
+  cam.add(R, 'camHeight', 1, 15)
+  cam.add(R, 'camSide', -6, 6)
+  cam.add(R, 'camLook', 5, 60)
+  cam.add(R, 'camAim', 0, 1)
+  cam.add(R, 'camStiff', 0.5, 12)
+  cam.add(R, 'fov', 30, 100)
+  f.add(R, 'fogNear', 0, 600)
+  f.add(R, 'skyR', 600, 4000)
+  f.add(R, 'skyJag', 0, 300)
+  const built = f.addFolder('Road and ground (rebuilds)')
+  built.add(R, 'roadHalf', 1, 8)
+  built.add(R, 'verge', 0, 6)
+  built.add(R, 'lineW', 0.05, 1)
+  built.add(R, 'shoulder', 2, 30)
+  built.add(R, 'blend', 5, 150)
+  built.add(R, 'hillAmp', 0, 300)
+  built.add(R, 'hillScale', 50, 800)
+  built.add(R, 'snowLine', 0, 2500)
+  built.add(R, 'seaLevel', -1, 5)
+  built.add(R, 'rockSlope', 0.3, 1)
+  for (const k of ['aheadPotato', 'aheadLow', 'aheadMedium', 'aheadHigh'] as const)
+    built.add(R, k, 200, 2000, 50)
+  for (const k of [
+    'tarmac',
+    'line',
+    'gravel',
+    'grass',
+    'dry',
+    'bush',
+    'rock',
+    'snow',
+    'sea',
+  ] as const)
+    built.addColor(R, k)
+  built.onChange(rebuild)
 }

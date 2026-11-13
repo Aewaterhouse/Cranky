@@ -57,6 +57,68 @@ export const VIS = {
   vignette: 0.45,
   busColour: '#f2b705',
   moodBlend: 1.6,
+  /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
+  route: {
+    roadHalf: 3.1,
+    verge: 1.2,
+    lineW: 0.24,
+    /** Road and near-terrain rows are this far apart; a chunk is `chunk` long. */
+    rowStep: 4,
+    chunk: 200,
+    behind: 150,
+    /** Road this close as the crow flies is built too, however far along the route it is. */
+    nearby: 600,
+    /** How far ahead chunks are built, per quality level. */
+    aheadPotato: 350,
+    aheadLow: 500,
+    aheadMedium: 800,
+    aheadHigh: 1000,
+    /** Flat bench either side of the centreline, then the blend back to natural ground. */
+    shoulder: 7.5,
+    blend: 45,
+    bankGain: 1.2,
+    bankMax: 0.1,
+    /** 1-2-1 passes over the centreline to hide the 1 m rounding of pack coordinates. */
+    smoothPasses: 2,
+    /** Routes without coordinates wander: two heading waves as [amplitude, wavelength] pairs. */
+    meander: [0.9, 260, 0.5, 90],
+    /** Made-up hills where there is no height data. */
+    hillAmp: 70,
+    hillScale: 260,
+    /** Terrain columns: metres out from the centreline, near (every row) and far (every `outerEvery` rows). */
+    inner: [8, 12, 18, 27, 40, 60, 90],
+    outer: [140, 210, 310, 450, 650],
+    outerEvery: 10,
+    /** Where a rider sits across the road when the game gives no offset (we ride on the left). */
+    lane: -1.7,
+    camBack: 9,
+    camHeight: 3.7,
+    camSide: 0,
+    camLook: 20,
+    /** 0 aims the camera at the rider, 1 at the point `camLook` up the road. */
+    camAim: 0.55,
+    camStiff: 4,
+    camClear: 1.3,
+    fov: 58,
+    viewShift: 0.06,
+    fogNear: 140,
+    skyR: 1500,
+    skyJag: 60,
+    snowLine: 1650,
+    /** Faces whose normal points up less than this are rock. */
+    rockSlope: 0.8,
+    tarmac: '#3f3f47',
+    line: '#ecebe0',
+    gravel: '#a39272',
+    grass: '#7fb24e',
+    dry: '#b9b060',
+    bush: '#4c8a47',
+    rock: '#8b8780',
+    snow: '#f3f6fa',
+    sea: '#3d8fc4',
+    /** Ground below this height (m) is drawn as water. */
+    seaLevel: 0.5,
+  },
   moods: {
     drill: {
       sky: '#3f8fe0',
@@ -169,6 +231,22 @@ export const VIS = {
       head: 0.15,
       stars: 0,
       fogFar: 260,
+    },
+    route: {
+      sky: '#3f8fe0',
+      fog: '#cfe4ee',
+      light: '#fff4e0',
+      hemi: '#cfe4ff',
+      ground: '#86b050',
+      hill: '#5f8a9c',
+      sunI: 2.6,
+      hemiI: 1.15,
+      sunElev: 40,
+      sunAz: -35,
+      sunSize: 0.035,
+      head: 0,
+      stars: 0,
+      fogFar: 1100,
     },
   } as Record<string, MoodDef>,
 }

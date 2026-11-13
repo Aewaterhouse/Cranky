@@ -41,10 +41,13 @@ const pt = (a: THREE.Vector3, px: number, f: number, y: number) => a.set(px, y, 
 
 export type RiderMode = 'ride' | 'run' | 'slump'
 
-/** A rider figure on a trainer bike with a canvas name tag. Local origin is the roof seat position. */
-export function makeRider(colour: string, seed: number) {
+/**
+ * A rider figure on a bike (on a trainer unless `road`) with a canvas name tag. Local origin is the surface
+ * under the bike.
+ */
+export function makeRider(colour: string, seed: number, road = false) {
   const root = new THREE.Group()
-  const bike = makeBike(colour)
+  const bike = makeBike(colour, road)
   const person = new THREE.Group()
   root.add(bike.group, person)
   const mats = {

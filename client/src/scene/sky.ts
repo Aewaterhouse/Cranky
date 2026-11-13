@@ -35,7 +35,7 @@ void main(){ gl_FragColor = vec4(mix(bot, top, vT), 1.0);
 const GRAD_VERT = `attribute float aT; varying float vT;
 void main(){ vT = aT; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`
 
-const gradMat = () =>
+export const gradMat = () =>
   new THREE.ShaderMaterial({
     vertexShader: GRAD_VERT,
     fragmentShader: GRAD_FRAG,
@@ -117,7 +117,8 @@ export class Sky {
   private windows: THREE.Mesh
   private tmp = new THREE.Color()
 
-  constructor() {
+  /** `bare` leaves just the dome and sun, for worlds that bring their own horizon. */
+  constructor(private bare = false) {
     this.dome = new THREE.Mesh(
       new THREE.SphereGeometry(520, 24, 16),
       new THREE.ShaderMaterial({
@@ -137,6 +138,7 @@ export class Sky {
       new THREE.MeshBasicMaterial({ color: '#ffd88a', fog: false, transparent: true }),
     )
     this.group.add(this.dome, this.city, this.windows)
+    if (bare) for (const o of [...this.ridges, this.city]) o.visible = false
   }
 
   update(env: Env, t: number, camPos: THREE.Vector3) {
@@ -162,7 +164,7 @@ export class Sky {
       .lerp(env.fog, 0.45)
       .multiplyScalar(0.7)
     const night = smooth(0.2, 0.9, env.stars)
-    this.windows.visible = night > 0.02
+    this.windows.visible = !this.bare && night > 0.02
     ;(this.windows.material as THREE.MeshBasicMaterial).opacity = night * 0.8
   }
 }

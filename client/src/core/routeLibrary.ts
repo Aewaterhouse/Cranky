@@ -1,6 +1,6 @@
 import { CFG } from '../config'
 import { rideSeconds, totalMass } from './physics'
-import { buildRoute, haversine, type RawPoint, type Route } from './route'
+import { buildRoute, haversine, type RawPoint, type Route, type TerrainData } from './route'
 
 const L = CFG.freeRide.library
 
@@ -24,6 +24,7 @@ export interface RoutePack {
   blurb: string
   published: { km: number; gainM: number; source: string }
   pts: [number, number, number][]
+  terrain?: TerrainData
 }
 
 export const ROUTE_INDEX: RouteSummary[] = Object.values(
@@ -43,7 +44,10 @@ export function packToRoute(pack: RoutePack): Route {
     if (i) d += haversine(pack.pts[i - 1][0], pack.pts[i - 1][1], lat, lon)
     return { d, lat, lon, ele }
   })
-  return buildRoute(pack.id, pack.name, raw, pack.blurb, { region: pack.region })
+  return buildRoute(pack.id, pack.name, raw, pack.blurb, {
+    region: pack.region,
+    terrain: pack.terrain,
+  })
 }
 
 export async function loadRoute(id: string): Promise<Route> {

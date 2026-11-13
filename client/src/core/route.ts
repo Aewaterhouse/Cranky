@@ -10,6 +10,18 @@ export interface RoutePoint {
   lat?: number
   lon?: number
 }
+/**
+ * Coarse heights for the land near a route. Row r is `r * cell` metres north of (lat0, lon0) and
+ * column c is `c * cell` metres east. Each row is a list of runs of known cells `[startCol, heights]`.
+ */
+export interface TerrainData {
+  cell: number
+  lat0: number
+  lon0: number
+  cols: number
+  rows: number
+  runs: ([number, number[]][] | null)[]
+}
 export interface Route {
   id: string
   name: string
@@ -22,6 +34,8 @@ export interface Route {
   points: RoutePoint[]
   distance: number
   ascent: number
+  /** Bundled routes only; never stored with imported routes. */
+  terrain?: TerrainData
 }
 /** A raw track point: `d` is metres along the route. */
 export interface RawPoint {

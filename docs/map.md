@@ -9,10 +9,11 @@
 - `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
-- `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
+- `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `route-dev.html` route world harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
 - `src/main.ts` bootstrap: login, shell, wiring to solo and bus.
 - `src/spike.ts` trainer test UI and Zwift Click test panel.
 - `src/sceneDev.ts` scene harness params and keys (see README).
+- `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README).
 - `src/config.ts` client tunables (caps, bands, sprint grades, curve defaults).
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.
@@ -35,7 +36,7 @@
 ### modes/, net/, trainer/
 - `modes/rideController.ts` per-tick ride logic: ERG, compliance, sprints.
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys); `modes/drill/ftpTest.ts` FTP test blocks and result maths; `modes/drill/cadence.ts` cadence-in-band tally; `modes/drill/cues.ts` coach cue timing; `modes/drill/extend.ts` +1 / +5 min; `modes/drill/liveTally.ts` incremental ride stats; `modes/drill/overlays.ts` centre message; `modes/drill/keys.ts` key map and Click mapping; `modes/drill/slope.ts` slope mode gradient sender with gears.
-- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause).
+- `modes/freeRide/freeRide.ts` free ride player on a route (physics, trainer gradient, auto-pause); feeds the 3D road world when the setting and WebGL allow.
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD).
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD); `spectate.ts` TV spectator view (`watch`, no trainer).
@@ -49,6 +50,13 @@
 - `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
 - `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `pack.ts` the VO2 Madness pack on the road (order by points, crown, medal, fire); `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
+- `math.ts` clamp, lerp, smooth, hash and value noise with no three.js import (re-exported by `util.ts`).
+
+### scene/route/ (the free-ride road world; files without three.js are unit-tested)
+- `roadPath.ts` projection to local metres, the centreline curve, `poseAt(d)` with banking, spur removal, the made-up line for routes without coordinates (no three.js).
+- `terrainGrid.ts` decodes a pack's height grid and samples it with a trust weight (no three.js); `roadIndex.ts` spatial hash of centreline segments (no three.js); `heightField.ts` `ground(x, z)`: grid or made-up hills, cut and filled to the nearest road (no three.js).
+- `roadGeo.ts` road ribbon triangles and the `Tris` builder; `terrainGeo.ts` terrain rows either side of the road, clipped where another stretch of road is nearer; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
+- `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
@@ -59,7 +67,7 @@
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudMad.ts` VO2 Madness box and effort leaderboard (`hudMad.css`); `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
-- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
+- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player layout, flat or as a slim HUD over the 3D world (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets
