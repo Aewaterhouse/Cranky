@@ -699,3 +699,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - The crew's notes from the first rides on real trainers are a checklist in `docs/ride-notes-plan.md`. It takes priority over the remaining roadmap items.
 - Default shift strength is 150% (was 100%): the crew found each gear click about half as strong as it should be. Devices that already saved a value keep it; the slider is in Settings, the free-ride menu and solo Slope mode.
 - Howick Street Crit (Launceston) is built from the owner's FIT course file by a small FIT reader (`scripts/routes/fit.py`): 1.7 km a lap, 57 m of climbing, up to 11.7%. The file has 49 points about 34 m apart, so positions are not smoothed (it would cut the corners) and the bends are only as sharp as the file. Its heights are the file's own, shifted onto the SRTM terrain like the recorded rides. No map features yet (the map server refused). `/*.fit` is git-ignored along with the GPX recordings.
+
+## Ride history stays on SQLite (2026-11-14)
+- The server runs on Railway with SQLite on a volume at `/data`, and Railway's volume backups are on (daily and weekly). Owner decision: stay on SQLite rather than move to a hosted database. A crew of six riders writes a handful of rides a day; SQLite on a volume is plenty, and it keeps local development and tests the same as production.
