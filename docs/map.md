@@ -23,7 +23,7 @@
 - `cosmetics.ts` catalogue and purchase logic.
 - `badges.ts` milestone badges, PR timeline.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
-- `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
+- `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
 - `plan.ts` plan parsing, flattening, frame lookup, session generator.
@@ -57,7 +57,7 @@
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudMad.ts` VO2 Madness box and effort leaderboard (`hudMad.css`); `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
-- `freeRideSetup.ts` free ride route picker and GPX import; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
+- `freeRideSetup.ts` free ride route picker and GPX import; `routePicker.ts` bundled route cards with filters; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
 ### tests/ and assets

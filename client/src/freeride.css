@@ -185,3 +185,21 @@
   margin-top: 4px;
   padding: 4px 10px;
 }
+.mini-prof {
+  width: 100%;
+  height: 30px;
+}
+.mini-prof .fill {
+  fill: var(--acc);
+  opacity: 0.25;
+}
+.mini-prof .line {
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.credit {
+  font-size: 0.75rem;
+  margin: 8px 0;
+}

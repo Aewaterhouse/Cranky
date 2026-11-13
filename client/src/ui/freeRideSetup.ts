@@ -1,10 +1,12 @@
 import type { Profile } from '../core/curve'
 import { CFG } from '../config'
 import { parseGpx, routeSeconds, routeStats, type Route } from '../core/route'
+import { loadRoute } from '../core/routeLibrary'
 import { myRoutes, removeMyRoute, saveMyRoute } from '../core/routeStore'
 import { h } from './dom'
 import type { HomeActions } from './home'
 import { toast } from './toast'
+import { routePicker } from './routePicker'
 import { needTrainer } from './trainer'
 
 const km = (m: number) => `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`
@@ -42,6 +44,18 @@ function routeCard(p: Profile, r: Route, selected: boolean, pick: () => void, de
 export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
   let sel: Route | undefined = myRoutes()[0]
   const list = h('div', { class: 'route-grid' })
+  const lib = routePicker(
+    p,
+    () => sel?.id,
+    async (r) => {
+      try {
+        sel = await loadRoute(r.id)
+        paint()
+      } catch (e) {
+        toast(`Could not load ${r.name}: ${(e as Error).message}`)
+      }
+    },
+  )
   const startLabel = h('span', { class: 'sb-what' })
   const go = h(
     'button',
@@ -50,7 +64,8 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
   )
   const paint = () => {
     const mine = myRoutes()
-    if (!mine.some((r) => r.id === sel?.id)) sel = mine[0]
+    if (!sel) sel = mine[0]
+    lib.paint()
     list.replaceChildren(
       ...(mine.length
         ? mine.map((r) =>
@@ -59,7 +74,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
               r,
               r.id === sel?.id,
               () => ((sel = r), paint()),
-              () => (removeMyRoute(r.id), paint()),
+              () => (removeMyRoute(r.id), r.id === sel?.id && (sel = undefined), paint()),
             ),
           )
         : [h('p', { class: 'dim' }, 'No routes yet. Import a GPX file to start.')]),
@@ -96,6 +111,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'lede' },
       'No ERG. Your power moves you along a real route and the trainer follows the gradient.',
     ),
+    h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Routes'), lib.el),
     h(
       'section',
       { class: 'panel' },
@@ -103,6 +119,11 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       list,
       h('button', { onclick: () => file.click() }, 'Import GPX'),
       file,
+    ),
+    h(
+      'p',
+      { class: 'dim credit' },
+      'Route data © OpenStreetMap contributors (ODbL); elevation from NASA SRTM',
     ),
     h('div', { class: 'startbar' }, startLabel, go),
   )
