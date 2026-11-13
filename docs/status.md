@@ -27,6 +27,7 @@
 - Free ride: roadside oddities, funny signs and chalk, wildlife, traffic, location-aware quips, time of day and weather; the HUD redesign from `docs/hud-notes.md`; six routes from the owner's rides; lap rides on loop courses.
 - Free ride Phase D: bend speed limits, optional wind, trainer gradient look-ahead, camera extras with a calm setting, rider poses, synthesised ride and place sounds; lap counter, lap times and bell. Audio has never been heard and motion was judged from stills.
 - Free ride Phase E: group rides on a shared server road layer (server-run positions, drafting, keep-together, bots with characters, lobby, name tags, TV view, crew results, four-rider headless test). Tried only with headless browsers on one machine.
+- Free ride Phase F: segments with live splits, server-side efforts and leaderboard endpoints, ghosts, FIT export with position and laps, route passport and badges, weekly featured route and climbing target, route map and segments in ride history.
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
@@ -41,6 +42,8 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Phase F gaps: no crew leaderboard screen yet (the endpoints exist); a ride finished offline queues its segment efforts but still loses its history entry; no mate-ghost picker in the group lobby; the 2D layout has no segment panel. Group-ride splits, mate ghosts, offline sync and scrap payouts are unit-tested only, and no FIT file has been uploaded to Strava.
+- The weekly challenge week starts Monday local time, unlike the older streak week (Sunday UTC). `config.ts` (335 lines) and `freeRide.ts` (308) are over the 300-line guide.
 - Group rides: the Phase E agent saw a solo free ride (2D layout) stall for about 9 s every 23 s in headless Chromium, after which the server read zero power. It does not reproduce on the 3D harness page on master (no gap over 1.5 s in 60 s); never checked in the 2D layout or a real browser. Watch for it on the first real group ride.
 - Group rides: drafting (27% at 2 m, none by 10 m), keep-together (up to 20%) and bot strengths are invented numbers. `freeRide.ts` is a little over 300 lines.
 - Eight route packs still have no map features (the public map server kept refusing): Full Gas Friday, Metros, Mount Buffalo, Mount Hotham, kunanyi, Willunga, Akuna Bay, Great Ocean Road, Beach Road. Re-run `scripts/routes/build_routes.py <id> --force` to fill them in.
