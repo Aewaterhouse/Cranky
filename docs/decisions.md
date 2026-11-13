@@ -745,3 +745,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
   - nightmare: 0/0/0, 0/0/0
 - Results swing hard with small changes (normal at 1.2 m/s gives a median of 25, at 1.0 a median of 80), so expect to tune after a real ride. Long plans are harder than short ones at the same level. A crew that rides in cadence sync gets the tune-up bonus (+1 m/s of gap) and finds every level easier, as before.
 - The servo stop counts too: the bus is parked and the horde closes on it at the creep rate, less what the crew earns against the servo's low neutral.
+
+## Power cables on the bus (2026-11-14)
+- Each rider's cable glows with power over target (capped at 1.5), times `VIS.cableGlowMax` (1.4), pulsing at twice the crank rate between 65% and 100% of that. With no target (a sprint or free block) any pedalling counts as 1. Colours `VIS.cableColour` and `VIS.cableGlow` (green, the bus game's toxic colour) are in the debug panel's Trainer folder. Not in VO2 Madness, where riders are on the road.

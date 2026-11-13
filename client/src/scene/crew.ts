@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { SLOTS, ROOF_Y } from './busParts'
+import { makeCable } from './cables'
 import { makeRider } from './riders'
 import type { SceneRider } from './world'
 import type { Particles } from './particles'
@@ -9,6 +10,7 @@ const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5
 
 interface Entry {
   r: ReturnType<typeof makeRider>
+  cable: ReturnType<typeof makeCable>
   slot: number
   seed: number
   runX: number
@@ -37,7 +39,8 @@ export class Crew {
     for (const [id, e] of this.map)
       if (!live.has(id)) {
         e.r.person.parent?.remove(e.r.person)
-        this.shell.remove(e.r.root)
+        this.shell.remove(e.r.root, e.cable.group)
+        e.cable.dispose()
         this.map.delete(id)
       }
     const taken = new Set([...this.map.values()].map((e) => e.slot))
@@ -50,12 +53,13 @@ export class Crew {
         taken.add(slot)
         e = {
           r: makeRider(COLOURS[this.map.size % COLOURS.length], this.map.size + i),
+          cable: makeCable(...SLOTS[slot]),
           slot,
           seed: Math.random() * 6.28,
           runX: 0,
         }
         e.r.root.position.set(SLOTS[slot][0], ROOF_Y, SLOTS[slot][1])
-        this.shell.add(e.r.root)
+        this.shell.add(e.r.root, e.cable.group)
         this.map.set(sr.id, e)
       }
       const r = e.r
@@ -79,6 +83,7 @@ export class Crew {
         r.pose(sr.st === 'spectator' ? 'slump' : 'ride', ph, Math.sign(SLOTS[e.slot][0]))
       }
       r.fade(sr.st === 'spectator' ? 0.35 : 1)
+      e.cable.update(sr.st === 'riding' ? (sr.effort ?? 0.8) : 0, ph)
       r.bike.group.visible = true
     })
   }

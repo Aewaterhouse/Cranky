@@ -32,6 +32,8 @@ export interface SceneRider {
   /** Heart rate in bpm and as a fraction of max, when the rider has a strap. */
   hr?: number | null
   hrp?: number | null
+  /** Power over target (about 1 on target); lights the rider's cable into the bus. */
+  effort?: number
 }
 export interface SceneState {
   speed: number

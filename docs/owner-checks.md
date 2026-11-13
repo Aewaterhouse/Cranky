@@ -125,3 +125,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Horde and mirror: on a bus ride in ERG, the horde is in the rear-view mirror all ride and comes into the main view when the crew slips; the mirror does not cover the event header, the Next chip or the countdown on the big screen or the iPad, and the frame rate holds up.
 - [ ] Difficulty: ride Normal in ERG and say whether the crew was close to failing by the end; then Hard, and whether the air strikes and gunships felt like the only way through.
 - [ ] Fallen riders: on a bus ride, when someone falls off, the red banner shows, everyone else's target goes up 5% (ERG follows), the crew list shows each share % and the 💪 carrier, and the extra feels fair. Answer in `docs/questions.md`.
+- [ ] Cables on the bus: visible from the chase camera on a real screen, brighter when riding hard, dark when someone falls off.

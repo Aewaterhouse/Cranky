@@ -220,6 +220,7 @@ export function startBusRide(
         look: lk[id],
         hr: r.hr,
         hrp: r.hrp,
+        effort: r.tgt ? r.w / r.tgt : r.w > 0 ? 1 : 0,
       })),
     }
     hud.tick(m)
