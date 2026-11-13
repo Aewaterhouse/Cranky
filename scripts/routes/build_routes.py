@@ -254,6 +254,12 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     return pack, {**head, **s, "smoothM": window}, problems
 
 
+def put(file: Path, text: str) -> None:
+    """Writes only when the content changed, so a dev server watching the packs is not reloaded."""
+    if not file.exists() or file.read_text() != text:
+        file.write_text(text)
+
+
 def main(argv: list[str]) -> int:
     """Builds the named routes (or all of them) and rewrites the index."""
     force = "--force" in argv
@@ -281,11 +287,11 @@ def main(argv: list[str]) -> int:
             failed += 1
             continue
         print(f"{'WARN' if problems else 'ok  '} {line} {'; '.join(problems)}")
-        (OUT / f"{spec['id']}.json").write_text(json.dumps(pack, separators=(",", ":")))
+        put(OUT / f"{spec['id']}.json", json.dumps(pack, separators=(",", ":")))
         index[spec["id"]] = entry
     order = [s["id"] for s in specs]
     kept = sorted(index.values(), key=lambda e: order.index(e["id"]) if e["id"] in order else 99)
-    index_file.write_text(json.dumps(kept, indent=1) + "\n")
+    put(index_file, json.dumps(kept, indent=1) + "\n")
     return 1 if failed else 0
 
 
