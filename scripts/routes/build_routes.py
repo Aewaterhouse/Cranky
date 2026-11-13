@@ -2,7 +2,8 @@
 
 Usage: python3 scripts/routes/build_routes.py [route-id ...] [--force]
 
-Reads scripts/routes/routes.json, writes content/routes/<id>.json and index.json.
+Reads scripts/routes/routes.json, writes content/routes/<id>.json (centreline plus a
+height grid of the land around it, see terrain.py) and index.json.
 A route whose length or climb is too far from its published figures is not written
 unless --force is given. Network replies are cached in scripts/routes/.cache.
 """
@@ -16,6 +17,8 @@ import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
+
+import terrain
 
 HERE = Path(__file__).parent
 OUT = HERE.parent.parent / "content" / "routes"
@@ -227,7 +230,8 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     head = {k: spec[k] for k in ("id", "name", "region", "blurb")}
     pts = [[round(la, 5), round(lo, 5), round(e, 1)] for (la, lo), e in zip(fine, ele, strict=False)]
     s.pop("smoothM")
-    return {**head, "published": pub, "pts": pts}, {**head, **s, "smoothM": window}, problems
+    pack = {**head, "published": pub, "pts": pts, "terrain": terrain.grid(fine)}
+    return pack, {**head, **s, "smoothM": window}, problems
 
 
 def main(argv: list[str]) -> int:

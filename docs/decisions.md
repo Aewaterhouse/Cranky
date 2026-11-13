@@ -284,3 +284,9 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Percentages clamp to 20-150 (ERG cap from config); sprint and free blocks carry no target; sprint time clamps to the config range.
 - IF is normalised power over FTP (sprint counted as 120 per cent, free as 50); TSS = hours x IF squared x 100.
 - Preview uses the existing plan graph, not the player chart. Delete is the existing X on the card.
+
+## Route packs: terrain grid (2026-11-13)
+- Each pack now carries a `terrain` block for the 3D world: SRTM heights on a 60 m grid, in whole metres, for every cell within 900 m of the road, stored row by row as runs of known cells. The grid's own corner (`lat0`, `lon0`) is the origin of the local-metre projection the scene uses. See `scripts/routes/terrain.py` for the exact layout.
+- Heights come straight from SRTM 1-arc-second tiles (public domain) on the AWS open terrain tile bucket, read with the standard library. Sea and data voids are 0 m.
+- The grid is not smoothed: the road's own heights win near the road (the scene cuts the ground to the road), so the two only need to agree roughly. On Mount Coot-tha the nearest grid cell is within 10 m of the road height everywhere and the median difference is 0.
+- The ten packs total 1.1 MB and are loaded one at a time.

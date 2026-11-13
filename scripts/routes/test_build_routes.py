@@ -6,6 +6,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 import build_routes as br  # noqa: E402
+import terrain  # noqa: E402
 
 
 def test_shortest_takes_the_shorter_road() -> None:
@@ -41,3 +42,14 @@ def test_stats_on_a_steady_climb() -> None:
 def test_stats_smooths_noise() -> None:
     flat = [50 + (1 if i % 2 else -1) for i in range(301)]
     assert br.stats(flat)["gainM"] < 30  # 300 m of rises unsmoothed
+
+
+def test_near_cells_is_a_disc() -> None:
+    cells = terrain.near_cells([(600.0, 600.0)], 60, 120)
+    assert (10, 10) in cells and (10, 12) in cells and (12, 10) in cells
+    assert (12, 12) not in cells and (10, 13) not in cells
+
+
+def test_runs_split_on_gaps() -> None:
+    cells = {(0, 2): 5, (0, 3): 6, (0, 7): 9, (2, 0): 1}
+    assert terrain.to_runs(cells, 3) == [[[2, [5, 6]], [7, [9]]], None, [[0, [1]]]]

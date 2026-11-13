@@ -3,7 +3,7 @@
 ## Root
 - `PLAN.md` design and phases; `AGENTS.md` working rules; `README.md` setup; `Dockerfile` production image (client build + server).
 - `scripts/run.sh` build client and start server on :8000; `scripts/selfsigned.sh` self-signed certs for LAN HTTPS.
-- `scripts/routes/build_routes.py` builds bundled route packs from OpenStreetMap and SRTM; `routes.json` route definitions (waypoints, published figures); `test_build_routes.py` its tests (`cd server && uv run pytest ../scripts/routes`).
+- `scripts/routes/build_routes.py` builds bundled route packs from OpenStreetMap and SRTM; `terrain.py` SRTM tile reader and the height grid around a route; `routes.json` route definitions (waypoints, published figures); `test_build_routes.py` its tests (`cd server && uv run pytest ../scripts/routes`).
 - `content/routes/index.json` route cards; `content/routes/<id>.json` one pack per bundled route.
 - `docs/protocol.md` wire protocol; `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/freeride-plan.md` free ride 3D world plan; `docs/map.md` this file.
 - `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
