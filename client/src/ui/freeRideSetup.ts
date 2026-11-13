@@ -12,10 +12,13 @@ import {
 import { ROUTE_INDEX, loadRoute } from '../core/routeLibrary'
 import { myRoutes, removeMyRoute, saveMyRoute } from '../core/routeStore'
 import { h } from './dom'
+import { ghostPick } from './ghostPick'
 import type { HomeActions } from './home'
 import { toast } from './toast'
 import { routePicker } from './routePicker'
 import { needTrainer } from './trainer'
+import { weekCard } from './weekCard'
+import '../passport.css'
 
 const km = (m: number) => `${(m / 1000).toFixed(m < 10000 ? 1 : 0)} km`
 
@@ -52,20 +55,18 @@ function routeCard(p: Profile, r: Route, selected: boolean, pick: () => void, de
 export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
   let sel: Route | undefined = myRoutes()[0]
   const list = h('div', { class: 'route-grid' })
-  const lib = routePicker(
-    p,
-    () => sel?.id,
-    async (r) => {
-      try {
-        sel = await loadRoute(r.id)
-        laps = lapsDefault(sel)
-        paint()
-      } catch (e) {
-        toast(`Could not load ${r.name}: ${(e as Error).message}`)
-      }
-    },
-  )
+  const pickBundled = async (r: { id: string; name: string }) => {
+    try {
+      sel = await loadRoute(r.id)
+      laps = lapsDefault(sel)
+      paint()
+    } catch (e) {
+      toast(`Could not load ${r.name}: ${(e as Error).message}`)
+    }
+  }
+  const lib = routePicker(p, () => sel?.id, pickBundled)
   const startLabel = h('span', { class: 'sb-what' })
+  const ghosts = ghostPick(p.id)
   let laps = 1
   const lapsBox = h('span', { class: 'laps' })
   const lapsFor = (r: Route) => {
@@ -84,7 +85,10 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     'button',
     {
       class: 'primary go',
-      onclick: needTrainer(() => sel && act.freeRide(sel.loop ? withLaps(sel, laps) : sel)),
+      onclick: needTrainer(async () => {
+        const r = sel && (sel.loop ? withLaps(sel, laps) : sel)
+        if (r) act.freeRide(r, await ghosts.specs())
+      }),
     },
     'Start',
   )
@@ -132,6 +136,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
         : [h('p', { class: 'dim' }, 'No routes yet. Import a GPX file to start.')]),
     )
     startLabel.replaceChildren(sel ? h('b', {}, sel.name) : 'Pick a route')
+    ghosts.set(sel)
     lapsBox.hidden = !sel?.loop
     if (sel?.loop) lapsFor(sel)
     go.disabled = !sel
@@ -168,6 +173,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       { class: 'lede' },
       'No ERG. Your power moves you along a real route and the trainer follows the gradient.',
     ),
+    weekCard(p, pickBundled),
     h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Routes'), lib.el),
     h(
       'section',
@@ -193,6 +199,6 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
       ),
       joinForm,
     ),
-    h('div', { class: 'startbar' }, startLabel, lapsBox, group, go),
+    h('div', { class: 'startbar' }, startLabel, lapsBox, ghosts.el, group, go),
   )
 }

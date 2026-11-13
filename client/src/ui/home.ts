@@ -1,3 +1,4 @@
+import type { GhostSpec } from '../core/ghost'
 import { CFG } from '../config'
 import { PLANS } from '../content'
 import { api } from '../core/api'
@@ -13,7 +14,8 @@ import { needTrainer } from './trainer'
 
 export interface HomeActions {
   drill(plan: Plan): void
-  freeRide(route: Route): void
+  /** `ghosts` are the best efforts picked to ride along. */
+  freeRide(route: Route, ghosts?: GhostSpec[]): void
   /** Make a group-ride room on a bundled route. Joining one by code is `join`. */
   groupRide(route: string, laps: number): void
   resume(snap: SoloSnap): void

@@ -1,6 +1,7 @@
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { shiftGear } from '../../core/gears'
+import type { GhostSpec } from '../../core/ghost'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
 import { draftSaving, stepSpeed, totalMass } from '../../core/physics'
@@ -12,7 +13,6 @@ import { settings } from '../../core/settings'
 import { clickSource, onClickShift } from '../../trainer/zwiftClick'
 import { SFX } from '../../ui/audio'
 import { clock, show } from '../../ui/dom'
-import { toast } from '../../ui/toast'
 import { freeRideView } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
 import { rideSound } from '../../ui/rideSound'
@@ -20,9 +20,9 @@ import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
 import { RoadFeel, cheering, trainerTarget } from './feel'
-import { makeGhosts, stepGhosts } from './ghosts'
 import { freeKeys } from './keys'
-import { Quipper, speak } from './quips'
+import { Quipper, recentPct, speak } from './quips'
+import { rideExtras } from './rideExtras'
 import type { RoadLink } from './roadLink'
 
 const STOP_S = 3
@@ -50,6 +50,7 @@ export function runFreeRide(
   trainer: Trainer,
   done: (p: Profile) => void,
   link?: RoadLink,
+  ghostSpecs?: GhostSpec[],
 ) {
   const params = new URLSearchParams(location.search)
   const fast = link ? 1 : +(params.get('fast') ?? 1)
@@ -94,10 +95,15 @@ export function runFreeRide(
     cadence: 0,
     look: profile.look,
   }
-  const ghosts = makeGhosts(me, profile.ftp, link ? 0 : +(params.get('ghosts') ?? 0))
   const kg = profile.weightKg || F.defaultKg
   const lapM = route.lapOf?.distance
   const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
+  const extras = rideExtras(route, { id: profile.id, kg, ftp: profile.ftp }, ride.rec, view, {
+    me,
+    group: !!link,
+    ghosts: ghostSpecs,
+    mates: link ? 0 : +(params.get('ghosts') ?? 0),
+  })
   let world: RouteWorld | undefined
   const feel = new RoadFeel(route)
   const sound = rideSound()
@@ -106,12 +112,7 @@ export function runFreeRide(
   const quipper = new Quipper()
   const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
   const climbs = top.ele - route.points[0].ele >= F.quips.summitGainM
-  const onQuip = (text: string) => {
-    const v = view as { toast?: (text: string) => void }
-    if (v.toast) v.toast(text)
-    else toast(text)
-    speak(text)
-  }
+  const onQuip = (text: string) => (view.toast(text), speak(text))
   if (settings.freeRideView === '3d')
     import('../../scene/route/routeWorld')
       .then((m) => {
@@ -223,10 +224,7 @@ export function runFreeRide(
     me.power = paused ? 0 : live.power
     me.effort = live.power / profile.ftp
     me.cheer = !starting && cheering(dist, route.distance, climbs ? top.d : undefined)
-    stepGhosts(ghosts, route, mass, paused, fast, dt)
-    const others = link?.others() ?? ghosts.map((g) => ({ ...g.rider, wkg: g.watts / kg }))
-    // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
-    if (world) world.state.riders = [me, ...others].map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
+    // The lap toast goes first, so a PR lap's fanfare (from the segments, just below) is what stays up.
     const lap = lapTimer?.info(dist)
     if (lap && lapTimer?.update(dist, el, speed) !== undefined) {
       const now = lapTimer.info(dist)
@@ -234,6 +232,10 @@ export function runFreeRide(
       view.toast(lapToast(now, clock))
       SFX.bell(now.n === now.of ? CFG.sound.bell.lastRings : 1)
     }
+    const { riders, ...seg } = extras.tick(dist, el, paused ? 0 : live.power, { paused, fast, dt })
+    const others = [...(link?.others() ?? []), ...riders]
+    // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
+    if (world) world.state.riders = [me, ...others].map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
@@ -256,6 +258,7 @@ export function runFreeRide(
       riders: [{ ...me, wkg: live.avg / kg }, ...others],
       me: me.id,
       lap,
+      ...seg,
       wind: settings.wind === 'off' || link ? undefined : wind,
       group: link && { draftW: draftSaving(speed, draft), band },
       banner: link?.banner(),
@@ -270,10 +273,7 @@ export function runFreeRide(
         total: route.distance,
         grade: p.grade,
         speed,
-        ftpPct:
-          (100 * pw.slice(-5).reduce((a, b) => a + b, live.power)) /
-          (Math.min(5, pw.length) + 1) /
-          profile.ftp,
+        ftpPct: recentPct(pw, live.power, profile.ftp),
         stopped: paused,
         summit: climbs && dist >= top.d,
         near: world?.near(),
@@ -294,6 +294,7 @@ export function runFreeRide(
     world?.dispose()
     sound?.stop()
     await ride.stop()
+    extras.finish(dist)
     finishRide(
       profile,
       ride.rec.summary(),

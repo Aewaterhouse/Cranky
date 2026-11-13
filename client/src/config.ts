@@ -170,6 +170,8 @@ export const CFG = {
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
     toastS: 3,
+    /** A PR or crew-best toast stays this long. */
+    toastBigS: 7,
     /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */
     phoneMaxH: 500,
     /** No ETA to the top below this speed (m/s). */
@@ -270,6 +272,42 @@ export const CFG = {
       gainForLevel: [150, 400, 800, 1400],
       steepPct: 6,
     },
+  },
+  /** Segments and ghosts (free ride Phase F). */
+  segments: {
+    /** Segment ids carry the start rounded to this many metres, so a small pack rebuild keeps them. */
+    idRoundM: 100,
+    /** The sprint: this long, nowhere steeper than `flatPct` either way; the panel shows `leadM` before it. */
+    sprint: { lenM: 300, flatPct: 2, leadM: 100 },
+    /** A climb takes the name of a named peak or lookout within this far of its top (m). */
+    poiM: 400,
+    /** Every effort keeps its distance every `traceS` seconds: the pace that live splits and ghosts replay. */
+    traceS: 5,
+    /** A group-ride position jump bigger than this (m) is a late join, not riding: no segment starts or ends. */
+    jumpM: 40,
+    /** Efforts kept waiting for the server at most. */
+    queueMax: 200,
+    /** A ghost turns its cranks at this cadence. */
+    ghostCadence: 85,
+  },
+  /** Route passport (Rider tab). */
+  passport: {
+    /** The map: the box of longitudes and latitudes drawn, the east-west squeeze and units per degree. */
+    map: { west: 112.5, east: 154.5, north: 9.5, south: 44.5, squeeze: 0.89, scale: 11 },
+    /** Route dots are kept at least this far apart (map units). */
+    dotGap: 15,
+    /** Metres climbed in total on one route for the three climbing badges (the last is an Everest). */
+    vertTiers: [2000, 4424, 8848],
+    /** Finishes of one route for the two repeat badges. */
+    repeatTiers: [5, 20],
+    /** Brisbane routes start within `km` of the city. */
+    brisbane: { at: [153.03, -27.47], km: 25 },
+  },
+  /** Weekly goals: scrap for finishing the featured route, and the rider's own climbing target. */
+  weekly: {
+    featuredScrap: 30,
+    /** The target is `stretch` times the average of the last `weeks` weeks with any climbing, to the nearest `roundM`. */
+    vert: { defaultM: 600, minM: 300, maxM: 6000, stretch: 1.1, roundM: 50, weeks: 4, scrap: 50 },
   },
   /**
    * Group rides. `draft` and `band` mirror DRAFT_* and BAND_* in the server's config.py (the server decides; the

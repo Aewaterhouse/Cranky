@@ -18,9 +18,14 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/profile/{id}` | Profile JSON, 404 if unknown |
 | PUT | `/api/profile/{id}` | Profile JSON (newer `updated` wins); 403 unless `id` is your own |
 | POST | `/api/rides` | `{summary}`: ride summary from the client, stored for the logged-in rider. The client adds `crew: true` for bus rides. |
-| GET | `/api/rides` | → the caller's rides, newest first: `[{id, date, plan, secs, avgPower, np, tss, kj, compliance, crew}]`. Fields missing from older rides are null; `crew` is false. |
+| GET | `/api/rides` | → the caller's rides, newest first: `[{id, date, plan, secs, avgPower, np, tss, kj, compliance, crew, route, distance}]`. Fields missing from older rides are null; `crew` is false. `route` (a route id) and `distance` (m) are set on free and group rides. |
 | GET | `/api/rides/{n}` | → the full stored summary (per-second arrays included); 404 unless it is your ride |
 | DELETE | `/api/rides/{n}` | Removes one of your rides; 404 unless it is yours. The profile is not touched. |
+| POST | `/api/efforts` | `{efforts: [{route, segment, secs, watts, wkg, date, rideDate?, trace?}]}` → `{saved}`: segment efforts for the logged-in rider. `segment` is `<route>:<kind>:<start m>`; `date` is when the effort finished and `rideDate` the start of its ride. Repeats (same rider, segment and `date`) are ignored, so a retried sync is safe. `trace` is metres from the segment's start every 5 s (the effort's pace); only a rider's best per segment keeps it. 422 on a bad value. |
+| GET | `/api/efforts?route=ID` | → `{mine: {segment: {segment, route, secs, watts, wkg, date, ride, count, trace}}, crew: {segment: [{id, name, secs, watts, wkg, date, ride}]}}`: the caller's best on each segment of the route and each segment's leaderboard, read before a ride. The first two rows of each leaderboard also carry `trace` |
+| GET | `/api/efforts/mine` | → the caller's best on every segment they have ridden: `[{segment, route, secs, watts, wkg, date, ride, count}]` |
+| GET | `/api/segments/{segment}/leaderboard?by=time\|wkg` | → each rider's best effort, fastest first (or highest W/kg first), at most 10: `[{id, name, secs, watts, wkg, date, ride}]`. `ride` is the id of the ride it came from, or null |
+| GET | `/api/segments/{segment}/ghost/{rider}` | → that rider's best traced effort `{id, name, secs, watts, wkg, date, ride, trace}`; 404 if none |
 | POST | `/api/rooms` | Optional `{kind: 'bus' \| 'road'}` (default `bus`) → `{code}`: new 4-letter room code |
 | GET | `/api/rooms` | → open rooms `[{code, kind, state, plan, host, riders: [names]}]`; for a road room `plan` is the route's name |
 | GET | `/api/plans` | → `[{id, name, desc, secs}]` |

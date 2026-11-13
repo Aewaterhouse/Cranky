@@ -115,6 +115,10 @@ export class Quipper {
   }
 }
 
+/** Power over the last few seconds (the newest reading included) as a % of FTP: how hard it is right now. */
+export const recentPct = (recorded: number[], now: number, ftp: number) =>
+  (100 * recorded.slice(-5).reduce((a, b) => a + b, now)) / (Math.min(5, recorded.length) + 1) / ftp
+
 /** Says a remark out loud when the announcer is on and the device can speak. */
 export function speak(text: string) {
   if (!settings.announcer || !settings.volume || !('speechSynthesis' in window)) return

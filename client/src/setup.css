@@ -729,3 +729,20 @@
 .ftp-card p {
   margin: 4px 0 12px;
 }
+
+/* Free-ride setup: the ghost choices in the start bar */
+.ghost-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9em;
+}
+.ghost-pick label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.ghost-pick:empty {
+  display: none;
+}

@@ -14,8 +14,15 @@ export function riderList() {
         ...rows.map((r) =>
           h(
             'div',
-            { class: `rrow ${r.me ? 'me' : r.gapM >= 0 ? 'ahead' : 'behind'}` },
-            h('span', { class: 'rn' }, r.name),
+            {
+              class: `rrow ${r.me ? 'me' : r.gapM >= 0 ? 'ahead' : 'behind'}${r.ghost ? ' ghost' : ''}`,
+            },
+            h(
+              'span',
+              { class: 'rn', title: r.ghost ? 'Ghost: a best effort ridden again' : '' },
+              r.ghost ? '◌ ' : '',
+              r.name,
+            ),
             h('span', { class: 'rw' }, r.wkg == null ? '' : r.wkg.toFixed(1)),
             h('span', { class: 'rg' }, r.me ? '' : gapText(r.gapM, speed)),
           ),

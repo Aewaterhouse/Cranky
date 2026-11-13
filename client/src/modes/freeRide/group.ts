@@ -10,6 +10,7 @@ import { roadLobbyView } from '../../ui/roadLobby'
 import { toast } from '../../ui/toast'
 import type { Trainer } from '../../types'
 import { crew } from '../zombieBus/crew'
+import { myGhost } from '../../core/ghost'
 import { runFreeRide } from './freeRide'
 import { RoadLink } from './roadLink'
 
@@ -93,7 +94,9 @@ export async function groupRide(
     link.clear()
     try {
       const lap = await loadRoute(l.route)
-      ride = runFreeRide(withLaps(lap, l.laps), profile, trainer, afterResults, link)
+      // My own best on the route rides along; nobody else sees it.
+      const pr = myGhost(profile.id, lap)
+      ride = runFreeRide(withLaps(lap, l.laps), profile, trainer, afterResults, link, pr && [pr])
     } catch (e) {
       toast(`Could not load the route: ${(e as Error).message}`, 'bad')
       leave()

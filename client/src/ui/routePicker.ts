@@ -7,6 +7,7 @@ import {
   lengthClass,
   type RouteSummary,
 } from '../core/routeLibrary'
+import { featuredRoute } from '../core/weekly'
 import { h, seg } from './dom'
 import { svgEl } from './svg'
 
@@ -34,12 +35,13 @@ function miniProfile(pts: number[]) {
   return svg
 }
 
-function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void) {
+function card(p: Profile, r: RouteSummary, on: boolean, pick: () => void, feat = false) {
   const power = p.ftp * CFG.freeRide.ftpFrac
   const d = difficulty(r.gainM, r.avgGrade)
   return h(
     'div',
-    { class: `route-card${on ? ' on' : ''}`, onclick: pick },
+    { class: `route-card${on ? ' on' : ''}${feat ? ' feat' : ''}`, onclick: pick },
+    feat ? h('span', { class: 'feat-tag' }, 'Route of the week') : '',
     h('b', {}, r.name),
     h('span', { class: 'dim' }, r.region),
     miniProfile(r.profile),
@@ -70,6 +72,7 @@ export function routePicker(
   let state = 'all'
   let len = 'all'
   const list = h('div', { class: 'route-grid' })
+  const feat = featuredRoute(ROUTE_INDEX)?.id
   const paint = () => {
     const shown = ROUTE_INDEX.filter(
       (r) =>
@@ -77,7 +80,7 @@ export function routePicker(
     )
     list.replaceChildren(
       ...(shown.length
-        ? shown.map((r) => card(p, r, r.id === selected(), () => pick(r)))
+        ? shown.map((r) => card(p, r, r.id === selected(), () => pick(r), r.id === feat))
         : [
             h(
               'p',

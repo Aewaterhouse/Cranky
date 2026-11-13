@@ -484,3 +484,60 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `freeRide.ts` lost its key map to `keys.ts` to stay near 300 lines; solo free ride runs the same loop with no link and behaves as before (same tests, same numbers).
 - The one ERG write in a road ride is the existing fail-safe when the ride stops (50% of FTP, then release), as in every other mode. During the ride the trainer only gets `setGrade`; `tests/roadLink.test.ts` and `test_road_multiplayer.py` check both ends.
 - Not built: imported GPX routes in a group ride (the server only has the bundled packs), a postcard for road rides, Discord post, scrap for finishing.
+
+## 2026-11-14 Free ride Phase F: reasons to come back
+
+### Segments
+- Every route gets its segments worked out from the route itself (`core/segments.ts`), nothing hand-made: each sustained climb (the same detection as the HUD's climb panel), one sprint, and the whole route. On a circuit the whole route is "one lap" instead, and a lap ride of any length has the same segments as its lap; a ride of N laps is not a segment of its own.
+- A climb is named after a named peak or lookout within 400 m of its top when the pack has one (`CFG.segments.poiM`), with a number if two climbs share it; otherwise "<route> · climb N" in road order.
+- The sprint is 300 m (`sprint.lenM`): the last stretch on the route (so nearest the finish, or the line on a circuit) with no gradient past 2% either way; when a route has none, the flattest 300 m. Routes under 600 m get no sprint.
+- Segment ids are `<route id>:<kind>:<start rounded to 100 m>` (`idRoundM`), so they survive a session and a small rebuild of a pack. A rebuild that moves a climb's start by more than that makes a new segment and orphans the old efforts.
+- Timing uses the ride clock (moving time in a solo ride, so a pause does not count; the server's clock in a group ride) and is taken at the line, not at the 200 ms tick. Average power is work over the time. With `?fast=N` times are game time.
+- Live splits are against the pace of the best effort itself: every effort keeps a trace (metres from the segment's start every 5 s, `CFG.segments.traceS`), and the split is your time so far minus the time the best took to reach the same spot. So a split agrees with the ghost up the road. A best with no trace (none exist yet) shows its time to beat but no live split.
+- "Crew" in a split is the fastest rider other than you. Taking the crew best means beating that time with a PR you had not already beaten it with.
+- The panel: on a climb the segment is a column of the existing climb panel (name, time, splits); a sprint gets a small panel in the same place, from 100 m out. The whole route or lap split is a row in the stats drawer ("This ride" / "This lap"), not a panel. The flat (charts) layout gets the toasts and results but no panel.
+- Results: a toast for every finished climb and sprint; a PR or first go gets the three-note jingle and holds 7 s (`CFG.hud.toastBigS`), a crew best the five-note one, and both are spoken when the announcer is on. A lap that is not a PR only gets the usual lap toast. Lines are in `fun/segmentLines.ts`, picked from the time so the same result always says the same thing.
+- While a fanfare toast is up, ordinary toasts (the commentator, lap toasts) are not shown, so a PR is not talked over the moment it lands. The commentator is still heard.
+- Efforts are saved as they are finished (not at the end of the ride), so a crash keeps them. A late join or rejoin in a group ride (a jump of more than 40 m) drops any go under way and starts none.
+- Server: one new table, `efforts` (rider, route, segment, secs, watts, wkg, date, ride_date, trace), made with `CREATE TABLE IF NOT EXISTS` and two indexes; nothing existing is altered. An effort is unique by rider, segment and finish time, so sending the same one twice stores it once.
+- The "ride id" of an effort is looked up when asked for, from the ride's start time (`ride_date`), because efforts are sent as they are finished and the ride itself is only posted at the end. It is null for a ride that was never saved (under 30 s, or posted while offline).
+- Leaderboards are each rider's best, fastest first, or by W/kg (`by=wkg`: each rider's highest W/kg effort, which need not be their fastest). Ten rows (`LEADERBOARD_ROWS`).
+- Offline: efforts go to a queue in localStorage beside this device's copy of the rider's bests (`core/efforts.ts`); the queue is sent after every effort and at login, and holds at most 200 (`CFG.segments.queueMax`). Rides themselves still have no offline queue (they never had one), so an offline ride keeps its segment times and PRs but not its history entry.
+- Limits (server `config.py`): an effort under 24 h, a trace of at most 6,000 points, 500 efforts a post.
+
+### Ghosts
+- A ghost is a best effort over the whole route (one lap, on a circuit) ridden again. Whole-route and lap efforts keep a trace: metres from the start every 5 s (`CFG.segments.traceS`), so a two-hour ride is about 1,400 small numbers. The server keeps the trace only for each rider's best on a segment; this device keeps its own best's trace in localStorage so the ghost works offline.
+- On a lap ride the ghost rides its best lap over and over from the start of the ride, so by lap 5 it is five best laps up the road. It is not restarted at the line each lap.
+- The ghost starts when the ride clock starts and runs on the ride clock, so it stops when a solo ride is paused.
+- Setup screen: once a route has a best, the start bar shows "◌ Your PR 12:34" ticked by default, and a list of mates who have a best on it (from the route's leaderboard) to pick one from. Up to two ghosts ride: yours and one mate's. A group ride brings your own PR ghost along automatically, seen only by you; there is no mate picker in the lobby.
+- Ghosts are only ever positions that are drawn and listed: they are not sent to the server, are not in the drafting sum, and do not count for the keep-together median. The ride loop adds them to the drawn and listed riders after the server's riders are read, and nothing reads them back.
+- Drawn see-through and pale (`VIS.route.ghost`: 40% solid, 55% towards white, in the debug panel under "Ghost riders"), 1.2 m and 2.3 m right of the rider's lane so they do not sit inside the rider. In the rider list a ghost has a ring mark (◌), italics, no W/kg, and the usual gap.
+- Not looked at in motion: the ghost was checked in still screenshots only.
+
+### FIT export with position
+- A free or group ride now records metres along the route at each recorded second (`dist` in the saved ride, beside `power`) and which route and how many laps (`route`). The FIT file is built at download time by reading the position, height and distance for each second off the route, so nothing bulky is stored. Speed is the distance covered in that second.
+- This needs the route on the device at download time: always true for bundled routes, true for an imported GPX only while it is still in this browser's "My routes". Without the route (or for a route with no coordinates) the file is the same power-only file as before.
+- With a track the session's sub-sport is virtual activity (58) instead of indoor cycling (6), which is what Strava and intervals.icu expect for a ride with a map that was ridden indoors, and the session gets total distance, total ascent and average speed.
+- Lap rides get one lap message per lap (the last may be a part lap); other rides with a track get one lap for the whole ride. Lap messages carry a message index and the lap's distance.
+- A ride without positions is byte-for-byte what it was (`tests/fitTrack.test.ts` holds the old encoder's length and checksum for a sample ride).
+- Not uploaded anywhere: the files were decoded by our own test reader only. Whether Strava draws the map is for the owner to try.
+
+### Route passport
+- Rider tab, new "Passport" sub-tab: the map, a table of every bundled route (times ridden, best time, metres climbed) and the passport badges.
+- The map is drawn in code from about 85 hand-typed longitude and latitude corners (`core/ausMap.ts`): mainland, Tasmania, six border lines and state labels. No ACT, no islands, gulfs mostly ironed out. It is a plain degrees projection squeezed 0.89 east-west.
+- Route dots sit where the route starts (`ROUTE_AT`, checked against the packs by a test, so a new route without a dot fails the suite). Dots closer than 15 map units (`CFG.passport.dotGap`) are pushed apart with a thin line back to the real spot, because Brisbane has five routes on top of each other. Dots are numbered to match the table and fill in once the route has been finished.
+- The passport lives in the profile (`passport[routeId] = {n, bestS, vertM, first}`), so it syncs with the profile and needs no new server code. It is stamped at the end of every free or group ride: each finished whole-route effort (or lap, on a circuit) is a time ridden; best time is the best of those (best lap on a circuit); climbing counts whether or not the ride was finished. Imported GPX routes are stamped too but are not on the map.
+- Rides from before Phase F are not in the passport: old rides did not record their route.
+- Badges, in the existing badge list (ids start `pp`): First Stamp (1 route), Frequent Flyer (5 routes), Interstate Incident (a route in every state that has one), All of Brisbane (every route starting within 25 km of the city: Coot-tha loop, Coot-tha Back, Mondo, Full Gas Friday, Nundah crit), Grand Tour (every route), Regular (5 finishes of one route) and Part of the furniture (20), and three climbing tiers on a single route: Hill Regular 2,000 m, Base Camp 4,424 m (half an Everest), Everested 8,848 m. The repeat and climbing badges are named after the route they were earned on ("Everested Coot-tha"). All numbers in `CFG.passport`.
+
+### Weekly featured route and climbing target
+- The route of the week is picked from the week number alone (weeks start at midnight on Monday by the device's clock, so mates in one time zone agree; the older streak counter's week starts on Sunday UTC and was left alone), so every rider sees the same one with no server: a hash of the week over the routes sorted by id, stepping on one if it lands on last week's. It shows in a "This week" card at the top of the free-ride setup (with "Pick it") and of the Passport, and its route card is outlined.
+- Finishing it (a lap of it, on a circuit) pays 30 scrap (`CFG.weekly.featuredScrap`), solo or in a group ride.
+- The weekly climb is personal: 1.1 times the average of the last 4 weeks in which the rider climbed anything in free ride, to the nearest 50 m, between 300 and 6,000 m; 600 m for someone with no history. It only looks at earlier weeks, so it does not move during the week. Reaching it pays 50 scrap.
+- Both are paid at the end of a ride through the same profile update that banks bus scrap, and each at most once a week: the week's log in the profile (`weeks[week] = {vertM, paid}`) remembers what was paid, so finishing twice pays once. The profile keeps five weeks of these.
+- Only free-ride and group-ride climbing counts; workouts and the bus have no hills.
+
+### Ride history
+- A free or group ride's row in History shows a small line map of its route, the route name, the distance and "free ride" or "group ride". The ride's detail gets a route card (the map with the part ridden drawn brighter and the start marked, distance, climbing, whether it was finished) and the same segments card as the end-of-ride summary.
+- The map is an SVG line drawn from the bundled pack (or the imported route if this browser still has it), not Leaflet: no tiles, no network, and cheap enough for a list. A ride on a route this device no longer has shows no map.
+- The list endpoint gained `route` (the route id) and `distance`; both are null for other rides and for rides from before Phase F.

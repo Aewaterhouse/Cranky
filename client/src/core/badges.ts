@@ -1,4 +1,6 @@
 import { isoWeek, type Profile, type RideRecord } from './curve'
+import { passportBadges } from './passport'
+import { ROUTE_INDEX } from './routeLibrary'
 
 export interface Badge {
   id: string
@@ -144,6 +146,7 @@ export function badges(p: Profile): Badge[] {
       !!p.badges?.legend,
       p.badges?.legend,
     ],
+    ...passportBadges(p, ROUTE_INDEX),
   ]
   return def.map(([id, name, desc, mark, rank, now, date]) => {
     const kept = p.badges?.[id]

@@ -1,11 +1,16 @@
-/** Minimal FIT activity encoder: one indoor cycling session with per-second power, cadence and heart rate. */
+/**
+ * Minimal FIT activity encoder: one cycling session with per-second power, cadence and heart rate. A ride with
+ * a `track` (free ride on a route) also gets position, altitude, distance and speed, and a lap message per lap.
+ */
 
 const FIT_EPOCH = 631065600 // seconds between the Unix epoch and 1989-12-31T00:00:00Z
 const ENUM = 0x00
 const U8 = 0x02
 const U16 = 0x84
 const U32 = 0x86
-const SIZE: Record<number, number> = { [ENUM]: 1, [U8]: 1, [U16]: 2, [U32]: 4 }
+const S32 = 0x85
+const SIZE: Record<number, number> = { [ENUM]: 1, [U8]: 1, [U16]: 2, [U32]: 4, [S32]: 4 }
+const SEMI = 2 ** 31 / 180 // degrees to FIT semicircles
 type Field = [num: number, type: number, value: number]
 
 const CRC_TABLE = [
@@ -32,6 +37,10 @@ export interface FitRide {
   np?: number
   tss?: number
   intensity?: number
+  /** Where the rider was at each recorded second: degrees, metres above sea level, metres ridden. */
+  track?: { lat: number; lon: number; ele: number; dist: number }[]
+  /** Lap rides: the length of a lap in metres. Needs `track`. */
+  lapM?: number
 }
 
 /** Returns the bytes of a .fit activity file. */
@@ -52,7 +61,8 @@ export function encodeFit(r: FitRide): Uint8Array {
       for (const [n, t] of fields) out.push(n, SIZE[t], t)
     }
     out.push(local)
-    for (const [, t, v] of fields) put(Math.max(0, Math.round(v)), SIZE[t])
+    for (const [, t, v] of fields)
+      put(t === S32 ? Math.round(v) : Math.max(0, Math.round(v)), SIZE[t])
   }
 
   const n = r.power.length
@@ -68,32 +78,69 @@ export function encodeFit(r: FitRide): Uint8Array {
     [2, U16, 0],
     [4, U32, t0],
   ])
-  for (let i = 0; i < n; i++)
+  const tr = r.track?.length === n && n ? r.track : undefined
+  const lapEnds: number[] = [] // index of the last record of each finished lap
+  for (let i = 0; i < n; i++) {
+    const at = tr?.[i]
     msg(1, 20, [
       [253, U32, t0 + i],
+      ...(at
+        ? ([
+            [0, S32, at.lat * SEMI],
+            [1, S32, at.lon * SEMI],
+            [2, U16, (at.ele + 500) * 5],
+            [5, U32, at.dist * 100],
+            [6, U16, (at.dist - (tr![i - 1]?.dist ?? 0)) * 1000],
+          ] as Field[])
+        : []),
       [3, U8, r.hr?.[i] || 0xff],
       [4, U8, Math.min(254, r.cadence[i] ?? 0)],
       [7, U16, r.power[i]],
     ])
+    if (at && r.lapM && i < n - 1 && Math.floor(tr![i + 1].dist / r.lapM) > lapEnds.length)
+      lapEnds.push(i)
+  }
   const totals: Field[] = [
     [253, U32, t1],
     [2, U32, t0],
     [7, U32, ms],
     [8, U32, ms],
   ]
-  msg(2, 19, [
-    ...totals,
-    [0, ENUM, 9],
-    [1, ENUM, 1],
-    [19, U16, mean(r.power)],
-    [20, U16, Math.max(0, ...r.power)],
-  ])
+  const distM = tr ? tr[n - 1].dist : 0
+  let up = 0
+  for (let i = 1; tr && i < n; i++) up += Math.max(0, tr[i].ele - tr[i - 1].ele)
+  if (!tr)
+    msg(2, 19, [
+      ...totals,
+      [0, ENUM, 9],
+      [1, ENUM, 1],
+      [19, U16, mean(r.power)],
+      [20, U16, Math.max(0, ...r.power)],
+    ])
+  // With a track: one lap message per lap ridden (the last one may be part of a lap).
+  let from = 0
+  for (const [k, to] of (tr ? [...lapEnds, n - 1] : []).entries()) {
+    const pw = r.power.slice(from, to + 1)
+    msg(2, 19, [
+      [254, U16, k],
+      [253, U32, t0 + to],
+      [2, U32, t0 + from],
+      [7, U32, (to + 1 - from) * 1000],
+      [8, U32, (to + 1 - from) * 1000],
+      [9, U32, (tr![to].dist - (from ? tr![from - 1].dist : 0)) * 100],
+      [0, ENUM, 9],
+      [1, ENUM, 1],
+      [19, U16, mean(pw)],
+      [20, U16, Math.max(0, ...pw)],
+    ])
+    from = to + 1
+  }
   msg(3, 18, [
     ...totals,
     [0, ENUM, 8],
     [1, ENUM, 1],
     [5, ENUM, 2],
-    [6, ENUM, 6],
+    [6, ENUM, tr ? 58 : 6],
     [20, U16, mean(r.power)],
     [21, U16, Math.max(0, ...r.power)],
     [18, U8, mean(r.cadence)],
@@ -104,7 +151,14 @@ export function encodeFit(r: FitRide): Uint8Array {
     [36, U16, r.intensity != null ? r.intensity * 1000 : 0xffff],
     [48, U32, r.power.reduce((s, v) => s + v, 0)],
     [25, U16, 0],
-    [26, U16, 1],
+    [26, U16, tr ? lapEnds.length + 1 : 1],
+    ...(tr
+      ? ([
+          [9, U32, distM * 100],
+          [22, U16, up],
+          [14, U16, (distM / n) * 1000],
+        ] as Field[])
+      : []),
   ])
   msg(4, 34, [
     [253, U32, t1],

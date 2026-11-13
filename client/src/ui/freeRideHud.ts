@@ -50,6 +50,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     arrive: stat('Arrive'),
     trainer: stat('Trainer feels'),
     ...(laps ? { lastLap: stat('Last lap'), bestLap: stat('Best lap') } : {}),
+    whole: stat(laps ? 'This lap' : 'This ride'),
     ...(settings.wind === 'off' ? {} : { wind: stat('Wind') }),
   }
 
@@ -61,13 +62,19 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const toTop = val('', 'km to top')
   const gain = val('', 'm', '+')
   const topEta = val('', 'ETA')
+  // The segment being timed: a column of the climb panel on a climb, a panel of its own for a sprint.
+  const segName = h('span', { class: 'seg-name' })
+  const segLines = h('div', { class: 'seg-lines' })
+  const segCol = h('div', { class: 'seg-col' }, segName, segLines)
+  const segBox = h('div', { class: 'glass segbox' })
   const climb = h(
     'div',
     { class: 'glass climb' },
     h('div', { class: 'climb-txt' }, climbHead, toTop.el, gain.el, topEta.el),
     h('div', { class: 'climb-prof' }, next.el),
+    segCol,
   )
-  climb.hidden = true
+  climb.hidden = segBox.hidden = true
   const gear = val('', `/${gearCount}`)
   const gearChip = h('div', { class: 'glass gear' }, h('span', {}, 'Gear'), gear.el)
   gearChip.hidden = true
@@ -158,7 +165,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
           ),
           h('button', { class: 'glass', onclick: () => toggle('stats') }, 'Stats'),
         ),
-        h('div', { class: 'dock-c' }, grade, climb),
+        h('div', { class: 'dock-c' }, grade, climb, segBox),
         h('div', { class: 'dock-r' }, group, gearChip),
       ),
       h('div', { class: 'glass strip' }, whole.el),
@@ -223,6 +230,24 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         topEta.v.textContent = s.speed < C.etaMinMs || v < C.etaMinMs ? '–' : clock(left / v)
         next.set(s.dist)
       }
+      // On a climb the segment rides in the climb panel; any other segment gets the small panel to itself.
+      const sg = s.seg
+      const inClimb = !!c && sg?.kind === 'climb'
+      segCol.hidden = !inClimb
+      segBox.hidden = !sg || !!c
+      if (sg) {
+        const lead = sg.inM === undefined ? '' : ` in ${Math.ceil(sg.inM / 10) * 10} m`
+        segName.textContent = inClimb ? sg.name : `${sg.name}${lead}`
+        segLines.replaceChildren(
+          ...sg.lines.map((t) =>
+            h('span', { class: t[0] === '−' ? 'up' : t[0] === '+' ? 'down' : '' }, t),
+          ),
+        )
+        const home = inClimb ? segCol : segBox
+        if (segName.parentElement !== home) home.replaceChildren(segName, segLines)
+      }
+      stats.whole.el.hidden = !s.whole?.length
+      stats.whole.v.textContent = s.whole?.join(' · ') ?? ''
       gearChip.hidden = !s.gears
       gear.v.textContent = String(s.gear)
       list.set(riderRows(s.riders, s.me), s.speed)

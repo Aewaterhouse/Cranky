@@ -160,3 +160,39 @@ Two people, two browsers (or two tabs logged in as different riders), simulated 
 - Race: in the lobby pick Race. Keep together turns off. Same ride, nobody is towed.
 - Look for: a rider jumping backwards or forwards (the correction should be invisible), riders drawn on top of each other, the chip flickering on and off, a rider list that disagrees with what you see, your own speed feeling laggy against the pedals.
 - Solo free ride must be unchanged: Start (not Group ride) with the server stopped still rides, pauses and finishes as before.
+
+## Free ride Phase F: reasons to come back
+
+Everything here was built against the simulated trainer and looked at in still screenshots from headless Chromium (software rendering), with the ride sped up by `?fast=`. Nobody has ridden it. Use a throwaway database (`ZB_DB=/tmp/x.db`) when trying it.
+
+**Segments and ghosts**
+
+1. Free ride, Willunga Hill, simulator. On the climb the climb panel gains a column: the segment's name, the time so far, and nothing else on a first go.
+2. Finish. The summary has a Segments card: the climb, the sprint and the whole route, each "First go".
+3. Ride it again. The start bar now offers "◌ Your PR". On the road a pale see-through rider sets off with you and "◌ Your PR" is in the rider list with a gap.
+4. Push harder than last time (arrow up on the simulator). The climb column shows "−0:0x vs PR" in green; ease off and it turns red with a plus.
+5. Finishing a segment faster gives a "New PR!" toast with a jingle that stays about 7 s. The summary marks it "PR by ...".
+6. Log in as a second rider, ride the same route slower: the splits also show "+0:xx vs <first rider>", and the setup screen offers the first rider's ghost in the list of mates.
+7. Lap ride (Nundah crit, 3 laps): every lap is a row in the Segments card; a faster lap gets the PR toast instead of the plain lap toast; the ghost keeps lapping at its best lap.
+8. Offline: stop the server mid-ride and finish. The summary still shows the segments. Start the server and log in again: `GET /api/efforts/mine` lists them.
+9. Group ride with a bot on a route you have a best on: your ghost is there for you only, and the drafting chip never lights up from the ghost.
+
+**FIT file**
+
+10. From the summary of a free ride (or from History), Download .fit and upload it to Strava or intervals.icu: expect the real map, an elevation profile, distance and speed, and one lap per lap on a lap ride. (Not tried: the file has only been decoded by our own test.)
+11. Download .fit for an ERG workout: same file as always, no map.
+
+**Passport**
+
+12. Rider tab, Passport. The map shows Australia with numbered dots; the route just finished is filled in and its row shows rides, best time and metres climbed. The "First Stamp" badge is earned.
+
+**The week**
+
+13. Free ride setup shows "This week": a route of the week (outlined in the grid, "Pick it" selects it) and the weekly climb bar. Finish the route of the week: the summary shows "+30 scrap", the card says "Banked", and the balance in the header goes up. Finish it again: no second payment.
+14. Climb past the weekly target (600 m for a new rider): "+50 scrap" once.
+
+**History**
+
+15. Rider tab, History: a free ride's row has a small route line, the route name, distance and "free ride". Open it: route card with the map (the part ridden is brighter), distance, climbing, then the Segments card.
+16. A ride from before this phase, or an ERG workout, looks as it did.
+

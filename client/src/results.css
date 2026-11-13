@@ -338,3 +338,10 @@ tr.me td {
 .res-bus .res-tile b {
   font-size: clamp(1.3rem, 2.4vw, 1.7rem);
 }
+
+.seg-res small {
+  color: var(--dim);
+}
+.seg-pr {
+  color: var(--acc);
+}

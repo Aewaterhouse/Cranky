@@ -84,12 +84,16 @@ class Store:
                           json_extract(json, '$.avgPower'), json_extract(json, '$.np'),
                           json_extract(json, '$.tss'),
                           json_extract(json, '$.record.kj'), json_extract(json, '$.compliance'),
-                          json_extract(json, '$.crew')
+                          json_extract(json, '$.crew'), json_extract(json, '$.route.id'),
+                          json_extract(json, '$.distance')
                    FROM rides WHERE rider = ? ORDER BY date DESC, n DESC""",
                 (rid,),
             ).fetchall()
         keys = ("id", "date", "plan", "secs", "avgPower", "np", "tss", "kj", "compliance")
-        return [{**dict(zip(keys, r, strict=False)), "crew": bool(r[9])} for r in rows]
+        return [
+            {**dict(zip(keys, r, strict=False)), "crew": bool(r[9]), "route": r[10], "distance": r[11]}
+            for r in rows
+        ]
 
     def ride(self, rid: str, n: int) -> dict | None:
         """The full summary of one of the rider's rides, or None."""

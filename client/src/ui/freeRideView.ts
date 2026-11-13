@@ -2,10 +2,12 @@ import '../solo.css'
 import '../freeride.css'
 import '../freeHud.css'
 import '../freeHudDock.css'
+import '../freeHudSeg.css'
 import { CFG } from '../config'
 import type { ListRider } from '../core/hud'
 import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
+import type { SegLive } from '../modes/freeRide/segmentRun'
 import type { Live } from '../modes/rideController'
 import { h } from './dom'
 import { freeRideFlat } from './freeRideFlat'
@@ -43,6 +45,9 @@ export interface FreeState {
   me: string
   /** Lap rides only. */
   lap?: LapInfo
+  /** The climb or sprint segment being ridden or coming up, and the splits for the whole route or lap. */
+  seg?: SegLive
+  whole?: string[]
   /** Headwind in m/s (a tailwind is negative), when the wind setting is on. */
   wind?: number
   /** Group rides: watts saved by drafting right now, and the keep-together scale on my speed (1 is none). */
@@ -121,11 +126,17 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
 
   const toastBox = h('div', { class: 'fr-toast', role: 'status' })
   let toastTimer = 0
-  const toast = (text: string) => {
+  let fanfareUntil = 0
+  const toast = (text: string, secs = CFG.hud.toastS) => {
+    // A fanfare (a PR) holds the stage: a passing remark does not talk over it.
+    const big = secs > CFG.hud.toastS
+    if (!big && performance.now() < fanfareUntil) return
+    fanfareUntil = big ? performance.now() + secs * 1000 : 0
     toastBox.textContent = text
     toastBox.classList.add('on')
+    toastBox.classList.toggle('big', big)
     clearTimeout(toastTimer)
-    toastTimer = window.setTimeout(() => toastBox.classList.remove('on'), CFG.hud.toastS * 1000)
+    toastTimer = window.setTimeout(() => toastBox.classList.remove('on'), secs * 1000)
   }
 
   // Each part is a class on the root; a phone starts without the map and the rider list.
@@ -157,7 +168,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     },
     confirmEnd,
     toggle,
-    /** A short message, top centre, gone after a few seconds. */
+    /** A short message, top centre, gone after a few seconds (`secs` to hold a fanfare longer). */
     toast,
     setDifficulty(v: number) {
       parts.difficulty = v

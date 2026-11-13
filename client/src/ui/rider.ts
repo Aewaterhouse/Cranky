@@ -6,6 +6,7 @@ import '../rider.css'
 import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
 import { historyTab } from './historyList'
+import { passportTab } from './passport'
 import { badgeGrid, prTimelinePanel } from './riderBadges'
 import { powerTab } from './riderPower'
 import { trendsTab } from './riderTrends'
@@ -16,6 +17,7 @@ const SUBS = {
   power: 'Power',
   trends: 'Trends',
   history: 'History',
+  passport: 'Passport',
   settings: 'Settings',
 }
 type Sub = keyof typeof SUBS
@@ -86,6 +88,7 @@ export function riderTab(p: Profile) {
       power: () => h('div', {}, powerTab(p), prTimelinePanel(p)),
       trends: () => trendsTab(p),
       history: () => historyTab(p),
+      passport: () => (stickBadges(p) && saveProfile(p), passportTab(p)),
       settings: () => riderSettings(p, () => root.firstElementChild!.replaceWith(head())),
     }
     body.replaceChildren(views[sub]())

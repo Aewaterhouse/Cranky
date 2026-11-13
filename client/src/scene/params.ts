@@ -98,6 +98,8 @@ export const VIS = {
     outerEvery: 10,
     /** Where a rider sits across the road when the game gives no offset (we ride on the left). */
     lane: -1.7,
+    /** Ghost riders (a best effort ridden again): how solid, how far towards white, and metres right of the rider's lane. */
+    ghost: { opacity: 0.4, pale: 0.55, lanes: [1.2, 2.3] },
     camBack: 9,
     camHeight: 3.7,
     camSide: 0,

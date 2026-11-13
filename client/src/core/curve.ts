@@ -1,3 +1,5 @@
+import type { Stamp } from './passport'
+import type { WeekLog } from './weekly'
 import { CFG } from '../config'
 import type { Grade, Tier } from '../types'
 import type { Look } from './cosmetics'
@@ -27,6 +29,9 @@ export interface Profile {
   zoneBounds?: number[]
   /** Badges earned so far, id to the date they were earned (kept even after old rides drop off the list). */
   badges?: Record<string, string>
+  /** Free ride: what has been ridden on each route, and the last few weeks' climbing and weekly rewards. */
+  passport?: Record<string, Stamp>
+  weeks?: Record<number, WeekLog>
   /** Every FTP change, oldest first. */
   ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */
