@@ -194,3 +194,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Overlay shows crewmates' real all-time bests only (no FTP estimates), as coloured chips above the chart. In W/kg mode each mate is divided by their own weight; mates with no weight are hidden there, and left out of the W/kg leaderboard.
 - Leaderboard is all-time bests at 5 s, 1 min, 5 min and 20 min (`CFG.crewDurations`), including the viewer, who is highlighted. Mate colours are in `CFG.crewColours`.
 - Bests are as last synced to the server, so a mate's newest ride shows once their profile has synced.
+
+## Big chests on every character (2026-11-13)
+- A joke change on the `Steven` branch: every rider and every zombie now has two large spheres on the chest. Size is `VIS.bust` in `client/src/scene/params.ts` (0 hides them). It is read once when a figure is built, so it is not a live slider in the debug panel.
+- Riders: the spheres are children of the torso and share the jersey material, so they follow the lean, outfit colour and spectator fade. Zombies: merged into the instanced torso geometry, so no extra draw calls.
+- Passes type-check, lint and unit tests. Zombies checked in the scene dev page; riders not yet seen from the front.
