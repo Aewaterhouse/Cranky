@@ -45,7 +45,7 @@
 - `camRig.ts` chase camera; `moods.ts` mood colour blending; `sky.ts` sky and sun.
 - `ground.ts` terrain and road; `props.ts` roadside props loop; `propGeo.ts` prop and vehicle geometry; `landmarks.ts` billboards and Servo station.
 - `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
-- `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier.
+- `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
 
 ### ui/

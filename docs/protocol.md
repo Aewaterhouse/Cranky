@@ -62,7 +62,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 `st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.
 
-`bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), scrap, sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open), repel (repellent charges), syncw, nitro (0..1 charge), boost (bool) (extra sync window, rpm)}`.
+`bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), scrap, sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open), repel (repellent charges), syncw, nitro (0..1 charge), boost (bool) (extra sync window, rpm), streak (0..1 progress to the next streak reward), next (`drop`, `airstrike` or `gunship`), gunship (bool, gunship up)}`.
 
 `fx`: list of `{k, text?, id?}`, one-shot effects since the last tick. `k` is one of
-`nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.
+`drop, airstrike, gunship, nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.

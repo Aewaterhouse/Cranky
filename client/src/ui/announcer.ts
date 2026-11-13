@@ -16,6 +16,12 @@ const LINES: Record<string, string[]> = {
   hauled: ['{name} is back aboard. Barely.'],
   tune: ['Engine is purring.', 'In tune. Listen to that.'],
   nitro: ['Nitro. Hold on to something.', 'Afterburner. Lovely riding.'],
+  drop: ['Supply drop. Somebody up there likes you.'],
+  airstrike: ['Air strike inbound. Heads down.', 'Air strike. That cleared the road.'],
+  gunship: [
+    'Gunship is up. The crew has the high ground.',
+    'Gunship overhead. Zombies, meet the boys.',
+  ],
   challenge: ['{name}, you are up.', 'Challenge for {name}.'],
   challenge_won: ['Nailed it.'],
   challenge_lost: ['Never mind.'],

@@ -85,6 +85,16 @@ NITRO_GAP = 2.5  # extra m/s of gap while boosting
 NITRO_SCRAP = 15
 NITRO_EVENTS = ("longhaul", "rampup", "surge")
 
+# Streak rewards: unbroken clean group riding earns air support, in order, then the streak starts again.
+STREAK_MIN = 0.9  # group compliance that keeps the streak alive
+STREAK_GRACE_S = 3  # seconds under STREAK_MIN before the streak resets
+STREAK_EVENTS = NITRO_EVENTS  # the streak holds (no gain, no reset) in every other event
+STREAKS = [(45, "drop"), (90, "airstrike"), (150, "gunship")]  # streak seconds needed, reward
+DROP_SCRAP = 15
+AIRSTRIKE_GAP = 15  # metres of gap, at once
+GUNSHIP_S = 20
+GUNSHIP_GAP = 2.0  # extra m/s of gap while the gunship is up
+
 # Personal challenges: a quick cadence drill for one human rider during long hauls and ramp-ups.
 CHALLENGE_EVERY_S = (150, 240)  # random wait between challenges
 CHALLENGE_S = 20

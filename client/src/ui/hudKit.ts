@@ -34,6 +34,9 @@ export const FX_ICON: Record<string, string> = {
   scrap: '⚙️',
   buy: '🛒',
   repel: '🛡️',
+  drop: '📦',
+  airstrike: '✈️',
+  gunship: '🛩️',
 }
 export const FX_DEFAULT: Record<string, string> = {
   crash: 'The bus hit the roadblock!',

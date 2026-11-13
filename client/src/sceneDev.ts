@@ -5,9 +5,9 @@ import { VIS } from './scene/params'
  * Scene dev harness. Open /scene-dev.html with optional params:
  *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  armour=0..100 (or none)
  *   speed=m/s  roadblock=0..1  paint=paint-rust  bullbar=1  spikes=1  riders=1..6  debug=1  hud=0
- *   vis.camHeight=5 (any numeric VIS tunable)  fx=hit|shake|slowmo|smash (fires once after fxAt ms, default 1500)
+ *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
  * Keys: 1-6 mood, [ ] gap, - = armour, , . speed, r roadblock (hold to approach), h hit, j shake,
- *       k slowmo, m smash, b bull bar, n spikes, p paint cycle, g toggle debug panel.
+ *       k slowmo, m smash, d supply drop, a air strike, u gunship, b bull bar, n spikes, p paint cycle, g toggle debug panel.
  */
 const q = new URLSearchParams(location.search)
 const num = (k: string, d: number | null) =>
@@ -32,6 +32,7 @@ const st = {
   spikes: q.get('spikes') === '1',
   paint: q.get('paint') ?? '',
   riders: Number(q.get('riders') ?? 5),
+  gunship: q.get('gunship') === '1',
 }
 let autoApproach = false
 
@@ -79,6 +80,7 @@ function apply() {
     riders: CREW.slice(0, st.riders),
     roadblock: st.roadblock,
     busLook: look,
+    gunship: st.gunship,
   }
 }
 apply()
@@ -106,6 +108,9 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'j') fire('shake')
   else if (e.key === 'k') fire('slowmo')
   else if (e.key === 'm') fire('smash')
+  else if (e.key === 'd') fire('drop')
+  else if (e.key === 'a') fire('airstrike')
+  else if (e.key === 'u') st.gunship = !st.gunship
   else if (e.key === 'b') st.bullbar = !st.bullbar
   else if (e.key === 'n') st.spikes = !st.spikes
   else if (e.key === 'p') st.paint = PAINTS[(PAINTS.indexOf(st.paint) + 1) % PAINTS.length]
@@ -122,5 +127,5 @@ setInterval(() => {
   }
 }, 100)
 setInterval(() => {
-  help.textContent = `mood ${st.mood} | gap ${st.gap ?? 'none'} | armour ${st.armour ?? 'none'} | speed ${st.speed} | roadblock ${st.roadblock?.toFixed(2) ?? 'none'} | keys: 1-6 mood [ ] gap \\ horde - = armour , . speed r roadblock h hit j shake k slowmo m smash b bullbar n spikes p paint g panel (fog ${VIS.fogNear})`
+  help.textContent = `mood ${st.mood} | gap ${st.gap ?? 'none'} | armour ${st.armour ?? 'none'} | speed ${st.speed} | roadblock ${st.roadblock?.toFixed(2) ?? 'none'} | keys: 1-6 mood [ ] gap \\ horde - = armour , . speed r roadblock h hit j shake k slowmo m smash d drop a airstrike u gunship b bullbar n spikes p paint g panel (fog ${VIS.fogNear})`
 }, 300)

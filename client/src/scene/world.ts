@@ -14,6 +14,7 @@ import { Props } from './props'
 import { Horde } from './horde'
 import { Roadblock } from './roadblock'
 import { Sky } from './sky'
+import { Strikes } from './strikes'
 import { Quality } from './quality'
 import { clamp } from './util'
 
@@ -37,8 +38,10 @@ export interface SceneState {
   roadblock: number | null
   /** The driver's bus cosmetics. */
   busLook?: Look
+  /** The crew's gunship is up and firing on the horde. */
+  gunship?: boolean
 }
-export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash'
+export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
 /** Where the horde front sits (metres behind the bus origin) for a given gap. */
 export const hordeZFor = (gap: number) => 5.5 + gap * VIS.gapScale + gap * gap * 0.002
@@ -65,6 +68,7 @@ export class World {
   private bus = makeBus()
   private horde = new Horde()
   private block = new Roadblock()
+  private strikes = new Strikes()
   private crew = new Crew(this.scene, this.bus.shell)
   private smoke = new Particles(500)
   private sparks = new Particles(300, true)
@@ -117,6 +121,7 @@ export class World {
       this.horde.group,
       this.block.group,
       this.block.debris,
+      this.strikes.group,
       this.smoke.points,
       this.sparks.points,
       this.key,
@@ -150,6 +155,7 @@ export class World {
     }
     if (kind === 'shake') this.rig.shake = Math.max(this.rig.shake, 1.6)
     if (kind === 'slowmo') this.slow = 1.8
+    if (kind === 'drop' || kind === 'airstrike') this.strikes.fire(kind)
     if (kind === 'smash') {
       const at = this.block.smash()
       this.rig.shake = 2
@@ -231,6 +237,9 @@ export class World {
     // roadblock
     this.block.update(this.t, dt, night, s.roadblock)
     this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ)
+    const hz = g === null ? null : this.hordeZ
+    if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
+      this.rig.shake = Math.max(this.rig.shake, 1.6)
     this.rig.update(this.camera, this.t, dt, {
       speed: s.speed,
       gap: g,
@@ -238,6 +247,7 @@ export class World {
       slow: sm < 1,
       climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
+    this.strikes.view(this.camera)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)
     this.sparks.update(dt, px)

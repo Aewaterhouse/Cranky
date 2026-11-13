@@ -26,6 +26,9 @@ const FX_SOUND: Record<string, () => void> = {
   hauled: SFX.scrap,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
+  drop: SFX.scrap,
+  airstrike: SFX.GREAT,
+  gunship: SFX.MEGA,
 }
 
 /** Zombie Bus ride view driven by server ticks. */
@@ -150,6 +153,7 @@ export function startBusRide(
       if (fx.k === 'hit' || fx.k === 'crash') world.fx('hit')
       if (fx.k === 'smash' || fx.k === 'crash') world.fx('smash')
       if (fx.k === 'shake') world.fx('shake')
+      if (fx.k === 'drop' || fx.k === 'airstrike') world.fx(fx.k)
       if (fx.k === 'slowmo') {
         world.fx('slowmo')
         world.fx('shake')
@@ -163,6 +167,7 @@ export function startBusRide(
       mood: (m.i < 0 ? 'drill' : m.ev in { warmup: 1, cooldown: 1 } ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
+      gunship: b.gunship,
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         name: r.name,

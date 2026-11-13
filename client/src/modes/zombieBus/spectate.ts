@@ -28,6 +28,9 @@ const FX_SOUND: Record<string, () => void> = {
   hauled: SFX.scrap,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
+  drop: SFX.scrap,
+  airstrike: SFX.GREAT,
+  gunship: SFX.MEGA,
 }
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 const GRADE_RE = /: (FAIL|HIT|GREAT|MEGA|LEGEND)\b/
@@ -142,6 +145,7 @@ export function spectate(code: string, leaveTo: () => void) {
       if (fx.k === 'hit' || fx.k === 'crash') world.fx('hit')
       if (fx.k === 'smash' || fx.k === 'crash') world.fx('smash')
       if (fx.k === 'shake') world.fx('shake')
+      if (fx.k === 'drop' || fx.k === 'airstrike') world.fx(fx.k)
       if (fx.k === 'slowmo') {
         world.fx('slowmo')
         world.fx('shake')
