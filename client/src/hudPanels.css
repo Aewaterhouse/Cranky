@@ -25,6 +25,23 @@
   letter-spacing: 0.1em;
   color: var(--dim);
 }
+.sh-x {
+  padding: 4px 10px;
+  font: 800 0.72rem var(--ui);
+  letter-spacing: 0.08em;
+}
+.sh.mini {
+  width: auto;
+  padding: 8px 12px;
+}
+.sh.mini .sh-head {
+  gap: 14px;
+  margin: 0;
+}
+.sh.mini .sh-cards,
+.sh.mini .sh-log {
+  display: none;
+}
 .sh-head b {
   font: 1.1rem var(--display);
   color: var(--fg);

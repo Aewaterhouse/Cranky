@@ -121,3 +121,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Old bus rides on Railway: after the next deploy, open a bus ride from before 2026-11-14 in History and tap Save postcard. It should be the Zombie Bus card with that ride's score; a plain card means the ladder had no matching row.
 - [ ] Backups on Railway: a day after deploying, `ls /data/backups` in a Railway shell shows a new `cranky-*.db` from about 17:00 UTC. Optionally try the restore steps in the README on a copy.
 - [ ] Bus countdown: on a bus ride, the "Next: … W" chip and 5-4-3-2-1 with a beep show before each target change, and 5 s is enough to get onto the new watts in ERG and without.
+- [ ] Servo Shop close button: easy to hit mid-ride on the big screen and the iPad.

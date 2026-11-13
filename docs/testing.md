@@ -301,3 +301,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Postcards in History: open a free ride and a solo workout in History and tap Save postcard. Each gives a PNG on the sky with the ride's power as hills; the free ride shows distance and climbing, the workout NP and TSS.
 - Bus postcard in History: ride a short bus ride with bots, then open it in History and tap Save postcard. The Zombie Bus card shows the score, distance, armour, sync, scrap, crew and awards on the sky background.
 - Bus countdown: a sped-up bus ride with bots (`ZB_TIME_SCALE`). Before each change of target the top centre shows "Next: 250 W" and a big 5, 4, 3, 2, 1 with a beep each; before a sprint only the SPRINT INCOMING splash shows.
+- Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with the scrap count and "Open shop", which brings the cards back. At the next servo stop it opens in full.

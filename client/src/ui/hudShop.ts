@@ -14,9 +14,16 @@ const ITEMS: { id: ShopItem; icon: string; name: string; desc: string; cost: num
   { id: 'sync', icon: '🔧', name: 'Wider sync window', desc: '+3 rpm engine tolerance', cost: 50 },
 ]
 
-/** Servo Stop shop: three upgrade cards plus a "who bought what" feed. */
+/** Servo Stop shop: three upgrade cards plus a "who bought what" feed. Closes to a small bar until the next stop. */
 export function makeShop(buy: (item: ShopItem) => void) {
   const scrapN = h('b', {}, '0')
+  let shut = false
+  const exit = h('button', { class: 'sh-x', 'aria-label': 'Close the shop' }, '✕ Close')
+  const fold = () => {
+    root.classList.toggle('mini', shut)
+    exit.textContent = shut ? 'Open shop' : '✕ Close'
+  }
+  exit.onclick = () => ((shut = !shut), fold())
   const log = h('div', { class: 'sh-log' })
   const cards = ITEMS.map((it) => {
     const need = h('span', { class: 'sh-need' })
@@ -45,6 +52,7 @@ export function makeShop(buy: (item: ShopItem) => void) {
       { class: 'sh-head' },
       h('span', {}, '⛽ SERVO SHOP'),
       h('span', {}, 'BUS SCRAP ', scrapN),
+      exit,
     ),
     h('div', { class: 'sh-cards' }, ...cards.map((c) => c.btn)),
     log,
@@ -54,7 +62,10 @@ export function makeShop(buy: (item: ShopItem) => void) {
     root,
     update(open: boolean, scrap: number) {
       root.hidden = !open
-      if (!open) return
+      if (!open) {
+        shut = false // the next servo stop opens it again
+        return fold()
+      }
       set(scrapN, `${scrap}`)
       for (const { it, btn, need } of cards) {
         btn.disabled = scrap < it.cost
