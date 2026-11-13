@@ -25,7 +25,7 @@
 - `api.ts` fetch with the login token; token and session storage.
 - `compliance.ts` rolling average and band scoring.
 - `cosmetics.ts` catalogue and purchase logic.
-- `badges.ts` milestone badges, PR timeline.
+- `badges.ts` milestone badges, PR timeline; `passport.ts` passport stamps per route and the passport badges; `ausMap.ts` the hand-drawn map of Australia, route dot positions and dot spreading.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
 - `climbs.ts` sustained climbs on a route and the one the rider is on; `hud.ts` HUD maths with no DOM: power zone (Zwift boundaries), gradient colour, gap text, rider-list rows.
 - `soundMix.ts` how loud each free-ride sound should be for the speed, the place and the sky (no audio API).
@@ -76,7 +76,7 @@
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio beeps, the lap bell and the event drone; `rideSound.ts` the synthesised free-ride sounds (freehub, wind, tyres, gear clunk, birds, cicadas, surf, gulls, mountain wind, traffic).
-- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve with crew overlay chips; `riderCrew.ts` crew leaderboard; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `svg.ts` SVG helpers.
+- `login.ts` login tiles and logo; `shell.ts` app shell and tabs; `home.ts` Ride tab and plan helpers; `garage.ts` Garage tab; `rider.ts` Rider tab; `riderStats.ts` zone bar and recent rides; `riderPower.ts` interactive power curve with crew overlay chips; `riderCrew.ts` crew leaderboard; `riderSettings.ts` FTP, weight, HR and power zones, FTP history; `historyList.ts` History sub-tab list; `historyDetail.ts` one ride in full; `rideExport.ts` .fit and JSON downloads; `riderBadges.ts` badge grid and PR timeline; `riderTrends.ts` Trends sub-tab (fitness/fatigue/form, weekly TSS, heatmap); `passport.ts` Passport sub-tab (map, route table, badges; `passport.css`); `svg.ts` SVG helpers.
 - `trainer.ts` trainer pill and connect modal; `clickPair.ts` Zwift Click section of the modal; `settings.ts` Settings screen.
 - `planGraph.ts` plan graph and zone colours; `planPicker.ts` plan picker with length scaling; `lobby.ts` bus lobby.
 - `builder.ts` workout builder screen (`builder.css`); `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.
@@ -91,7 +91,7 @@
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.
 - `tests/roadVectors.test.ts` generates and checks the vectors shared with the server; `tests/roadLink.test.ts` group-ride prediction, drafting, toasts and no ERG target.
-- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results; `tests/efforts.test.ts` bests on the device, the offline queue and the merge with the server; `tests/ghost.test.ts` ghost positions, laps and the rider-list row; `tests/fitTrack.test.ts` decodes a FIT file with position and laps.
+- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results; `tests/efforts.test.ts` bests on the device, the offline queue and the merge with the server; `tests/ghost.test.ts` ghost positions, laps and the rider-list row; `tests/fitTrack.test.ts` decodes a FIT file with position and laps; `tests/passport.test.ts` the map, stamps and passport badges.
 - `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 

@@ -1,0 +1,136 @@
+/* Route passport (Rider tab) and the weekly card (also on the free-ride setup). */
+.pp-cols {
+  display: grid;
+  grid-template-columns: minmax(300px, 1.2fr) minmax(280px, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .pp-cols {
+    grid-template-columns: 1fr;
+  }
+}
+.aus {
+  width: 100%;
+  max-height: 520px;
+}
+.aus .land {
+  fill: #2c3a2e;
+  stroke: #6d8a6f;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.aus .border {
+  fill: none;
+  stroke: #6d8a6f;
+  stroke-width: 0.7;
+  stroke-dasharray: 3 3;
+  opacity: 0.7;
+}
+.aus .state {
+  fill: #8fa893;
+  font: 600 11px var(--ui);
+  text-anchor: middle;
+  opacity: 0.55;
+}
+.aus .lead {
+  stroke: var(--dim);
+  stroke-width: 0.6;
+}
+.aus .dot circle {
+  fill: var(--bg2);
+  stroke: var(--dim);
+  stroke-width: 1.2;
+}
+.aus .dot text {
+  fill: var(--dim);
+  font: 700 7.5px var(--ui);
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.aus .dot.got circle {
+  fill: var(--acc);
+  stroke: #fff;
+}
+.aus .dot.got text {
+  fill: var(--acc-ink);
+}
+.pp-list {
+  width: 100%;
+  font-size: 0.88rem;
+}
+.pp-list td,
+.pp-list th {
+  padding: 3px 6px;
+}
+.pp-list tr:not(.got) td {
+  color: var(--dim);
+}
+.pp-list small {
+  color: var(--dim);
+}
+.pp-n {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6em;
+  height: 1.6em;
+  border: 1px solid var(--dim);
+  border-radius: 50%;
+  font: 700 0.72rem var(--ui);
+}
+.pp-list .got .pp-n {
+  background: var(--acc);
+  border-color: var(--acc);
+  color: var(--acc-ink);
+}
+.wk-cols {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px 24px;
+}
+.wk-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wk-item b small {
+  font-weight: 400;
+  color: var(--dim);
+}
+.wk-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: var(--dim);
+  font-size: 0.85rem;
+}
+.wk-pay {
+  color: var(--acc);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.wk-pay.done {
+  color: #7fd13b;
+}
+.wk-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: var(--bg2);
+  overflow: hidden;
+}
+.wk-bar i {
+  display: block;
+  height: 100%;
+  background: var(--acc);
+}
+.route-card.feat {
+  outline: 1px dashed var(--acc);
+}
+.route-card .feat-tag {
+  color: var(--acc);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

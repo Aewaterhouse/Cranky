@@ -1,4 +1,4 @@
-import { badges, prTimeline } from '../core/badges'
+import { badges, prTimeline, type Badge } from '../core/badges'
 import type { Profile } from '../core/curve'
 import { fmtDur } from '../core/powerCurve'
 import { h } from './dom'
@@ -6,13 +6,17 @@ import { h } from './dom'
 const day = (iso: string) =>
   new Date(iso).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
 
-/** Milestone badges: earned ones in colour with their date, the rest dimmed with what they take. */
-export function badgeGrid(p: Profile) {
-  const all = badges(p)
+/** Milestone badges: earned ones in colour with their date, the rest dimmed with what they take. `only` narrows the list. */
+export function badgeGrid(p: Profile, title = 'Badges', only: (b: Badge) => boolean = () => true) {
+  const all = badges(p).filter(only)
   return h(
     'section',
     { class: 'panel' },
-    h('h2', { class: 'label' }, `Badges (${all.filter((b) => b.earned).length} of ${all.length})`),
+    h(
+      'h2',
+      { class: 'label' },
+      `${title} (${all.filter((b) => b.earned).length} of ${all.length})`,
+    ),
     h(
       'div',
       { class: 'badges' },

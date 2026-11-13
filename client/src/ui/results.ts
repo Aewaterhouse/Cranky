@@ -1,6 +1,7 @@
 import '../results.css'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
+import { stampRide } from '../core/passport'
 import { postRide, saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
@@ -73,6 +74,8 @@ export function finishRide(
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
   const banked = group ? bankScrap(group.scrap, myAwards) : 0
   if (banked) p = { ...p, scrap: p.scrap + banked }
+  // A free ride goes in the passport.
+  p = stampRide(p, s)
   saveProfile(p)
   if (s.record.secs >= 30) postRide({ ...s, crew: !!group || !!road })
   const prs =

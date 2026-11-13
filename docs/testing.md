@@ -178,4 +178,6 @@ Segments and ghosts
 FIT file
 10. From the summary of a free ride (or from History), Download .fit and upload it to Strava or intervals.icu: expect the real map, an elevation profile, distance and speed, and one lap per lap on a lap ride. (Not tried: the file has only been decoded by our own test.)
 11. Download .fit for an ERG workout: same file as always, no map.
+Passport
+12. Rider tab, Passport. The map shows Australia with numbered dots; the route just finished is filled in and its row shows rides, best time and metres climbed. The "First Stamp" badge is earned.
 
