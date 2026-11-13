@@ -218,3 +218,51 @@ def test_weekly_mutators_apply_above_easy():
     bus.scrap, bus.armour = 500, 50
     bus.buy(room.riders["r0"], "plating")
     assert bus.armour == 50 and not bus.state(room, 1, 0)["shop"]
+
+
+def kinds(fx):
+    return [f["k"] for f in fx if f["k"] in ("drop", "airstrike", "gunship")]
+
+
+def test_streak_pays_out_in_order_then_starts_again():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 0.92)
+    assert kinds(run(room, bus, 44)) == []
+    scrap = bus.scrap
+    assert kinds(run(room, bus, 2)) == ["drop"] and bus.scrap >= scrap + C.DROP_SCRAP
+    assert bus.state(room, 1, 0)["next"] == "airstrike"
+    assert kinds(run(room, bus, 46)) == ["airstrike"]
+    assert kinds(run(room, bus, 60)) == ["gunship"]
+    st = bus.state(room, 1, 0)
+    assert st["gunship"] and st["streak"] == 0 and st["next"] == "drop"
+    run(room, bus, C.GUNSHIP_S)
+    assert not bus.state(room, 1, 0)["gunship"] and bus.streak > 0
+
+
+def test_streak_resets_on_a_lapse_or_a_fall_and_holds_outside_its_events():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 30)
+    set_all(room, 0.8)
+    run(room, bus, C.STREAK_GRACE_S - 1)
+    assert bus.streak == 30
+    run(room, bus, 2)
+    assert bus.streak == 0
+    set_all(room, 1.0)
+    run(room, bus, 30)
+    run(room, bus, 20, ev="servo")
+    assert bus.streak == 30
+    room.riders["r0"].st = "fell"
+    run(room, bus, 1)
+    assert bus.streak == 0
+
+
+def test_gunship_opens_the_gap():
+    gaps = []
+    for until in (-1.0, 1e9):
+        room, bus = FakeRoom(STEADY), ZombieBus()
+        set_all(room, 0.85)
+        bus.gunship_until = until
+        run(room, bus, 10)
+        gaps.append(bus.gap)
+    assert abs(gaps[1] - gaps[0] - C.GUNSHIP_GAP * 10) < 0.01

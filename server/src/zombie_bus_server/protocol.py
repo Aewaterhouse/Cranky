@@ -105,6 +105,9 @@ class Bus(BaseModel):
     syncw: int
     nitro: float = 0
     boost: bool = False
+    streak: float = 0
+    next: str = "drop"
+    gunship: bool = False
 
 
 class Fx(BaseModel):

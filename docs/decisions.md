@@ -199,3 +199,19 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - A joke change on the `Steven` branch: every rider and every zombie now has two large spheres on the chest. Size is `VIS.bust` in `client/src/scene/params.ts` (0 hides them). It is read once when a figure is built, so it is not a live slider in the debug panel.
 - Riders: the spheres are children of the torso and share the jersey material, so they follow the lean, outfit colour and spectator fade. Zombies: merged into the instanced torso geometry, so no extra draw calls.
 - Passes type-check, lint and unit tests. Zombies checked in the scene dev page; riders not yet seen from the front.
+
+## Streak rewards: supply drop, air strike, gunship (2026-11-13)
+- Killstreak-style air support for clean group riding, with our own names and look. The streak counts seconds of group compliance at 0.9 or better (`STREAK_MIN`) during long hauls, ramp-ups and surges. Rewards come in order, then the streak starts again: 45 s supply drop (+15 scrap), 90 s air strike (+15 m of gap at once), 150 s gunship (20 s at +2 m/s of gap). All numbers are in `config.py`.
+- The streak resets after 3 s under 0.9, and at once when anyone falls off (it stays at zero until they are hauled back). In warm-up, cool-down, servo stops and roadblocks it holds: no gain, no reset. It does not count while the gunship is up.
+- Gunship view: the camera blends to a seat behind the gunship as it circles the horde, with the riding crew's names on a tag beside it. The chase camera never shows the sky, so a gunship overhead would have been off screen. The world was not built to be seen from above, so its edges can show for those 20 s.
+- Checked against the other mechanics:
+  - Nitro: independent meters. Nitro needs 0.95, the streak 0.9, so a strong crew can have both at once. At perfect compliance in a long haul that is about 3 + 2.5 + 2 = 7.5 m/s of gap; `GAP_MAX` (120 m) still caps it.
+  - Surge: an air strike (+15 m) more than cancels one grab (-12 m). Clean overs still pay as before.
+  - Roadblocks: the streak holds through sprints, so a failed sprint does not break it. A gunship that is already up keeps adding gap through a roadblock.
+  - Falls and hauls: unchanged. Group compliance already ignores a fallen rider, so the explicit reset on a fall is what stops a crew streaking while a mate runs behind.
+  - Score and ladder: scrap adds straight to the score, so supply drops lift it by at most about 15 per 170 s of eligible riding (roughly 3% on a long ride). Distance, armour and difficulty scaling are untouched. Scores from before and after this change are not quite like for like.
+  - Weekly mutators and difficulty: no interaction. Mutators do not scale streak rewards.
+  - Resume after a restart: the new fields are plain numbers in the bus snapshot; an old snapshot loads with a zero streak.
+  - Riders with no compliance reading count as 1.0 in the group average, as they already do for nitro, so they help a streak along.
+  - Tracers and bursts share the 300-spark pool with roadblock and engine sparks; the pool recycles its oldest particles, so a smash during a gunship run may look thinner.
+- Passes server and client tests, type-check and lint. Each effect was checked in the scene dev page (`gunship=1`, `fx=drop|airstrike`, keys `d`, `a`, `u`). Not yet played through in a real bus ride, and the HUD streak bar and announcer lines have not been seen or heard.

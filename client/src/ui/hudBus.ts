@@ -6,6 +6,11 @@ const GAP_MAX = 120
 const GAP_CLOSE = 25
 const SYNC_RPM = 5
 const SYNC_MIN_CADENCE = 30
+const STREAK_NAME: Record<string, string> = {
+  drop: 'SUPPLY DROP',
+  airstrike: 'AIR STRIKE',
+  gunship: 'GUNSHIP',
+}
 
 const median = (a: number[]) => {
   const s = [...a].sort((x, y) => x - y)
@@ -31,6 +36,8 @@ export function makeBusPanel() {
   const pipsEl = h('div', { class: 'bs-pips' })
   const nitroFill = h('i', {})
   const nitroState = h('span', { class: 'bs-sync-s' })
+  const streakFill = h('i', {})
+  const streakState = h('span', { class: 'bs-sync-s' })
   const stat = (label: string, v: HTMLElement, unit: string) =>
     h('div', { class: 'bs-stat' }, h('label', {}, label), h('div', {}, v, h('small', {}, unit)))
   const root = h(
@@ -51,6 +58,8 @@ export function makeBusPanel() {
     syncTrack,
     h('div', { class: 'bs-head' }, h('label', {}, 'NITRO'), nitroState),
     h('div', { class: 'bs-nitro' }, nitroFill),
+    h('div', { class: 'bs-head' }, h('label', {}, 'STREAK'), streakState),
+    h('div', { class: 'bs-nitro bs-streak' }, streakFill),
     pipsEl,
   )
   const dots = new Map<string, HTMLElement>()
@@ -114,6 +123,9 @@ export function makeBusPanel() {
             ? `${Math.round(b.nitro * 100)}%`
             : 'RIDE CLEAN TO CHARGE',
       )
+      streakFill.style.width = `${(b.gunship ? 1 : (b.streak ?? 0)) * 100}%`
+      streakFill.parentElement!.dataset.s = b.gunship ? 'boost' : ''
+      set(streakState, b.gunship ? 'GUNSHIP UP!' : `NEXT: ${STREAK_NAME[b.next] ?? ''}`)
       const key = `${b.repel}/${b.syncw}`
       if (pipsEl.dataset.k !== key) {
         pipsEl.dataset.k = key

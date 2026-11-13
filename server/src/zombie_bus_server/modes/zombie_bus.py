@@ -50,6 +50,10 @@ class ZombieBus:
         self.ev = ""
         self.repel = 0
         self.syncw = 0
+        self.streak = 0.0
+        self.streak_n = 0
+        self.streak_low = 0.0
+        self.gunship_until = -1.0
 
     def to_dict(self) -> dict:
         """JSON-safe copy of all state (the roadblock's rider sets become sorted lists)."""
@@ -91,6 +95,7 @@ class ZombieBus:
 
         self.run_challenge(room, active, ev)
         boost = self.charge_nitro(room, comp, ev, dt, bool(active))
+        self.run_streak(room, comp, ev, dt, bool(active))
         self.speed = (C.V_MIN + (C.V_MAX - C.V_MIN) * comp) * (C.TUNE_MULT if self.tune else 1)
         self.speed *= C.NITRO_SPEED if boost else 1
         self.gap += C.NITRO_GAP * dt if boost else 0
@@ -157,6 +162,38 @@ class ZombieBus:
             self.emit("nitro", f"NITRO! Perfect riding lit the afterburner. +{C.NITRO_SCRAP} scrap")
             return True
         return False
+
+    def run_streak(self, room: Room, comp: float, ev: str, dt: float, riding: bool) -> None:
+        """Counts unbroken clean riding and pays out air support. A fall or a lapse resets it."""
+        if room.el < self.gunship_until:
+            self.gap += C.GUNSHIP_GAP * dt if riding else 0
+            return
+        if any(r.st == "fell" for r in room.riders.values()):
+            self.streak, self.streak_n, self.streak_low = 0.0, 0, 0.0
+            return
+        if not riding or ev not in C.STREAK_EVENTS:
+            return
+        if comp < C.STREAK_MIN:
+            self.streak_low += dt
+            if self.streak_low >= C.STREAK_GRACE_S:
+                self.streak, self.streak_n = 0.0, 0
+            return
+        self.streak_low = 0.0
+        self.streak += dt
+        need, kind = C.STREAKS[self.streak_n]
+        if self.streak < need:
+            return
+        self.streak_n += 1
+        if kind == "drop":
+            self.scrap += C.DROP_SCRAP
+            self.emit("drop", f"{need} s streak: supply drop! +{C.DROP_SCRAP} scrap")
+        elif kind == "airstrike":
+            self.gap += C.AIRSTRIKE_GAP
+            self.emit("airstrike", f"{need} s streak: air strike on the horde! +{C.AIRSTRIKE_GAP} m")
+        else:
+            self.streak, self.streak_n = 0.0, 0
+            self.gunship_until = room.el + C.GUNSHIP_S
+            self.emit("gunship", f"{need} s streak: the crew is up in the gunship for {C.GUNSHIP_S} s!")
 
     def block_change(self, room: Room, i: int, b: dict, ev: str) -> None:
         if self.rb:
@@ -336,6 +373,9 @@ class ZombieBus:
             "shop": self.ev == "servo" and not self.mut.get("no_shop"),
             "repel": self.repel,
             "syncw": self.syncw,
+            "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),
+            "next": C.STREAKS[self.streak_n][1],
+            "gunship": room.el < self.gunship_until,
         }
 
     def summary(self, room: Room) -> dict:

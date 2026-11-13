@@ -63,6 +63,10 @@ export interface BusState {
   syncw: number
   nitro: number
   boost: boolean
+  /** 0..1 progress of the clean-riding streak towards `next`. */
+  streak: number
+  next: 'drop' | 'airstrike' | 'gunship'
+  gunship: boolean
 }
 export interface Fx {
   k: string

@@ -36,6 +36,10 @@ export const VIS = {
   hordeSize: 220,
   /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
   bust: 0.17,
+  /** Gunship orbit around the horde: height, radius and turn rate (rad/s). */
+  gunshipHeight: 30,
+  gunshipOrbit: 34,
+  gunshipSpin: 0.35,
   sun: 1,
   shadow: 1,
   shake: 1,

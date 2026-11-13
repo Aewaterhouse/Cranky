@@ -316,6 +316,9 @@
   background: linear-gradient(90deg, #ff7a1a, #ffd23f);
   transition: width 0.5s linear;
 }
+.bs-streak i {
+  background: linear-gradient(90deg, #7fd13b, #ffd23f);
+}
 .bs-nitro[data-s='boost'] i {
   background: linear-gradient(90deg, #6cf, #fff);
   animation: bs-pulse 0.5s infinite alternate;
