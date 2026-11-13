@@ -1,4 +1,4 @@
-"""Routes cut from a recorded ride (GPX): the rider's own line and barometric heights.
+"""Routes cut from a recorded ride (GPX) or a course file (FIT): the rider's own line and heights.
 
 The recordings stay out of git (they start and end at home); only the cut section is used.
 """
@@ -7,10 +7,12 @@ import math
 import re
 from pathlib import Path
 
+import fit
 import terrain
 
 SPACING_M = 10
 LOOP_SEARCH_M = 400  # how far either side of the stated lap end to look for the true closure
+SPARSE_M = 15  # tracks with points further apart than this are not position-smoothed
 OFFSET_EVERY = 10  # compare every 10th point with SRTM to remove the altimeter's offset
 
 Point = tuple[float, float]
@@ -83,19 +85,24 @@ def resample(pts: list[tuple[float, float, float]], step: float) -> list[tuple[f
     return out
 
 
+def _average(section: list) -> list:
+    """Three-point moving average of (lat, lon, ele)."""
+    out = []
+    for i in range(len(section)):
+        near = section[max(0, i - 1) : i + 2]
+        out.append(tuple(sum(q[k] for q in near) / len(near) for k in range(3)))
+    return out
+
+
 def route(file: Path, from_km: float, to_km: float, loop: bool) -> tuple[list[Point], list[float]]:
     """Returns the 10 m centreline and heights for a section of a recorded ride."""
-    raw = parse(file.read_text())
+    raw = fit.track(file) if file.suffix.lower() == ".fit" else parse(file.read_text())
     ele = fill([p[2] for p in raw])
     section = cut([(la, lo, e) for (la, lo, _), e in zip(raw, ele, strict=False)], from_km, to_km, loop)
-    # A three-point average takes the GPS jitter out without rounding off corners.
-    smooth = [
-        tuple(
-            sum(q[k] for q in section[max(0, i - 1) : i + 2]) / len(section[max(0, i - 1) : i + 2])
-            for k in range(3)
-        )
-        for i in range(len(section))
-    ]
+    # A three-point average takes the GPS jitter out of a recording. A course file's points are already
+    # clean and far apart, where averaging would only cut the corners.
+    spacing = sum(haversine(a[:2], b[:2]) for a, b in zip(section, section[1:], strict=False)) / len(section)
+    smooth = section if spacing > SPARSE_M else _average(section)
     if loop:
         # Altimeters drift over a lap; spread the mismatch so the lap closes exactly.
         drift = smooth[-1][2] - smooth[0][2]

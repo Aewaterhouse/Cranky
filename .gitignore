@@ -11,3 +11,4 @@ scripts/routes/.cache/
 .shots/
 # Owner ride recordings: they start and end at home, so they never go in git.
 /*.gpx
+/*.fit

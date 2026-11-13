@@ -472,5 +472,23 @@
    "source": "owner's ride recording, November 2026"
   },
   "notes": "One clean lap from the middle of the session."
+ },
+ {
+  "id": "howick-street-crit",
+  "name": "Howick Street Crit",
+  "region": "TAS",
+  "blurb": "Launceston's Howick Street criterium: 1.7 km a lap with a proper hill in it, which is not what anyone signs up to a crit for. Up, over, down, repeat.",
+  "gpx": "Howick_Crit.fit",
+  "cutKm": [
+   0,
+   1.667
+  ],
+  "loop": true,
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "owner's course file, November 2026"
+  },
+  "notes": "From a FIT course file (49 points, about 34 m apart), not a recording, so corners are only as sharp as the file."
  }
 ]

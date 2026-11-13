@@ -1,5 +1,7 @@
 # Cranky roadmap
 
+**Current priority (2026-11-14):** the checklist from the first real rides, `docs/ride-notes-plan.md`. Work through it before anything below.
+
 **Cranky** is the app. **Zombie Bus** is its first game; solo workouts, watch parties and later games sit alongside it.
 
 A backlog of what to build next, grouped by theme. Sizes are rough: **S** = an evening, **M** = a weekend, **L** = a week or more. Items the owner asked for are marked ★.
