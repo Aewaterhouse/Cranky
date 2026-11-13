@@ -9,10 +9,11 @@
 - `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
-- `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
+- `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `route-dev.html` route world harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
 - `src/main.ts` bootstrap: login, shell, wiring to solo and bus.
 - `src/spike.ts` trainer test UI and Zwift Click test panel.
 - `src/sceneDev.ts` scene harness params and keys (see README).
+- `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README).
 - `src/config.ts` client tunables (caps, bands, sprint grades, curve defaults).
 - `src/types.ts` shared types (Plan, Block, Tier, Trainer, Frame).
 - `src/content.ts` loads plans from content/workouts via Vite glob.

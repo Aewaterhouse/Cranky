@@ -45,7 +45,7 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 - [x] Your rider on a bike, legs turning at your cadence, in your garage kit.
 - [x] Chase camera that looks into corners and up climbs.
 - [ ] Slim free-ride HUD over the scene: speed, power, cadence, heart rate, gear, gradient; elevation strip along the bottom; minimap in the corner.
-- [ ] Scene harness page for routes and visual settings in the debug panel.
+- [x] Scene harness page for routes and visual settings in the debug panel.
 - [ ] Automatic quality levels and the 2D fallback.
 
 ### Phase C: the place (L)

@@ -314,3 +314,7 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Camera: 9 m back along the road and 3.7 m up, so it is always over tarmac and never inside a cut bank; it is also held at least 1.3 m above the ground under it. It aims 55% of the way from the rider to a point 20 m up the road, which looks into bends and tilts with the gradient. The more the road doubles back (a hairpin), the less it looks ahead, so the rider stays in shot. Field of view 58 degrees, widening by up to 5 with speed. All in `VIS.route`.
 - A genuine U-turn in a route (ride out, turn round, ride back) is drawn as the data says: the road doubles back on itself and the camera swings round. Not pretty, not fixed.
 
+## 2026-11-13 Free ride 3D road world (Phase B): harness
+- A sibling page, `/route-dev.html` (`src/routeDev.ts`), rather than more switches on the bus harness. It is dev-server only, like `scene-dev.html`.
+- The debug panel gains a Route world folder when the route world opens it. Road, ground and colour settings are baked into chunks, so changing one drops the chunks and they rebuild over the next few frames.
+
