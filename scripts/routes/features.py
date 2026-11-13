@@ -216,6 +216,9 @@ def build(line: list[Point], route_nodes: set[int] | None, grid: dict, fetch: Fe
     ):
         tags = el.get("tags", {})
         kind = next((POI_KINDS[v] for v in tags.values() if v in POI_KINDS), None)
+        # Light poles and pylons are tagged as towers too; only broadcast towers are landmarks.
+        if kind == "tower" and "communication" not in (tags["man_made"] + tags.get("tower:type", "")):
+            continue
         g = el if el["type"] == "node" else (el.get("geometry") or [None])[0]
         if kind and g:
             e, n = local(g["lat"], g["lon"])

@@ -242,8 +242,16 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     try:
         pack["features"] = features.build(fine, nodes, grid, fetch)
     except OSError as err:
-        # The scene has defaults for a pack with no map features; rebuild later to add them.
-        print(f"     {spec['id']}: no map features yet ({err})")
+        # Keep what an earlier build fetched; a pack with none falls back to the scene's defaults.
+        old_file = OUT / f"{spec['id']}.json"
+        old = json.loads(old_file.read_text()) if old_file.exists() else {}
+        same = {k: v for k, v in old.get("terrain", {}).items() if k != "cover"} == grid
+        if "features" in old and same:
+            pack["features"] = old["features"]
+            grid["cover"] = old["terrain"].get("cover")
+        print(
+            f"     {spec['id']}: map server refused ({err}); kept {'old' if 'features' in pack else 'no'} features"
+        )
     return pack, {**head, **s, "smoothM": window}, problems
 
 
