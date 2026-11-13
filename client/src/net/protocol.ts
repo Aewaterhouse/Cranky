@@ -1,3 +1,4 @@
+import type { DraftLevel } from '../core/physics'
 // Mirrors docs/protocol.md and server/src/zombie_bus_server/protocol.py.
 import type { GroupSummary } from '../ui/results'
 import type { Look } from '../core/cosmetics'
@@ -31,7 +32,14 @@ export type ClientMsg =
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
-  | { t: 'road'; route: string; laps: number; style: RoadStyle; together?: boolean }
+  | {
+      t: 'road'
+      route: string
+      laps: number
+      style: RoadStyle
+      together?: boolean
+      draft?: DraftLevel
+    }
   | {
       t: 'data'
       p: number
@@ -151,6 +159,8 @@ export interface RoadLobby {
   distance: number
   style: RoadStyle
   together: boolean
+  /** The host's drafting level for the ride. */
+  draft?: DraftLevel
   riders: RoadLobbyRider[]
 }
 export interface RoadRiderTick {

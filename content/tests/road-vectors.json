@@ -3289,36 +3289,130 @@
  "draft": [
   {
    "gaps": [],
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [],
+   "level": "realistic",
+   "out": 1
+  },
+  {
+   "gaps": [],
+   "level": "strong",
    "out": 1
   },
   {
    "gaps": [
     0.5
    ],
-   "out": 0.73
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    0.5
+   ],
+   "level": "realistic",
+   "out": 0.75
+  },
+  {
+   "gaps": [
+    0.5
+   ],
+   "level": "strong",
+   "out": 0.7
   },
   {
    "gaps": [
     2
    ],
-   "out": 0.73
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    2
+   ],
+   "level": "realistic",
+   "out": 0.7699888963426692
+  },
+  {
+   "gaps": [
+    2
+   ],
+   "level": "strong",
+   "out": 0.723986675611203
   },
   {
    "gaps": [
     5
    ],
-   "out": 0.83125
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    5
+   ],
+   "level": "realistic",
+   "out": 0.8604912135574883
+  },
+  {
+   "gaps": [
+    5
+   ],
+   "level": "strong",
+   "out": 0.8325894562689858
   },
   {
    "gaps": [
     9.9
    ],
-   "out": 0.996625
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    9.9
+   ],
+   "level": "realistic",
+   "out": 0.9383507590145984
+  },
+  {
+   "gaps": [
+    9.9
+   ],
+   "level": "strong",
+   "out": 0.926020910817518
   },
   {
    "gaps": [
     10
    ],
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    10
+   ],
+   "level": "realistic",
+   "out": 0.9393697313410878
+  },
+  {
+   "gaps": [
+    10
+   ],
+   "level": "strong",
+   "out": 0.9272436776093054
+  },
+  {
+   "gaps": [
+    15,
+    25
+   ],
+   "level": "off",
    "out": 1
   },
   {
@@ -3326,6 +3420,24 @@
     15,
     25
    ],
+   "level": "realistic",
+   "out": 0.9686733583401005
+  },
+  {
+   "gaps": [
+    15,
+    25
+   ],
+   "level": "strong",
+   "out": 0.9624080300081206
+  },
+  {
+   "gaps": [
+    1,
+    3,
+    8
+   ],
+   "level": "off",
    "out": 1
   },
   {
@@ -3334,7 +3446,17 @@
     3,
     8
    ],
-   "out": 0.649
+   "level": "realistic",
+   "out": 0.6094460412639667
+  },
+  {
+   "gaps": [
+    1,
+    3,
+    8
+   ],
+   "level": "strong",
+   "out": 0.47654675836437055
   },
   {
    "gaps": [
@@ -3345,14 +3467,113 @@
     5,
     6
    ],
-   "out": 0.6
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "level": "realistic",
+   "out": 0.436690748415266
+  },
+  {
+   "gaps": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+   ],
+   "level": "strong",
+   "out": 0.11115124735877668
   },
   {
    "gaps": [
     -2,
     30
    ],
+   "level": "off",
    "out": 1
+  },
+  {
+   "gaps": [
+    -2,
+    30
+   ],
+   "level": "realistic",
+   "out": 0.9978370761992198
+  },
+  {
+   "gaps": [
+    -2,
+    30
+   ],
+   "level": "strong",
+   "out": 0.9974044914390638
+  },
+  {
+   "gaps": [
+    1,
+    1,
+    1.5,
+    1.5,
+    1.5
+   ],
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    1,
+    1,
+    1.5,
+    1.5,
+    1.5
+   ],
+   "level": "realistic",
+   "out": 0.4
+  },
+  {
+   "gaps": [
+    1,
+    1,
+    1.5,
+    1.5,
+    1.5
+   ],
+   "level": "strong",
+   "out": 0.050000000000000044
+  },
+  {
+   "gaps": [
+    29,
+    31
+   ],
+   "level": "off",
+   "out": 1
+  },
+  {
+   "gaps": [
+    29,
+    31
+   ],
+   "level": "realistic",
+   "out": 0.9974448074457134
+  },
+  {
+   "gaps": [
+    29,
+    31
+   ],
+   "level": "strong",
+   "out": 0.9969337689348561
   }
  ],
  "band": [

@@ -114,6 +114,9 @@ Results: `time` is null for a rider who did not finish; `dist` is what they rode
 A road tick never carries a power target (`tgt`): the trainer only ever gets a gradient from the rider's own
 position, through `ErgController.setGrade`.
 
+## Drafting (road rooms)
+- The host's `road` message can carry `draft: 'off' | 'realistic' | 'strong'` (left out keeps the room's level, strong by default). The road lobby carries `draft`.
+
 ## ERG or gears (bus rooms)
 - Client `{t: 'erg', on}` at any time: this rider's trainer mode (ERG, or ERG off on virtual gears). Lobby riders and tick riders carry `erg` (default true).
 - Host `{t: 'trainers', mode: 'choose' | 'erg' | 'gears'}` before the start: the ride's trainer mode, in the lobby as `trainers`. Unless it is `choose`, every rider's `erg` follows it.

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { CFG } from '../src/config'
 import { RoadFeel, cheering, trainerTarget } from '../src/modes/freeRide/feel'
 import { freePlan } from '../src/modes/freeRide/freeRide'
-import { cornerSpeed, totalMass } from '../src/core/physics'
+import { cornerSpeed, draftGrade, totalMass } from '../src/core/physics'
 import { RideRecorder } from '../src/core/ride'
 import { buildRoute, routeSeconds } from '../src/core/route'
 import { ErgController } from '../src/trainer/ergController'
@@ -65,6 +65,19 @@ describe('free ride feel', () => {
   const F = CFG.freeRide
   const target = (d: number, v: number, paused = false, diff = 1) =>
     trainerTarget(wall, d, v, diff, paused, 0, CFG.gears.start, M)
+
+  it('drafting takes the drag it saves off the trainer gradient', () => {
+    const v = 11
+    const off = draftGrade(v, 0.7, M)
+    expect(draftGrade(v, 1, M)).toBe(0)
+    expect(off).toBeGreaterThan(0.3)
+    expect(off).toBeLessThan(2)
+    expect(draftGrade(v, 0.05, M)).toBeGreaterThan(off)
+    const flat = trainerTarget(wall, 0, v, 1, false, 90, CFG.gears.start, M)
+    expect(
+      trainerTarget(wall, 0, v, 1, false, 90, CFG.gears.start, M, undefined, 1, off),
+    ).toBeLessThan(flat)
+  })
 
   it('the trainer gets the road a second or two ahead, so the wall arrives as the road tilts', () => {
     const before = wall.points.findIndex((p) => p.grade > 5) * F.spacingM - 12

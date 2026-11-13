@@ -13,7 +13,8 @@ export type WindName = keyof typeof W.ms
 /**
  * The gradient (%) free ride hands to `ErgController.setGrade`: flat when paused, otherwise the road a second or
  * two of travel ahead (so the resistance arrives as the road tilts), scaled by the difficulty, plus the virtual
- * gear's offset times the shift strength. Always inside the free-ride range; never a power target.
+ * gear's offset times the shift strength, less `draftPct` while drafting in a group. Always inside the
+ * free-ride range; never a power target.
  */
 export function trainerTarget(
   route: Route,
@@ -26,9 +27,10 @@ export function trainerTarget(
   mass: number,
   chainring?: number,
   strength = 1,
+  draftPct = 0,
 ) {
   if (paused) return 0
-  const ahead = routeAt(route, Math.min(route.distance, dist + leadM(speed))).grade
+  const ahead = routeAt(route, Math.min(route.distance, dist + leadM(speed))).grade - draftPct
   return gearGrade(ahead, cadence, gear, mass, F.grade, chainring, difficulty, strength)
 }
 

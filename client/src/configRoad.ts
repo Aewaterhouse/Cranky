@@ -200,7 +200,18 @@ export const ROAD_CFG = {
    * client predicts with the same numbers, and content/tests/road-vectors.json fails if they drift).
    */
   road: {
-    draft: { wheel: 0.27, fullM: 2, reachM: 10, bunchM: 20, bunchX: 0.15, cap: 0.4, minMs: 3 },
+    draft: {
+      fullM: 1.5,
+      decayM: 6,
+      reachM: 30,
+      minMs: 3,
+      /** CdA saving per whole rider ahead, by the host's drafting level. */
+      levels: {
+        off: [0],
+        realistic: [0, 0.25, 0.38, 0.47, 0.54, 0.6],
+        strong: [0, 0.3, 0.5, 0.7, 0.85, 0.95],
+      },
+    },
     band: { max: 0.2, deadM: 15, fullM: 150 },
     /** Power, cadence and heart rate go to the server this often (s). */
     sendS: 0.5,

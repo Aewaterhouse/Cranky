@@ -83,22 +83,30 @@ export function speedLimit(v: number, curvAt: (s: number) => number) {
   return lim
 }
 
+export type DraftLevel = keyof typeof CFG.road.draft.levels
+
 /**
  * Group rides: the drag multiplier (1 is clean air) for a rider, given the metres to each moving rider ahead.
- * Full on a wheel, nothing by `reachM`, a bit more for every extra rider close ahead. The server's
- * `draft_factor` is the one that counts; this is the same sum for the client's guess between ticks.
+ * Each counts fully inside `fullM` and fades exponentially past it, to nothing by `reachM`; the count picks the
+ * saving from the level's table. The server's `draft_factor` is the one that counts; this is the same sum
+ * for the client's guess between ticks.
  */
-export function draftFactor(gaps: number[]) {
+export function draftFactor(gaps: number[], level: DraftLevel = 'strong') {
   const D = CFG.road.draft
-  const near = gaps.filter((g) => g > 0 && g <= D.bunchM)
-  const first = Math.min(...near)
-  if (!near.length || first >= D.reachM) return 1
-  const fade = Math.min(1, (D.reachM - first) / (D.reachM - D.fullM))
-  return 1 - Math.min(D.cap, D.wheel * fade * (1 + D.bunchX * (near.length - 1)))
+  const n = gaps
+    .filter((g) => g > 0 && g <= D.reachM)
+    .reduce((a, g) => a + Math.exp(-Math.max(0, g - D.fullM) / D.decayM), 0)
+  const t = D.levels[level]
+  const k = Math.min(Math.floor(n), t.length - 1)
+  return 1 - (k === t.length - 1 ? t[k] : t[k] + (t[k + 1] - t[k]) * (n - k))
 }
 
 /** Watts drafting is saving at physics speed `v` (m/s) with drag multiplier `draft`. */
 export const draftSaving = (v: number, draft: number) => 0.5 * P.rho * P.cda * (1 - draft) * v ** 3
+
+/** The same saving as a gradient (%) off the trainer's road, so drafting feels easier at the pedals too. */
+export const draftGrade = (v: number, draft: number, mass: number) =>
+  (100 * 0.5 * P.rho * P.cda * (1 - draft) * v * v) / (mass * G)
 
 /** Keep-together: the scale on distance covered for a rider `gap` metres ahead of the middle of the group. */
 export function bandFactor(gap: number) {

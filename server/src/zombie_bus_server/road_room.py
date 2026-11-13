@@ -28,7 +28,7 @@ class RoadRoom(Room):
     def __init__(self, code: str, store: Store | None = None) -> None:
         super().__init__(code, store)
         self.route, self.laps = C.ROAD_DEFAULT_ROUTE, C.ROAD_DEFAULT_LAPS
-        self.style, self.together = "social", True
+        self.style, self.together, self.drafting = "social", True, C.DRAFT_DEFAULT
         self.sim: RoadSim | None = None
         self.rngs: dict[str, random.Random] = {}
         self.empty_s = 0.0
@@ -54,6 +54,7 @@ class RoadRoom(Room):
             "distance": lap.distance * self.laps,
             "style": self.style,
             "together": self.together,
+            "draft": self.drafting,
             "riders": [
                 {
                     "id": r.id,
@@ -79,6 +80,7 @@ class RoadRoom(Room):
             "laps": self.laps,
             "style": self.style,
             "together": self.together,
+            "draft": self.drafting,
             "riders": [r.to_dict() for r in self.riders.values()],
             "sim": self.sim.to_dict() if self.sim else None,
         }
@@ -89,6 +91,7 @@ class RoadRoom(Room):
         room = cls(d["code"], store)
         room.host, room.state, room.route, room.laps = d["host"], d["state"], d["route"], d["laps"]
         room.style, room.together = d["style"], d["together"]
+        room.drafting = d.get("draft", C.DRAFT_DEFAULT)
         room.plan = {"name": load_lap(room.route).name}
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.sim = RoadSim.from_dict(d["sim"]) if d["sim"] else None
@@ -149,6 +152,7 @@ class RoadRoom(Room):
             self.route, self.laps = msg.route, max(1, min(lap.laps_max(), msg.laps))
             self.style, self.state, self.plan = msg.style, "lobby", {"name": lap.name}
             self.together = msg.style == "social" if msg.together is None else msg.together
+            self.drafting = msg.draft or self.drafting
             await self.lobby()
         elif isinstance(msg, Bots) and self.state != "running":
             road_bots.set_bots(self, msg.n)
@@ -161,7 +165,7 @@ class RoadRoom(Room):
 
     def start(self) -> None:
         road_bots.assume_ftps(self)
-        self.sim = RoadSim(self.route, self.laps, self.together)
+        self.sim = RoadSim(self.route, self.laps, self.together, drafting=self.drafting)
         for r in self.riders.values():
             self.sim.add(r.id, self.kg_of(r.id), r.ftp, r.bot)
         self.state, self.summary, self.empty_s = "running", None, 0.0

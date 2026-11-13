@@ -84,10 +84,10 @@ describe('group ride link', () => {
   it('carries the others on between ticks and drafts off the wheel in front', () => {
     const { link, clock } = make()
     link.tick(tick(10, { me: at(100), kev: at(103, 10) }))
-    expect(link.draft(100)).toBeCloseTo(1 - (R.draft.wheel * 7) / 8)
+    expect(link.draft(100)).toBeCloseTo(1 - 0.3 * Math.exp(-1.5 / R.draft.decayM))
     clock.t += 0.3
     expect(link.others()[0].d).toBeCloseTo(106)
-    expect(link.draft(104.5)).toBeCloseTo(1 - R.draft.wheel)
+    expect(link.draft(104.5)).toBeCloseTo(1 - R.draft.levels.strong[1])
     expect(link.draft(107)).toBe(1)
     expect(draftSaving(10, 0.73)).toBeCloseTo(0.5 * 1.225 * 0.32 * 0.27 * 1000)
     link.tick(tick(11, { me: at(100), kev: at(103, 1) }))

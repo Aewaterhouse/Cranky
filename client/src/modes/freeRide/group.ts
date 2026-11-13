@@ -72,7 +72,8 @@ export async function groupRide(
   const view = roadLobbyView({
     profile: () => profile,
     status,
-    setup: (route, laps, style, together) => net.send({ t: 'road', route, laps, style, together }),
+    setup: (route, laps, style, together, draft) =>
+      net.send({ t: 'road', route, laps, style, together, draft }),
     bots: (n) => net.send({ t: 'bots', n }),
     start: () => net.send({ t: 'start' }),
     leave: () => leave(),

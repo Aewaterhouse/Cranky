@@ -71,7 +71,7 @@ class Rules:
         pack = [m for m in live if m.moving or m.p > 0]
         mid = statistics.median(m.d for m in pack) if sim.together and len(pack) > 1 else None
         for m in live:
-            m.draft = draft_factor([o.d - m.d for o in moving if o is not m])
+            m.draft = draft_factor([o.d - m.d for o in moving if o is not m], sim.drafting)
             m.band = band_factor(m.d - mid) if mid is not None and m in pack else 1.0
         for k, m in enumerate(sim.ranked()):
             m.lane = C.ROAD_LANES[k % len(C.ROAD_LANES)]
@@ -119,8 +119,15 @@ RULES: dict[str, type[Rules]] = {"ride": Rules}
 class RoadSim:
     """Positions on a road, stepped with the same physics as the client's free ride."""
 
-    def __init__(self, route: str, laps: int = 1, together: bool = False, game: str = "ride") -> None:
-        self.route, self.together, self.game = route, together, game
+    def __init__(
+        self,
+        route: str,
+        laps: int = 1,
+        together: bool = False,
+        game: str = "ride",
+        drafting: str = C.DRAFT_DEFAULT,
+    ) -> None:
+        self.route, self.together, self.game, self.drafting = route, together, game, drafting
         self.road = Road(route, laps)
         self.rules = RULES[game]()
         self.movers: dict[str, Mover] = {}
@@ -193,6 +200,7 @@ class RoadSim:
             "laps": self.road.laps,
             "together": self.together,
             "game": self.game,
+            "drafting": self.drafting,
             "el": self.el,
             "first_fin": self.first_fin,
             "movers": [asdict(m) for m in self.movers.values()],
@@ -200,7 +208,7 @@ class RoadSim:
 
     @classmethod
     def from_dict(cls, d: dict) -> RoadSim:
-        sim = cls(d["route"], d["laps"], d["together"], d["game"])
+        sim = cls(d["route"], d["laps"], d["together"], d["game"], d.get("drafting", C.DRAFT_DEFAULT))
         sim.el, sim.first_fin = d["el"], d["first_fin"]
         sim.movers = {m["id"]: Mover(**m) for m in d["movers"]}
         sim.order = sorted(sim.movers, key=lambda i: -sim.movers[i].d)

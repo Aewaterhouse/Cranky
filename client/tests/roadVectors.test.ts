@@ -96,7 +96,15 @@ async function build() {
       [1, 3, 8],
       [1, 2, 3, 4, 5, 6],
       [-2, 30],
-    ].map((gaps) => ({ gaps, out: draftFactor(gaps) })),
+      [1, 1, 1.5, 1.5, 1.5],
+      [29, 31],
+    ].flatMap((gaps) =>
+      (['off', 'realistic', 'strong'] as const).map((level) => ({
+        gaps,
+        level,
+        out: draftFactor(gaps, level),
+      })),
+    ),
     band: [-400, -150, -80, -15, -5, 0, 10, 40, 150, 900].map((gap) => ({
       gap,
       out: bandFactor(gap),
@@ -125,9 +133,14 @@ describe('road vectors shared with the server', () => {
   })
 
   it('drafting only ever helps and the band is bounded', () => {
-    expect(draftFactor([1])).toBeCloseTo(0.73)
-    expect(draftFactor([1, 2, 3, 4, 5, 6])).toBeCloseTo(0.6)
-    expect(draftFactor([12])).toBe(1)
+    // 30% on one wheel, 50% on two, about 95% deep in a pack of five; nothing past the reach or with it off
+    expect(draftFactor([1])).toBeCloseTo(0.7)
+    expect(draftFactor([1, 1.5])).toBeCloseTo(0.5)
+    expect(draftFactor([1, 1, 1.5, 1.5, 1.5])).toBeCloseTo(0.05)
+    expect(draftFactor([1, 2, 3, 4, 5, 6, 7, 8])).toBeGreaterThanOrEqual(0.05)
+    expect(draftFactor([31])).toBe(1)
+    expect(draftFactor([1], 'off')).toBe(1)
+    expect(draftFactor([1], 'realistic')).toBeGreaterThan(draftFactor([1]))
     expect(bandFactor(-1000)).toBeCloseTo(1.2)
     expect(bandFactor(1000)).toBeCloseTo(0.8)
     expect(bandFactor(5)).toBe(1)

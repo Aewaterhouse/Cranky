@@ -4,7 +4,7 @@ import { shiftGear } from '../../core/gears'
 import type { GhostSpec } from '../../core/ghost'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
-import { draftSaving, stepSpeed, totalMass } from '../../core/physics'
+import { draftGrade, draftSaving, stepSpeed, totalMass } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
 import { VIS } from '../../scene/params'
 import type { RoadSummary } from '../../net/protocol'
@@ -182,6 +182,7 @@ export function runFreeRide(
       mass,
       settings.chainring,
       settings.shiftStrength,
+      draftGrade(speed, draft, mass),
     )
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want

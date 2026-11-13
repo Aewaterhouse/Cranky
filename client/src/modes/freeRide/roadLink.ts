@@ -1,5 +1,5 @@
 import { CFG } from '../../config'
-import { bandFactor, draftFactor } from '../../core/physics'
+import { bandFactor, draftFactor, type DraftLevel } from '../../core/physics'
 import type {
   ClientMsg,
   RoadLobby,
@@ -33,6 +33,7 @@ export class RoadLink {
   private close = new Map<string, boolean>()
   private notes: string[] = []
   private together = false
+  private drafting: DraftLevel = 'strong'
 
   constructor(
     readonly me: string,
@@ -53,6 +54,7 @@ export class RoadLink {
     }
     this.info = new Map(l.riders.map((r) => [r.id, r]))
     this.together = l.together
+    this.drafting = l.draft ?? 'strong'
   }
 
   tick(m: RoadTick) {
@@ -145,7 +147,10 @@ export class RoadLink {
   /** The drag multiplier for me at `d`: the server's sum, on the positions as they are right now. */
   draft(d: number) {
     const ahead = this.others().filter((o) => o.st !== 'finished' && o.speed >= R.draft.minMs)
-    return draftFactor(ahead.map((o) => o.d - d))
+    return draftFactor(
+      ahead.map((o) => o.d - d),
+      this.drafting,
+    )
   }
 
   /** The keep-together scale for me at `d`; 1 when the host has it off or I am not turning the pedals. */

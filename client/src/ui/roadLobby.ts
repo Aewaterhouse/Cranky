@@ -1,6 +1,7 @@
 import '../road.css'
 import { CFG } from '../config'
 import type { Profile } from '../core/curve'
+import type { DraftLevel } from '../core/physics'
 import { ROUTE_INDEX } from '../core/routeLibrary'
 import type { RoadLobby, RoadStyle } from '../net/protocol'
 import { avatar, h, seg } from './dom'
@@ -10,7 +11,7 @@ import { trainerCheck } from './trainer'
 export interface RoadLobbyCtx {
   profile: () => Profile
   status: HTMLElement
-  setup(route: string, laps: number, style: RoadStyle, together: boolean): void
+  setup(route: string, laps: number, style: RoadStyle, together: boolean, draft: DraftLevel): void
   bots(n: number): void
   start(): void
   leave(): void
@@ -28,12 +29,14 @@ async function copy(text: string) {
 /** Group-ride lobby, built once and patched in place: who is in, the route, and the host's choices. */
 export function roadLobbyView(c: RoadLobbyCtx) {
   let l: RoadLobby | undefined
-  const send = (over: Partial<Pick<RoadLobby, 'route' | 'laps' | 'style' | 'together'>>) => {
+  const send = (
+    over: Partial<Pick<RoadLobby, 'route' | 'laps' | 'style' | 'together' | 'draft'>>,
+  ) => {
     if (!l) return
     const next = { ...l, ...over }
     // Changing the style resets keep-together to that style's usual setting.
     const together = over.style ? over.style === 'social' : next.together
-    c.setup(next.route, next.laps, next.style, together)
+    c.setup(next.route, next.laps, next.style, together, next.draft ?? 'strong')
   }
   const riders = h('div', { class: 'road-riders' })
   const code = h('div', { class: 'code-letters' })
@@ -76,6 +79,23 @@ export function roadLobbyView(c: RoadLobbyCtx) {
   )
   const keep = h('input', { type: 'checkbox', onchange: () => send({ together: keep.checked }) })
   const keepNote = h('span', { class: 'dim' })
+  const DRAFT_WHAT: Record<DraftLevel, string> = {
+    off: 'No drafting: everyone rides in clean air.',
+    realistic: 'About what you get outside: a quarter off on a wheel, up to 60% in a bunch.',
+    strong:
+      'Big tow: 30% off on one wheel, 50% on two, nearly free deep in a pack. The trainer eases off too.',
+  }
+  const draftSeg = seg<DraftLevel>(
+    [
+      ['off', 'Off'],
+      ['realistic', 'Realistic'],
+      ['strong', 'Strong'],
+    ],
+    'strong',
+    (draft) => send({ draft }),
+    'diff',
+  )
+  const draftNote = h('span', { class: 'dim' })
   const botN = h('b', {}, '0')
   const botBtn = (d: number, label: string) =>
     h(
@@ -139,6 +159,9 @@ export function roadLobbyView(c: RoadLobbyCtx) {
     total.textContent = `${(m.distance / 1000).toFixed(1)} km in all`
     styleSeg.set(m.style)
     keep.checked = m.together
+    draftSeg.set(m.draft ?? 'strong')
+    draftSeg.hidden = !isHost
+    draftNote.textContent = `${isHost ? '' : `${(m.draft ?? 'strong').replace(/^./, (c) => c.toUpperCase())}. `}${DRAFT_WHAT[m.draft ?? 'strong']}`
     keep.disabled = !isHost
     keepNote.textContent = m.together
       ? 'A gentle tow for riders off the back, a hand on the jersey for riders off the front.'
@@ -203,6 +226,7 @@ export function roadLobbyView(c: RoadLobbyCtx) {
           total,
           h('div', { class: 'bot-row' }, h('span', {}, 'Style'), styleSeg),
           h('label', { class: 'bot-row' }, keep, h('span', {}, 'Keep together'), keepNote),
+          h('div', { class: 'bot-row' }, h('span', {}, 'Drafting'), draftSeg, draftNote),
         ),
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Trainer'), trainerCheck()),
         startSlot,

@@ -762,3 +762,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Descent camera (2026-11-14)
 - `FEEL.cam`: shake 0.028 → 0.05 m, shakeRoll 0.003 → 0.008 rad, from 11 → 9 m/s, full at 19 → 16 m/s, on from 4% → 3% down; camera lean share 0.3 → 0.5, max 0.07 → 0.1 rad (the limit in the riderPose comfort test). Faster riders lean more in bends, so descents get the most of it.
+
+## Drafting levels (2026-11-14)
+- Replaced the old wheel/bunch/cap model with a count of riders ahead: each counts fully inside 1.5 m and decays `exp(-(gap - 1.5) / 6)`, cut at 30 m. The count indexes a per-level table of CdA savings, interpolated between whole riders. Strong (default): 0, 0.3, 0.5, 0.7, 0.85, 0.95. Realistic: 0, 0.25, 0.38, 0.47, 0.54, 0.6. Off: 0. "A pack of five" read as five riders close ahead.
+- The owner's "at a reference speed" is read as these being drag savings; the watts saved still grow with speed as drag does.
+- Trainer: the gradient sent drops by `100 · ½ρ·CdA·(1 − draft)·v² / (m·g)`, the drag saved expressed as a slope. About 0.8% on one wheel at 40 km/h, about 2.5% deep in a strong pack.

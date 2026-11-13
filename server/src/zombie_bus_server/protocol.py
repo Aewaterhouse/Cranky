@@ -47,6 +47,7 @@ class RoadSetup(BaseModel):
     laps: int = Field(default=1, ge=1, le=99)
     style: Literal["social", "race"] = "social"
     together: bool | None = None
+    draft: Literal["off", "realistic", "strong"] | None = None  # None keeps the room's drafting
 
 
 class Start(BaseModel):

@@ -50,10 +50,9 @@ def test_more_watts_per_kilo_wins_uphill():
     assert rows[0]["time"] < rows[1]["time"] < rows[2]["time"] < rows[3]["time"]
 
 
-def pair(monkeypatch, wheel: float) -> RoadSim:
+def pair(drafting: str) -> RoadSim:
     """A 250 W leader and a 215 W follower of the same weight, started on the wheel at speed."""
-    monkeypatch.setattr(C, "DRAFT_WHEEL", wheel)
-    sim = RoadSim("beach-road")
+    sim = RoadSim("beach-road", drafting=drafting)
     lead, follow = sim.add("lead", 75, 250), sim.add("follow", 75, 250)
     lead.p, follow.p = 250, 215
     ride(sim, 0)
@@ -62,15 +61,16 @@ def pair(monkeypatch, wheel: float) -> RoadSim:
     return sim
 
 
-def test_drafting_saves_power_for_a_follower(monkeypatch):
-    sim = pair(monkeypatch, C.DRAFT_WHEEL)
+def test_drafting_saves_power_for_a_follower():
+    sim = pair("realistic")
     lead, follow = sim.movers["lead"], sim.movers["follow"]
     assert 0 < lead.d - follow.d < C.DRAFT_REACH_M  # still on the wheel with 35 W less
     assert follow.draft < 1 and lead.draft == 1
     saved = next(r for r in sim.rules.results(sim) if r["id"] == "follow")["saved"]
     assert saved > 15
-    alone = pair(monkeypatch, 0.0)
-    assert alone.movers["lead"].d - alone.movers["follow"].d > 3 * C.DRAFT_REACH_M  # dropped without it
+    alone = pair("off")
+    assert alone.movers["follow"].draft == 1
+    assert alone.movers["lead"].d - alone.movers["follow"].d > C.DRAFT_REACH_M  # dropped without it
 
 
 def test_a_bunch_drafts_better_than_one_wheel():
@@ -80,7 +80,7 @@ def test_a_bunch_drafts_better_than_one_wheel():
         m.d, m.v = 400 - 2.0 * k, 10.0
     sim.step(DT)
     drafts = [m.draft for m in sim.movers.values()]
-    assert drafts[0] == 1 and drafts[1] > drafts[2] > drafts[3] >= 1 - C.DRAFT_CAP
+    assert drafts[0] == 1 and drafts[1] > drafts[2] > drafts[3] >= 1 - C.DRAFT_LEVELS["strong"][-1]
     assert {m.lane for m in sim.movers.values()} == set(C.ROAD_LANES)
 
 
@@ -181,3 +181,23 @@ def test_bots_fill_the_room_and_copy_the_humans_fitness():
     assert "tgt" not in str(tick)
     back = RoadRoom.from_dict(room.to_dict())
     assert back.paused and back.sim and back.sim.riders().keys() == tick["riders"].keys()
+
+
+def test_the_host_sets_the_drafting_level_for_the_ride():
+    from test_resume import FakeWS, join
+
+    async def main():
+        room, ws = RoadRoom("DRFT"), FakeWS()
+        await room.handle("h0", ws, join("H0"))
+        await room.handle(
+            "h0", ws, {"t": "road", "route": "beach-road", "laps": 1, "style": "social", "draft": "off"}
+        )
+        lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        room.start()
+        room.task.cancel()
+        return room, lobby
+
+    room, lobby = asyncio.run(main())
+    assert lobby["draft"] == "off" and room.sim.drafting == "off"
+    assert RoadSim.from_dict(room.sim.to_dict()).drafting == "off"
+    assert RoadRoom.from_dict(room.to_dict()).drafting == "off"

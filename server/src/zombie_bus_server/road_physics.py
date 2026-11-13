@@ -65,13 +65,15 @@ def speed_limit(v: float, curv_at: Callable[[float], float]) -> float:
     return lim
 
 
-def draft_factor(gaps: list[float]) -> float:
+def draft_factor(gaps: list[float], level: str = C.DRAFT_DEFAULT) -> float:
     """CdA multiplier (1 is clean air) for a rider, given the metres to each moving rider ahead."""
-    near = [g for g in gaps if 0 < g <= C.DRAFT_BUNCH_M]
-    if not near or min(near) >= C.DRAFT_REACH_M:
-        return 1.0
-    fade = min(1.0, (C.DRAFT_REACH_M - min(near)) / (C.DRAFT_REACH_M - C.DRAFT_FULL_M))
-    return 1 - min(C.DRAFT_CAP, C.DRAFT_WHEEL * fade * (1 + C.DRAFT_BUNCH_X * (len(near) - 1)))
+    n = sum(
+        math.exp(-max(0.0, g - C.DRAFT_FULL_M) / C.DRAFT_DECAY_M) for g in gaps if 0 < g <= C.DRAFT_REACH_M
+    )
+    table = C.DRAFT_LEVELS[level]
+    k = min(int(n), len(table) - 1)
+    share = table[k] if k == len(table) - 1 else table[k] + (table[k + 1] - table[k]) * (n - k)
+    return 1 - share
 
 
 def band_factor(gap: float) -> float:

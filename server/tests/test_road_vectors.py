@@ -34,10 +34,16 @@ def test_physics_matches_the_client():
 
 
 def test_drafting_and_keep_together_match_the_client():
-    assert all(near(P.draft_factor(x["gaps"]), x["out"]) for x in V["draft"])
+    assert all(near(P.draft_factor(x["gaps"], x["level"]), x["out"]) for x in V["draft"])
     assert all(near(P.band_factor(x["gap"]), x["out"]) for x in V["band"])
-    assert P.draft_factor([1]) == pytest.approx(1 - C.DRAFT_WHEEL)
-    assert min(P.draft_factor([0.1 * k for k in range(1, 60)]), 1) == pytest.approx(1 - C.DRAFT_CAP)
+    # The owner's numbers: 30% on one wheel, 50% on two, about 95% deep in a pack of five; off is clean air.
+    assert P.draft_factor([1]) == pytest.approx(0.7)
+    assert P.draft_factor([1, 1.5]) == pytest.approx(0.5)
+    assert P.draft_factor([1, 1, 1.5, 1.5, 1.5]) == pytest.approx(0.05)
+    assert P.draft_factor([1, 1], "off") == 1
+    assert P.draft_factor([1], "realistic") > P.draft_factor([1])
+    reach = [P.draft_factor([g]) for g in (1, 5, 10, 20, 29, 31)]
+    assert reach == sorted(reach) and reach[-1] == 1 and reach[-2] < 1
     assert P.band_factor(-1e4) == pytest.approx(1 + C.BAND_MAX)
     assert P.band_factor(1e4) == pytest.approx(1 - C.BAND_MAX)
 

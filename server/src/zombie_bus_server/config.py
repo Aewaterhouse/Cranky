@@ -261,15 +261,19 @@ ROAD_LAPS_MAX = 99
 ROAD_LAPS_MAX_M = 300_000
 ROAD_DEFAULT_ROUTE = "nundah-crit"
 ROAD_DEFAULT_LAPS = 3
-# Drafting: the CdA saving on a wheel, full inside DRAFT_FULL_M and fading to nothing at DRAFT_REACH_M. Each
-# extra rider ahead within DRAFT_BUNCH_M adds DRAFT_BUNCH_X of it, up to DRAFT_CAP. Nobody drafts a rider
-# slower than DRAFT_MIN_MS.
-DRAFT_WHEEL = 0.27
-DRAFT_FULL_M = 2.0
-DRAFT_REACH_M = 10.0
-DRAFT_BUNCH_M = 20.0
-DRAFT_BUNCH_X = 0.15
-DRAFT_CAP = 0.4
+# Drafting: each moving rider ahead within DRAFT_REACH_M counts fully inside DRAFT_FULL_M and fades
+# exponentially (e-fold every DRAFT_DECAY_M) beyond. The count picks the CdA saving from the host's level,
+# a share per whole rider ahead, interpolated between and held at the last. Nobody drafts a rider slower
+# than DRAFT_MIN_MS. "strong" is the default: 30% on one wheel, 50% on two, 95% deep in a pack of five.
+DRAFT_FULL_M = 1.5
+DRAFT_DECAY_M = 6.0
+DRAFT_REACH_M = 30.0
+DRAFT_LEVELS = {
+    "off": [0.0],
+    "realistic": [0.0, 0.25, 0.38, 0.47, 0.54, 0.6],
+    "strong": [0.0, 0.3, 0.5, 0.7, 0.85, 0.95],
+}
+DRAFT_DEFAULT = "strong"
 DRAFT_MIN_MS = 3.0
 # Keep-together: distance covered is scaled by up to BAND_MAX either way, by how far the rider is from the
 # middle of the group; nothing inside BAND_DEAD_M, all of it by BAND_FULL_M. The physics speed is untouched.
