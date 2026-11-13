@@ -29,6 +29,7 @@
 - Free ride Phase E: group rides on a shared server road layer (server-run positions, drafting, keep-together, bots with characters, lobby, name tags, TV view, crew results, four-rider headless test). Tried only with headless browsers on one machine.
 - Free ride Phase F: segments with live splits, server-side efforts and leaderboard endpoints, ghosts, FIT export with position and laps, route passport and badges, weekly featured route and climbing target, route map and segments in ride history.
 - Free ride Phase G: crew leaderboards, the 2D layout caught up, offline rides keep their history, route flyovers and loading cards, summit and finish moments with a postcard, settings (units, camera distance, colour-blind gradients, reduced motion, sound mix), a frame-time monitor with a low-power level, phone and tablet layouts, offline routes, and the owner's checklist in `docs/owner-checks.md`.
+- One HUD across all three ride screens: the solo workout player and the Zombie Bus now use the free-ride HUD's power panel, clock, rider list, menu, toasts, clean view and display size. The end-to-end ride test passes.
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
@@ -43,6 +44,7 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Shared HUD leftovers: the bus status block, shop, Madness board and TV board keep the older bordered glass; Large display size on a 1024 px tablet and Huge at 720p overlap; the solo menu covers the power panel; the 3-2-1 tone, media corner, ghost and heart-rate display were not looked at after the change.
 - Phase G gaps: the group-ride podium is on the results screen, not in the 3D world; imperial units are not applied on History screens, short metre countdowns or chart axes; frame rates are software-renderer numbers only (Auto now settles at Low power: 10 to 16 fps on the three measured routes); the flyover runs well over its 7 s in software.
 - Phase F gaps: no crew leaderboard screen yet (the endpoints exist); a ride finished offline queues its segment efforts but still loses its history entry; no mate-ghost picker in the group lobby; the 2D layout has no segment panel. Group-ride splits, mate ghosts, offline sync and scrap payouts are unit-tested only, and no FIT file has been uploaded to Strava.
 - The weekly challenge week starts Monday local time, unlike the older streak week (Sunday UTC). `config.ts` (335 lines) and `freeRide.ts` (308) are over the 300-line guide.
