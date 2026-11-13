@@ -160,3 +160,19 @@ Two people, two browsers (or two tabs logged in as different riders), simulated 
 - Race: in the lobby pick Race. Keep together turns off. Same ride, nobody is towed.
 - Look for: a rider jumping backwards or forwards (the correction should be invisible), riders drawn on top of each other, the chip flickering on and off, a rider list that disagrees with what you see, your own speed feeling laggy against the pedals.
 - Solo free ride must be unchanged: Start (not Group ride) with the server stopped still rides, pauses and finishes as before.
+
+## Free ride Phase F: reasons to come back
+
+Everything here was built against the simulated trainer and looked at in still screenshots from headless Chromium (software rendering), with the ride sped up by `?fast=`. Nobody has ridden it. Use a throwaway database (`ZB_DB=/tmp/x.db`) when trying it.
+
+Segments and ghosts
+1. Free ride, Willunga Hill, simulator. On the climb the climb panel gains a column: the segment's name, the time so far, and nothing else on a first go.
+2. Finish. The summary has a Segments card: the climb, the sprint and the whole route, each "First go".
+3. Ride it again. The start bar now offers "◌ Your PR". On the road a pale see-through rider sets off with you and "◌ Your PR" is in the rider list with a gap.
+4. Push harder than last time (arrow up on the simulator). The climb column shows "−0:0x vs PR" in green; ease off and it turns red with a plus.
+5. Finishing a segment faster gives a "New PR!" toast with a jingle that stays about 7 s. The summary marks it "PR by ...".
+6. Log in as a second rider, ride the same route slower: the splits also show "+0:xx vs <first rider>", and the setup screen offers the first rider's ghost in the list of mates.
+7. Lap ride (Nundah crit, 3 laps): every lap is a row in the Segments card; a faster lap gets the PR toast instead of the plain lap toast; the ghost keeps lapping at its best lap.
+8. Offline: stop the server mid-ride and finish. The summary still shows the segments. Start the server and log in again: `GET /api/efforts/mine` lists them.
+9. Group ride with a bot on a route you have a best on: your ghost is there for you only, and the drafting chip never lights up from the ghost.
+

@@ -30,7 +30,10 @@ function home(p: Profile = profile) {
   profile = p
   showHome(profile, {
     drill: (plan) => (keepAwake(true), runDrill(plan, profile, currentTrainer()!, home)),
-    freeRide: (r) => (keepAwake(true), runFreeRide(r, profile, currentTrainer()!, home)),
+    freeRide: (r, ghosts) => (
+      keepAwake(true),
+      runFreeRide(r, profile, currentTrainer()!, home, undefined, ghosts)
+    ),
     groupRide: (route, laps) => (
       keepAwake(true),
       groupRide(null, { route, laps }, profile, currentTrainer()!, home)

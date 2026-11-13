@@ -505,3 +505,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Offline: efforts go to a queue in localStorage beside this device's copy of the rider's bests (`core/efforts.ts`); the queue is sent after every effort and at login, and holds at most 200 (`CFG.segments.queueMax`). Rides themselves still have no offline queue (they never had one), so an offline ride keeps its segment times and PRs but not its history entry.
 - Limits (server `config.py`): an effort under 24 h, a trace of at most 6,000 points, 500 efforts a post.
 
+### Ghosts
+- A ghost is a best effort over the whole route (one lap, on a circuit) ridden again. Whole-route and lap efforts keep a trace: metres from the start every 5 s (`CFG.segments.traceS`), so a two-hour ride is about 1,400 small numbers. The server keeps the trace only for each rider's best on a segment; this device keeps its own best's trace in localStorage so the ghost works offline.
+- On a lap ride the ghost rides its best lap over and over from the start of the ride, so by lap 5 it is five best laps up the road. It is not restarted at the line each lap.
+- The ghost starts when the ride clock starts and runs on the ride clock, so it stops when a solo ride is paused.
+- Setup screen: once a route has a best, the start bar shows "◌ Your PR 12:34" ticked by default, and a list of mates who have a best on it (from the route's leaderboard) to pick one from. Up to two ghosts ride: yours and one mate's. A group ride brings your own PR ghost along automatically, seen only by you; there is no mate picker in the lobby.
+- Ghosts are only ever positions that are drawn and listed: they are not sent to the server, are not in the drafting sum, and do not count for the keep-together median. The ride loop adds them to the drawn and listed riders after the server's riders are read, and nothing reads them back.
+- Drawn see-through and pale (`VIS.route.ghost`: 40% solid, 55% towards white, in the debug panel under "Ghost riders"), 1.2 m and 2.3 m right of the rider's lane so they do not sit inside the rider. In the rider list a ghost has a ring mark (◌), italics, no W/kg, and the usual gap.
+- Not looked at in motion: the ghost was checked in still screenshots only.

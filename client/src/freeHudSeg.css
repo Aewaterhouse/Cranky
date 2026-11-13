@@ -42,6 +42,11 @@
 .seg-lines .down {
   color: #ff8a7a;
 }
+/* A ghost in the rider list: a best effort, not a rider. */
+.rrow.ghost .rn {
+  font-style: italic;
+  opacity: 0.75;
+}
 /* A PR or crew best holds the toast longer and a size up. */
 .fr-toast.big {
   font-size: calc(3 * var(--u));

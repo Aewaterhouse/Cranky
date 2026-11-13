@@ -31,6 +31,27 @@ export interface RoadRider {
   effort?: number
   /** Arms up: over the top or at the finish. */
   cheer?: boolean
+  /** A best effort ridden again: drawn see-through. */
+  ghost?: boolean
+}
+
+const WHITE = new THREE.Color('#ffffff')
+/** Makes a figure see-through and pale. Its materials are copied first: riders share some. */
+function ghostify(root: THREE.Object3D) {
+  root.traverse((o) => {
+    const m = o as THREE.Mesh
+    if (!m.isMesh) return
+    const one = (src: THREE.Material) => {
+      const c = src.clone() as THREE.MeshLambertMaterial
+      c.transparent = true
+      c.opacity = VIS.route.ghost.opacity
+      c.depthWrite = false
+      c.color?.lerp(WHITE, VIS.route.ghost.pale)
+      return c
+    }
+    m.material = Array.isArray(m.material) ? m.material.map(one) : one(m.material)
+    m.castShadow = false
+  })
 }
 
 interface Entry {
@@ -79,6 +100,7 @@ export class RoadRiders {
         e.now = newRoadPose()
         r.tag.scale.multiplyScalar(TAG_SCALE)
         r.label(s.name, null, 'riding')
+        if (s.ghost) ghostify(r.root)
         this.group.add(r.root)
         this.map.set(s.id, e)
         this.list.push(e)

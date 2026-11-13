@@ -86,8 +86,8 @@ The fun is in the riding, but the information has to be as good as the establish
 Built against simulated trainers and one PC only: not yet ridden by two people on two devices, on real trainers or over a slow network. How to add a road game on top: `docs/road-games.md`.
 
 ### Phase F: reasons to come back (M)
-- [ ] Segments: climbs found automatically plus named ones, with a live split against your best and the crew's best.
-- [ ] Ghosts: your PR and a chosen mate's best as see-through riders.
+- [x] Segments: climbs found automatically plus named ones, with a live split against your best and the crew's best.
+- [x] Ghosts: your PR and a chosen mate's best as see-through riders.
 - [ ] FIT export with position, altitude, distance and speed, so an upload to Strava shows the real map.
 - [ ] Route passport: a map of Australia that fills in as you finish routes; badges for repeats and vertical metres.
 - [ ] Weekly featured route and a vertical-metre challenge, paying scrap for the garage.

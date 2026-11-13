@@ -31,6 +31,8 @@ export interface ListRider {
   d: number
   /** Watts per kilo, when known. */
   wkg?: number
+  /** A best effort ridden again, not a rider. */
+  ghost?: boolean
 }
 export interface RiderRow {
   id: string
@@ -39,6 +41,7 @@ export interface RiderRow {
   /** Metres ahead of me (negative: behind). */
   gapM: number
   me: boolean
+  ghost?: boolean
 }
 
 /**
@@ -57,6 +60,7 @@ export function riderRows(riders: ListRider[], meId: string, c = CFG.hud.riders)
     wkg: r.wkg,
     gapM: r.d - me.d,
     me: r === me,
+    ghost: r.ghost,
   }))
 }
 
