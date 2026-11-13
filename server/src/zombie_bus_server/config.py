@@ -28,6 +28,10 @@ TIERS = ["hard", "medium", "easy"]
 FELL_COMPLIANCE = 0.6
 FELL_AFTER_S = 30
 FELL_COOLDOWN_S = 60
+# While riders are off the bus everyone still on it carries them: targets rise by FELL_LOAD per fallen
+# rider, up to FELL_LOAD_MAX in all. The 150% FTP cap still applies.
+FELL_LOAD = 0.05
+FELL_LOAD_MAX = 0.15
 HAUL_S = 20
 HAUL_MIN = 0.85
 HAUL_SCRAP = 30

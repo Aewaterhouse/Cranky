@@ -32,6 +32,8 @@ export interface HudOpts {
   /** What the End button says: the host ends the ride for everyone, anyone else leaves the bus. */
   quitLabel?: () => string
   onBuy?: (item: ShopItem) => void
+  /** ERG switch: `erg` is the state to show; `slope(d)` steps the gradient when ERG is off and returns it. */
+  erg?: { on: () => boolean; toggle: () => void; slope: (d: number) => number }
   /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
   mad?: string[]
 }
@@ -70,6 +72,20 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const toggle = (part: string) => root.classList.toggle(`hud-${part}`)
   const m = hudMenu()
   const quit = m.item('End ride', '', onQuit, 'danger')
+  const ergLabel = h('span', {})
+  const ergItems = o.erg
+    ? [
+        m.item(ergLabel, 'E', () => (o.erg!.toggle(), paintErg())),
+        m.item('Easier', '↓', () => toast.show(`Gradient ${o.erg!.slope(-1).toFixed(0)}%`)),
+        m.item('Harder', '↑', () => toast.show(`Gradient ${o.erg!.slope(1).toFixed(0)}%`)),
+      ]
+    : []
+  const paintErg = () => {
+    const on = o.erg?.on() ?? true
+    ergLabel.textContent = on ? 'ERG: on' : 'ERG: off'
+    ergItems.slice(1).forEach((b) => (b.hidden = on))
+  }
+  paintErg()
   m.el.append(
     h('h2', {}, o.plan?.name ?? 'Zombie Bus'),
     h('label', {}, 'Your tier', tier),
@@ -77,6 +93,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       m.item('Stats', 'S', () => toggle('stats')),
       m.item('Crew', 'R', () => toggle('riders')),
       m.item('Clean view', 'H', () => toggle('clean')),
+      ...ergItems,
       quit,
     ),
     m.size(),
@@ -130,7 +147,15 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
     const part = KEYS[e.key.toLowerCase()]
-    if (!part || e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT') return
+    const typing = e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT'
+    if (o.erg && !typing) {
+      // E switches ERG; with it off the arrows set the gradient.
+      const step = e.key === 'ArrowUp' ? 1 : e.key === 'ArrowDown' ? -1 : 0
+      if (e.key.toLowerCase() === 'e') return (e.preventDefault(), o.erg.toggle(), paintErg())
+      if (step && !o.erg.on())
+        return (e.preventDefault(), toast.show(`Gradient ${o.erg.slope(step).toFixed(0)}%`))
+    }
+    if (!part || typing) return
     e.preventDefault()
     toggle(part)
   }

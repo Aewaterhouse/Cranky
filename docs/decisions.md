@@ -689,3 +689,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - The free-ride look-ahead still applies: the road gradient fed into that sum is the one a second or two up the road (`trainerTarget` in `modes/freeRide/feel.ts`).
 - His gear tile and shift-strength slider were written for the old tile layout. They now sit in the 2D free-ride layout (tile in the top row, slider beside trainer difficulty), the 3D HUD's menu (slider; the HUD already has a gear chip) and the solo player's mode switch for Slope mode. Settings has the slider too. None of these placements has been looked at in a browser.
 - `gearText` is kept for the solo mode switch's read-out.
+
+## Zombie Bus: riding without ERG, and fallen riders load the rest (2026-11-14)
+- Owner request, built quickly and not tested beyond type-check, lint and the existing suites: no new tests, never ridden.
+- ERG can be switched off on the bus (menu, or `E`). The trainer then gets a gradient the rider sets with ↑ ↓ (menu: Easier / Harder), starting at 2% in the solo slope range, through `ergController.setGrade`; the block target is still shown and scored. The choice is remembered per device (`settings.busErg`). Virtual gears are not wired in on the bus.
+- While anyone is off the bus, every rider still on it gets a higher target: +5% per fallen rider, up to +15% (`FELL_LOAD`, `FELL_LOAD_MAX` in the server config), until they are hauled back. The 150% FTP cap still applies, sprint blocks still have no target, and the fallen rider's own target is not raised. Bots chase the raised target too. This can snowball: a harder target makes the next fall more likely, which is the point, but the numbers may want softening after a real ride.

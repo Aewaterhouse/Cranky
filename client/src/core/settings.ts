@@ -14,6 +14,8 @@ export interface Settings {
   colourBlind: boolean
   /** Spoken commentary during bus rides. */
   announcer: boolean
+  /** Zombie Bus: false rides without ERG (a gradient you set yourself); targets are then only scored. */
+  busErg: boolean
   /** Dry remarks during free rides. */
   quips: boolean
   /** Free ride as the 3D road world, or the flat charts-and-map layout. */
@@ -47,6 +49,7 @@ const DEFAULTS: Settings = {
   hudScale: 0,
   colourBlind: false,
   announcer: true,
+  busErg: true,
   quips: true,
   freeRideView: '3d',
   chainring: CFG.gears.chainring,

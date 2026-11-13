@@ -1,4 +1,5 @@
 import { CFG } from '../../config'
+import { saveSettings, settings } from '../../core/settings'
 import type { Profile } from '../../core/curve'
 import { frameAt, planTotal } from '../../core/plan'
 import { saveProfile } from '../../core/profile'
@@ -65,6 +66,9 @@ export function startBusRide(
   const isHost = () => l.host === profile.id
   const looks = () => Object.fromEntries(l.riders.map((r) => [r.id, r.look]))
   let lk = looks()
+  // Non-ERG riding: the trainer gets a gradient the rider sets; targets still score. All writes stay in ergController.
+  let busGrade: number = CFG.ride.gradeStart
+  const applyErg = () => (settings.busErg ? ride.erg.setErg() : ride.erg.setGrade(busGrade))
   const hud = makeHud(
     (t) => {
       profile.tier = t
@@ -76,6 +80,26 @@ export function startBusRide(
       else if (!isHost() && confirm('Leave the bus?')) leave()
     },
     {
+      erg: {
+        on: () => settings.busErg,
+        toggle: () => {
+          saveSettings({ busErg: !settings.busErg })
+          applyErg()
+          hud.toast(
+            settings.busErg
+              ? 'ERG on: the trainer holds your target'
+              : 'ERG off: hold the target yourself. ↑ ↓ change the gradient',
+          )
+        },
+        slope: (d) => {
+          busGrade = Math.min(
+            CFG.ride.grade[1],
+            Math.max(CFG.ride.grade[0], busGrade + d * CFG.ride.gradeStep),
+          )
+          applyErg()
+          return busGrade
+        },
+      },
       plan,
       tier: profile.tier,
       rec: ride.rec,
@@ -102,6 +126,7 @@ export function startBusRide(
       4000,
     )
   ride.start()
+  if (!settings.busErg) applyErg()
   const sender = setInterval(() => {
     const v = ride.live
     const hr = currentHr()

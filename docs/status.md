@@ -44,6 +44,7 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Zombie Bus non-ERG mode and the fallen-rider load on everyone else's targets were added on 2026-11-14 without tests or a ride (owner asked for speed). Check both on the next bus ride.
 - Shared HUD leftovers: the bus status block, shop, Madness board and TV board keep the older bordered glass; Large display size on a 1024 px tablet and Huge at 720p overlap; the solo menu covers the power panel; the 3-2-1 tone, media corner, ghost and heart-rate display were not looked at after the change.
 - Phase G gaps: the group-ride podium is on the results screen, not in the 3D world; imperial units are not applied on History screens, short metre countdowns or chart axes; frame rates are software-renderer numbers only (Auto now settles at Low power: 10 to 16 fps on the three measured routes); the flyover runs well over its 7 s in software.
 - Phase F gaps: no crew leaderboard screen yet (the endpoints exist); a ride finished offline queues its segment efforts but still loses its history entry; no mate-ghost picker in the group lobby; the 2D layout has no segment panel. Group-ride splits, mate ghosts, offline sync and scrap payouts are unit-tested only, and no FIT file has been uploaded to Strava.

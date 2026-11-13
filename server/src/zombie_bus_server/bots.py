@@ -43,7 +43,7 @@ class Brain:
                 room.mode.on_sprint(r, self.last_i, grade, self.combo)
             self.last_i = i
         comp = self.compliance(room.el, dt)
-        tgt = r.target(blocks[i], bel) if i >= 0 else None
+        tgt = r.target(blocks[i], bel, getattr(room, "load", 1.0)) if i >= 0 else None
         if tgt is not None:
             jitter = rng.uniform(1 - C.BOT_POWER_JITTER, 1 + C.BOT_POWER_JITTER)
             w = tgt * jitter * min(1.0, comp / C.BOT_COMP[0])

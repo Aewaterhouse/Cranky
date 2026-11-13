@@ -262,7 +262,8 @@ class ZombieBus:
                 self.hauls[r.id] = {"until": room.el + C.HAUL_S, "sum": 0.0, "n": 0}
                 self.emit(
                     "fell",
-                    f"{r.name} fell off the bus! Dropped to {r.tier}. Hold it to haul them back!",
+                    f"{r.name} fell off the bus! Dropped to {r.tier}. "
+                    f"Everyone else's targets go up {round(C.FELL_LOAD * 100)}% until they are hauled back!",
                     r.id,
                 )
 

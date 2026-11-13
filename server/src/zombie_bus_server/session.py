@@ -87,9 +87,20 @@ class Rider:
     def from_dict(cls, d: dict) -> Rider:
         return cls(**d)
 
-    def target(self, b: dict, bel: float) -> int | None:
+    def target(self, b: dict, bel: float, load: float = 1.0) -> int | None:
+        """Returns the rider's target in watts (None on sprint blocks), never over 150% FTP.
+
+        Args:
+            b: The current block.
+            bel: Seconds into the block.
+            load: Multiplier for riders still on the bus while others have fallen off.
+        """
         f = block_target(b, self.tier, bel)
-        return None if f is None else min(round(f * self.ftp), round(self.ftp * 1.5))
+        if f is None:
+            return None
+        if self.st != "riding":
+            load = 1.0
+        return min(round(f * self.ftp * load), round(self.ftp * 1.5))
 
 
 class Room:
@@ -355,6 +366,8 @@ class Room:
         loc = locate(blocks, self.el) if self.el >= 0 else None
         i, bel = loc if loc else (-1, 0.0)
         ev = event_for(blocks, i) if i >= 0 else "warmup"
+        fallen = sum(r.st == "fell" for r in self.riders.values())
+        load = self.load = 1 + min(C.FELL_LOAD_MAX, C.FELL_LOAD * fallen)
         bots.drive(self, dt, i, bel)
         self.update_states(dt)
         fx = self.mode.tick(self, dt, i, bel, ev) if i >= 0 else []
@@ -362,7 +375,7 @@ class Room:
             r.id: {
                 "name": r.name,
                 "tier": r.tier,
-                "tgt": r.target(blocks[i], bel) if i >= 0 else None,
+                "tgt": r.target(blocks[i], bel, load) if i >= 0 else None,
                 "w": round(r.w),
                 "cad": round(r.cad),
                 "s": r.s,
