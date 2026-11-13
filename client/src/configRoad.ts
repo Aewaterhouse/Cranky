@@ -39,6 +39,10 @@ export const ROAD_CFG = {
     /** Workouts: the "Next" chip shows this many seconds before a change; the countdown starts this many seconds out. */
     nextS: 10,
     countS: 3,
+    /** Bus: a target change is counted down from this many seconds, and a block is not scored for its first
+     *  `busGraceS` seconds while the crew gets onto the new watts. */
+    busWarnS: 5,
+    busGraceS: 5,
     /** The interval summary stays this long (real seconds), and the interval list shows this many rows. */
     summaryS: 5,
     intervalRows: 7,

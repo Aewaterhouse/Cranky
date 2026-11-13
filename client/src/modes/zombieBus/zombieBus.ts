@@ -1,4 +1,5 @@
 import { CFG } from '../../config'
+import { busScore } from '../../core/hud'
 import { saveSettings, settings } from '../../core/settings'
 import type { Profile } from '../../core/curve'
 import { frameAt, planTotal } from '../../core/plan'
@@ -135,7 +136,7 @@ export function startBusRide(
       p: v.power,
       w: Math.round(v.avg),
       cad: v.cadence,
-      s: ride.frame?.tgt ? v.c : null,
+      s: busScore(ride.frame, v.c),
       hr,
       hrp: hr && profile.maxHr ? Math.round((hr / profile.maxHr) * 100) / 100 : null,
     })

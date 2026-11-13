@@ -127,3 +127,20 @@ export function windText(ms: number, units: Units = 'metric') {
   const v = Math.round(speedIn(Math.abs(ms), units))
   return v < 1 ? 'Still' : `${ms > 0 ? 'Head' : 'Tail'} ${v} ${unitNames(units).speed}`
 }
+
+/**
+ * The bus's warning before a target change: the seconds left (whole, counting down from `busWarnS`) and what is
+ * coming. Nothing when the target stays the same, and nothing before a sprint, which has its own countdown.
+ */
+export function busWarn(
+  f: { tgt: number | null; next?: { type: string; in: number; tgt: number | null } },
+  warnS = CFG.hud.busWarnS,
+) {
+  const n = f.next
+  if (!n || n.type === 'sprint' || n.tgt === f.tgt || n.in > warnS || n.in <= 0) return null
+  return { s: Math.ceil(n.in), text: n.tgt == null ? 'Next: free ride' : `Next: ${n.tgt} W` }
+}
+
+/** The bus's score to send: none in a block with no target, or in the first `busGraceS` seconds of a block. */
+export const busScore = (f: { tgt: number | null; bel: number } | null, c: number | null) =>
+  f?.tgt && f.bel >= CFG.hud.busGraceS ? c : null

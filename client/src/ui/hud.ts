@@ -6,6 +6,8 @@ import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
 import { busAim } from '../core/aim'
+import { busWarn } from '../core/hud'
+import { SFX } from './audio'
 import type { Live } from '../modes/rideController'
 import type { RideRecorder } from '../core/ride'
 import type { ShopItem, Tick } from '../net/protocol'
@@ -98,6 +100,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     ),
     m.size(),
   )
+  const nextChip = h('div', { class: 'glass nchip off' })
+  const count = h('div', { class: 'count off' })
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
   const root: HTMLElement = h(
     'div',
@@ -106,7 +110,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       'div',
       { class: 'rhud bhud' },
       h('div', { class: 'hud-tl' }, power.el, ...(stats ? [stats.root] : [])),
-      h('div', { class: 'hud-tc' }, header.root, sprint),
+      h('div', { class: 'hud-tc' }, header.root, sprint, nextChip, count),
       h('div', { class: 'hud-tr' }, roster.root),
       h(
         'div',
@@ -169,6 +173,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   fit()
   let lastI = -2
   let lastCount = 0
+  let lastWarn = 0
   let rbProg: number | null = null
   const bestSprint = (live: Live) => {
     const best = Math.max(0, ...(o.rec?.sprints.map((s) => s.avg) ?? []))
@@ -216,10 +221,20 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           root.style.setProperty('--ev', s.col)
         }
       }
-      const count = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
-      if (count !== lastCount && count > 0 && count <= 3)
-        sp.splash('sp-count', `${count}`, 'SPRINT INCOMING', 1000, 2)
-      lastCount = count
+      const toSprint = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
+      if (toSprint !== lastCount && toSprint > 0 && toSprint <= 3)
+        sp.splash('sp-count', `${toSprint}`, 'SPRINT INCOMING', 1000, 2)
+      lastCount = toSprint
+      // 5-4-3-2-1 with the solo player's tone before the target changes
+      const warn = busWarn(f)
+      nextChip.classList.toggle('off', !warn)
+      count.classList.toggle('off', !warn)
+      if (warn && warn.s !== lastWarn) {
+        nextChip.textContent = warn.text
+        count.textContent = String(warn.s)
+        SFX.countdown()
+      }
+      lastWarn = warn?.s ?? 0
     },
     /** Before the bus leaves: show live power and a big countdown. */
     countdown(n: number, live: Live) {
