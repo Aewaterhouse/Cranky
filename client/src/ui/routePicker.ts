@@ -120,16 +120,41 @@ export function routePicker(
 ) {
   let state = 'all'
   let len = 'all'
-  const list = h('div', { class: 'route-grid' })
+  const list = h('div', {})
   const feat = featuredRoute(ROUTE_INDEX)?.id
   const paint = () => {
     const shown = ROUTE_INDEX.filter(
       (r) =>
         (state === 'all' || r.region === state) && (len === 'all' || lengthClass(r.km) === len),
     )
+    // The crew's own recordings first, then the routes drawn from map data.
+    const section = (title: string, note: string, rs: RouteSummary[]) =>
+      rs.length
+        ? [
+            h('h3', { class: 'route-sec' }, title, h('span', { class: 'dim' }, note)),
+            h(
+              'div',
+              { class: 'route-grid' },
+              ...rs.map((r) =>
+                card(p, r, r.id === selected(), () => pick(r), r.id === feat, paint),
+              ),
+            ),
+          ]
+        : []
     list.replaceChildren(
       ...(shown.length
-        ? shown.map((r) => card(p, r, r.id === selected(), () => pick(r), r.id === feat, paint))
+        ? [
+            ...section(
+              'Real rides',
+              "Cut from the crew's own recordings",
+              shown.filter((r) => r.real),
+            ),
+            ...section(
+              'Classic climbs and roads',
+              'Built from map data',
+              shown.filter((r) => !r.real),
+            ),
+          ]
         : [
             h(
               'p',

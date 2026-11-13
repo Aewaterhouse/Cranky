@@ -25,6 +25,8 @@ export interface RouteSummary {
   profile: number[]
   /** A circuit: laps can be chosen. */
   loop?: boolean
+  /** Cut from one of the crew's own recordings, not drawn from map data. */
+  real?: boolean
 }
 /** The lazy-loaded pack for one route; `pts` are [lat, lon, ele]. */
 export interface RoutePack {

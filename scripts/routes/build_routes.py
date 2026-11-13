@@ -251,7 +251,8 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
             grid["cover"] = old["terrain"].get("cover")
         kept = "old" if "features" in pack else "no"
         print(f"     {spec['id']}: map server refused ({err}); kept {kept} features")
-    return pack, {**head, **s, "smoothM": window}, problems
+    real = {"real": True} if "gpx" in spec else {}  # cut from a crew recording, not drawn from map data
+    return pack, {**head, **real, **s, "smoothM": window}, problems
 
 
 def put(file: Path, text: str) -> None:

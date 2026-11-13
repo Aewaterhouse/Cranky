@@ -309,3 +309,4 @@ Built against the simulated trainer and looked at in still screenshots from head
 - VO2 Madness on gears: in the lobby pick VO2 Madness and Gears; in the ride the GEAR tile shows and Z X shift; the effort leaderboard still scores heart rate.
 - Trainer mode per ride: as driver pick 🚲 Trainers "All gears"; a second rider's ERG / Gears switch hides and their seat shows "⚙ Gears". In the ride `E` only shows a toast. Back to "Each rider" and their own pick returns.
 - Drafting: in a group-ride lobby the host sees Drafting Off / Realistic / Strong; a guest sees the level and what it means. In the ride on Strong behind bots, the HUD's drafting watts climb as more riders are close ahead.
+- Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import { CFG } from '../src/config'
-import { difficulty, estimateSeconds, lengthClass, packToRoute } from '../src/core/routeLibrary'
+import {
+  ROUTE_INDEX,
+  difficulty,
+  estimateSeconds,
+  lengthClass,
+  packToRoute,
+} from '../src/core/routeLibrary'
 import { FIXTURE_PACK } from './fixtures/routePack'
 
 describe('routeLibrary', () => {
@@ -33,5 +39,23 @@ describe('routeLibrary', () => {
     const flat = estimateSeconds(20, 0, 200)
     expect(estimateSeconds(20, 1000, 200)).toBeGreaterThan(flat)
     expect(estimateSeconds(40, 0, 200)).toBeGreaterThan(flat)
+  })
+})
+
+describe('real rides', () => {
+  it("marks the routes cut from the crew's recordings, and only those", () => {
+    expect(
+      ROUTE_INDEX.filter((r) => r.real)
+        .map((r) => r.id)
+        .sort(),
+    ).toEqual([
+      'darren-smith',
+      'full-gas-friday',
+      'howick-street-crit',
+      'metros-road-race',
+      'mondo',
+      'mount-coot-tha-back',
+      'nundah-crit',
+    ])
   })
 })

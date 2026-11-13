@@ -298,3 +298,16 @@
   padding: 4px 10px;
   font-size: 0.78rem;
 }
+/* Route picker sections: the crew's real rides, then the map-built routes */
+.route-sec {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 16px 0 8px;
+  font-size: 1rem;
+}
+.route-sec .dim {
+  font: 500 0.8rem var(--ui);
+  letter-spacing: 0;
+  text-transform: none;
+}

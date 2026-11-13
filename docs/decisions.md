@@ -767,3 +767,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 - Replaced the old wheel/bunch/cap model with a count of riders ahead: each counts fully inside 1.5 m and decays `exp(-(gap - 1.5) / 6)`, cut at 30 m. The count indexes a per-level table of CdA savings, interpolated between whole riders. Strong (default): 0, 0.3, 0.5, 0.7, 0.85, 0.95. Realistic: 0, 0.25, 0.38, 0.47, 0.54, 0.6. Off: 0. "A pack of five" read as five riders close ahead.
 - The owner's "at a reference speed" is read as these being drag savings; the watts saved still grow with speed as drag does.
 - Trainer: the gradient sent drops by `100 · ½ρ·CdA·(1 − draft)·v² / (m·g)`, the drag saved expressed as a slope. About 0.8% on one wheel at 40 km/h, about 2.5% deep in a strong pack.
+
+## Route sections (2026-11-14)
+- A route is a "real ride" when its spec in scripts/routes/routes.json has a recording (`gpx`, which also takes FIT files). The flag sits in the index, not hard-coded in the client, so a new recorded route lands in the right section by itself. The map-data section is called "Classic climbs and roads".
