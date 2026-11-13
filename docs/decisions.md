@@ -484,3 +484,18 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - `freeRide.ts` lost its key map to `keys.ts` to stay near 300 lines; solo free ride runs the same loop with no link and behaves as before (same tests, same numbers).
 - The one ERG write in a road ride is the existing fail-safe when the ride stops (50% of FTP, then release), as in every other mode. During the ride the trainer only gets `setGrade`; `tests/roadLink.test.ts` and `test_road_multiplayer.py` check both ends.
 - Not built: imported GPX routes in a group ride (the server only has the bundled packs), a postcard for road rides, Discord post, scrap for finishing.
+
+## 2026-11-14 Free ride Phase F: reasons to come back
+
+### Segments
+- Every route gets its segments worked out from the route itself (`core/segments.ts`), nothing hand-made: each sustained climb (the same detection as the HUD's climb panel), one sprint, and the whole route. On a circuit the whole route is "one lap" instead, and a lap ride of any length has the same segments as its lap; a ride of N laps is not a segment of its own.
+- A climb is named after a named peak or lookout within 400 m of its top when the pack has one (`CFG.segments.poiM`), with a number if two climbs share it; otherwise "<route> · climb N" in road order.
+- The sprint is 300 m (`sprint.lenM`): the last stretch on the route (so nearest the finish, or the line on a circuit) with no gradient past 2% either way; when a route has none, the flattest 300 m. Routes under 600 m get no sprint.
+- Segment ids are `<route id>:<kind>:<start rounded to 100 m>` (`idRoundM`), so they survive a session and a small rebuild of a pack. A rebuild that moves a climb's start by more than that makes a new segment and orphans the old efforts.
+- Timing uses the ride clock (moving time in a solo ride, so a pause does not count; the server's clock in a group ride) and is taken at the line, not at the 200 ms tick. Average power is work over the time. With `?fast=N` times are game time.
+- Live splits have no recorded pace for the best to compare with on climbs and sprints, so the best time is shared out along the segment by how long a steady 200 W, 75 kg rider would take to each point (`modelW`). It is exact at the end and close on the way; it is not a replay of the PR.
+- "Crew" in a split is the fastest rider other than you. Taking the crew best means beating that time with a PR you had not already beaten it with.
+- The panel: on a climb the segment is a column of the existing climb panel (name, time, splits); a sprint gets a small panel in the same place, from 100 m out. The whole route or lap split is a row in the stats drawer ("This ride" / "This lap"), not a panel. The flat (charts) layout gets the toasts and results but no panel.
+- Results: a toast for every finished climb and sprint; a PR or first go gets the three-note jingle and holds 7 s (`CFG.hud.toastBigS`), a crew best the five-note one, and both are spoken when the announcer is on. A lap that is not a PR only gets the usual lap toast. Lines are in `fun/segmentLines.ts`, picked from the time so the same result always says the same thing.
+- Efforts are saved as they are finished (not at the end of the ride), so a crash keeps them. A late join or rejoin in a group ride (a jump of more than 40 m) drops any go under way and starts none.
+

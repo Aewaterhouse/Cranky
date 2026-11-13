@@ -170,6 +170,8 @@ export const CFG = {
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
     toastS: 3,
+    /** A PR or crew-best toast stays this long. */
+    toastBigS: 7,
     /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */
     phoneMaxH: 500,
     /** No ETA to the top below this speed (m/s). */
@@ -270,6 +272,25 @@ export const CFG = {
       gainForLevel: [150, 400, 800, 1400],
       steepPct: 6,
     },
+  },
+  /** Segments and ghosts (free ride Phase F). */
+  segments: {
+    /** Segment ids carry the start rounded to this many metres, so a small pack rebuild keeps them. */
+    idRoundM: 100,
+    /** The sprint: this long, nowhere steeper than `flatPct` either way; the panel shows `leadM` before it. */
+    sprint: { lenM: 300, flatPct: 2, leadM: 100 },
+    /** A climb takes the name of a named peak or lookout within this far of its top (m). */
+    poiM: 400,
+    /** Live splits share a best time out along the segment by the time a steady `modelW` rider would take. */
+    modelW: 200,
+    /** Whole-route and lap efforts keep the distance every `traceS` seconds, for ghosts. */
+    traceS: 5,
+    /** A group-ride position jump bigger than this (m) is a late join, not riding: no segment starts or ends. */
+    jumpM: 40,
+    /** Efforts kept waiting for the server at most. */
+    queueMax: 200,
+    /** How solid a ghost rider is drawn (0 to 1). */
+    ghostOpacity: 0.38,
   },
   /**
    * Group rides. `draft` and `band` mirror DRAFT_* and BAND_* in the server's config.py (the server decides; the

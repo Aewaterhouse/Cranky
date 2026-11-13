@@ -9,6 +9,7 @@ import { ZONE_COLOURS } from './planGraph'
 import { groupSection, postcard } from './resultsGroup'
 import { roadSection } from './roadResults'
 import type { RoadSummary } from '../net/protocol'
+import { segmentSection } from './segResults'
 import { segsFromSeries } from './soloSegs'
 import { workoutChart } from './workoutChart'
 
@@ -231,6 +232,7 @@ export function finishRide(
         : '',
       group ? groupSection(group, profile.id) : '',
       road ? roadSection(road, profile.id) : '',
+      segmentSection(s.segments),
       ftpBox,
       h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
       h(

@@ -23,6 +23,7 @@ import { RoadFeel, cheering, trainerTarget } from './feel'
 import { makeGhosts, stepGhosts } from './ghosts'
 import { freeKeys } from './keys'
 import { Quipper, speak } from './quips'
+import { rideExtras } from './rideExtras'
 import type { RoadLink } from './roadLink'
 
 const STOP_S = 3
@@ -98,6 +99,13 @@ export function runFreeRide(
   const kg = profile.weightKg || F.defaultKg
   const lapM = route.lapOf?.distance
   const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
+  const extras = rideExtras(
+    route,
+    { id: profile.id, kg },
+    ride.rec,
+    (t, secs) => view.toast(t, secs),
+    !!link,
+  )
   let world: RouteWorld | undefined
   const feel = new RoadFeel(route)
   const sound = rideSound()
@@ -234,6 +242,7 @@ export function runFreeRide(
       view.toast(lapToast(now, clock))
       SFX.bell(now.n === now.of ? CFG.sound.bell.lastRings : 1)
     }
+    const seg = extras.tick(dist, el, paused ? 0 : live.power)
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
@@ -256,6 +265,7 @@ export function runFreeRide(
       riders: [{ ...me, wkg: live.avg / kg }, ...others],
       me: me.id,
       lap,
+      ...seg,
       wind: settings.wind === 'off' || link ? undefined : wind,
       group: link && { draftW: draftSaving(speed, draft), band },
       banner: link?.banner(),
@@ -294,6 +304,7 @@ export function runFreeRide(
     world?.dispose()
     sound?.stop()
     await ride.stop()
+    extras.finish(dist)
     finishRide(
       profile,
       ride.rec.summary(),

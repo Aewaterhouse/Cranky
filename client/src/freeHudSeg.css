@@ -1,0 +1,59 @@
+/* Free-ride HUD: the segment being timed. A column of the climb panel on a climb, its own small panel otherwise. */
+.seg-col,
+.fhud .segbox {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: calc(0.3 * var(--u));
+  white-space: nowrap;
+}
+.seg-col {
+  padding-left: calc(1.5 * var(--u));
+  border-left: 1px solid rgb(255 255 255 / 0.18);
+}
+.fhud .segbox {
+  padding: calc(0.8 * var(--u)) calc(1.6 * var(--u));
+}
+.seg-name {
+  max-width: calc(34 * var(--u));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: calc(1.8 * var(--u));
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--acc);
+}
+.seg-lines {
+  display: flex;
+  flex-direction: column;
+  font: 600 calc(2.2 * var(--u)) / 1.2 var(--ui);
+  font-variant-numeric: tabular-nums;
+}
+.fhud .segbox .seg-lines {
+  flex-direction: row;
+  gap: calc(1.6 * var(--u));
+}
+.seg-lines > span:first-child {
+  font-size: 1.2em;
+}
+.seg-lines .up {
+  color: #7fe07a;
+}
+.seg-lines .down {
+  color: #ff8a7a;
+}
+/* A PR or crew best holds the toast longer and a size up. */
+.fr-toast.big {
+  font-size: calc(3 * var(--u));
+  box-shadow: 0 0 0 2px var(--acc);
+}
+@media (max-height: 500px) {
+  .seg-name {
+    max-width: calc(24 * var(--u));
+  }
+  .seg-lines {
+    flex-direction: row;
+    gap: calc(1.2 * var(--u));
+    font-size: calc(2 * var(--u));
+  }
+}

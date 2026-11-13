@@ -1,5 +1,6 @@
 import type { Plan, SprintResult } from '../types'
 import { bestEfforts, zoneOf, type RideRecord } from './curve'
+import type { SegResult } from './segmentTracker'
 
 export interface BlockStat {
   i: number
@@ -45,6 +46,10 @@ export class RideRecorder {
   /** Free ride only: metres ridden and metres climbed. */
   distance?: number
   ascent?: number
+  /** Free ride only: metres along the route at each recorded second, the route ridden and the segment results. */
+  dist: number[] = []
+  route?: { id: string; name: string; laps?: number; done: boolean }
+  segments?: SegResult[]
   startedAt = new Date().toISOString()
   constructor(
     public plan: Plan,
@@ -73,6 +78,7 @@ export class RideRecorder {
     hr: number | null = null,
   ) {
     this.hr.push(hr)
+    if (this.distance !== undefined) this.dist.push(this.distance)
     this.power.push(p)
     this.cadence.push(cad)
     this.target.push(tgt)
@@ -134,6 +140,9 @@ export class RideRecorder {
       maxHr: hrs.length ? Math.max(...hrs) : null,
       distance: this.distance,
       ascent: this.ascent,
+      dist: this.dist.length ? [...this.dist] : undefined,
+      route: this.route,
+      segments: this.segments,
     }
   }
 }
