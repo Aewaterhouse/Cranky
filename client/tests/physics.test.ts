@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest'
-import { resistance, stepSpeed, steadySpeed, totalMass, trainerGrade } from '../src/core/physics'
+import { CFG } from '../src/config'
+import {
+  cornerSpeed,
+  headwind,
+  leadM,
+  resistance,
+  speedLimit,
+  stepSpeed,
+  steadySpeed,
+  totalMass,
+  trainerGrade,
+} from '../src/core/physics'
 
 const kmh = (v: number) => v * 3.6
 const M = totalMass(75)
@@ -75,5 +86,96 @@ describe('ride physics', () => {
     expect(trainerGrade(30, 1)).toBe(20)
     expect(trainerGrade(-3, 0.5)).toBe(-1.5)
     expect(steadySpeed(250, 8, M)).toBe(before)
+  })
+})
+
+describe('the feel: momentum, bends and wind', () => {
+  const K = CFG.freeRide.corner
+  it('carries speed out of a dip and up the other side', () => {
+    let v = steadySpeed(150, 0, M)
+    for (let i = 0; i < 20; i++) v = stepSpeed(v, 150, -6, M, 1)
+    const bottom = v
+    for (let i = 0; i < 8; i++) v = stepSpeed(v, 150, 6, M, 1)
+    expect(bottom).toBeGreaterThan(steadySpeed(150, 0, M) + 3)
+    expect(v).toBeGreaterThan(steadySpeed(150, 6, M) + 1)
+    expect(v).toBeLessThan(bottom)
+  })
+  it('a bend has a speed from its radius: fast through sweepers, sensible round a hairpin, never a stop', () => {
+    expect(cornerSpeed(0)).toBe(CFG.freeRide.maxMs)
+    expect(cornerSpeed(1 / 200)).toBe(CFG.freeRide.maxMs)
+    expect(cornerSpeed(1 / 30)).toBeCloseTo(Math.sqrt(K.latMs2 * 30))
+    expect(cornerSpeed(-1 / 30)).toBe(cornerSpeed(1 / 30))
+    expect(kmh(cornerSpeed(1 / 8))).toBeGreaterThan(19)
+    expect(kmh(cornerSpeed(1 / 8))).toBeLessThan(30)
+    expect(cornerSpeed(1 / 2)).toBe(K.minMs)
+  })
+  it('the limit eases down towards a hairpin and is the bend speed in it', () => {
+    const hairpinAt = (at: number) => (s: number) => (s >= at && s < at + 30 ? 1 / 8 : 0)
+    const far = speedLimit(20, hairpinAt(300))
+    const mid = speedLimit(20, hairpinAt(40))
+    const near = speedLimit(20, hairpinAt(10))
+    expect(far).toBe(CFG.freeRide.maxMs)
+    expect(mid).toBeLessThan(far)
+    expect(near).toBeLessThan(mid)
+    expect(speedLimit(20, hairpinAt(0))).toBeCloseTo(cornerSpeed(1 / 8))
+    expect(speedLimit(20, () => 0)).toBe(CFG.freeRide.maxMs)
+  })
+  it('a coasting descent into a hairpin is slowed gently, in time, and never stopped', () => {
+    // 20 m/s down 8% with a hairpin 150 m on: ride it at the app's 200 ms tick.
+    let v = 20
+    let d = 0
+    let hardest = 0
+    let atBend = 0
+    const curv = (x: number) => (x >= 150 && x < 180 ? 1 / 8 : 0)
+    while (d < 200) {
+      const was = v
+      v = stepSpeed(
+        v,
+        0,
+        -8,
+        M,
+        0.2,
+        0,
+        speedLimit(v, (s) => curv(d + s)),
+      )
+      hardest = Math.max(hardest, (was - v) / 0.2)
+      d += v * 0.2
+      if (d >= 150 && !atBend) atBend = v
+    }
+    expect(atBend).toBeLessThanOrEqual(cornerSpeed(1 / 8) + 0.6)
+    expect(atBend).toBeGreaterThanOrEqual(K.minMs)
+    expect(hardest).toBeLessThanOrEqual(K.maxBrakeMs2 + 1e-6)
+    // Out of the bend it runs away again.
+    expect(v).toBeGreaterThan(atBend)
+  })
+  it('leaves a rider under the limit alone', () => {
+    expect(stepSpeed(8, 200, 0, M, 1, 0, 15)).toBe(stepSpeed(8, 200, 0, M, 1))
+  })
+  it('a headwind slows, a tailwind helps, and no wind changes nothing', () => {
+    const still = steadySpeed(200, 0, M)
+    let head = still
+    let tail = still
+    for (let i = 0; i < 300; i++) {
+      head = stepSpeed(head, 200, 0, M, 1, 4)
+      tail = stepSpeed(tail, 200, 0, M, 1, -4)
+    }
+    expect(head).toBeLessThan(still - 1)
+    expect(tail).toBeGreaterThan(still + 1)
+    expect(resistance(10, 2, M, 0)).toBe(resistance(10, 2, M))
+  })
+  it('works out the headwind from where the wind blows and where the rider points', () => {
+    expect(headwind(5, 0, 0, -1)).toBeCloseTo(5)
+    expect(headwind(5, 0, 0, 1)).toBeCloseTo(-5)
+    expect(headwind(5, 0, 1, 0)).toBeCloseTo(0)
+    expect(headwind(5, Math.PI / 2, 1, 0)).toBeCloseTo(5)
+  })
+  it('reads the trainer gradient a second or two up the road, within bounds', () => {
+    const L = CFG.freeRide.lead
+    expect(leadM(0)).toBe(0)
+    expect(leadM(-3)).toBe(0)
+    expect(leadM(8)).toBeCloseTo(8 * L.s)
+    expect(leadM(100)).toBe(L.maxM)
+    expect(L.s).toBeGreaterThanOrEqual(1)
+    expect(L.s).toBeLessThanOrEqual(2)
   })
 })

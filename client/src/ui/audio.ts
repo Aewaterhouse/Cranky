@@ -1,7 +1,12 @@
+import { CFG } from '../config'
 import { settings } from '../core/settings'
+
+const B = CFG.sound.bell
 
 let ctx: AudioContext | null = null
 const ac = () => (ctx ??= new AudioContext())
+/** The one audio context, made on first use. Throws where there is no audio. */
+export const audioCtx = ac
 
 export function beep(
   freq: number,
@@ -43,6 +48,13 @@ export const SFX = {
   LEGEND: () => seq([523, 659, 784, 1047, 784, 1047, 1319, 1568], 0.1, 'sawtooth'),
   cue: () => (beep(784, 0.5, 'sine', 0.05), beep(1047, 0.7, 'sine', 0.05, 0.15)),
   scrap: () => seq([1200, 1600], 0.05, 'triangle'),
+  /** A hand bell at the line: one ring for a lap, a good shake of it for the last lap. */
+  bell: (rings = 1) => {
+    for (let r = 0; r < rings; r++)
+      B.partials.forEach(([mult, gain]) =>
+        beep(B.hz * mult, B.ringS, 'sine', B.gain * gain, r * B.gapS),
+      )
+  },
 }
 
 /** Low drone that shifts with the event mood. */

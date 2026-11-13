@@ -18,6 +18,12 @@ export interface Settings {
   freeRideView: '3d' | '2d'
   /** Chainring teeth on the bike on the trainer (with a 14T Zwift Cog), for virtual gears. */
   chainring: number
+  /** Free ride: wind along the road (off unless asked for). */
+  wind: 'off' | 'breeze' | 'blowy'
+  /** Free ride: a steady camera with no shake, lean, tuck or widening view. */
+  calmCamera: boolean
+  /** Free ride: freehub, wind, tyres, gear clunks and the sounds of the place. */
+  rideSounds: boolean
 }
 
 const KEY = 'cranky.settings'
@@ -30,6 +36,9 @@ const DEFAULTS: Settings = {
   quips: true,
   freeRideView: '3d',
   chainring: CFG.gears.chainring,
+  wind: 'off',
+  calmCamera: false,
+  rideSounds: true,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

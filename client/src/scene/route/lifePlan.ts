@@ -154,3 +154,14 @@ export function member(h: Herd, i: number, out: number[]): number[] {
   out[2] = rand() * Math.PI * 2
   return out
 }
+
+/**
+ * Metres from the centreline for a crossing animal that started at `o0` on its own verge `tt` seconds ago, when
+ * the rider was `ahead0` metres short and is now `ahead` short. It ambles at `ms`, and breaks into a trot if
+ * that would leave it on the road when the rider arrives: it is always across by `crossClear` metres out.
+ */
+export function crossAt(o0: number, tt: number, ms: number, ahead0: number, ahead: number): number {
+  const hurry = (ahead0 - ahead) / Math.max(1, ahead0 - L.crossClear)
+  const trot = o0 - Math.min(1, Math.max(0, hurry)) * (o0 + R.roadHalf + R.verge)
+  return Math.max(-L.crossTo, Math.min(o0 - Math.max(0, tt) * ms, trot))
+}

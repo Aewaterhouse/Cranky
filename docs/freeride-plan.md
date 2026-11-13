@@ -68,11 +68,11 @@ The fun is in the riding, but the information has to be as good as the establish
 - [x] Time of day and weather moods per ride (dawn, midday, golden hour, mist on the high routes).
 
 ### Phase D: the feel (M)
-- [ ] Physics: momentum through dips, corner speed limits and braking on descents, optional headwind.
-- [ ] Trainer gradient looks slightly ahead so resistance arrives as the road tilts, not after.
-- [ ] Camera: wider view with speed, a little shake on rough descents, tuck when coasting fast.
-- [ ] Sound (CC0): freehub tick when coasting, wind by speed, tyre hum, gear clunk, birds and cicadas by place.
-- [ ] Rider animation: out of the saddle on steep ramps and sprints, coasting, celebrating at the top.
+- [x] Physics: momentum through dips, corner speed limits and braking on descents, optional headwind.
+- [x] Trainer gradient looks slightly ahead so resistance arrives as the road tilts, not after.
+- [x] Camera: wider view with speed, a little shake on rough descents, tuck when coasting fast.
+- [x] Sound (synthesised, no files): freehub tick when coasting, wind by speed, tyre hum, gear clunk, birds and cicadas by place. Not yet heard by a person.
+- [x] Rider animation: out of the saddle on steep ramps and sprints, coasting, celebrating at the top.
 
 ### Phase E: ride together (L)
 - [ ] Server road mode: rooms by code, lobby with route choice, server-run positions, late join, rejoin after a refresh.

@@ -59,3 +59,9 @@ export function riderRows(riders: ListRider[], meId: string, c = CFG.hud.riders)
     me: r === me,
   }))
 }
+
+/** Wind along the road for the stats drawer: "Head 11 km/h", "Tail 6 km/h" or "Still". */
+export function windText(ms: number) {
+  const kmh = Math.round(Math.abs(ms) * 3.6)
+  return kmh < 1 ? 'Still' : `${ms > 0 ? 'Head' : 'Tail'} ${kmh} km/h`
+}

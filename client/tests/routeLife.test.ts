@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { VIS } from '../src/scene/params'
 import { FUN } from '../src/scene/route/funVis'
-import { LIFE_KINDS, LifePlan, TRAFFIC, member, type Herd } from '../src/scene/route/lifePlan'
+import {
+  LIFE_KINDS,
+  LifePlan,
+  TRAFFIC,
+  crossAt,
+  member,
+  type Herd,
+} from '../src/scene/route/lifePlan'
 import { funWorld } from './funWorld'
 
 const R = VIS.route
@@ -87,5 +94,28 @@ describe('wildlife and traffic along a road', () => {
   })
   it('has every kind in the table', () => {
     expect(LIFE_KINDS.length).toBeGreaterThanOrEqual(12)
+  })
+})
+
+describe('an animal crossing the road', () => {
+  const edge = R.roadHalf + R.verge
+  const o0 = edge + L.kinds.wombat.near
+  it('waits on its own verge and ends up well off the far side', () => {
+    expect(crossAt(o0, 0, L.wombatMs, L.cross, L.cross)).toBe(o0)
+    expect(crossAt(o0, 60, L.wombatMs, L.cross, L.cross)).toBe(-L.crossTo)
+  })
+  it('is off the road before the rider arrives, at any speed', () => {
+    for (const ms of [1, 5, 12, 25]) {
+      const tt = (L.cross - L.crossClear) / ms
+      expect(crossAt(o0, tt, L.wombatMs, L.cross, L.crossClear)).toBeLessThanOrEqual(-edge)
+      expect(crossAt(o0, tt + 1, L.wombatMs, L.cross, 0)).toBeLessThanOrEqual(-edge)
+    }
+  })
+  it('ambles at its own pace when the rider is in no hurry', () => {
+    expect(crossAt(o0, 2, L.wombatMs, L.cross, L.cross - 1)).toBeCloseTo(o0 - 2 * L.wombatMs)
+  })
+  it('does not set off with the rider already on top of it', () => {
+    expect(L.crossLate).toBeGreaterThan(L.crossClear)
+    expect(L.crossLate).toBeLessThan(L.cross)
   })
 })

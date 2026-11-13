@@ -2,7 +2,7 @@ import { hash } from '../math'
 import { VIS } from '../params'
 import type { Level } from '../quality'
 import { FUN } from './funVis'
-import { TRAFFIC, member, type Herd, type LifePlan } from './lifePlan'
+import { TRAFFIC, crossAt, member, type Herd, type LifePlan } from './lifePlan'
 import { LifePool } from './lifePool'
 import { newPose, type Pose, type RoadPath } from './roadPath'
 
@@ -17,8 +17,10 @@ interface Live {
   h: Herd
   n: number
   t0: number
-  /** Traffic: metres along the road. Flocks: how high they perch. */
+  /** Traffic: metres along the road. Flocks: how high they perch. Crossings: how far short the rider was at the off. */
   at: number
+  /** Crossings: metres from the centreline so far, so it never backs up. */
+  o: number
   m: Float32Array
   /** The road where it crosses or stands, worked out once. */
   road: Pose
@@ -58,7 +60,7 @@ export class Life {
           const n = Math.round(h.n * (h.kind === 'roos' && this.dusk ? L.duskMobs : 1))
           const at = hash(h.seed) < L.perchShare ? L.perch : 0
           const road = this.path.poseAt(h.d, newPose())
-          l = { h, n, t0: -1, at, m: new Float32Array(n * 4), road }
+          l = { h, n, t0: -1, at, o: Infinity, m: new Float32Array(n * 4), road }
           for (let i = 0; i < n; i++) l.m.set(member(h, i, tmp), i * 4)
         }
         for (let i = 0; i < l.n; i++)
@@ -72,7 +74,7 @@ export class Life {
     const k = h.kind
     if (k === 'roos') return gap < L.spook
     if (k === 'cockatoos' || k === 'galahs') return gap < L.burst
-    if (k === 'wombat' || k === 'lyrebird') return ahead < L.cross && ahead > 0
+    if (k === 'wombat' || k === 'lyrebird') return ahead < L.cross && ahead > L.crossLate
     if (k === 'magpie') return Math.abs(ahead) < L.swoop
     return TRAFFIC.includes(k) && ahead < L.trafficSee && ahead > -R.chunk
   }
@@ -94,6 +96,7 @@ export class Life {
       const gap = Math.hypot(h.x - me.x, h.z - me.z)
       if (l.t0 === -1 && this.triggers(h, gap, h.d - d)) {
         l.t0 = t
+        if (k === 'wombat' || k === 'lyrebird') l.at = h.d - d
         if (road) {
           l.at = Math.min(this.path.length - 20, d + L.trafficSee)
           this.pool.paint(
@@ -105,7 +108,7 @@ export class Life {
       const tt = l.t0 >= 0 ? t - l.t0 : -1
       if (road) this.traffic(l, dt, d)
       else if (k === 'magpie') this.magpie(l, tt, me, t)
-      else if (k === 'wombat' || k === 'lyrebird') this.crossing(l, tt, t)
+      else if (k === 'wombat' || k === 'lyrebird') this.crossing(l, tt, t, h.d - d)
       else this.mob(l, tt, t, me)
       // Something happening beats something merely standing there.
       const busy = l.t0 >= 0 && tt < L.eventS
@@ -173,17 +176,25 @@ export class Life {
     }
   }
 
-  /** A wombat or lyrebird that sets off across the road as the rider comes up. */
-  private crossing(l: Live, tt: number, t: number) {
+  /**
+   * A wombat or lyrebird that sets off across the road as the rider comes up and is off the far side before the
+   * rider gets there, however fast that is. One the rider starts too close to stays on the verge.
+   */
+  private crossing(l: Live, tt: number, t: number, ahead: number) {
     const { h, road } = l
     const wombat = h.kind === 'wombat'
     const edge = R.roadHalf + R.verge
     const o0 = edge + L.kinds[h.kind].near
-    const o = Math.max(-L.crossTo, o0 - Math.max(0, tt) * (wombat ? L.wombatMs : L.lyreMs))
+    const was = l.o
+    if (tt >= 0) {
+      const o = crossAt(o0, tt, wombat ? L.wombatMs : L.lyreMs, l.at, ahead)
+      l.o = Math.min(l.o, o)
+    }
+    const o = Math.min(o0, l.o)
     const x = road.x + road.rx * h.side * o
     const z = road.z + road.rz * h.side * o
     const y = Math.abs(o) < edge ? road.y : this.height(x, z)
-    const wob = tt >= 0 && o > -L.crossTo ? Math.sin(t * (wombat ? 9 : 14)) : 0
+    const wob = o < was && o > -L.crossTo ? Math.sin(t * (wombat ? 9 : 14)) : 0
     const yaw = Math.atan2(-road.rx * h.side, -road.rz * h.side)
     this.pool.put(h.kind, x, y, z, yaw, wombat ? 0 : wob * 0.12, wombat ? wob * 0.1 : 0)
   }

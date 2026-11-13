@@ -45,8 +45,14 @@ export function across(p: Pose, o: number, out: Float64Array, i: number) {
   out[i + 2] = p.z + p.rz * o
 }
 
-/** Road ribbon for d0..d1: gravel verges, edge lines, tarmac and a dashed centre line. */
-export function buildRoad(path: RoadPath, d0: number, d1: number, out: Tris) {
+/** Road ribbon for d0..d1: gravel verges, edge lines, tarmac and a dashed centre line, left out inside `gaps`. */
+export function buildRoad(
+  path: RoadPath,
+  d0: number,
+  d1: number,
+  out: Tris,
+  gaps: [number, number][] = [],
+) {
   tarmac.set(R.tarmac)
   line.set(R.line)
   gravel.set(R.gravel)
@@ -69,7 +75,8 @@ export function buildRoad(path: RoadPath, d0: number, d1: number, out: Tris) {
     })
     for (let c = 0; c < n - 1; c++) {
       // One dash in three along the centre; every face gets a slightly different shade.
-      const base = c === 3 && row % 3 ? tarmac : cols[c]
+      const bare = row % 3 || gaps.some(([a, b]) => d + R.rowStep > a && d < b)
+      const base = c === 3 && bare ? tarmac : cols[c]
       tint.copy(base).multiplyScalar(0.94 + hash(row * 7 + c) * (base === gravel ? 0.2 : 0.08))
       const a = c * 3
       const f = (n + c) * 3

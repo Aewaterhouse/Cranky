@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { CFG } from '../src/config'
+import { RoadFeel, cheering, trainerTarget } from '../src/modes/freeRide/feel'
 import { freePlan } from '../src/modes/freeRide/freeRide'
+import { cornerSpeed, totalMass } from '../src/core/physics'
 import { RideRecorder } from '../src/core/ride'
 import { buildRoute, routeSeconds } from '../src/core/route'
 import { ErgController } from '../src/trainer/ergController'
@@ -49,5 +51,91 @@ describe('free ride plumbing', () => {
     expect(s.compliance).toBe(0)
     expect(s.avgPower).toBe(200)
     expect(s.blocks[0].secs).toBe(40)
+  })
+})
+
+describe('free ride feel', () => {
+  // Flat for a kilometre, then a 10% wall.
+  const wall = buildRoute('w', 'Wall', [
+    { d: 0, ele: 0 },
+    { d: 1000, ele: 0 },
+    { d: 2000, ele: 100 },
+  ])
+  const M = totalMass(75)
+  const F = CFG.freeRide
+  const target = (d: number, v: number, paused = false, diff = 1) =>
+    trainerTarget(wall, d, v, diff, paused, 0, CFG.gears.start, M)
+
+  it('the trainer gets the road a second or two ahead, so the wall arrives as the road tilts', () => {
+    const before = wall.points.findIndex((p) => p.grade > 5) * F.spacingM - 12
+    expect(target(before, 0)).toBeLessThan(target(before, 10))
+    expect(target(before, 10)).toBeGreaterThan(5)
+    expect(target(before - 300, 22)).toBeLessThan(1)
+    expect(target(1700, 5)).toBeCloseTo(target(1700, 0), 0)
+  })
+  it('flat when paused, and never past the end of the route', () => {
+    expect(target(1500, 5, true)).toBe(0)
+    expect(Number.isFinite(target(wall.distance, 20))).toBe(true)
+  })
+  it('whatever the road and speed, the trainer only ever gets a gradient inside the range, never ERG', async () => {
+    const cliff = buildRoute('c', 'Cliff', [
+      { d: 0, ele: 0 },
+      { d: 500, ele: 200 },
+      { d: 1000, ele: 0 },
+    ])
+    const sim = new SimTrainer()
+    const erg = new ErgController(sim, 250, () => 0)
+    for (let d = 0; d <= 1000; d += 50)
+      for (const [v, cad] of [
+        [0, 0],
+        [6, 80],
+        [22, 110],
+      ]) {
+        const g = trainerTarget(cliff, d, v, 1, false, cad, 24, M)
+        expect(g).toBeGreaterThanOrEqual(F.grade[0])
+        expect(g).toBeLessThanOrEqual(F.grade[1])
+        erg.setGrade(g * 3, F.grade)
+        await erg.tick()
+      }
+    expect(sim.log.length).toBeGreaterThan(0)
+    expect(sim.log.every((l) => l.startsWith('sim '))).toBe(true)
+    for (const l of sim.log) {
+      const pct = Number(l.slice(4))
+      expect(pct).toBeGreaterThanOrEqual(F.grade[0])
+      expect(pct).toBeLessThanOrEqual(F.grade[1])
+    }
+  })
+  it('arms go up just over the top and coming to the line, not before', () => {
+    expect(cheering(990, 5000, 1000)).toBe(false)
+    expect(cheering(1010, 5000, 1000)).toBe(true)
+    expect(cheering(1000 + F.cheer.summitM + 1, 5000, 1000)).toBe(false)
+    expect(cheering(4990, 5000, undefined)).toBe(true)
+    expect(cheering(2000, 5000, undefined)).toBe(false)
+  })
+  it('a straight road has no bend limit and no wind unless asked; wind turns with the road', () => {
+    const feel = new RoadFeel(hill, 1)
+    expect(feel.limit(100, 20)).toBe(F.maxMs)
+    expect(feel.wind(100, 'off', undefined, 0)).toBe(0)
+    // A lap of a ring about 100 m in radius: a headwind somewhere, a tailwind opposite, never more than the wind.
+    const n = 63
+    const ring = buildRoute(
+      'ring',
+      'Ring',
+      Array.from({ length: n + 1 }, (_, i) => ({
+        d: i * 10,
+        ele: 0,
+        lat: -27 + 0.0009 * Math.cos((i / n) * 2 * Math.PI),
+        lon: 153 + 0.001 * Math.sin((i / n) * 2 * Math.PI),
+      })),
+    )
+    const round = new RoadFeel(ring, 1)
+    const w = Array.from({ length: 12 }, (_, i) => round.wind(40 + i * 50, 'breeze', undefined, 0))
+    expect(Math.max(...w)).toBeGreaterThan(1.5)
+    expect(Math.min(...w)).toBeLessThan(-1.5)
+    expect(Math.max(...w.map(Math.abs))).toBeLessThanOrEqual(F.wind.ms.breeze + 1e-9)
+    const mist = round.wind(40, 'breeze', 'routeMist', 0)
+    expect(Math.abs(mist)).toBeCloseTo(Math.abs(w[0]) * F.wind.mood.routeMist)
+    expect(round.limit(100, 20)).toBeLessThanOrEqual(F.maxMs)
+    expect(round.limit(100, 20)).toBeGreaterThan(cornerSpeed(1 / 50))
   })
 })
