@@ -36,6 +36,7 @@
 - `effects.ts` resistance modifier bus with caps.
 - `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, session generator.
 - `profile.ts` local profile cache and server sync.
+- `fit.ts` FIT activity encoder (power, cadence, heart rate; position, altitude, distance, speed and laps for a ride with a track); `rideTrack.ts` the track for a saved ride from its route and per-second distances.
 - `ride.ts` per-ride recorder (JSON save and restore), summary, NP/IF/TSS; `snapshot.ts` crash-recovery snapshots in localStorage and the remembered bus code.
 
 ### modes/, net/, trainer/
@@ -90,7 +91,7 @@
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.
 - `tests/roadVectors.test.ts` generates and checks the vectors shared with the server; `tests/roadLink.test.ts` group-ride prediction, drafting, toasts and no ERG target.
-- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results; `tests/efforts.test.ts` bests on the device, the offline queue and the merge with the server; `tests/ghost.test.ts` ghost positions, laps and the rider-list row.
+- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results; `tests/efforts.test.ts` bests on the device, the offline queue and the merge with the server; `tests/ghost.test.ts` ghost positions, laps and the rider-list row; `tests/fitTrack.test.ts` decodes a FIT file with position and laps.
 - `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 

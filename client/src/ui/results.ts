@@ -1,4 +1,3 @@
-import { encodeFit } from '../core/fit'
 import '../results.css'
 import { bankScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
@@ -7,6 +6,7 @@ import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { groupSection, postcard } from './resultsGroup'
+import { downloadFit, downloadJson } from './rideExport'
 import { roadSection } from './roadResults'
 import type { RoadSummary } from '../net/protocol'
 import { segmentSection } from './segResults'
@@ -80,33 +80,6 @@ export function finishRide(
       ? []
       : Object.entries(s.record.best).filter(([d, w]) => !before[+d] || w > before[+d].w)
   const sug = ftpSuggestion(p)
-  const exportFit = () => {
-    const bytes = encodeFit({
-      start: s.record.date,
-      power: s.power,
-      cadence: s.cadence,
-      hr: s.hr,
-      np: s.np,
-      tss: s.tss,
-      intensity: s.if,
-    })
-    const a = h('a', {
-      href: URL.createObjectURL(
-        new Blob([bytes as BlobPart], { type: 'application/octet-stream' }),
-      ),
-      download: `cranky-${s.record.date.slice(0, 16).replace(':', '')}.fit`,
-    })
-    a.click()
-  }
-  const exportJson = () => {
-    const a = h('a', {
-      href: URL.createObjectURL(
-        new Blob([JSON.stringify(s, null, 2)], { type: 'application/json' }),
-      ),
-      download: `ride-${s.record.date.slice(0, 16)}.json`,
-    })
-    a.click()
-  }
   const ftpBox = h('div')
   if (sug)
     ftpBox.append(
@@ -318,8 +291,8 @@ export function finishRide(
       h(
         'div',
         { class: 'row res-actions' },
-        h('button', { onclick: exportFit }, 'Download .fit'),
-        h('button', { onclick: exportJson }, 'Export JSON'),
+        h('button', { onclick: () => void downloadFit(s) }, 'Download .fit'),
+        h('button', { onclick: () => downloadJson(s) }, 'Export JSON'),
         group ? h('button', { onclick: () => postcard(group, s.planName) }, 'Postcard') : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),

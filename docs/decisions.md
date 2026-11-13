@@ -513,3 +513,11 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - Ghosts are only ever positions that are drawn and listed: they are not sent to the server, are not in the drafting sum, and do not count for the keep-together median. The ride loop adds them to the drawn and listed riders after the server's riders are read, and nothing reads them back.
 - Drawn see-through and pale (`VIS.route.ghost`: 40% solid, 55% towards white, in the debug panel under "Ghost riders"), 1.2 m and 2.3 m right of the rider's lane so they do not sit inside the rider. In the rider list a ghost has a ring mark (◌), italics, no W/kg, and the usual gap.
 - Not looked at in motion: the ghost was checked in still screenshots only.
+
+### FIT export with position
+- A free or group ride now records metres along the route at each recorded second (`dist` in the saved ride, beside `power`) and which route and how many laps (`route`). The FIT file is built at download time by reading the position, height and distance for each second off the route, so nothing bulky is stored. Speed is the distance covered in that second.
+- This needs the route on the device at download time: always true for bundled routes, true for an imported GPX only while it is still in this browser's "My routes". Without the route (or for a route with no coordinates) the file is the same power-only file as before.
+- With a track the session's sub-sport is virtual activity (58) instead of indoor cycling (6), which is what Strava and intervals.icu expect for a ride with a map that was ridden indoors, and the session gets total distance, total ascent and average speed.
+- Lap rides get one lap message per lap (the last may be a part lap); other rides with a track get one lap for the whole ride. Lap messages carry a message index and the lap's distance.
+- A ride without positions is byte-for-byte what it was (`tests/fitTrack.test.ts` holds the old encoder's length and checksum for a sample ride).
+- Not uploaded anywhere: the files were decoded by our own test reader only. Whether Strava draws the map is for the owner to try.

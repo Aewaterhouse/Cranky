@@ -196,7 +196,7 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
           { class: 'row res-actions' },
           h(
             'button',
-            { disabled: !s.power?.length, onclick: () => downloadFit(s) },
+            { disabled: !s.power?.length, onclick: () => void downloadFit(s) },
             'Download .fit',
           ),
           h('button', { onclick: () => downloadJson(s) }, 'Export JSON'),

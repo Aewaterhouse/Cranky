@@ -175,4 +175,7 @@ Segments and ghosts
 7. Lap ride (Nundah crit, 3 laps): every lap is a row in the Segments card; a faster lap gets the PR toast instead of the plain lap toast; the ghost keeps lapping at its best lap.
 8. Offline: stop the server mid-ride and finish. The summary still shows the segments. Start the server and log in again: `GET /api/efforts/mine` lists them.
 9. Group ride with a bot on a route you have a best on: your ghost is there for you only, and the drafting chip never lights up from the ghost.
+FIT file
+10. From the summary of a free ride (or from History), Download .fit and upload it to Strava or intervals.icu: expect the real map, an elevation profile, distance and speed, and one lap per lap on a lap ride. (Not tried: the file has only been decoded by our own test.)
+11. Download .fit for an ERG workout: same file as always, no map.
 
