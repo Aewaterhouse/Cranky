@@ -218,3 +218,72 @@ BOT_HR_AT_FTP = 0.9  # fraction of max at FTP
 BOT_HR_LAG_S = 30
 BOT_IDLE_X = 0.5  # power as a fraction of FTP when ERG is off outside a sprint
 BOT_GRADES = {"FAIL": 10, "HIT": 45, "GREAT": 35, "MEGA": 9, "LEGEND": 1}
+
+# Road rides (free ride together). The physics and route numbers mirror `freeRide` and `road` in
+# client/src/config.ts; content/tests/road-vectors.json is run by both test suites and fails if either drifts.
+ROAD_TICK_HZ = 4
+ROAD_MAX_RIDERS = 8
+ROAD_DEFAULT_KG = 75
+ROAD_BIKE_KG = 9
+ROAD_CRR = 0.004
+ROAD_CDA = 0.32
+ROAD_RHO = 1.225
+ROAD_DRIVETRAIN = 0.975
+ROAD_MAX_MS = 22
+ROAD_MAX_DRIVE_N = 600
+ROAD_CORNER_LAT_MS2 = 7
+ROAD_CORNER_MIN_MS = 5.5
+ROAD_BRAKE_MS2 = 2.5
+ROAD_MAX_BRAKE_MS2 = 4
+ROAD_CORNER_STEP_M = 5
+ROAD_SPACING_M = 10
+ROAD_SMOOTH_M = 100
+ROAD_MAX_GRADE_PCT = 20
+ROAD_MAX_STORED = 4000
+ROAD_SMOOTH_PASSES = 2
+ROAD_UTURN_SHIFT_M = 3.5
+ROAD_UTURN_BULB_M = 12
+ROAD_LAPS_MAX = 99
+ROAD_LAPS_MAX_M = 300_000
+ROAD_DEFAULT_ROUTE = "nundah-crit"
+ROAD_DEFAULT_LAPS = 3
+# Drafting: the CdA saving on a wheel, full inside DRAFT_FULL_M and fading to nothing at DRAFT_REACH_M. Each
+# extra rider ahead within DRAFT_BUNCH_M adds DRAFT_BUNCH_X of it, up to DRAFT_CAP. Nobody drafts a rider
+# slower than DRAFT_MIN_MS.
+DRAFT_WHEEL = 0.27
+DRAFT_FULL_M = 2.0
+DRAFT_REACH_M = 10.0
+DRAFT_BUNCH_M = 20.0
+DRAFT_BUNCH_X = 0.15
+DRAFT_CAP = 0.4
+DRAFT_MIN_MS = 3.0
+# Keep-together: distance covered is scaled by up to BAND_MAX either way, by how far the rider is from the
+# middle of the group; nothing inside BAND_DEAD_M, all of it by BAND_FULL_M. The physics speed is untouched.
+BAND_MAX = 0.2
+BAND_DEAD_M = 15.0
+BAND_FULL_M = 150.0
+ROAD_LANES = (-2.3, -1.1)  # two abreast, in metres right of the centre line (we ride on the left)
+ROAD_LATE_GAP_M = 5.0  # a late joiner starts this far behind the last rider still moving
+ROAD_FINISH_GRACE_S = 600  # the ride ends this long after the first rider finishes, whoever is still out
+ROAD_ABANDON_S = 600  # or after this many ride seconds with no human connected
+ROAD_STOPPED_MS = 0.5  # slower than this reads as stopped
+# Road bots: (name, personality, kg, fitness, one-liner). Their FTP is the humans' median W/kg times their own
+# weight and fitness, so they ride with the people in the room. ROAD_BOT_X is the fraction of that FTP each
+# personality holds (`x`) and what it does instead when its moment comes.
+ROAD_BOT_WKG = 3.0  # assumed W/kg when no human has a weight and FTP to copy
+ROAD_BOT_JITTER = 0.04
+ROAD_BOT_CAD = 88
+ROAD_BOTS = [
+    ("Diesel Dave", "diesel", 84, 1.0, "Sits on the same watts all day. Has never once looked back."),
+    ("Surging Shaz", "surger", 62, 1.02, "Attacks, regrets it, recovers, attacks again."),
+    ("Mountain Goat Mick", "climber", 58, 1.05, "Weighs nothing. Waits for the hill, then leaves."),
+    ("Sprinter Trev", "sprinter", 88, 0.97, "Does no work until the sign. Then does all of it."),
+    ("Wheelsucker Wozza", "sucker", 76, 0.95, "Will do a turn next lap. He promises."),
+]
+ROAD_BOT_X = {
+    "diesel": {"x": 0.8},
+    "surger": {"x": 0.7, "surge_x": 1.2, "surge_s": 20, "every_s": 90},
+    "climber": {"x": 0.72, "climb_x": 1.0, "climb_pct": 3.0},
+    "sprinter": {"x": 0.72, "sprint_x": 2.2, "sprint_m": 300},
+    "sucker": {"x": 0.84, "sit_x": 0.66},
+}

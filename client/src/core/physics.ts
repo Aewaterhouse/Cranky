@@ -10,12 +10,14 @@ export const totalMass = (weightKg?: number) => (weightKg || P.defaultKg) + P.bi
 /**
  * Force opposing motion at speed `v` (m/s) on `gradePct`, in newtons. Negative on a steep descent. `wind` is the
  * headwind in m/s (a tailwind is negative): the air drags on the speed through the air, not over the ground.
+ * `draft` scales the drag (1 is clean air, see `draftFactor`).
  */
-export function resistance(v: number, gradePct: number, mass: number, wind = 0) {
+export function resistance(v: number, gradePct: number, mass: number, wind = 0, draft = 1) {
   const th = Math.atan(gradePct / 100)
   const air = v + wind
   return (
-    mass * G * (Math.sin(th) + P.crr * Math.cos(th)) + 0.5 * P.rho * P.cda * air * Math.abs(air)
+    mass * G * (Math.sin(th) + P.crr * Math.cos(th)) +
+    0.5 * P.rho * P.cda * draft * air * Math.abs(air)
   )
 }
 
@@ -48,12 +50,13 @@ export function stepSpeed(
   dt: number,
   wind = 0,
   limit: number = P.maxMs,
+  draft = 1,
 ) {
   const n = Math.max(1, Math.ceil(dt / 0.1))
   const h = dt / n
   for (let i = 0; i < n; i++) {
     const drive = Math.min((power * P.drivetrain) / Math.max(v, 0.5), P.maxDriveN)
-    const next = v + ((drive - resistance(v, gradePct, mass, wind)) / mass) * h
+    const next = v + ((drive - resistance(v, gradePct, mass, wind, draft)) / mass) * h
     v = next > limit ? Math.max(limit, Math.min(next, v - K.maxBrakeMs2 * h)) : next
     v = Math.min(P.maxMs, Math.max(0, v))
   }
@@ -78,6 +81,27 @@ export function speedLimit(v: number, curvAt: (s: number) => number) {
       Math.sqrt(cornerSpeed(curvAt(s)) ** 2 + 2 * K.brakeMs2 * Math.max(0, s - K.stepM)),
     )
   return lim
+}
+
+/**
+ * Group rides: the drag multiplier (1 is clean air) for a rider, given the metres to each moving rider ahead.
+ * Full on a wheel, nothing by `reachM`, a bit more for every extra rider close ahead. The server's
+ * `draft_factor` is the one that counts; this is the same sum for the client's guess between ticks.
+ */
+export function draftFactor(gaps: number[]) {
+  const D = CFG.road.draft
+  const near = gaps.filter((g) => g > 0 && g <= D.bunchM)
+  const first = Math.min(...near)
+  if (!near.length || first >= D.reachM) return 1
+  const fade = Math.min(1, (D.reachM - first) / (D.reachM - D.fullM))
+  return 1 - Math.min(D.cap, D.wheel * fade * (1 + D.bunchX * (near.length - 1)))
+}
+
+/** Keep-together: the scale on distance covered for a rider `gap` metres ahead of the middle of the group. */
+export function bandFactor(gap: number) {
+  const B = CFG.road.band
+  const over = Math.min(1, Math.max(0, Math.abs(gap) - B.deadM) / (B.fullM - B.deadM))
+  return 1 - Math.sign(gap) * over * B.max
 }
 
 /** Metres ahead at which the trainer's gradient is read at speed `v`, so the resistance arrives with the road. */
