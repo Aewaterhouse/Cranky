@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CFG } from '../src/config'
+import { busAim, soloAim } from '../src/core/aim'
 import { effortSummary, isRest, listWindow, nextText, tolerance, tolText } from '../src/core/hud'
 
 describe('tolerance bar', () => {
@@ -61,4 +62,48 @@ describe('interval summary and list', () => {
     expect(listWindow(20, 19, 7)).toEqual([13, 20])
     expect(listWindow(3, 2, 7)).toEqual([0, 3])
   })
+})
+
+describe('what the power panel is told', () => {
+  const frame = (type: 'steady' | 'sprint' | 'free', tgt: number | null) => ({
+    el: 0,
+    i: 0,
+    bel: 0,
+    type,
+    label: 'x',
+    dur: 60,
+    tgt,
+  })
+  it('leads with the target in ERG and with power outside it', () => {
+    expect(soloAim(frame('steady', 250), null)).toMatchObject({ target: 250, targetLeads: true })
+    const res = soloAim(frame('steady', 250), 'Resistance 40%')
+    expect(res.targetLeads).toBeFalsy()
+    expect(res.note).toBe('Resistance 40%')
+    expect(res.chip).toBe('aim 250 W')
+  })
+  it('never gives a sprint a target power, even if the frame carries one', () => {
+    for (const aim of [
+      soloAim(frame('sprint', null), null),
+      soloAim(frame('sprint', 900), null),
+      soloAim(frame('sprint', 900), 'Slope +2%'),
+      busAim(frame('sprint', null), 700, 640),
+      busAim(frame('sprint', 900), 300, 640),
+    ]) {
+      expect(aim.target ?? null).toBeNull()
+      expect(aim.cap).toBe('Sprint')
+      expect(aim.chip).toBe('ERG off')
+    }
+  })
+  it('shows the best sprint so far, and says when it is beaten', () => {
+    expect(busAim(frame('sprint', null), 300, 640).note).toBe('All out · best 640 W')
+    expect(busAim(frame('sprint', null), 700, 640).note).toBe('All out · new best!')
+    expect(busAim(frame('sprint', null), 640 * CFG.hud.sprintBarOver, 640).fill).toBeCloseTo(1)
+  })
+  it('has no target in a free block or before the start', () => {
+    expect(soloAim(frame('free', null), null).target ?? null).toBeNull()
+    expect(busAim(frame('free', null), 150, 640).target ?? null).toBeNull()
+    expect(busAim(null, 150, 640).note).toBe('Get ready')
+  })
+  it('puts power first in the bus, with the target beneath', () =>
+    expect(busAim(frame('steady', 180), 150, 640)).toMatchObject({ target: 180 }))
 })

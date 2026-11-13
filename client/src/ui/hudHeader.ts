@@ -32,6 +32,8 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
   )
   return {
     root,
+    /** The plan timeline, so a layout can put it somewhere else (the bus HUD's bottom strip). */
+    tl,
     setTier: build,
     /** `mask` replaces the next block's name and watts (the VO2 Madness mystery box). */
     update(
@@ -51,8 +53,8 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
       set(
         next,
         f.next
-          ? `NEXT  ${mask ?? `${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''}`}  in ${fmt(f.next.in)}`
-          : 'LAST BLOCK',
+          ? `Next: ${mask ?? `${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''}`} in ${fmt(f.next.in)}`
+          : 'Last block',
       )
       graph?.setProgress(elapsedS)
       set(elapsed, fmt(elapsedS))

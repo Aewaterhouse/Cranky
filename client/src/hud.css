@@ -1,7 +1,9 @@
 @import './hudBus.css';
 @import './hudPanels.css';
 @import './hudSplash.css';
-/* In-ride game HUD. Every class is prefixed (hud-, eh-, cp-, bs-, rs-, st-, sh-, sp-, fd-) to stay clear of the rest of the app. */
+/* The game layer of the bus ride and the TV view: event header, bus status, shop, splashes, feed. Every class is
+   prefixed (hud-, eh-, bs-, sh-, sp-, fd-) to stay clear of the rest of the app. The rider's own numbers, the
+   crew list and the layout of the bus ride are the shared ride HUD (rideHud.css, busHud.css). */
 .stage {
   position: fixed;
   inset: 0;
@@ -22,18 +24,10 @@
   text-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
 }
 .hud button,
-.hud select,
-.hud .st-strip {
+.hud select {
   pointer-events: auto;
 }
 .hud label {
-  display: block;
-  color: var(--dim);
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-}
-.cp-lab {
   display: block;
   color: var(--dim);
   font-size: 0.66rem;
@@ -57,8 +51,7 @@
     inset 0 1px 0 rgb(255 255 255 / 0.06);
 }
 .hud-left,
-.hud-right,
-.hud-bl {
+.hud-right {
   position: absolute;
   width: 262px;
   display: flex;
@@ -72,10 +65,6 @@
 .hud-right {
   top: 12px;
   right: 12px;
-}
-.hud-bl {
-  bottom: 12px;
-  left: 12px;
 }
 
 /* Event header */
@@ -170,214 +159,4 @@
   height: 100%;
   background: linear-gradient(90deg, #e040fb, #ff9bff);
   transition: width 0.5s linear;
-}
-
-/* Cockpit */
-.cp {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  translate: -50% 0;
-  width: min(560px, 48vw);
-  padding: 12px 18px 12px;
-  transition:
-    border-color 0.3s,
-    box-shadow 0.3s;
-}
-.cp-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
-.cp-tg {
-  text-align: right;
-}
-.cp-pow {
-  font: 4.2rem/1 var(--display);
-  letter-spacing: -0.02em;
-}
-.cp-unit {
-  color: var(--dim);
-  font-weight: 800;
-  font-size: 0.8rem;
-  margin-left: 4px;
-}
-.cp-unit.big {
-  font-size: 1.3rem;
-}
-.cp-tgt-n {
-  font: 2.4rem/1 var(--display);
-  color: var(--acc);
-}
-.cp-delta {
-  display: block;
-  min-height: 1.1em;
-  margin-top: 2px;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--tox);
-}
-.cp-delta[data-s='warn'] {
-  color: var(--amber);
-}
-.cp-delta[data-s='bad'] {
-  color: var(--bad);
-}
-.cp-gauge {
-  position: relative;
-  height: 20px;
-  margin: 12px 0 4px;
-  border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    rgb(255 90 78 / 0.35),
-    rgb(255 176 32 / 0.25) 30%,
-    rgb(255 255 255 / 0.06) 40% 60%,
-    rgb(255 176 32 / 0.25) 70%,
-    rgb(255 90 78 / 0.35)
-  );
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
-  --n: var(--tox);
-}
-.cp-gauge[data-s='warn'] {
-  --n: var(--amber);
-}
-.cp-gauge[data-s='bad'] {
-  --n: var(--bad);
-}
-.cp-band {
-  position: absolute;
-  top: -3px;
-  bottom: -3px;
-  border-radius: 8px;
-  background: rgb(127 209 59 / 0.28);
-  border: 2px solid var(--tox);
-  box-shadow: 0 0 14px rgb(127 209 59 / 0.45);
-}
-.cp-needle {
-  position: absolute;
-  top: -8px;
-  width: 8px;
-  height: 36px;
-  margin-left: -4px;
-  border-radius: 4px;
-  background: var(--n);
-  box-shadow:
-    0 0 0 2px rgb(0 0 0 / 0.55),
-    0 0 14px var(--n);
-  left: 50%;
-  transition:
-    left 0.45s cubic-bezier(0.3, 1.4, 0.5, 1),
-    background 0.3s;
-}
-.cp-gauge u {
-  position: absolute;
-  top: 24px;
-  text-decoration: none;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  color: var(--dim);
-}
-.cp-lo {
-  left: 4px;
-}
-.cp-hi {
-  right: 4px;
-}
-.cp-row {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 22px;
-  padding-top: 8px;
-  border-top: 1px solid rgb(255 255 255 / 0.08);
-}
-.cp-cell {
-  flex: 1;
-  text-align: center;
-}
-.cp-n {
-  font: 1.5rem/1.1 var(--display);
-}
-.cp-sbar,
-.cp-allout {
-  display: none;
-}
-.cp.nogauge .cp-gauge {
-  visibility: hidden;
-}
-.cp.sprint {
-  border-color: #e040fb;
-  animation: cp-glow 0.7s ease-in-out infinite alternate;
-}
-.cp.sprint .cp-gauge {
-  display: none;
-}
-.cp.sprint .cp-row {
-  margin-top: 12px;
-}
-.cp.sprint .cp-allout {
-  display: block;
-  text-align: center;
-  font: 1.5rem/1 var(--display);
-  letter-spacing: 0.1em;
-  color: #ff7bff;
-  margin-bottom: 4px;
-  animation: cp-bob 0.35s ease-in-out infinite alternate;
-}
-.cp.sprint .cp-pow {
-  font-size: 5.6rem;
-  color: #fff;
-}
-.cp.sprint .cp-tgt-n {
-  color: #ff7bff;
-}
-.cp.sprint .cp-sbar {
-  display: block;
-  position: relative;
-  height: 22px;
-  margin-top: 10px;
-  border-radius: 11px;
-  background: rgb(255 255 255 / 0.1);
-  overflow: visible;
-}
-.cp-fill {
-  display: block;
-  height: 100%;
-  border-radius: 11px;
-  background: linear-gradient(90deg, #a21caf, #e040fb, #ffb0ff);
-  box-shadow: 0 0 16px #e040fb;
-  transition: width 0.4s;
-}
-.cp.beat .cp-fill {
-  background: linear-gradient(90deg, #e040fb, #ffd54a);
-}
-.cp-mark {
-  position: absolute;
-  top: -5px;
-  width: 3px;
-  height: 32px;
-  background: #fff;
-  border-radius: 2px;
-}
-.cp.go {
-  animation: cp-go 0.5s;
-}
-@keyframes cp-glow {
-  to {
-    box-shadow:
-      0 0 36px rgb(224 64 251 / 0.65),
-      0 10px 30px rgb(0 0 0 / 0.35);
-  }
-}
-@keyframes cp-bob {
-  to {
-    transform: scale(1.08);
-  }
-}
-@keyframes cp-go {
-  from {
-    transform: scale(1.08);
-  }
 }

@@ -1,27 +1,11 @@
 import { CFG } from '../config'
+import type { Aim } from '../core/aim'
 import { powerZone, tolerance, tolText } from '../core/hud'
 import { inCadBand } from '../modes/drill/cadence'
 import { h } from './dom'
 import { hudVal } from './hudParts'
 import { ZONE_COLOURS } from './planGraph'
 
-/** What a workout block asks of the rider, for the power panel. */
-export interface Aim {
-  /** The small caption over the big number: "Target", "Power · 3 s", "Sprint". */
-  cap: string
-  /** A chip beside it: "🔒 ERG", "ERG off". */
-  chip?: string
-  /** Target watts. Never set in a sprint. */
-  target?: number | null
-  /** The target is the big number and power sits beneath it; otherwise the other way round. */
-  targetLeads?: boolean
-  /** The second line in place of the other number: "All out", "Resistance 40%". */
-  note?: string
-  /** Sprint: how full the bar is against the rider's best, 0..1. */
-  fill?: number
-  /** Cadence band of the block, when the plan sets one. */
-  cad?: [number, number]
-}
 export interface PowerState {
   /** The rider's power as shown: 3 s average, or live in a sprint. */
   power: number

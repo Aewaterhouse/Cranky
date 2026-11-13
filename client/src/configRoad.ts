@@ -42,6 +42,11 @@ export const ROAD_CFG = {
     /** The interval summary stays this long (real seconds), and the interval list shows this many rows. */
     summaryS: 5,
     intervalRows: 7,
+    /** Bus: a sprint fills the bar at this multiple of the rider's best; the game panels are drawn for a
+     *  screen where one HUD unit is `designU` px (720 px tall); zones use `fallbackFtp` when no FTP is known. */
+    sprintBarOver: 1.15,
+    designU: 7.2,
+    fallbackFtp: 200,
     /** A PR or crew-best toast stays this long. */
     toastBigS: 7,
     /** Screens this short or shorter (CSS px) start without the minimap and rider list; freeHudDock.css uses the same number. */

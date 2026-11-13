@@ -227,22 +227,12 @@
 }
 
 @media (max-width: 1100px) {
-  .st-strip kbd {
-    display: none;
-  }
   .hud-left,
-  .hud-right,
-  .hud-bl {
+  .hud-right {
     width: 214px;
   }
   .eh {
     width: min(440px, 40vw);
-  }
-  .cp {
-    width: min(500px, 46vw);
-  }
-  .cp-pow {
-    font-size: 3.4rem;
   }
   .sp-MEGA .sp-big,
   .sp-LEGEND .sp-big {

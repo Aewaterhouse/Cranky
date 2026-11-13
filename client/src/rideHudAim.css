@@ -186,3 +186,37 @@
   min-width: 5ch;
   font: 400 calc(2.4 * var(--u)) var(--display);
 }
+
+/* Phone landscape: the menu scrolls if it must, and the stats drawer opens beside the power panel, under the
+   clock, in two columns (there is no room beneath the panel). */
+@media (max-height: 500px) {
+  .rh .hmenu {
+    min-width: 62vw;
+    max-height: calc(100vh - var(--sb) - 8 * var(--u) - 54px);
+    overflow-y: auto;
+  }
+  .rh .menu-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .rh .cue-line {
+    width: calc(46 * var(--u));
+  }
+  .rh .hstats {
+    position: absolute;
+    top: calc(21 * var(--u));
+    left: calc(100% + var(--u));
+    width: max-content;
+    min-width: 0;
+    grid-template-columns: auto auto;
+    column-gap: calc(3 * var(--u));
+  }
+  .rh.hud-stats .rhud .hstats {
+    display: grid;
+  }
+  .rh .hstats > :not(div),
+  .rh .hstats > .ghost-note,
+  .rh .hstats > .st-zones,
+  .rh .hstats > .st-sprints {
+    grid-column: 1 / -1;
+  }
+}

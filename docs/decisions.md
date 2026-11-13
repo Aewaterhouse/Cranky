@@ -627,3 +627,47 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 ### Dev aids added in Phase G
 - `?at=7000` starts a solo free ride that many metres in, `?intro=0` skips the card and flyover, `?perf=1` shows the frame-time overlay. None of them changes what a normal ride does.
 - Not done, on purpose: a mate-ghost picker in the group lobby (the lead dropped it), riders standing on a podium in the 3D world (the podium is drawn on the results screen), and unit conversion on the History screens.
+
+## 2026-11-14 HUD conventions in the solo player and the bus
+Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like the free ride. Built to sections 7, 8 and 9 of `docs/hud-notes.md`. A display change only: nothing that decides what is sent to the trainer was touched.
+
+**One HUD, three modes**
+- The free-ride HUD's panels became the shared ride HUD: `rideHud.css` and `rideHudDock.css` (glass, power panel, top-centre panel, list, toast, dock, strip, menu, phone rules; class `rhud`, sizes in `--u` under `.rh` or `.fr`), `ui/hudPower.ts` (the power panel) and `ui/hudParts.ts` (number with unit, stats row, ☰ menu, toast). The free ride uses them and looks as it did. `rideHudAim.css` holds what only a workout needs.
+- Every mode: power top left, the clock or speed top centre, a list on the right edge, a strip along the bottom, ☰ and Stats bottom left, the stats drawer under the power panel, toasts top centre, H for clean view, the same display-size setting.
+- The power panel in a workout has fixed slots: caption and a chip ("🔒 ERG", "ERG off", "aim 180 W"), the big number with zone and W/kg beside it, the bar, a second line, then cadence and heart rate. Nothing moves when a block has no target or a sensor drops out.
+- Tolerance bar: green inside the compliance band the ride is scored with (`CFG.compliance.band`, 5%, the same as the notes), amber out to 10% off (`CFG.hud.tol.warn`), red beyond; the bar spans 30% either way (`tol.span`, the old gauge's range). The bus cockpit used to go amber out to 12%; it is 10% everywhere now. Scoring is unchanged. The words beside it ("on target", "▲ push 12 W", "▼ ease 12 W") mean colour is never the only cue.
+- With the colour-blind setting on, the three tolerance colours become the Okabe-Ito green, yellow and vermilion (in `rideHud.css`), and heart-rate colours everywhere use the shared zone palette (they had their own five colours).
+- The power number's zone uses Zwift's boundaries (as in the free ride); the workout chart's blocks keep the app's own zone bands. So a block drawn in one zone's colour can show a number a zone away near a boundary. Not unified, as in the free ride.
+
+**Solo workout player**
+- The target stays top left rather than centre screen (the notes put it top centre) so power is in the same place in all three modes. It is the big number at 9 units (the other modes' power is 7; 7 on a phone); power sits beneath it at 3.8 in its zone colour with "on target" or the watts to find. The interval clock is the second-biggest number at 6, top centre, under the interval's name and "2 of 6", over "12:20 gone · 43:40 to go".
+- The close-up chart (60 s either side of now) sits where the other modes have the road. The whole workout is the bottom strip (9 units tall, 6 on a phone, no axes): bars by target, the now line and the power trace over them.
+- Outside ERG the big number is your power; the mode and its level ("Resistance 40%", "Slope +2% · gear") take the second line. The plan's target still shows as an "aim 180 W" chip and still drives the tolerance bar, because the ride is still scored against it.
+- A sprint or a free block never shows a target: the caption says "Sprint" or "Power", the second line "All out" or "Free ride", the bar is the zone colour.
+- Coach cue: one line under the clock, bright for `CFG.cueS` (8 s), then quiet until the interval ends. Long ones are cut with an ellipsis rather than wrapped, so the panel never changes height.
+- "Next: 5:00 at 320 W" shows for the last 10 s of an interval (`CFG.hud.nextS`) and all through a rest. A rest is a free block or a target under 60% of FTP (zone 1). A sprint reads "Next: 0:10 sprint, all out".
+- 3-2-1: the existing countdown tone and a digit under the clock for the last 3 s (`CFG.hud.countS`) before every change; it was sprints only. Into a sprint it is still the big one over the chart. These seconds are real seconds, so `?fast=` squeezes more workout into them.
+- Interval summary: top right for 5 s (`CFG.hud.summaryS`) after an effort (not after a rest, and not after a sprint, which has its grade splash): average power, watts off the average target, share of seconds in the scoring band, and cadence in band when the block set one.
+- Interval list on the right edge in the rider list's rows: at most 7 (`CFG.hud.intervalRows`), the current one second from the top, the zone colour on the edge, ✓ or ✗ when done. It replaces the scrolling list. A block with a cadence band has ↻ after its name; the band and the share in band are the row's tooltip and in the summary.
+- Stats drawer (S): average, normalised, intensity factor, TSS, energy, average cadence, compliance, time in zone and the ghost note. Elapsed and remaining moved under the clock.
+- ☰ menu: mode, tier, Pause, Skip interval, End ride, Stats, Intervals, Clean view, Media, Cadence line, Heart rate line, display size. The dock keeps Stats, the context buttons (+1 min, I'm done, +5 min, Finish now), the intensity stepper and, outside ERG, the level or gradient stepper.
+- Keys: H clean view, S stats, I interval list (R was taken by resistance mode). With the simulator, S is also its sprint key; that is a dev-only clash, the same one the free ride has.
+- Clean view leaves the chart and the overlay; a tap on the chart brings the HUD back.
+- Speed and distance were never shown here. Gear shows only with the slope stepper.
+- The trace's glow on the workout chart is now a wide faint stroke instead of a canvas shadow blur: the blur took most of a frame on a software canvas at the chart's new size.
+
+**Zombie Bus ride**
+- The cockpit at the bottom is gone. Your power is the hero top left with W/kg beside it; when the block has a target it is on the second line with the tolerance bar. In a sprint the panel says "Sprint · ERG off", the second line is "All out · best 640 W" and the bar fills towards 115% of your best sprint so far (`CFG.hud.sprintBarOver`, the old cockpit's number). There is a "SPRINT · all out" chip under the clock. No target power anywhere.
+- Top centre: the event name, the time left in the block as the big number, then "Next: Long haul · 180 W in 2:23", which stays up the whole time in the bus (what is coming is part of the game), and the roadblock bar. A sprint coming next never names a power. The plan timeline moved to the bottom strip with elapsed and total at its ends.
+- The crew is the right-edge list: name with the tier's letter, watts, compliance (or "fell · 12 s", "watching", "free") and heart rate. Watts rather than W/kg because the server does not send anyone's weight. Yours is the highlighted row.
+- Tier and End ride (or Leave the bus) moved into the ☰ menu. My stats is the same drawer as the other modes; Tab still opens it, and so does S. R shows or hides the crew.
+- The game's own panels are grouped: bus status is one block bottom centre (armour, horde gap, speed and distance and scrap on top; engine sync, nitro, streak beneath; upgrade pips on a third row on screens taller than 740 px, as before), the feed is bottom right, the shop and the splashes are where they were. They are still drawn at a 720 px design height and zoomed, now to the same unit as the shared HUD (`CFG.hud.designU`), so the display-size setting moves everything together.
+- VO2 Madness has no bus, so its mystery box and effort board take the left column under the power panel, and step aside while the stats drawer is open.
+- "Trainer reconnected" and other passing messages are top-centre toasts now rather than a title splash.
+- The game layer (splashes included) is drawn under the shared panels, so a wide splash passes behind the power panel and the crew list instead of over your numbers, and the ☰ menu opens over the bus status block.
+- TV board: keeps its layout. Numbers are tabular with the small unit style, and heart-rate colours come from the shared zone palette.
+
+**Phone and tablet**
+- Phone landscape (500 px tall or less): the list starts hidden in both modes (☰ or the key brings it back). The solo chart sits to the right of the power panel and the interval list drops its results column. There is no room under the power panel, so the stats drawer opens beside it, under the clock, in two columns. The bus status block runs from beside the corner buttons to the right edge with the feed above it; the Madness board takes the top right corner. The ☰ menu is wider with three buttons a row and scrolls if it is still too tall. Buttons are at least 44 px on touch screens; side margins are 4 vh or the safe area.
+- The free ride's own ☰ menu on a phone was left alone (the brief said not to change that screen); by its sizes it is probably a little taller than a 390 px screen. Not checked.
+- Tablet (1024x768) uses the desktop layout as it is.

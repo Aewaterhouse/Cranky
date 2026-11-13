@@ -1,0 +1,265 @@
+/* Zombie Bus ride screen: the shared ride HUD (rideHud.css, rideHudAim.css) for the rider's own numbers, the
+   clock, the crew and the plan strip, with the game's own panels (bus status or the VO2 Madness box, shop,
+   feed, splashes) kept in the older `.hud` layer, which is zoomed to match (--gz, set in ui/hud.ts). */
+.bus-ride {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.bus-ride > .hud {
+  zoom: var(--gz, 1);
+  z-index: 0;
+}
+.bus-ride.pre .eh,
+.bus-ride.pre .strip,
+.hud-clean .hud-left,
+.hud-clean .hud-right {
+  visibility: hidden;
+}
+
+/* Top centre: the event, the time left in the block, what is next */
+.bhud .eh {
+  position: static;
+  translate: none;
+  width: auto;
+  min-width: calc(40 * var(--u));
+  border: 0;
+  box-shadow: inset 0 calc(0.4 * var(--u)) 0 var(--ev);
+}
+.bhud .eh-main {
+  flex-direction: column;
+  gap: calc(0.3 * var(--u));
+}
+.bhud .eh-chip {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 700 calc(1.9 * var(--u)) var(--ui);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.bhud .eh-icon {
+  font-size: 1.2em;
+}
+.bhud .eh-label {
+  flex: none;
+  font-size: calc(1.7 * var(--u));
+  color: rgba(255, 255, 255, 0.75);
+}
+.bhud .eh-label:empty {
+  display: none;
+}
+.bhud .eh-left {
+  margin: 0;
+  font: 400 calc(6 * var(--u)) / 1 var(--display);
+}
+.bhud .eh-next {
+  margin: calc(0.4 * var(--u)) 0 0;
+  font: 500 calc(2.2 * var(--u)) var(--ui);
+  letter-spacing: 0;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
+}
+.bhud .eh-rb {
+  margin-top: calc(0.8 * var(--u));
+  font-size: calc(1.6 * var(--u));
+}
+.bhud .eh-rb div {
+  height: calc(1 * var(--u));
+}
+.bhud .nchip.sprint {
+  color: #e040fb;
+  box-shadow: inset 0 0 0 calc(0.25 * var(--u)) #e040fb;
+}
+
+/* Bottom strip: the plan, with elapsed and total at its ends */
+.bhud .strip .eh-tl {
+  height: 100%;
+  padding: 0 calc(1.5 * var(--u));
+  gap: calc(1.2 * var(--u));
+  font: 500 calc(1.9 * var(--u)) var(--ui);
+  color: rgba(255, 255, 255, 0.78);
+}
+.bhud .strip .plan-graph {
+  height: 76%;
+  background: none;
+}
+
+/* Right edge: the crew, in the rider list's rows */
+.rhud .crew .rrow {
+  grid-template-columns: 12ch 5.5ch 8.5ch 5ch;
+  align-items: baseline;
+}
+.crew .rn {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.crew .rn small {
+  margin: 0 0 0 0.5em;
+  padding: 0 0.35em;
+  border-radius: 0.3em;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.7em;
+  font-weight: 700;
+}
+.crew .rw {
+  font-weight: 700;
+  opacity: 1;
+}
+.crew .rg {
+  font-weight: 700;
+}
+.crew .rb {
+  text-align: right;
+  font-weight: 500;
+}
+.crew [data-st='spectator'] {
+  opacity: 0.55;
+}
+.crew [data-st='fell'] {
+  box-shadow: inset 0 0 0 calc(0.2 * var(--u)) var(--bad);
+}
+
+/* Stats drawer extras: time in zone and sprint grades */
+.bhud .hstats .st-zones {
+  height: calc(1.2 * var(--u));
+  margin: calc(0.4 * var(--u)) 0;
+  border-radius: 99px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.14);
+}
+.bhud .hstats .st-sprints {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: calc(0.6 * var(--u));
+  max-width: calc(34 * var(--u));
+}
+.bhud .hstats .st-chip {
+  padding: 0 calc(0.8 * var(--u));
+  border-radius: calc(0.5 * var(--u));
+  box-shadow: inset 0 0 0 1px var(--g);
+  color: var(--g);
+  font-weight: 700;
+  opacity: 1;
+}
+.rhud .hmenu button.danger {
+  color: var(--bad);
+}
+.rhud .hmenu label {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.6 * var(--u));
+}
+.rhud .hmenu select {
+  pointer-events: auto;
+  font: inherit;
+}
+
+/* The game's own panels, grouped: bus status bottom centre (two rows of three), the feed bottom left over the corner buttons */
+.bus-ride .hud-left {
+  top: auto;
+  left: 50%;
+  bottom: 62px;
+  width: min(790px, 66vw);
+  translate: -50% 0;
+}
+.bus-ride .bs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px 18px;
+  padding: 8px 14px 10px;
+}
+.bus-ride .bs > * {
+  margin: 0;
+  grid-column: 1;
+}
+.bus-ride .bs > :nth-child(3),
+.bus-ride .bs > :nth-child(4),
+.bus-ride .bs > :nth-child(8),
+.bus-ride .bs > :nth-child(9) {
+  grid-column: 2;
+}
+.bus-ride .bs > :nth-child(10),
+.bus-ride .bs > :nth-child(11) {
+  grid-column: 3;
+}
+.bus-ride .bs > :nth-child(-n + 4):nth-child(odd),
+.bus-ride .bs > :nth-child(6),
+.bus-ride .bs > :nth-child(8),
+.bus-ride .bs > :nth-child(10) {
+  align-self: end;
+}
+.bus-ride .bs > :nth-child(1),
+.bus-ride .bs > :nth-child(3) {
+  grid-row: 1;
+}
+.bus-ride .bs > :nth-child(2),
+.bus-ride .bs > :nth-child(4) {
+  grid-row: 2;
+}
+.bus-ride .bs > :nth-child(6),
+.bus-ride .bs > :nth-child(8),
+.bus-ride .bs > :nth-child(10) {
+  grid-row: 3;
+}
+.bus-ride .bs > :nth-child(7),
+.bus-ride .bs > :nth-child(9),
+.bus-ride .bs > :nth-child(11) {
+  grid-row: 4;
+}
+.bus-ride .bs > :nth-child(2) {
+  align-self: center;
+}
+.bus-ride .bs-stats {
+  grid-area: 1 / 3 / 3 / 4;
+  padding: 0;
+  border: 0;
+}
+.bus-ride .bs-pips {
+  grid-area: 5 / 1 / 6 / -1;
+  display: flex;
+  gap: 4px 12px;
+  margin-top: 4px;
+}
+@media (max-height: 740px) {
+  .bus-ride .bs-pips {
+    display: none;
+  }
+}
+.bus-ride .hud-right {
+  top: auto;
+  right: auto;
+  left: 22px;
+  bottom: 110px;
+}
+/* VO2 Madness has no bus: its box and effort board sit in the left column, under the power panel */
+.bus-ride .hud-left.mad {
+  top: 232px;
+  left: 22px;
+  bottom: auto;
+  width: 262px;
+  translate: none;
+}
+.hud-stats .hud-left.mad {
+  visibility: hidden;
+}
+.bus-ride .sh {
+  bottom: 190px;
+}
+
+/* Phone landscape: bus status runs from beside the corner buttons to the right edge, and the Madness
+   board takes the top right corner (the crew list starts hidden there). */
+@media (max-height: 500px) {
+  .bus-ride .hud-left {
+    left: auto;
+    right: 14px;
+    width: calc((100vw - 150px) / var(--gz, 1));
+    translate: none;
+  }
+  .bus-ride .hud-left.mad {
+    top: 12px;
+    left: auto;
+    right: 14px;
+    width: 262px;
+  }
+}

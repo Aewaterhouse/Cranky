@@ -10,6 +10,13 @@
   --ok: var(--tox);
   --warn: #ffb020;
 }
+/* The colour-blind setting: on target, close and off in the Okabe-Ito green, yellow and vermilion. */
+.cb .fr,
+.cb .rh {
+  --ok: #009e73;
+  --warn: #f0e442;
+  --bad: #d55e00;
+}
 .rhud {
   position: fixed;
   inset: 0;

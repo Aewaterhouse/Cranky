@@ -3,6 +3,7 @@ import '../rideHudDock.css'
 import '../rideHudAim.css'
 import '../soloHud.css'
 import { CFG } from '../config'
+import { soloAim } from '../core/aim'
 import { hrZone } from '../core/curve'
 import { effortSummary, isRest, nextText } from '../core/hud'
 import type { BlockStat } from '../core/ride'
@@ -10,7 +11,7 @@ import type { Live } from '../modes/rideController'
 import type { Frame, Plan, Tier } from '../types'
 import { clock, fmt, h } from './dom'
 import { hudToast } from './hudParts'
-import { powerPanel, type Aim } from './hudPower'
+import { powerPanel } from './hudPower'
 import { ZONE_COLOURS } from './planGraph'
 import { soloActions, type SoloAction } from './soloExtras'
 import { mediaCorner } from './soloMedia'
@@ -50,22 +51,6 @@ export interface ViewState {
   weightKg: number
   /** 3, 2, 1 before the interval changes; 0 otherwise. */
   count: number
-}
-
-/** What the power panel says for this moment of the workout. A sprint or a free block never has a target. */
-export function soloAim(f: Frame, mode: ModeState): Aim {
-  const erg = mode.kind === 'erg'
-  if (f.type === 'sprint') return { cap: 'Sprint', chip: 'ERG off', note: 'All out', cad: f.cad }
-  if (f.tgt == null) return { cap: 'Power · 3 s', chip: 'ERG off', note: 'Free ride', cad: f.cad }
-  return erg
-    ? { cap: 'Target', chip: '🔒 ERG', target: f.tgt, targetLeads: true, cad: f.cad }
-    : {
-        cap: 'Power · 3 s',
-        chip: `aim ${f.tgt} W`,
-        target: f.tgt,
-        note: modeText(mode),
-        cad: f.cad,
-      }
 }
 
 /**
@@ -255,7 +240,7 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         cadence: live.cadence,
         hr: live.hr,
         hrColour: live.hr && maxHr ? ZONE_COLOURS[hrZone(live.hr, maxHr)] : undefined,
-        aim: soloAim(f, s.mode),
+        aim: soloAim(f, s.mode.kind === 'erg' ? null : modeText(s.mode)),
       })
       panel.cadence(s.cadPct)
       blockName.textContent = `${f.label} · ${f.i + 1} of ${plan.blocks.length}`

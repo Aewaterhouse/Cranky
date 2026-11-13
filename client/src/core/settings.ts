@@ -87,6 +87,7 @@ export function applySettings() {
   else root.removeProperty('--hud-scale')
   setZonePalette(settings.colourBlind)
   setGradePalette(settings.colourBlind)
+  document.documentElement.classList.toggle('cb', settings.colourBlind)
   document.documentElement.classList.toggle('reduced-motion', lessMotion())
   localStorage.setItem('cranky.gfx', settings.gfx)
 }

@@ -104,6 +104,44 @@ In the app: Ride, Free ride, Mount Coot-tha, Start with the simulated trainer. A
 - Settings, Free ride view, Charts: the old flat layout still works, with its tiles, both profiles and the big map.
 - Not checked on real hardware: a telly across the room, an iPad, a phone with a notch, a real heart-rate strap.
 
+## HUD conventions in the solo player and the bus (Phase B2)
+
+Simulated trainer throughout. `?fast=20` speeds a solo workout up; `[` and `]` change the simulator's effort so power goes off target.
+
+**Solo workout**
+
+1. Start Sweet Spot 3x20 in ERG. Top left: "Target" with a lock and "ERG", the target big, a tolerance bar, your power beneath it in its zone colour, cadence under that. Top centre: the interval's name and "1 of 8", the time left big, "gone" and "to go" small. Right edge: the interval list with the current one highlighted. Bottom: the whole workout as a strip with a now line and your trace.
+2. Press `[` twice: the needle leaves the green band and the words go amber ("▲ push 18 W"). Three more: red. `]` back: "on target", green.
+3. In the warm-up and each Recover, "Next: 20:00 at 178 W" sits under the clock the whole time. In a sweet spot block it appears only for the last 10 s.
+4. The last 3 s of every interval: 3, 2, 1 under the clock with a tone each, then the block tone.
+5. When a sweet spot block ends, a summary shows top right for 5 s: average, off target, in band. Nothing shows after a Recover.
+6. The coach's line appears under the clock in the accent colour, goes quiet after 8 s and clears when the interval ends. The panel does not change height.
+7. ☰: mode, tier, Pause, Skip interval, End ride, Stats, Intervals, Clean view, Media, Cadence line, Heart rate line, display size all work. Picking Large makes every number bigger at once.
+8. S opens the stats drawer under the power panel; I hides the interval list; H hides everything but the chart and H or a tap on the chart brings it back.
+9. R (resistance): the big number is your power, "Resistance 40%" is on the second line, the chip says "aim 178 W", a stepper for the level appears bottom right. G (slope) the same with the gradient and gear. E back to ERG.
+10. Cadence Spin-ups: in a spin-up the cadence unit reads "110–120 rpm" and the number is amber outside the band, green inside.
+11. Sprints 8x10: before a sprint the big 3-2-1 covers the chart; in it the panel says "Sprint · ERG off" and "All out" with no target anywhere; the grade splashes afterwards.
+12. Ramp test (Solo workout, Test your FTP): no mode, tier or intensity controls; "I'm done" is in the dock during the ramp; the new FTP question comes at the end.
+13. Space pauses: "PAUSED" over the chart with the HUD still readable behind it. Esc asks before ending.
+14. Media in the menu opens the video corner bottom right, above the strip; typing in its box does not pause or skip.
+15. Ride a workout twice: the second time the dashed blue ghost is on both charts and the stats drawer says what it is.
+
+**Zombie Bus**
+
+16. Two riders, Bus Quick 30. Top left: your power big with zone and W/kg, the tolerance bar, "Target 111 W on target", cadence. Top centre: the event, time left big, "Next: …". Right edge: both riders with watts and compliance, yours highlighted. Bottom centre: bus status in one block. Bottom: the plan strip with elapsed and total.
+17. Roadblock (sprint): "SPRINT · all out" chip under the clock, the panel says "Sprint · ERG off" and "All out · best … W", the bar fills as you push. No target power on screen, in the header's "Next" line beforehand either.
+18. Servo Stop: the shop opens above the bus status block and buying still works; the feed lines show bottom right.
+19. A rider who stops pedalling falls off: their row says "fell · 20 s" counting down in red.
+20. ☰: tier, Stats, Crew, Clean view, End ride (Leave the bus for a guest), display size. S or Tab opens my stats under the power panel; R hides the crew; H hides the HUD and the game panels, splashes still show.
+21. VO2 Madness: the mystery box and "who's trying hardest" board are in the left column under the power panel; everything else as above.
+22. TV (`?watch=CODE`): the board is laid out as before; numbers do not jiggle as they change.
+
+**Everywhere**
+
+23. Settings, in-ride display size Huge: solo, bus and free ride all grow; nothing overlaps at 1280x720.
+24. Settings, colour-blind colours on: zone colours change in the power panel, the charts, the interval list, the plan strip and heart rates; the tolerance colours become green, yellow and vermilion.
+25. Phone landscape (844x390) and tablet (1024x768): both screens fit with no overlap, the list starts hidden on the phone, every button is at least a thumb wide.
+
 ## Free ride 3D world (Phase C)
 
 Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.route.camBack=40` for a view from above.
