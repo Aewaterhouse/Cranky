@@ -4,6 +4,7 @@ import '../freeHud.css'
 import '../freeHudDock.css'
 import { CFG } from '../config'
 import type { ListRider } from '../core/hud'
+import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
 import type { Live } from '../modes/rideController'
 import { h } from './dom'
@@ -40,6 +41,8 @@ export interface FreeState {
   /** Everyone on the road, me included. */
   riders: ListRider[]
   me: string
+  /** Lap rides only. */
+  lap?: LapInfo
 }
 
 /** HUD parts that can be switched on and off. */

@@ -28,6 +28,7 @@
 - `badges.ts` milestone badges, PR timeline.
 - `fitness.ts` TSS estimate, CTL/ATL/TSB, weekly TSS, heatmap, streaks; `riderMetrics.ts` zones, HR zones, W/kg, FTP series; `powerCurve.ts` power curve lines and axis maths; `crewCurve.ts` crew leaderboard ranking and mate curve lines.
 - `climbs.ts` sustained climbs on a route and the one the rider is on; `hud.ts` HUD maths with no DOM: power zone (Zwift boundaries), gradient colour, gap text, rider-list rows.
+- `laps.ts` lap counter, lap times and the lap toast for lap rides (no DOM).
 - `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.

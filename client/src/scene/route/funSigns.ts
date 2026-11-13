@@ -33,6 +33,23 @@ export interface Chalk {
   tint: number
 }
 
+/** A chalk message as painted: one or two words a line. */
+export function chalkRows(text: string): string[] {
+  if (text === 'ARROW') return [text]
+  return text.split(' ').reduce<string[]>((acc, w) => {
+    const last = acc[acc.length - 1]
+    if (last !== undefined && last.length + w.length < 9) acc[acc.length - 1] += ` ${w}`
+    else acc.push(w)
+    return acc
+  }, [])
+}
+
+/** The stretch of road a chalk message covers, with a little room either end: the centre line is left out there. */
+export function chalkSpan(c: Chalk): [number, number] {
+  const far = c.d + (chalkRows(c.text).length - 1) * C.letterL * C.rowGap
+  return [c.d - C.letterL / 2 - C.lineClear, far + C.letterL / 2 + C.lineClear]
+}
+
 /** Breaks `text` into at most `lines` lines of about `width` letters, widening only when it must. */
 export function wrap(text: string, width = S.wrap, lines = 3): string {
   for (let w = width; ; w++) {

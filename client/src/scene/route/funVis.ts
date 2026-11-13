@@ -283,6 +283,9 @@ export const FUN = {
     letterW: 0.62,
     letterL: 3.2,
     maxW: 5.4,
+    /** Rows of a message are this many letter lengths apart; the centre line stops this far (m) short of the chalk. */
+    rowGap: 1.08,
+    lineClear: 1.5,
     lift: 0.03,
     fade: 0.85,
     tints: ['#f6f6f2', '#f6f6f2', '#f7e36a', '#f4a6c0', '#a6d8f4'],

@@ -429,4 +429,10 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 ## Lap rides on loop courses (2026-11-13)
 - A route marked `loop` gets a lap stepper beside Start. The ride is the lap repeated end to end as one long route (`withLaps`), so distance, climb, the elevation strip, ETA and the finish all work unchanged. The 3D world still draws the single lap and riders wrap round it, so scenery is built once.
 - Limits (`CFG.freeRide.laps`): at most 99 laps or 300 km. The stepper starts at about 12 km worth of laps (10 for the Nundah crit track, 1 for the road race circuits). There is no endless mode: pick plenty of laps and end the ride when you have had enough.
-- Lap count, lap times and a bell on the last lap are not shown yet.
+- Lap count, lap times and the bell came with Phase D (below).
+
+## 2026-11-13 Free ride Phase D: fixes before the feel
+- Crossing animals never stand on the road when the rider gets there. A wombat or lyrebird still ambles at its own pace (1.3 and 2.4 m/s), but its progress is also tied to how far the rider has come since it set off: it is off the far verge by the time the rider is 22 m short (`life.crossClear`), so a fast rider sees it break into a trot (wombats really can run). It only sets off if the rider is between 55 and 40 m short (`life.crossLate`); a rider who starts closer finds it sitting on its own verge. It never backs up.
+- Chalk keeps its size and its wander across the lane; the dashed centre line is simply left out under each message and for 1.5 m either end (`chalk.lineClear`), as if the chalkers had scrubbed it. Rows of a message are 1.08 letter lengths apart (`chalk.rowGap`, was inline).
+- Lap rides: "Lap 3 / 10" leads the totals under the speed; "Last lap" and "Best lap" rows join the stats drawer on lap rides only. Lap time is moving time (pauses do not count), timed back to where the line was crossed rather than to the 200 ms tick. Finishing a lap gives a toast ("Lap 3 done · 4:12", with "best yet" from the second lap on) and one ring of a synthesised hand bell; starting the final lap says "Last lap" and rings three times. The last lap's own time is not toasted: that is the finish. Bell numbers in `CFG.sound.bell` (1,320 Hz with overtones at 2.76 and 5.4 times, 1.1 s ring). The flat (charts) layout gets the toast and the bell but no lap counter.
+

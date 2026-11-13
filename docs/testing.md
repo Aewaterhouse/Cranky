@@ -126,3 +126,12 @@ Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.ro
 - Wildlife: `?route=mount-coot-tha&next=life&speed=6` rides up to the next animals; `&kind=roos` (also `cows`, `sheep`, `cockatoos`, `galahs`, `seagulls`, `wombat`, `lyrebird`, `magpie`, `ute`, `caravan`, `coach`) picks a kind, where the route has one. Roos should sit up, then hop away from the road as you arrive and stop to watch; flocks burst into the air; the wombat ambles across in front of you; the magpie makes three passes over your helmet; vehicles come down the other lane and pass on your right. Nothing should float above or sink into the ground, and animals should not stand on the road unless they are crossing it.
 - Moods: `&mood=routeDawn`, `routeGolden`, `routeDusk`, `routeMist`, `routeShower` (rain streaks should fall around the camera). Without `mood=` the sky follows your clock; `?route=mount-hotham&d=25000` is in mist on most days. The debug panel (`g`) has the same choice under Route world, mood.
 - Remarks: in the app start a free ride on Mount Coot-tha with the simulated trainer. A remark appears about 8 s in, then no more than one a minute; passing an oddity usually gets one. Hold the simulated power above 105% of FTP: only short encouragement, at most every 90 s. Stop for 20 s: one remark. Settings, Free ride remarks, Off: none.
+
+## Free ride Phase D: the feel
+
+Harness as before (`/route-dev.html`). Nothing here has been heard or felt by its author: the sounds and the trainer feel were only unit-tested, so listen and ride with a critical ear.
+
+- Wombat: `?route=mount-coot-tha&next=life&kind=wombat&back=70&speed=12`: it sets off as you come up, trots, and is off the far side before you reach it. `&back=14`: it sits on the verge and stays there. Same with `kind=lyrebird`. Look for: an animal on the tarmac as you pass.
+- Chalk: `?route=ben-lomond&d=13000&next=chalk`: no dashed centre line under or just before and after the words.
+- Laps: in the app pick the Nundah crit track with 3 laps and the simulated trainer (`?fast=8` hurries it). "Lap 1 / 3" leads the totals under the speed. Crossing the line: a toast with the lap time and one ring of the bell; into the final lap the toast starts "Last lap" and the bell rings three times. Stats (S): "Last lap" and "Best lap" fill in after the first lap.
+

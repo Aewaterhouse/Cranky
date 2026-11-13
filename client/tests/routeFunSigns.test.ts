@@ -2,7 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { CHALK_LINES } from '../src/fun/chalkLines'
 import { SIGN_LINES } from '../src/fun/signLines'
 import { VIS } from '../src/scene/params'
-import { dealer, planChalk, planFunSigns, stretches, wrap } from '../src/scene/route/funSigns'
+import {
+  chalkRows,
+  chalkSpan,
+  dealer,
+  planChalk,
+  planFunSigns,
+  stretches,
+  wrap,
+} from '../src/scene/route/funSigns'
 import { FUN } from '../src/scene/route/funVis'
 import { rng } from '../src/scene/route/scatter'
 import { funWorld } from './funWorld'
@@ -161,5 +169,17 @@ describe('chalk', () => {
     expect(km.length).toBeGreaterThan(0)
     for (const c of km)
       expect(+c.text.match(/(\d+) KM/)![1]).toBeCloseTo((12000 - c.d) / 1000, -0.2)
+  })
+})
+
+describe('chalk and the centre line', () => {
+  it('breaks the line under the whole message with room either end', () => {
+    const C = FUN.chalk
+    expect(chalkRows('ALLEZ ALLEZ ALLEZ').length).toBe(3)
+    const [a, b] = chalkSpan({ d: 500, text: 'ALLEZ ALLEZ ALLEZ', tint: 0 })
+    expect(a).toBeLessThan(500 - C.letterL / 2)
+    expect(b).toBeGreaterThan(500 + 2 * C.letterL * C.rowGap + C.letterL / 2)
+    const [c, e] = chalkSpan({ d: 500, text: 'ARROW', tint: 0 })
+    expect(e - c).toBeCloseTo(C.letterL + 2 * C.lineClear)
   })
 })

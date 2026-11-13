@@ -55,6 +55,22 @@ export const CFG = {
   extend: { minuteS: 60, easyS: 300, easyPct: 50, graceS: 20 },
   ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
   scene: { speedMax: 22 },
+  /** Synthesised sounds (ui/audio.ts, ui/rideSound.ts). Gains are 0..1 before the volume setting. */
+  sound: {
+    /** Lap bell: base pitch, bell-like overtones as [multiple, gain], ring time, rings on the last lap and their gap. */
+    bell: {
+      hz: 1320,
+      partials: [
+        [1, 1],
+        [2.76, 0.45],
+        [5.4, 0.2],
+      ],
+      gain: 0.12,
+      ringS: 1.1,
+      lastRings: 3,
+      gapS: 0.28,
+    },
+  },
   /** Virtual gears (free ride and solo slope): 24 ratios spanning Zwift's range, set on a 14T Zwift Cog. */
   gears: {
     ratios: [

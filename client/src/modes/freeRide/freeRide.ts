@@ -1,6 +1,7 @@
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { gearGrade, shiftGear } from '../../core/gears'
+import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
 import { steadySpeed, stepSpeed, totalMass, trainerGrade } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
@@ -8,7 +9,8 @@ import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { settings } from '../../core/settings'
 import { clickSource, onClickShift } from '../../trainer/zwiftClick'
-import { show } from '../../ui/dom'
+import { SFX } from '../../ui/audio'
+import { clock, show } from '../../ui/dom'
 import { toast } from '../../ui/toast'
 import { freeRideView, type FreePart } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
@@ -109,6 +111,7 @@ export function runFreeRide(
   // On a lap ride the world draws one lap, so its riders wrap round at the lap length.
   const lapM = route.lapOf?.distance
   const shown = lapM ? riders.map((r) => ({ ...r })) : riders
+  const lapTimer = lapM ? new LapTimer(lapM, Math.round(route.distance / lapM)) : undefined
   let world: RouteWorld | undefined
   // Remarks go to the HUD's toast when the view has one, and are spoken when the announcer is on.
   const quipper = new Quipper()
@@ -211,6 +214,13 @@ export function runFreeRide(
       g.rider.d = Math.min(route.distance, g.rider.d + g.rider.speed * dt)
     }
     if (lapM) riders.forEach((r, i) => Object.assign(shown[i], r, { d: r.d % lapM }))
+    const lap = lapTimer?.info(dist)
+    if (lap && lapTimer?.update(dist, el, speed) !== undefined) {
+      const now = lapTimer.info(dist)
+      Object.assign(lap, now)
+      view.toast(lapToast(now, clock))
+      SFX.bell(now.n === now.of ? CFG.sound.bell.lastRings : 1)
+    }
     ride.rec.distance = Math.round(dist)
     ride.rec.ascent = Math.round(route.ascent - ascentFrom(route, dist))
     const pw = ride.rec.power
@@ -236,6 +246,7 @@ export function runFreeRide(
         ...ghosts.map((g) => ({ ...g.rider, wkg: g.watts / kg })),
       ],
       me: me.id,
+      lap,
     })
     const quip =
       settings.quips &&

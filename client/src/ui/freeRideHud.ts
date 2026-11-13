@@ -33,6 +33,8 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const dist = h('span', {})
   const el = h('span', {})
   const up = h('span', { class: 'up' })
+  const lap = h('span', { class: 'lap' })
+  const laps = !!route.lapOf
 
   const stat = (label: string) => {
     const v = h('b', {}, '–')
@@ -46,6 +48,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     eta: stat('Finish in'),
     arrive: stat('Arrive'),
     trainer: stat('Trainer feels'),
+    ...(laps ? { lastLap: stat('Last lap'), bestLap: stat('Best lap') } : {}),
   }
 
   const whole = profileChart(route, undefined, true)
@@ -122,7 +125,12 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     h(
       'div',
       { class: 'hud-tc' },
-      h('div', { class: 'glass speed' }, spd.el, h('div', { class: 'totals' }, dist, el, up)),
+      h(
+        'div',
+        { class: 'glass speed' },
+        spd.el,
+        h('div', { class: 'totals' }, ...(laps ? [lap] : []), dist, el, up),
+      ),
     ),
     h('div', { class: 'hud-tr' }, h('div', { class: 'minimap' }, mapBox), list.el),
     h(
@@ -186,6 +194,11 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         { hour: 'numeric', minute: '2-digit' },
       )
       stats.trainer.v.textContent = `${s.trainerGrade.toFixed(1)}%`
+      if (s.lap && stats.lastLap && stats.bestLap) {
+        lap.textContent = `Lap ${s.lap.n} / ${s.lap.of}`
+        stats.lastLap.v.textContent = s.lap.lastS === undefined ? '–' : clock(s.lap.lastS)
+        stats.bestLap.v.textContent = s.lap.bestS === undefined ? '–' : clock(s.lap.bestS)
+      }
 
       grade.textContent = `${s.grade > 0 ? '▲' : '▼'} ${Math.abs(s.grade).toFixed(1)}%`
       grade.style.color = gradeColour(s.grade)

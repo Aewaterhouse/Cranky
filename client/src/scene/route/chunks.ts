@@ -6,7 +6,7 @@ import { dropBuildingGeos } from './buildingGeo'
 import { buildBuildings, buildPlants } from './chunkProps'
 import type { Features } from './features'
 import { buildChalk, buildFunSigns } from './funSignGeo'
-import type { Chalk, FunSign } from './funSigns'
+import { chalkSpan, type Chalk, type FunSign } from './funSigns'
 import type { Furn } from './furniture'
 import { buildFurniture, buildRails, dropFurnitureGeos } from './furnitureGeo'
 import type { HeightField } from './heightField'
@@ -118,7 +118,8 @@ export class Chunks {
     const solid = new Tris(pose.x, pose.y, pose.z)
     const water = new Tris(pose.x, pose.y, pose.z)
     const strips = new Tris(pose.x, pose.y, pose.z)
-    buildRoad(field.path, d0, d1, solid)
+    const chalked = [k - 1, k, k + 1].flatMap((c) => this.place.chalk.get(c) ?? []).map(chalkSpan)
+    buildRoad(field.path, d0, d1, solid, chalked)
     const patches = [new Patch(field, d0, d1, far, -1), new Patch(field, d0, d1, far, 1)]
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)

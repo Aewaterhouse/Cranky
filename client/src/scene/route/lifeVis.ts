@@ -40,6 +40,9 @@ export const LIFE = {
   /** A crossing starts when the rider is this far short of it and ends this far off the other side. */
   cross: 55,
   crossTo: 11,
+  /** It is off the far verge by the time the rider is this close, and does not set off at all inside `crossLate`. */
+  crossClear: 22,
+  crossLate: 40,
   wombatMs: 1.3,
   lyreMs: 2.4,
   /** The magpie strikes within this of its tree: this many passes over this long, this far, low and high. */

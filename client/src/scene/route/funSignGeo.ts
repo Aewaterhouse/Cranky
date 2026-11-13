@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { hash } from '../math'
 import { VIS } from '../params'
 import { col, type Anchor } from './chunkProps'
-import type { Chalk, FunSign } from './funSigns'
+import { chalkRows, type Chalk, type FunSign } from './funSigns'
 import { FUN } from './funVis'
 import type { HeightField } from './heightField'
 import { drawnHeight, type Patch } from './patch'
@@ -71,19 +71,11 @@ export function buildChalk(
 ): THREE.Object3D[] {
   const out: THREE.Object3D[] = []
   for (const c of list) {
-    const lines =
-      c.text === 'ARROW'
-        ? [c.text]
-        : c.text.split(' ').reduce<string[]>((acc, w) => {
-            const last = acc[acc.length - 1]
-            if (last !== undefined && last.length + w.length < 9) acc[acc.length - 1] += ` ${w}`
-            else acc.push(w)
-            return acc
-          }, [])
+    const lines = chalkRows(c.text)
     const tint = C.tints[Math.floor(c.tint * C.tints.length)]
     lines.forEach((line, i) => {
       // The top line is the furthest up the road, so the message reads as a block from the saddle.
-      const p = path.poseAt(c.d + (lines.length - 1 - i) * C.letterL * 1.08, pose)
+      const p = path.poseAt(c.d + (lines.length - 1 - i) * C.letterL * C.rowGap, pose)
       const m = signs.chalk(line, tint)
       const w = line === 'ARROW' ? C.letterL * 0.8 : Math.min(C.maxW, line.length * C.letterW + 0.4)
       const cb = Math.cos(p.bank)
