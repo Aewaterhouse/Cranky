@@ -22,6 +22,8 @@
 - Free ride Phase A (`docs/freeride-plan.md`): ten bundled Australian routes and a card picker (not yet seen in a browser).
 - Free ride Phase B: the 3D road world (road, terrain, rider, chase camera, slim HUD, `/route-dev.html` harness, 2D fallback setting). Seen only in software-rendered screenshots.
 - Workout builder (solo picker, My workouts).
+- Free ride Phase C so far: land-cover ground, side streets and street signs, gum trees and scrub, houses and shops from real footprints, road furniture, landmarks. Seen in headless screenshots and by the owner on Mount Coot-tha.
+- HUD research (`docs/hud-notes.md`).
 
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
