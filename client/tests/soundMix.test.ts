@@ -25,11 +25,16 @@ describe('bike sounds follow the ride', () => {
   it('wind is silent at a crawl, rises with speed and is never past full', () => {
     expect(windGain(0)).toBe(0)
     expect(windGain(S.wind.fromMs)).toBe(0)
-    const g = [5, 8, 12, 16, 20].map((v) => windGain(v))
+    const g = [5, 8, 12, 15].map((v) => windGain(v))
     for (let i = 1; i < g.length; i++) expect(g[i]).toBeGreaterThan(g[i - 1])
     expect(windGain(S.wind.fullMs)).toBe(1)
     expect(windGain(60)).toBe(1)
-    expect(windHz(15)).toBeGreaterThan(windHz(5))
+    expect(windHz(10)).toBeGreaterThan(windHz(5))
+  })
+  it('wind stops climbing on a fast descent', () => {
+    expect(windHz(25)).toBe(S.wind.maxHz)
+    expect(windHz(40)).toBe(windHz(25))
+    expect(windGain(25)).toBe(windGain(40))
   })
   it('a headwind is louder than a tailwind at the same road speed', () => {
     expect(windGain(8, 4)).toBeGreaterThan(windGain(8))

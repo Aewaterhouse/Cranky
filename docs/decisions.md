@@ -756,3 +756,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Trainer mode per ride (2026-11-14)
 - The host's pick (`trainers`: choose, erg, gears) defaults to "each rider chooses", so nothing changes unless the driver sets it. A forced pick does not overwrite the rider's saved ERG / Gears preference; it only applies for that ride. The server works out each rider's `erg` from both (`Room.erg_of`).
+
+## Quieter wind (2026-11-14)
+- Free-ride wind: level 0.28 (was 0.5), full at 16 m/s through the air (was 20), pitch capped at 850 Hz (`CFG.audio.ride.wind.maxHz`). Picked so cruising speeds sound about the same and fast descents are about half as loud with no climbing whistle.

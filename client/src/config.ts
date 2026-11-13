@@ -80,7 +80,7 @@ export const CFG = {
       level: {
         master: 1,
         freehub: 0.22,
-        wind: 0.5,
+        wind: 0.28,
         tyre: 0.4,
         clunk: 0.7,
         birds: 0.12,
@@ -95,8 +95,9 @@ export const CFG = {
       bedEaseS: 2,
       /** Freehub: pawl clicks per wheel turn, silent below `minMs`, at most `maxHz` clicks a second; each click rings at `ringHz` for `clickS`; booked `aheadS` ahead. */
       freehub: { clicks: 18, minMs: 0.8, maxHz: 45, ringHz: 3400, clickS: 0.012, aheadS: 0.35 },
-      /** Wind in the ears: from `fromMs` to full at `fullMs` through the air; its pitch rises `hzPerMs`. */
-      wind: { fromMs: 3, fullMs: 20, hz: 350, hzPerMs: 45, q: 0.7 },
+      /** Wind in the ears: from `fromMs` to full at `fullMs` through the air; its pitch rises `hzPerMs` up to
+       *  `maxHz`, so a fast descent is a steady rush, not a rising whistle. */
+      wind: { fromMs: 3, fullMs: 16, hz: 350, hzPerMs: 45, maxHz: 850, q: 0.7 },
       tyre: { fullMs: 14, hz: 110, hzPerMs: 14, q: 0.8 },
       clunk: { hz: 150, thunkS: 0.07, settleS: 0.05 },
       /** Noise beds as [filter Hz, Q, swell Hz, swell depth]: cicadas rattle fast, surf and wind swell slowly. */

@@ -30,9 +30,9 @@ export const freehubHz = (speed: number, coasting: boolean) =>
 export const windGain = (speed: number, headwind = 0) =>
   clamp((speed + headwind - S.wind.fromMs) / (S.wind.fullMs - S.wind.fromMs)) ** 2
 
-/** The wind's pitch (filter centre, Hz) climbs with the speed through the air. */
+/** The wind's pitch (filter centre, Hz) climbs with the speed through the air, then levels off. */
 export const windHz = (speed: number, headwind = 0) =>
-  S.wind.hz + Math.max(0, speed + headwind) * S.wind.hzPerMs
+  Math.min(S.wind.maxHz, S.wind.hz + Math.max(0, speed + headwind) * S.wind.hzPerMs)
 
 /** Tyre hum, 0..1: there as soon as the wheels turn, levelling off at speed. */
 export const tyreGain = (speed: number) => Math.sqrt(clamp(speed / S.tyre.fullMs))
