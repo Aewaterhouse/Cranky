@@ -5,6 +5,7 @@ export const CFG = {
   erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1, maxFails: 5 },
   ftms: { resMax: 100, replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
+  click: { backoffMs: [1000, 2000, 4000, 5000] },
   clock: { hz: 4, snapS: 1, gain: 0.2, windowS: 4, rateMin: 0.5, rateMax: 30, staleS: 3 },
   recovery: { saveMs: 5000, maxAgeMs: 30 * 60 * 1000 },
   compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },
@@ -54,6 +55,19 @@ export const CFG = {
   extend: { minuteS: 60, easyS: 300, easyPct: 50, graceS: 20 },
   ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
   scene: { speedMax: 22 },
+  /** Virtual gears (free ride and solo slope): 24 ratios spanning Zwift's range, set on a 14T Zwift Cog. */
+  gears: {
+    ratios: [
+      0.75, 0.87, 0.99, 1.11, 1.23, 1.38, 1.53, 1.68, 1.86, 2.04, 2.22, 2.4, 2.61, 2.82, 3.03, 3.24,
+      3.49, 3.74, 3.99, 4.24, 4.54, 4.84, 5.14, 5.49,
+    ],
+    start: 12,
+    cogTeeth: 14,
+    chainring: 34,
+    wheelM: 2.1,
+    /** Below this cadence (rpm) the trainer just gets the road's gradient. */
+    minCadence: 20,
+  },
   /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
   tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
   freeRide: {

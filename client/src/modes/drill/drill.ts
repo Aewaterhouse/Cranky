@@ -3,6 +3,8 @@ import '../../solo.css'
 import type { Profile } from '../../core/curve'
 import { recordFtp } from '../../core/curve'
 import { frameAt, planTotal, startOf } from '../../core/plan'
+import { shiftGear } from '../../core/gears'
+import { totalMass } from '../../core/physics'
 import { saveProfile } from '../../core/profile'
 import { RideRecorder } from '../../core/ride'
 import { clearSnap, saveSnap, soloKey, type SoloSnap } from '../../core/snapshot'
@@ -11,13 +13,14 @@ import { SFX } from '../../ui/audio'
 import type { SoloAction } from '../../ui/soloExtras'
 import { show } from '../../ui/dom'
 import { finishRide } from '../../ui/results'
-import { stepMode, type ModeState, type RideMode } from '../../ui/soloMode'
+import { startMode, stepMode, type ModeState, type RideMode } from '../../ui/soloMode'
 import { soloView } from '../../ui/soloView'
 import type { Frame, Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { addEasy, addMinute, ownPlan } from './extend'
 import { CueTracker } from './cues'
-import { soloKeys } from './keys'
+import { soloClick, soloKeys } from './keys'
+import { slopeSender } from './slope'
 import { LiveTally } from './liveTally'
 import { pickOverlay, type Overlay } from './overlays'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
@@ -57,7 +60,8 @@ export function runDrill(
   let count = START_S
   let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
   let below = 0
-  let mode: ModeState = { kind: 'erg', level: CFG.ride.resStart, grade: CFG.ride.gradeStart }
+  let mode = startMode()
+  const sendSlope = slopeSender(ride.erg, totalMass(profile.weightKg))
   let manual = false
   let auto = false
   let finished = false
@@ -105,8 +109,11 @@ export function runDrill(
     mode = next
     if (kind === 'erg') ride.erg.setErg()
     else if (kind === 'res') ride.erg.setResistance(mode.level)
-    else ride.erg.setGrade(mode.grade)
+    else sendSlope(mode, ride.live.cadence, true)
   }
+  const gear = (d: number) =>
+    mode.kind === 'slope' &&
+    ((mode = { ...mode, gear: shiftGear(mode.gear, d) }), sendSlope(mode, ride.live.cadence, true))
   const inRamp = (i: number | undefined) =>
     spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
   function rampDone() {
@@ -151,18 +158,18 @@ export function runDrill(
   }
   const bump = (d: number) =>
     !plan.test && (intensity = Math.min(1.5, Math.max(0.5, +(intensity + d).toFixed(2))))
-  const onKey = soloKeys(
-    {
-      pause: togglePause,
-      skip,
-      end: view.confirmEnd,
-      bump,
-      mode: (k) => setMode(k),
-      step: (d) => setMode(mode.kind, stepMode(mode, d)),
-    },
-    !isSim,
-  )
+  const keyActs = {
+    pause: togglePause,
+    skip,
+    end: view.confirmEnd,
+    bump,
+    mode: (k: RideMode) => setMode(k),
+    step: (d: number) => setMode(mode.kind, stepMode(mode, d)),
+    gear,
+  }
+  const onKey = soloKeys(keyActs, !isSim)
   addEventListener('keydown', onKey)
+  const offClick = plan.test ? () => {} : soloClick(keyActs, () => mode.kind)
   ride.start()
 
   const scaled = (f: Frame, k: number): Frame => ({
@@ -235,6 +242,7 @@ export function runDrill(
         reconnecting: ride.trainerStatus === 'reconnecting',
       })
     }
+    if (mode.kind === 'slope') sendSlope(mode, live.cadence)
     tally.record(ride.rec, el, live)
     if (now >= splashUntil || overlay[2] === 'pause') {
       view.overlay(...overlay)
@@ -280,6 +288,7 @@ export function runDrill(
     clearInterval(saver)
     clearSnap(key)
     removeEventListener('keydown', onKey)
+    offClick()
     await ride.stop()
     profile.tier = origTier
     tally.record(ride.rec, el, ride.live)

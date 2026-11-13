@@ -1,4 +1,5 @@
 import { CFG } from '../config'
+import { gearText } from '../core/gears'
 import { h } from './dom'
 
 export type RideMode = 'erg' | 'res' | 'slope'
@@ -6,6 +7,8 @@ export interface ModeState {
   kind: RideMode
   level: number
   grade: number
+  /** Virtual gear, used in slope mode. */
+  gear: number
 }
 
 const LABELS: [RideMode, string, string][] = [
@@ -20,7 +23,7 @@ export const modeText = (m: ModeState) =>
   m.kind === 'res'
     ? `Resistance ${m.level}%`
     : m.kind === 'slope'
-      ? `Slope ${signed(m.grade)}`
+      ? `Slope ${signed(m.grade)} · ${gearText(m.gear)}`
       : 'ERG'
 
 /** Header control: ERG / Resistance / Slope switch with a stepper for the level or gradient. */
@@ -47,10 +50,18 @@ export function modeSwitch(on: { set: (k: RideMode) => void; nudge: (dir: number
     set(m: ModeState) {
       btns.forEach((b) => b.classList.toggle('on', b.dataset.mode === m.kind))
       step.style.display = m.kind === 'erg' ? 'none' : ''
-      val.textContent = m.kind === 'res' ? `${m.level}%` : signed(m.grade)
+      val.textContent =
+        m.kind === 'res' ? `${m.level}%` : `${signed(m.grade)} · ${gearText(m.gear)}`
     },
   }
 }
+
+export const startMode = (): ModeState => ({
+  kind: 'erg',
+  level: CFG.ride.resStart,
+  grade: CFG.ride.gradeStart,
+  gear: CFG.gears.start,
+})
 
 /** The state after one step up (dir 1) or down (dir -1) of the level or gradient. */
 export function stepMode(m: ModeState, dir: number): ModeState {

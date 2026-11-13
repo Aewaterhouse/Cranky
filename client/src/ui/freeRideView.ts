@@ -1,5 +1,6 @@
 import '../solo.css'
 import '../freeride.css'
+import { gearText } from '../core/gears'
 import { ascentFrom, routeStats, type Route } from '../core/route'
 import type { Live } from '../modes/rideController'
 import { fmt, h } from './dom'
@@ -18,6 +19,8 @@ export interface FreeState {
   speed: number
   grade: number
   trainerGrade: number
+  /** Virtual gear. */
+  gear: number
   dist: number
   el: number
   paused: 'manual' | 'auto' | null
@@ -210,7 +213,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number)
       set(wkg, (l.avg / s.weightKg).toFixed(2))
       gv.textContent = s.grade.toFixed(1)
       gbox.style.setProperty('--g', gradeColour(s.grade))
-      gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}%`
+      gsub.textContent = `% · trainer ${s.trainerGrade.toFixed(1)}% · ${gearText(s.gear)}`
       whole.set(s.dist)
       next.set(s.dist)
       mapUpdate?.(s.dist)

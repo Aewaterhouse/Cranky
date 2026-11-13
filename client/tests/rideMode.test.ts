@@ -64,7 +64,7 @@ describe('ride modes', () => {
     expect(sim.log).toEqual(['res 30', 'res 100', 'sim 15', 'sim -5'])
   })
   it('steps the level and gradient within range', () => {
-    const m = { kind: 'res' as const, level: 98, grade: 0 }
+    const m = { kind: 'res' as const, level: 98, grade: 0, gear: 12 }
     expect(stepMode(m, 1).level).toBe(100)
     expect(stepMode({ ...m, kind: 'slope', grade: -5 }, -1).grade).toBe(-5)
     expect(stepMode({ ...m, kind: 'erg' }, 1)).toEqual({ ...m, kind: 'erg' })

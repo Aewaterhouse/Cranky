@@ -1,8 +1,11 @@
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
+import { gearGrade, shiftGear } from '../../core/gears'
 import { normalisedPower } from '../../core/ride'
 import { stepSpeed, totalMass, trainerGrade } from '../../core/physics'
 import { ascentFrom, routeAt, routeSeconds, type Route } from '../../core/route'
+import { settings } from '../../core/settings'
+import { onClickShift } from '../../trainer/zwiftClick'
 import { show } from '../../ui/dom'
 import { freeRideView } from '../../ui/freeRideView'
 import { finishRide } from '../../ui/results'
@@ -58,6 +61,7 @@ export function runFreeRide(
   let last = performance.now()
   let sent = 0
   let sentAt = -Infinity
+  let gear = CFG.gears.start
 
   const view = freeRideView(
     route,
@@ -101,12 +105,16 @@ export function runFreeRide(
             ? () => nudge(0.05)
             : k === '-' || k === '_'
               ? () => nudge(-0.05)
-              : null
+              : k === 'z' || k === 'Z' || k === 'x' || k === 'X'
+                ? () => shift(k.toLowerCase() === 'x' ? 1 : -1)
+                : null
     if (!act) return
     act()
     e.preventDefault()
   }
+  const shift = (d: number) => (gear = shiftGear(gear, d))
   addEventListener('keydown', onKey)
+  const offClick = onClickShift(shift)
   ride.start()
 
   const tick = () => {
@@ -132,8 +140,10 @@ export function runFreeRide(
       el += dt * fast
       dist = Math.min(route.distance, dist + speed * dt * fast)
     }
-    // Paused means an easy, flat trainer; riding means the road gradient scaled by difficulty.
-    const want = paused ? 0 : trainerGrade(p.grade, difficulty)
+    // Paused means an easy, flat trainer; riding means the road gradient scaled by difficulty, then
+    // adjusted for the virtual gear. Game speed above still comes from power alone.
+    const road = trainerGrade(p.grade, difficulty)
+    const want = paused ? 0 : gearGrade(road, live.cadence, gear, mass, F.grade, settings.chainring)
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want
       sentAt = now / 1000
@@ -148,6 +158,7 @@ export function runFreeRide(
       speed,
       grade: p.grade,
       trainerGrade: sent,
+      gear,
       dist,
       el,
       paused: manual ? 'manual' : auto ? 'auto' : null,
@@ -167,6 +178,7 @@ export function runFreeRide(
     finished = true
     clearInterval(timer)
     removeEventListener('keydown', onKey)
+    offClick()
     await ride.stop()
     finishRide(profile, ride.rec.summary(), done)
   }

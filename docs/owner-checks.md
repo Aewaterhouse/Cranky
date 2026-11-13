@@ -20,6 +20,13 @@ Everything below was built and tested against the simulated trainer only. Tick t
 - [ ] Trainer and strap connected together for a whole ride without dropouts.
 - [ ] Set Max HR on the Rider tab and check the HR tile's zone colours look sensible.
 
+## Zwift Click and virtual gears
+- [ ] Open `/spike.html`, press "Pair Zwift Click" and press each button. Each press should show UP or DOWN once (not on release). Copy the `[Click]` console lines into `docs/testing.md` if anything looks off.
+- [ ] Pair the Click from the trainer window ("Zwift Click (optional)"); the readout should say connected. Switch the Click off and on: it should reconnect.
+- [ ] Free ride on a flat bit: gear 12 should feel about like the real bike in the 34T ring. Shift up and down with the Click and with `Z` / `X`; it should get harder and easier within a couple of seconds and show "Gear n/24".
+- [ ] Solo Slope mode: same check. ERG mode: Click changes intensity by 1%. Resistance mode: Click steps the level.
+- [ ] Set your real chainring under Settings if it is not 34T.
+
 ## Crash recovery
 - [ ] Refresh the page mid solo workout. The home screen should offer "Resume your workout?"; resuming should pick up at the same point with the earlier minutes still in the results.
 - [ ] Refresh mid bus ride with at least one other rider aboard. "Rejoin bus" should put you back on with your stats intact.
