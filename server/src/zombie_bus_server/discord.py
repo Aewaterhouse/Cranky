@@ -11,6 +11,15 @@ log = logging.getLogger(__name__)
 
 def format_summary(plan_name: str, s: dict) -> str:
     """Builds the chat message for a finished Zombie Bus ride."""
+    if s.get("mode") == "madness":
+        crew = ", ".join(f"{r['name']} {r['points']}" for r in s["riders"])
+        return "\n".join(
+            [
+                f"🤯 **VO2 Madness** · {s['score']} effort points",
+                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
+                f"Pack: {crew}",
+            ]
+        )
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",

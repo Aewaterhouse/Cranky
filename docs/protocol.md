@@ -60,6 +60,8 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 `data` also carries `hr` (bpm or null) and `hrp` (bpm / the rider's max heart rate, or null). Each rider in a tick has the same two fields.
 
+`{t:'game', game:'bus'|'madness'}` (host, not while running) picks the crew game; the lobby carries `game`. In VO2 Madness the plan is dealt by the server and `bus.mad` holds `{pts, red, crown, lead, round, rounds, work, box, next, twist}`; extra fx kinds are `go, rest, box, crown, lead, sandbag`.
+
 `tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
 `st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.

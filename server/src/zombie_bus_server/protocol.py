@@ -36,6 +36,11 @@ class Difficulty(BaseModel):
     level: Literal["easy", "normal", "hard", "nightmare"]
 
 
+class Game(BaseModel):
+    t: Literal["game"]
+    game: Literal["bus", "madness"]
+
+
 class Start(BaseModel):
     t: Literal["start"]
 
@@ -76,7 +81,7 @@ class Buy(BaseModel):
 
 ClientMsg = TypeAdapter(
     Annotated[
-        Join | Watch | Setup | Bots | Difficulty | Start | End | TierMsg | Data | Sprint | Buy,
+        Join | Watch | Setup | Bots | Difficulty | Game | Start | End | TierMsg | Data | Sprint | Buy,
         Field(discriminator="t"),
     ]
 )
@@ -112,6 +117,7 @@ class Bus(BaseModel):
     streak: float = 0
     next: str = "drop"
     gunship: bool = False
+    mad: dict | None = None
 
 
 class Fx(BaseModel):

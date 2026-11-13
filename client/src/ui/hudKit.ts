@@ -14,7 +14,17 @@ export const EVENTS: Record<string, EventStyle> = {
   servo: { name: 'Servo Stop', icon: '⛽', col: '#7fd13b' },
   cooldown: { name: 'Cool-down', icon: '❄️', col: '#44bba4' },
 }
-export const eventOf = (ev: string) => EVENTS[ev] ?? EVENTS.longhaul
+/** VO2 Madness names for the same block events. */
+const MAD_EVENTS: Record<string, EventStyle> = {
+  longhaul: { name: 'Interval', icon: '🔥', col: '#ff5a4e' },
+  rampup: { name: 'Ramp', icon: '📈', col: '#ff7a1a' },
+  surge: { name: 'On / Off', icon: '⚡', col: '#e040fb' },
+  roadblock: { name: 'Sprint', icon: '💥', col: '#ffd23f' },
+  servo: { name: 'Recover', icon: '🎁', col: '#44bba4' },
+}
+let skin = EVENTS
+export const madEvents = (on: boolean) => (skin = on ? { ...EVENTS, ...MAD_EVENTS } : EVENTS)
+export const eventOf = (ev: string) => skin[ev] ?? skin.longhaul
 
 export const FX_ICON: Record<string, string> = {
   hit: '💥',
@@ -34,6 +44,12 @@ export const FX_ICON: Record<string, string> = {
   scrap: '⚙️',
   buy: '🛒',
   repel: '🛡️',
+  go: '🔥',
+  box: '🎁',
+  crown: '👑',
+  lead: '🥇',
+  sandbag: '🧺',
+  rest: '😮‍💨',
   drop: '📦',
   airstrike: '✈️',
   gunship: '🛩️',

@@ -60,6 +60,7 @@ export async function crew(
     },
     bots: (n) => net.send({ t: 'bots', n }),
     difficulty: (level) => net.send({ t: 'difficulty', level }),
+    game: (game) => net.send({ t: 'game', game }),
     start: () => net.send({ t: 'start' }),
     leave,
   })

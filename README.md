@@ -71,7 +71,7 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 
 ## Scene dev harness
 
-`pnpm dev` only: open `/scene-dev.html` to look at the 3D scene without a server or trainer. Params: `mood=drill|longhaul|surge|roadblock|servo|finish`, `gap=0..120|none`, `armour=0..100|none`, `speed=m/s`, `roadblock=0..1`, `paint=paint-rust`, `bullbar=1`, `spikes=1`, `riders=1..6`, `gunship=1`, `debug=1`, `hud=0`, `vis.<name>=n` (any numeric visual tunable, e.g. `vis.camHeight=5`), `fx=hit|shake|slowmo|smash|drop|airstrike` with `fxAt=ms`. Keys: 1-6 mood, `[` `]` gap, `\` horde on/off, `-` `=` armour, `,` `.` speed, `r` roadblock, `h` `j` `k` `m` fx, `d` supply drop, `a` air strike, `u` gunship, `b` bull bar, `n` spikes, `p` paint, `g` debug panel.
+`pnpm dev` only: open `/scene-dev.html` to look at the 3D scene without a server or trainer. Params: `mood=drill|longhaul|surge|roadblock|servo|finish`, `gap=0..120|none`, `armour=0..100|none`, `speed=m/s`, `roadblock=0..1`, `paint=paint-rust`, `bullbar=1`, `spikes=1`, `riders=1..6`, `gunship=1`, `mad=1` (VO2 Madness pack), `debug=1`, `hud=0`, `vis.<name>=n` (any numeric visual tunable, e.g. `vis.camHeight=5`), `fx=hit|shake|slowmo|smash|drop|airstrike` with `fxAt=ms`. Keys: 1-6 mood, `[` `]` gap, `\` horde on/off, `-` `=` armour, `,` `.` speed, `r` roadblock, `h` `j` `k` `m` fx, `d` supply drop, `a` air strike, `u` gunship, `b` bull bar, `n` spikes, `p` paint, `g` debug panel.
 
 ## HTTPS (important)
 

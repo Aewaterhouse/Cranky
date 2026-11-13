@@ -21,6 +21,7 @@ export function groupSection(g: GroupSummary, myId: string) {
       h('div', { class: 'dim' }, a.why),
     )
   }
+  const mad = g.mode === 'madness'
   return h(
     'div',
     { class: 'res-group' },
@@ -30,13 +31,17 @@ export function groupSection(g: GroupSummary, myId: string) {
       h(
         'div',
         { class: 'res-score' },
-        h('span', {}, 'Bus score'),
+        h('span', {}, mad ? 'Pack effort points' : 'Bus score'),
         h('b', {}, g.score.toLocaleString()),
       ),
       tile('Distance', `${(g.distance / 1000).toFixed(1)} km`),
-      tile('Armour', String(Math.round(g.armour))),
-      tile('Sync', `${Math.round(g.syncPct)}%`),
-      tile('Scrap', String(g.scrap)),
+      ...(mad
+        ? []
+        : [
+            tile('Armour', String(Math.round(g.armour))),
+            tile('Sync', `${Math.round(g.syncPct)}%`),
+            tile('Scrap', String(g.scrap)),
+          ]),
     ),
     g.awards.length
       ? h(
@@ -56,7 +61,13 @@ export function groupSection(g: GroupSummary, myId: string) {
         h(
           'tr',
           {},
-          ...['Rider', 'Compliance', 'Time in zone', 'Falls', 'Sprints'].map((x) => h('th', {}, x)),
+          ...[
+            'Rider',
+            'Compliance',
+            'Time in zone',
+            mad ? 'Points · in the red' : 'Falls',
+            'Sprints',
+          ].map((x) => h('th', {}, x)),
         ),
         ...g.riders.map((r) =>
           h(
@@ -65,7 +76,7 @@ export function groupSection(g: GroupSummary, myId: string) {
             h('td', {}, r.name),
             h('td', {}, pctStr(r.compliance)),
             h('td', {}, fmt(r.inBandSecs)),
-            h('td', {}, String(r.falls)),
+            h('td', {}, mad ? `${r.points ?? 0} · ${r.redSecs ?? 0} s` : String(r.falls)),
             h('td', {}, r.sprints.join(' ') || '–'),
           ),
         ),

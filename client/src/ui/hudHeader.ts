@@ -33,7 +33,15 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
   return {
     root,
     setTier: build,
-    update(f: Frame, ev: string, elapsedS: number, totalS: number, rbProg: number | null) {
+    /** `mask` replaces the next block's name and watts (the VO2 Madness mystery box). */
+    update(
+      f: Frame,
+      ev: string,
+      elapsedS: number,
+      totalS: number,
+      rbProg: number | null,
+      mask?: string,
+    ) {
       const e = eventOf(ev)
       root.style.setProperty('--ev', e.col)
       set(icon, e.icon)
@@ -43,7 +51,7 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
       set(
         next,
         f.next
-          ? `NEXT  ${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''}  in ${fmt(f.next.in)}`
+          ? `NEXT  ${mask ?? `${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''}`}  in ${fmt(f.next.in)}`
           : 'LAST BLOCK',
       )
       graph?.setProgress(elapsedS)

@@ -9,7 +9,8 @@ import { h } from './dom'
 import { makeBusPanel } from './hudBus'
 import { makeCockpit } from './hudCockpit'
 import { makeHeader } from './hudHeader'
-import { eventOf, FX_DEFAULT } from './hudKit'
+import { eventOf, FX_DEFAULT, madEvents } from './hudKit'
+import { makeMadPanel } from './hudMad'
 import { makeRoster } from './hudRoster'
 import { makeShop } from './hudShop'
 import { makeSplash } from './hudSplash'
@@ -21,6 +22,8 @@ export interface HudOpts {
   rec?: RideRecorder
   meId?: string
   onBuy?: (item: ShopItem) => void
+  /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
+  mad?: string[]
 }
 /** Events whose title card replaces a feed line. */
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
@@ -29,8 +32,11 @@ const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {
   const sp = makeSplash()
   const cockpit = makeCockpit()
-  const header = makeHeader(o.plan, o.tier ?? 'hard')
+  madEvents(!!o.mad)
+  const header = makeHeader(o.mad ? undefined : o.plan, o.tier ?? 'hard')
   const bus = makeBusPanel()
+  const mad = o.mad ? makeMadPanel(o.mad) : null
+  let mask: string | undefined
   const shop = makeShop((i) => o.onBuy?.(i))
   const stats = o.rec ? makeStats(o.rec) : null
   const tier = h(
@@ -53,7 +59,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     'div',
     { class: 'hud' },
     header.root,
-    h('div', { class: 'hud-left' }, bus.root),
+    h('div', { class: 'hud-left' }, mad?.root ?? bus.root),
     h('div', { class: 'hud-right' }, roster.root, sp.feed),
     shop.root,
     h('div', { class: 'hud-bl' }, ...(stats ? [stats.root] : [])),
@@ -80,7 +86,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       const e = ev ?? (f.type === 'sprint' ? 'roadblock' : (f.event ?? 'longhaul'))
       root.classList.remove('pre')
       cockpit.update(f, live, bestSprint(live))
-      header.update(f, e, f.el, total, rbProg)
+      header.update(f, e, f.el, total, rbProg, mask)
       stats?.update()
       if (f.i !== lastI) {
         lastI = f.i
@@ -107,13 +113,16 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     countdown(n: number, live: Live) {
       root.classList.add('pre')
       cockpit.update(null, live, 0)
-      sp.splash('sp-count sp-pre', `${n}`, 'BUS LEAVES IN', 1100, 0)
+      sp.splash('sp-count sp-pre', `${n}`, mad ? 'MADNESS STARTS IN' : 'BUS LEAVES IN', 1100, 0)
     },
     /** Everything that comes from the server tick: bus, roster, shop, fx. */
     tick(m: Tick) {
       const meId = o.meId ?? ''
       rbProg = m.bus.rb
       bus.update(m.bus, m.riders)
+      const ms = m.bus.mad
+      if (ms) mad?.update(ms, m.riders, meId)
+      mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m.riders, meId, m.el)
       shop.update(m.bus.shop, m.bus.scrap)
       for (const fx of m.fx) {
@@ -130,13 +139,24 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
             3200,
             2,
           )
+        else if (fx.k === 'box') {
+          mad?.spin(text.split('!')[0])
+          sp.splash('sp-smash', '🎁 MYSTERY BOX', text, 4500, 2)
+        } else if (fx.k === 'go')
+          sp.splash('sp-go', text, 'Heart rate up. Who wants it most?', 1800, 2)
+        else if (fx.k === 'crown')
+          sp.splash('sp-smash', `👑 ${fx.id === meId ? 'YOU' : who.toUpperCase()}`, text, 2600, 1)
         else if (fx.k === 'challenge' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR CHALLENGE!', text.replace(/^[^:]*: /, ''), 4000, 2)
         else if (fx.k === 'smash')
           sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
         if (fx.k === 'buy') shop.bought(text)
         if (text && !((fx.k === 'sprint' || fx.k === 'slowmo') && fx.id === meId))
-          sp.line(fx.k, text, ['hit', 'grab', 'crash', 'fell'].includes(fx.k) ? 'bad' : '')
+          sp.line(
+            fx.k,
+            text,
+            ['hit', 'grab', 'crash', 'fell', 'sandbag'].includes(fx.k) ? 'bad' : '',
+          )
       }
     },
     /** Generic splash, kept for the solo mode. */

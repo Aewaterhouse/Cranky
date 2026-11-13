@@ -45,7 +45,7 @@
 - `camRig.ts` chase camera; `moods.ts` mood colour blending; `sky.ts` sky and sun.
 - `ground.ts` terrain and road; `props.ts` roadside props loop; `propGeo.ts` prop and vehicle geometry; `landmarks.ts` billboards and Servo station.
 - `bus.ts` the bus; `busParts.ts` bus dimensions and seat slots; `bike.ts` bikes; `riders.ts` rider figures; `hats.ts` hats; `crew.ts` crew on the bus.
-- `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
+- `horde.ts` instanced zombie crowd; `roadblock.ts` roadblock barrier; `pack.ts` the VO2 Madness pack on the road (order by points, crown, medal, fire); `strikes.ts` streak air support (supply crate, strike jet, gunship and its camera view).
 - `particles.ts` particle pool; `emitters.ts` exhaust, dust, smash bursts; `fxLayer.ts` screen and impact effects.
 
 ### ui/
@@ -56,7 +56,7 @@
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloExtras.ts` context buttons; `soloMode.ts` ERG/resistance/slope switch; `soloPanel.ts` interval list.
 - `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudKit.ts` event styles and shared bits.
 - `workoutChart.ts` solo workout chart; `soloSegs.ts` profile segments; `solo.ts` solo setup; `soloView.ts` player view; `soloPanel.ts` interval list.
-- `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
+- `hud.ts` HUD assembly; `hudHeader.ts` event header and timeline; `hudCockpit.ts` my power cockpit; `hudBus.ts` bus status; `hudMad.ts` VO2 Madness box and effort leaderboard (`hudMad.css`); `hudRoster.ts` crew roster; `hudStats.ts` my stats; `hudShop.ts` Servo Stop shop; `hudSplash.ts` splashes and feed; `hudTvBoard.ts` / `hudTvScreens.ts` TV crew board, lobby and end screens (`tv.css`); `hudKit.ts` event styles and shared bits.
 - `freeRideSetup.ts` free ride route picker and GPX import; `freeRideView.ts` free ride player layout (`freeride.css`); `freeRideChart.ts` gradient-coloured elevation profile canvas; `freeRideMap.ts` Leaflet map with the route and rider dot (lazy-loaded).
 - `results.ts` end-of-ride summary; `resultsGroup.ts` crew results and postcard PNG.
 
@@ -68,5 +68,5 @@
 - `src/zombie_bus_server/app.py` REST (login, riders, rooms, profile), WebSocket, static client.
 - `config.py` tunables, env vars, `SEED_USERS`; `protocol.py` message schemas; `plan.py` plan loading, targets, generator.
 - `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete).
-- `modes/zombie_bus.py` bus, horde, events, shop, awards rules.
+- `modes/zombie_bus.py` bus, horde, events, shop, awards rules; `modes/vo2_madness.py` VO2 Madness: dealing the session, effort scoring, crown, mystery box, awards.
 - `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_rides.py` ride history endpoints; `test_multiplayer.py` 4-bot headless ride.

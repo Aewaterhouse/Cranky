@@ -4,6 +4,21 @@ import type { Look } from '../core/cosmetics'
 import type { Grade, Plan, Tier } from '../types'
 
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
+export type Game = 'bus' | 'madness'
+/** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
+export interface MadState {
+  pts: Record<string, number>
+  red: Record<string, number>
+  crown: string | null
+  lead: string | null
+  round: number
+  rounds: number
+  work: boolean
+  box: boolean
+  /** The next interval's name once the box has opened. */
+  next: string | null
+  twist: string | null
+}
 
 export type ClientMsg =
   | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look }
@@ -11,6 +26,7 @@ export type ClientMsg =
   | { t: 'setup'; plan: string; minutes: number }
   | { t: 'bots'; n: number }
   | { t: 'difficulty'; level: Difficulty }
+  | { t: 'game'; game: Game }
   | { t: 'start' }
   | { t: 'end' }
   | { t: 'tier'; tier: Tier }
@@ -44,6 +60,7 @@ export interface Lobby {
   plan: Plan
   minutes: number
   difficulty: Difficulty
+  game?: Game
   mutator: { id: string; name: string; desc: string } | null
   riders: LobbyRider[]
 }
@@ -78,6 +95,7 @@ export interface BusState {
   streak: number
   next: 'drop' | 'airstrike' | 'gunship'
   gunship: boolean
+  mad?: MadState | null
 }
 export interface Fx {
   k: string

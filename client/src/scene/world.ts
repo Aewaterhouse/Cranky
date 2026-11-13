@@ -8,6 +8,7 @@ import { FxLayer } from './fxLayer'
 import { Ground } from './ground'
 import { Billboards, Servo } from './landmarks'
 import { MoodBlend } from './moods'
+import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
 import { VIS, type Mood } from './params'
 import { Props } from './props'
@@ -43,6 +44,8 @@ export interface SceneState {
   busLook?: Look
   /** The crew's gunship is up and firing on the horde. */
   gunship?: boolean
+  /** VO2 Madness: no bus, the riders race along the road as a pack. */
+  mad?: MadScene | null
 }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
@@ -72,6 +75,7 @@ export class World {
   private horde = new Horde()
   private block = new Roadblock()
   private strikes = new Strikes()
+  private pack = new Pack()
   private crew = new Crew(this.scene, this.bus.shell)
   private smoke = new Particles(500)
   private sparks = new Particles(300, true)
@@ -125,6 +129,7 @@ export class World {
       this.block.group,
       this.block.debris,
       this.strikes.group,
+      this.pack.group,
       this.smoke.points,
       this.sparks.points,
       this.key,
@@ -224,7 +229,9 @@ export class World {
       pitch: this.pitch,
       dz,
     })
-    busEmitters(this.smoke, this.sparks, dt, s, this.bus, env.fog)
+    this.bus.group.visible = !s.mad
+    this.pack.group.visible = !!s.mad
+    if (!s.mad) busEmitters(this.smoke, this.sparks, dt, s, this.bus, env.fog)
 
     // horde
     const g = s.gap
@@ -239,7 +246,9 @@ export class World {
 
     // roadblock
     this.block.update(this.t, dt, night, s.roadblock)
-    this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
+    if (s.mad) this.pack.update(s.riders, s.mad, this.t, dt, s.speed, this.smoke, this.sparks)
+    else
+      this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
     const hz = g === null ? null : this.hordeZ
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
       this.rig.shake = Math.max(this.rig.shake, 1.6)
@@ -248,6 +257,7 @@ export class World {
       gap: g,
       hit: this.hit,
       slow: sm < 1,
+      pack: !!s.mad,
       climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
     this.strikes.view(this.camera)
