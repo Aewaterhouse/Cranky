@@ -42,8 +42,8 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 ### Phase B: 3D road world (L)
 - [x] Road curve, banking and chunk streaming from a pack.
 - [x] Terrain from the height grid, cut to the road, with distant hills as a simple skyline.
-- [ ] Your rider on a bike, legs turning at your cadence, in your garage kit.
-- [ ] Chase camera that looks into corners and up climbs.
+- [x] Your rider on a bike, legs turning at your cadence, in your garage kit.
+- [x] Chase camera that looks into corners and up climbs.
 - [ ] Slim free-ride HUD over the scene: speed, power, cadence, heart rate, gear, gradient; elevation strip along the bottom; minimap in the corner.
 - [ ] Scene harness page for routes and visual settings in the debug panel.
 - [ ] Automatic quality levels and the 2D fallback.

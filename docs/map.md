@@ -55,6 +55,7 @@
 - `roadPath.ts` projection to local metres, the centreline curve, `poseAt(d)` with banking, spur removal, the made-up line for routes without coordinates (no three.js).
 - `terrainGrid.ts` decodes a pack's height grid and samples it with a trust weight (no three.js); `roadIndex.ts` spatial hash of centreline segments (no three.js); `heightField.ts` `ground(x, z)`: grid or made-up hills, cut and filled to the nearest road (no three.js).
 - `roadGeo.ts` road ribbon triangles and the `Tris` builder; `terrainGeo.ts` terrain rows either side of the road, clipped where another stretch of road is nearer; `chunks.ts` builds and disposes 200 m chunks around the rider; `skyline.ts` the ring of distant hills.
+- `routeWorld.ts` scene owner for a route (`RouteWorld`, `RoadState`), render loop, lights, floating origin; `roadRiders.ts` rider figures placed along the road, smoothed between reports; `routeCam.ts` chase camera.
 
 ### ui/
 - `dom.ts` DOM helpers; `toast.ts` toasts and modal; `audio.ts` WebAudio sounds.
