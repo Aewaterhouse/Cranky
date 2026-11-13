@@ -86,6 +86,8 @@ The suggested order below attacks them in that order: reliable first, then serio
 
 ## 4. Free ride on real routes
 
+**Owner priority (2026-11-13):** free ride is being built out into a 3D world on real Australian routes. The phased plan and checklists are in `docs/freeride-plan.md`; it replaces the unticked items in this table. Phase A waits on the owner approving OpenStreetMap data.
+
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ ★ GPX routes | Import any GPX (or a Strava route) and ride it; the trainer follows the gradient | L |

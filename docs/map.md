@@ -3,7 +3,7 @@
 ## Root
 - `PLAN.md` design and phases; `AGENTS.md` working rules; `README.md` setup; `Dockerfile` production image (client build + server).
 - `scripts/run.sh` build client and start server on :8000; `scripts/selfsigned.sh` self-signed certs for LAN HTTPS.
-- `docs/protocol.md` wire protocol; `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/map.md` this file.
+- `docs/protocol.md` wire protocol; `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/freeride-plan.md` free ride 3D world plan; `docs/map.md` this file.
 - `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
