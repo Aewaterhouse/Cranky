@@ -51,7 +51,7 @@ Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L =
 ### Phase C: the place (L)
 - [x] Painted map ground: land use, water, side streets, street-name signs at junctions. (Built against made-up fixture data; real map data is not in the packs yet.)
 - [x] Trees and scrub where the map says bush; low-poly houses and shops from building outlines. (Buildings seen only with made-up fixture data.)
-- [ ] Road furniture: kilometre markers, gradient signs, numbered hairpins, guard rails on the drop side, start and summit arches.
+- [x] Road furniture: kilometre markers, gradient signs, numbered hairpins, guard rails on the drop side, edge posts on bends, start, summit and finish arches.
 - [ ] Hand-placed landmarks per route (Coot-tha TV towers and lookout, the Ben Lomond plateau, Hotham's summit hut, the Twelve Apostles turn-off).
 - [ ] Life: kangaroos, cockatoos, a swooping magpie in spring, the odd ute and caravan on the other side of the road.
 - [ ] Time of day and weather moods per ride (dawn, midday, golden hour, mist on the high routes).

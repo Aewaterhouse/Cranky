@@ -40,7 +40,8 @@ export function buildStreets(
   }
   return cf.signs.map((j) => {
     const y = drawnHeight(field, patches, j.x, j.z)
-    addBox(solid, j.x, y + S.streetH / 2, j.z, 0.07, S.streetH / 2, 0.07, 0, col.set(S.post))
+    const top = S.streetH - S.streetW / 10
+    addBox(solid, j.x, y + top / 2, j.z, 0.07, top / 2, 0.07, 0, col.set(S.post))
     const m = signs.plate(j.name, S.streetW, S.streetW / 5, S.streetBg, S.streetFg)
     m.position.set(j.x - solid.ax, y + S.streetH - solid.ay, j.z - solid.az)
     m.rotation.y = Math.atan2(-j.dz, j.dx)

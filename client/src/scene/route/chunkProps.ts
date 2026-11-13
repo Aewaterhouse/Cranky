@@ -14,15 +14,20 @@ import { KINDS, TREES, type Spot } from './scatter'
 const P = VIS.route.place
 const pose = newPose()
 const mat = new THREE.Matrix4()
-const pos = new THREE.Vector3()
-const quat = new THREE.Quaternion()
-const scale = new THREE.Vector3()
-const UP = new THREE.Vector3(0, 1, 0)
-const col = new THREE.Color()
-type Anchor = { ax: number; ay: number; az: number }
+export const pos = new THREE.Vector3()
+export const quat = new THREE.Quaternion()
+export const scale = new THREE.Vector3()
+export const UP = new THREE.Vector3(0, 1, 0)
+export const col = new THREE.Color()
+export type Anchor = { ax: number; ay: number; az: number }
 
 /** One instanced mesh of `geo` for `n` things; `place` sets pos (scene metres), quat, scale and col for each. */
-function instances(geo: THREE.BufferGeometry, n: number, a: Anchor, place: (i: number) => void) {
+export function instances(
+  geo: THREE.BufferGeometry,
+  n: number,
+  a: Anchor,
+  place: (i: number) => void,
+) {
   const m = new THREE.InstancedMesh(geo, VC, n)
   for (let i = 0; i < n; i++) {
     col.set('#ffffff')

@@ -97,3 +97,6 @@ Same harness as Phase B (`/route-dev.html`). Add `&vis.route.camHeight=40&vis.ro
 - `?route=mount-coot-tha&d=2700&fixture=1`: houses along the side streets with different walls and roofs, doors facing the road, none on a street. Look for a house half-buried or floating on steep ground.
 - `?route=mount-hotham&d=20000` then `d=24000`: snow gums, then only boulders, tussocks and shrubs above the treeline.
 - Settings, Graphics, Potato: far fewer plants and none beyond 60 m.
+- `?route=mount-coot-tha&d=0`: green START arch over the road with a readable banner; the FINISH arch of the loop is just behind it.
+- `?route=ben-lomond&d=14200` and on: a green kilometre marker each km on the left, a yellow gradient sign before the ladder, blue numbered hairpin signs counting down, grey guard rail on the drop side, white edge posts round the bends. `d=17700`: red SUMMIT arch at the end.
+- Look for: a sign or post standing on the tarmac, a rail floating above or buried in the verge, a sign facing away from the rider.

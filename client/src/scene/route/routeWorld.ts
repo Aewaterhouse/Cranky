@@ -6,6 +6,7 @@ import { Quality, type Level } from '../quality'
 import { Sky } from '../sky'
 import { Chunks } from './chunks'
 import { Features } from './features'
+import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
 import { LandCover } from './landCover'
 import { Signs } from './signs'
@@ -79,6 +80,7 @@ export class RouteWorld {
       cover: new LandCover(terrain, route.region),
       features: new Features(terrain && route.features, this.field),
       signs: new Signs(),
+      furniture: planFurniture(path),
     })
     this.riders = new RoadRiders(path)
     path.poseAt(0, this.riders.me)

@@ -108,3 +108,30 @@ export function addBox(
     out.add(corner, a, e, f, colour)
   }
 }
+
+/** Adds a bar from a to b (xyz triples) that follows the slope between them: `lo`..`hi` above the line, `thick` across. */
+export function addBeam(
+  out: Tris,
+  a: ArrayLike<number>,
+  b: ArrayLike<number>,
+  lo: number,
+  hi: number,
+  thick: number,
+  colour: THREE.Color,
+) {
+  const len = Math.hypot(b[0] - a[0], b[2] - a[2]) || 1
+  const lx = (((b[2] - a[2]) / len) * thick) / 2
+  const lz = ((-(b[0] - a[0]) / len) * thick) / 2
+  for (let i = 0; i < 8; i++) {
+    const e = i & 4 ? b : a
+    const s = i & 1 ? 1 : -1
+    corner[i * 3] = e[0] + lx * s
+    corner[i * 3 + 1] = e[1] + (i & 2 ? hi : lo)
+    corner[i * 3 + 2] = e[2] + lz * s
+  }
+  for (let q = 0; q < 24; q += 4) {
+    const [c, d, e, f] = [QUADS[q] * 3, QUADS[q + 1] * 3, QUADS[q + 2] * 3, QUADS[q + 3] * 3]
+    out.add(corner, c, d, e, colour)
+    out.add(corner, c, e, f, colour)
+  }
+}
