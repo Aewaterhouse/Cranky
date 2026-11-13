@@ -27,6 +27,9 @@ export interface SceneRider {
   st: string
   cadence: number
   look?: Look
+  /** Heart rate in bpm and as a fraction of max, when the rider has a strap. */
+  hr?: number | null
+  hrp?: number | null
 }
 export interface SceneState {
   speed: number
@@ -236,7 +239,7 @@ export class World {
 
     // roadblock
     this.block.update(this.t, dt, night, s.roadblock)
-    this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ)
+    this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
     const hz = g === null ? null : this.hordeZ
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
       this.rig.shake = Math.max(this.rig.shake, 1.6)

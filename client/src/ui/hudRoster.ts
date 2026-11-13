@@ -1,6 +1,6 @@
 import type { RiderTick } from '../net/protocol'
 import { avatar, h } from './dom'
-import { compColour, set } from './hudKit'
+import { compColour, hrColour, hrText, set } from './hudKit'
 
 const HAUL_S = 20
 
@@ -10,6 +10,7 @@ interface Row {
   badge: HTMLElement
   bar: HTMLElement
   watts: HTMLElement
+  hr: HTMLElement
 }
 
 /** Right-hand crew roster. Rows are kept and updated in place. */
@@ -28,6 +29,7 @@ export function makeRoster(footer: Node) {
           const badge = h('span', { class: 'rs-badge' })
           const bar = h('i', {})
           const watts = h('b', {})
+          const hr = h('span', { class: 'rs-hr' })
           row = {
             root: h(
               'div',
@@ -36,7 +38,7 @@ export function makeRoster(footer: Node) {
               h(
                 'div',
                 { class: 'rs-mid' },
-                h('div', { class: 'rs-name' }, h('span', {}, r.name), tier, badge),
+                h('div', { class: 'rs-name' }, h('span', {}, r.name), tier, badge, hr),
                 h('div', { class: 'rs-bar' }, bar),
               ),
               h('div', { class: 'rs-w' }, watts, h('small', {}, 'W')),
@@ -45,6 +47,7 @@ export function makeRoster(footer: Node) {
             badge,
             bar,
             watts,
+            hr,
           }
           rows.set(id, row)
           list.append(row.root)
@@ -56,6 +59,8 @@ export function makeRoster(footer: Node) {
         set(row.tier, r.tier[0].toUpperCase())
         row.tier.dataset.t = r.tier
         set(row.watts, r.st === 'riding' ? `${Math.round(r.w)}` : '–')
+        set(row.hr, hrText(r))
+        row.hr.style.color = hrColour(r.hrp)
         set(
           row.badge,
           r.st === 'fell'

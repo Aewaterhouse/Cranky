@@ -48,6 +48,16 @@ export const FX_DEFAULT: Record<string, string> = {
 export const set = (el: HTMLElement, v: string) => {
   if (el.textContent !== v) el.textContent = v
 }
+/** Heart rate as the crew sees it: bpm, plus % of max when the rider has set one. */
+export const hrText = (r: { hr?: number | null; hrp?: number | null; st: string }) =>
+  r.hr && r.st !== 'spectator' ? `♥ ${r.hr}${r.hrp ? ` · ${Math.round(r.hrp * 100)}%` : ''}` : ''
+/** Colour by heart-rate zone: under 60, 70, 80 and 90% of max, then over. */
+export const hrColour = (hrp: number | null | undefined) =>
+  hrp
+    ? ['var(--dim)', '#5aa9e6', 'var(--tox)', 'var(--amber)', 'var(--bad)'][
+        [0.6, 0.7, 0.8, 0.9].filter((f) => hrp >= f).length
+      ]
+    : ''
 /** Green / amber / red by compliance. */
 export const compColour = (c: number | null | undefined) =>
   c == null ? 'var(--dim)' : c > 0.85 ? 'var(--tox)' : c > 0.6 ? 'var(--amber)' : 'var(--bad)'

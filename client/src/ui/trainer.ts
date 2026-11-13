@@ -156,7 +156,11 @@ function hrSection() {
             h('b', {}, src.name),
             h('span', { class: 'num' }, bpm ? `${bpm} bpm` : 'waiting for data…'),
           )
-        : h('p', {}, 'Pair a Bluetooth chest strap or armband to record and show your heart rate.'),
+        : h(
+            'p',
+            {},
+            'Pair a Bluetooth chest strap or armband to record your heart rate. On the bus your crew sees your bpm, and your % of max once you set a max heart rate under Rider settings.',
+          ),
       h(
         'div',
         { class: 'row' },

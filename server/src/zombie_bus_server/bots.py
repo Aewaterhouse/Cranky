@@ -53,6 +53,10 @@ class Brain:
             w = r.ftp * (rng.uniform(*C.BOT_SPRINT_X) if sprint else C.BOT_IDLE_X)
             r.s = None
         r.p = r.w = w
+        want = min(1.0, C.BOT_HR_REST + (C.BOT_HR_AT_FTP - C.BOT_HR_REST) * w / r.ftp)
+        was = r.hrp or C.BOT_HR_REST
+        r.hrp = was + (want - was) * min(1.0, dt / C.BOT_HR_LAG_S)
+        r.hr = round(r.hrp * C.BOT_HR_MAX)
         r.cad = cad + rng.uniform(-C.BOT_CAD_JITTER, C.BOT_CAD_JITTER)
         r.last_data = time.monotonic()
 

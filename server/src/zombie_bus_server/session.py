@@ -50,6 +50,8 @@ class Rider:
     w: float = 0.0
     cad: float = 0.0
     s: float | None = None
+    hr: int | None = None
+    hrp: float | None = None
     st: str = "riding"
     low_s: float = 0.0
     zero_s: float = 0.0
@@ -255,6 +257,7 @@ class Room:
             return
         if isinstance(msg, Data):
             r.p, r.w, r.cad, r.s, r.last_data = msg.p, msg.w, msg.cad, msg.s, time.monotonic()
+            r.hr, r.hrp = msg.hr or None, msg.hrp if msg.hr else None
         elif isinstance(msg, Sprint):
             self.mode.on_sprint(r, msg.blk, msg.grade, msg.combo)
         elif isinstance(msg, Buy) and self.state == "running":
@@ -312,7 +315,7 @@ class Room:
         for r in self.riders.values():
             if now - r.last_data > C.STALE_DATA_S:
                 r.p = r.w = r.cad = 0.0
-                r.s = None
+                r.s = r.hr = r.hrp = None
             r.zero_s = r.zero_s + dt if r.p < 1 else 0.0
             if not r.connected or r.zero_s >= C.SPECTATOR_NO_POWER_S:
                 r.st = "spectator"
@@ -337,6 +340,8 @@ class Room:
                 "cad": round(r.cad),
                 "s": r.s,
                 "st": r.st,
+                "hr": r.hr,
+                "hrp": None if r.hrp is None else round(r.hrp, 2),
             }
             for r in self.riders.values()
         }

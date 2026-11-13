@@ -215,3 +215,13 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
   - Riders with no compliance reading count as 1.0 in the group average, as they already do for nitro, so they help a streak along.
   - Tracers and bursts share the 300-spark pool with roadblock and engine sparks; the pool recycles its oldest particles, so a smash during a gunship run may look thinner.
 - Passes server and client tests, type-check and lint. Each effect was checked in the scene dev page (`gunship=1`, `fx=drop|airstrike`, keys `d`, `a`, `u`). Not yet played through in a real bus ride, and the HUD streak bar and announcer lines have not been seen or heard.
+
+## Heart rate on the bus (2026-11-13)
+- Strap pairing already existed (Web Bluetooth heart-rate service, in the trainer modal, with auto-reconnect), but the reading stayed on the rider's own screen. It now goes to the crew.
+- Each `data` message carries `hr` (bpm) and `hrp` (bpm / the rider's max heart rate from Rider settings, or null if they have not set one). The server relays both in every rider's tick and clears them when the data goes stale. Nothing in the bus rules reads heart rate: it is display only, so compliance, streaks, nitro and scoring are unchanged.
+- Raw numbers: a chip above each rider's name tag in the scene (`♥ 162  88%`), and the same beside the name in the crew roster and on the TV board. Colour follows the usual five zones (under 60, 70, 80, 90% of max, then over). Without a max heart rate the chip shows bpm only, in white.
+- Look: skin blends towards red from 70% of max (`VIS.heatFrom`) to 100%, and steam puffs off the head from 85% (`VIS.steamFrom`), thicker towards 100%. Both need `hrp`, so a rider with no max heart rate set shows numbers but never reddens or steams. Spectators show neither.
+- Bots fake a heart rate from their power (45% of max at rest, 90% at FTP, 30 s lag, max 190) so the read-outs can be seen without a second person.
+- Steam uses the shared 500-particle smoke pool (exhaust, dust, horde dust), which recycles its oldest particles; six riders steaming hard add roughly 150 live particles.
+- Name tags are taller to fit the chip, so tags overlap a little more when riders bunch up on screen.
+- Passes server and client tests, type-check and lint. Chip, reddening and steam were checked in the scene dev page with made-up heart rates. Not tested with a real chest strap, and the roster and TV board read-outs have not been seen in a real ride.

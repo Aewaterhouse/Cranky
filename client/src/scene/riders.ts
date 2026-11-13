@@ -3,10 +3,16 @@ import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
 import { makeHat } from './hats'
 import { VIS } from './params'
-import { box, clamp, ico, span } from './util'
+import type { Particles } from './particles'
+import { box, clamp, ico, rand, smooth, span } from './util'
 
 const SKINS = ['#f0c8a0', '#d9a577', '#b07a50', '#7a4e32', '#f3d2b8', '#e0b088']
 const SHORTS = '#23252c'
+const HOT = new THREE.Color('#ff2a1a')
+const STEAM = new THREE.Color('#f4f6f8')
+/** Tag colour by heart-rate zone (under 60, 70, 80, 90% of max, then over). */
+const HR_COLS = ['#9aa7b8', '#5aa9e6', '#6cff7a', '#ffd24a', '#ff5a4a']
+const TAG_H = 132
 const THIGH = 0.46
 const SHIN = 0.46
 const ARM = 0.32
@@ -87,23 +93,45 @@ export function makeRider(colour: string, seed: number) {
 
   const canvas = document.createElement('canvas')
   canvas.width = 320
-  canvas.height = 80
+  canvas.height = TAG_H
   const tex = new THREE.CanvasTexture(canvas)
   tex.colorSpace = THREE.SRGBColorSpace
   const tag = new THREE.Sprite(
     new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }),
   )
-  tag.scale.set(2.8, 0.7, 1)
+  tag.scale.set(2.8, (2.8 * TAG_H) / 320, 1)
   tag.renderOrder = 10
   person.add(tag)
   let lastTag = ''
-  const label = (name: string, c: number | null, state: string) => {
+  /** Name pill, with a heart-rate chip above it when the rider has a strap: bpm and % of max. */
+  const label = (
+    name: string,
+    c: number | null,
+    state: string,
+    hr?: number | null,
+    hrp?: number | null,
+  ) => {
     const col = c == null ? '#cfcfcf' : c > 0.85 ? '#6cff7a' : c > 0.6 ? '#ffd24a' : '#ff5a4a'
-    const key = name + col + state
+    const beat = hr ? `♥ ${hr}${hrp ? `  ${Math.round(hrp * 100)}%` : ''}` : ''
+    const key = name + col + state + beat
     if (key === lastTag) return
     lastTag = key
     const g = canvas.getContext('2d')!
-    g.clearRect(0, 0, 320, 80)
+    g.setTransform(1, 0, 0, 1, 0, 0)
+    g.clearRect(0, 0, 320, TAG_H)
+    g.font = '700 34px system-ui, sans-serif'
+    g.textAlign = 'center'
+    g.textBaseline = 'middle'
+    if (beat) {
+      const w = g.measureText(beat).width + 36
+      g.fillStyle = 'rgba(14,12,22,0.78)'
+      g.beginPath()
+      g.roundRect(160 - w / 2, 4, w, 46, 18)
+      g.fill()
+      g.fillStyle = hrp ? HR_COLS[[0.6, 0.7, 0.8, 0.9].filter((f) => hrp >= f).length] : '#ffffff'
+      g.fillText(beat, 160, 29)
+    }
+    g.translate(0, TAG_H - 80)
     g.fillStyle = 'rgba(14,12,22,0.78)'
     g.beginPath()
     g.roundRect(6, 12, 308, 56, 22)
@@ -112,15 +140,36 @@ export function makeRider(colour: string, seed: number) {
     g.strokeStyle = state === 'riding' ? col : '#888'
     g.stroke()
     g.fillStyle = '#fff'
-    g.font = '700 34px system-ui, sans-serif'
-    g.textAlign = 'center'
-    g.textBaseline = 'middle'
     g.fillText((state === 'fell' ? '! ' : '') + name.slice(0, 12), 160, 42)
     g.fillStyle = col
     g.beginPath()
     g.arc(30, 40, 9, 0, 7)
     g.fill()
     tex.needsUpdate = true
+  }
+
+  const skin0 = mats.skin.color.clone()
+  let hot = 0
+  const hp = new THREE.Vector3()
+  /** Reddens the skin as effort climbs, and puffs steam off the head when the rider is cranking. */
+  const heat = (hrp: number | null | undefined, dt: number, steam?: Particles, speed = 0) => {
+    const e = hrp ?? 0
+    hot += (smooth(VIS.heatFrom, 1, e) - hot) * clamp(dt * 2)
+    mats.skin.color.copy(skin0).lerp(HOT, hot * 0.8)
+    const k = clamp((e - VIS.steamFrom) / (1 - VIS.steamFrom))
+    if (!steam || e < VIS.steamFrom || Math.random() > dt * (10 + k * 22)) return
+    head.getWorldPosition(hp)
+    hp.y += 0.3
+    steam.emit({
+      p: hp,
+      v: { x: rand(-0.4, 0.4), y: rand(1.4, 2.8), z: rand(0, 1) + speed * 0.15 },
+      life: rand(0.7, 1.3),
+      s0: 0.5,
+      s1: 2 + k,
+      c: STEAM,
+      a: 0.75,
+      drag: 0.96,
+    })
   }
 
   let hatKey = ''
@@ -217,7 +266,7 @@ export function makeRider(colour: string, seed: number) {
       pt(x, s * 0.19, hf, hyy)
       span(fore[i], w, x)
     }
-    tag.position.set(side * 0.9, sy + 0.9, -sf)
+    tag.position.set(side * 0.9, sy + 0.9 + (0.35 * (TAG_H - 80)) / 80, -sf)
   }
-  return { root, person, bike, label, setLook, fade, pose, tag }
+  return { root, person, bike, label, setLook, fade, pose, heat, tag }
 }

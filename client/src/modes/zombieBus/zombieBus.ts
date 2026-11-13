@@ -5,6 +5,7 @@ import { saveProfile } from '../../core/profile'
 import { RideRecorder } from '../../core/ride'
 import { busKey, clearSnap, loadSnap, saveSnap, type BusSnap } from '../../core/snapshot'
 import { ClockSync } from '../../net/clockSync'
+import { currentHr } from '../../trainer/heartRate'
 import type { Lobby, Tick } from '../../net/protocol'
 import type { WsClient } from '../../net/wsClient'
 import { World, debugPanel } from '../../scene/world'
@@ -93,12 +94,15 @@ export function startBusRide(
   ride.start()
   const sender = setInterval(() => {
     const v = ride.live
+    const hr = currentHr()
     net.send({
       t: 'data',
       p: v.power,
       w: Math.round(v.avg),
       cad: v.cadence,
       s: ride.frame?.tgt ? v.c : null,
+      hr,
+      hrp: hr && profile.maxHr ? Math.round((hr / profile.maxHr) * 100) / 100 : null,
     })
   }, 1000 / CFG.net.sendHz)
   const saver = setInterval(
@@ -175,6 +179,8 @@ export function startBusRide(
         st: r.st,
         cadence: r.cad,
         look: lk[id],
+        hr: r.hr,
+        hrp: r.hrp,
       })),
     }
     hud.tick(m)
