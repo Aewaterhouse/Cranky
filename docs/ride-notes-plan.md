@@ -37,7 +37,7 @@ Already in the code when the notes were written (built in a hurry, never tested,
 ## 4. Free ride feel
 
 - [x] **Less wind noise at speed and on descents.** Quieter overall, and it should not keep climbing with speed. Done: wind level 0.5 → 0.28, full by 16 m/s (58 km/h) and no louder past it, and its pitch stops rising at 850 Hz, so a descent is a steady rush. About as loud as before at 30 km/h, roughly half at 60 km/h.
-- [ ] **More camera shake and lean on descents.**
+- [x] **More camera shake and lean on descents.** Done: shake starts sooner (9 m/s, 3% down) and is about twice as strong at full (16 m/s), and the camera takes half the rider's lean into bends, up to about 6° (the comfort test's limit). All in the debug panel (route → feel); "Calm camera" still turns it off.
 - [ ] **Drafting settings, and more drafting by default.** Longer reach with an exponential drop-off, a bit stronger on one wheel, and scaling with the size of the group: roughly 30% behind one rider, 50% behind two, up to about 95% deep in a pack of five, at a reference speed. Host settings in the group-ride lobby (off / realistic / strong). **Drafting must make the trainer feel easier,** not only the on-screen speed: reduce the gradient sent to the trainer by the drag saved, through `ergController.setGrade` only.
 - [ ] **Sort the routes into two clear sections.** "Real rides" for the routes cut from the crew's own recordings (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street), and a separate section for the routes generated from map data.
 

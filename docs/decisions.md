@@ -759,3 +759,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Quieter wind (2026-11-14)
 - Free-ride wind: level 0.28 (was 0.5), full at 16 m/s through the air (was 20), pitch capped at 850 Hz (`CFG.audio.ride.wind.maxHz`). Picked so cruising speeds sound about the same and fast descents are about half as loud with no climbing whistle.
+
+## Descent camera (2026-11-14)
+- `FEEL.cam`: shake 0.028 → 0.05 m, shakeRoll 0.003 → 0.008 rad, from 11 → 9 m/s, full at 19 → 16 m/s, on from 4% → 3% down; camera lean share 0.3 → 0.5, max 0.07 → 0.1 rad (the limit in the riderPose comfort test). Faster riders lean more in bends, so descents get the most of it.

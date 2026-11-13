@@ -10,18 +10,18 @@ export const FEEL = {
     fovKick: 6,
     fovKickAt: 18,
     /** Shake on a fast descent: metres and roll at full, from `shakeFrom` to `shakeFull`, on at least `shakeGrade` down, at `shakeHz`. */
-    shake: 0.028,
-    shakeRoll: 0.003,
-    shakeFrom: 11,
-    shakeFull: 19,
-    shakeGrade: 0.04,
+    shake: 0.05,
+    shakeRoll: 0.008,
+    shakeFrom: 9,
+    shakeFull: 16,
+    shakeGrade: 0.03,
     shakeHz: 8,
     /** Coasting in a tuck: the camera comes this share of `camBack` closer and this much lower. */
     tuckIn: 0.22,
     tuckDown: 0.9,
     /** The camera rolls this share of the rider's lean into a bend, at most `leanMax`, eased at `leanRate` a second. */
-    lean: 0.3,
-    leanMax: 0.07,
+    lean: 0.5,
+    leanMax: 0.1,
     leanRate: 3,
     /** How quickly the aim follows a change of gradient (1/s): lower is gentler. */
     pitchStiff: 2,

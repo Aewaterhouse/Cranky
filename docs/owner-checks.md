@@ -129,3 +129,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Bus on gears: pick Gears in the lobby, ride a bus with ERG off on a real trainer. Shifting with the Click (or Z X) should let you hold the target at a normal cadence; say if the 2% base road feels right.
 - [ ] VO2 Madness on gears: pick Gears in the lobby and ride a Madness round; the top gears on the 2% base road should be hard enough for a VO2 interval.
 - [ ] Wind noise: ride a free-ride descent over 50 km/h with sound on; the wind should be a steady rush, not overpowering, and not keep rising.
+- [ ] Descent camera: on a fast free-ride descent the camera should shake and lean into bends noticeably but not make you seasick (iPad and big screen).
