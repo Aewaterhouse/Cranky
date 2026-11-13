@@ -18,7 +18,7 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/profile/{id}` | Profile JSON, 404 if unknown |
 | PUT | `/api/profile/{id}` | Profile JSON (newer `updated` wins); 403 unless `id` is your own |
 | POST | `/api/rides` | `{summary}`: ride summary from the client, stored for the logged-in rider. The client adds `crew: true` for bus rides. |
-| GET | `/api/rides` | → the caller's rides, newest first: `[{id, date, plan, secs, avgPower, np, tss, kj, compliance, crew}]`. Fields missing from older rides are null; `crew` is false. |
+| GET | `/api/rides` | → the caller's rides, newest first: `[{id, date, plan, secs, avgPower, np, tss, kj, compliance, crew, route, distance}]`. Fields missing from older rides are null; `crew` is false. `route` (a route id) and `distance` (m) are set on free and group rides. |
 | GET | `/api/rides/{n}` | → the full stored summary (per-second arrays included); 404 unless it is your ride |
 | DELETE | `/api/rides/{n}` | Removes one of your rides; 404 unless it is yours. The profile is not touched. |
 | POST | `/api/efforts` | `{efforts: [{route, segment, secs, watts, wkg, date, rideDate?, trace?}]}` → `{saved}`: segment efforts for the logged-in rider. `segment` is `<route>:<kind>:<start m>`; `date` is when the effort finished and `rideDate` the start of its ride. Repeats (same rider, segment and `date`) are ignored, so a retried sync is safe. `trace` is metres from the segment's start every 5 s (the effort's pace); only a rider's best per segment keeps it. 422 on a bad value. |

@@ -4,7 +4,9 @@ import { saveProfile } from '../core/profile'
 import type { RideSummary } from '../core/ride'
 import { ZONE_NAMES } from '../core/riderMetrics'
 import '../results.css'
-import { fmt, h, pctStr } from './dom'
+import { fmt, h, kmStr, pctStr } from './dom'
+import { routeTrace } from './routeTrace'
+import { segmentSection } from './segResults'
 import { ZONE_COLOURS } from './planGraph'
 import { downloadFit, downloadJson } from './rideExport'
 import { segsFromSeries } from './soloSegs'
@@ -79,6 +81,24 @@ function body(s: RideSummary) {
       ...(hasHr ? [tile('Avg HR', `${s.avgHr} bpm`), tile('Max HR', `${s.maxHr} bpm`)] : []),
       tile('Compliance', s.compliance ? pctStr(s.compliance) : '–', `FTP ${s.ftp ?? '–'} W`),
     ),
+    s.route
+      ? card(
+          s.route.laps ? `${s.route.name} · ${s.route.laps} laps` : s.route.name,
+          h(
+            'div',
+            { class: 'rd-route' },
+            routeTrace(s.route.id, 300, 190, s.route.laps ? Infinity : (s.distance ?? Infinity)),
+            h(
+              'div',
+              { class: 'res-tiles' },
+              tile('Distance', `${kmStr(s.distance ?? 0)} km`),
+              tile('Climbed', `${s.ascent ?? 0} m`),
+              tile('Route', s.route.done ? 'Finished' : 'Not finished'),
+            ),
+          ),
+        )
+      : '',
+    segmentSection(s.segments),
     power.length > 1 ? card('Power vs target', h('div', { class: 'res-chart' }, chart.el)) : '',
     h(
       'div',

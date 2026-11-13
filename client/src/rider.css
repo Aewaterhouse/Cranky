@@ -434,3 +434,53 @@ button.danger {
 .board tr.me {
   color: var(--acc);
 }
+
+/* Ride history: the little route map in a list row and the route card in a ride's detail */
+.rtrace {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.rtrace .all {
+  stroke: var(--line);
+  stroke-width: 3;
+}
+.rtrace .on {
+  stroke: var(--acc);
+  stroke-width: 2.5;
+}
+.rtrace .start {
+  fill: #fff;
+  stroke: var(--acc-ink);
+}
+.rtrace.none {
+  display: none;
+}
+.hl-row .plan .rtrace {
+  width: 44px;
+  height: 28px;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+.hl-row .plan small {
+  color: var(--dim);
+}
+.rd-route {
+  display: grid;
+  grid-template-columns: minmax(200px, 300px) 1fr;
+  gap: 16px;
+  align-items: center;
+}
+.rd-route .res-tiles {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.rd-route .rtrace {
+  width: 100%;
+  background: var(--bg2);
+  border-radius: 8px;
+}
+@media (max-width: 640px) {
+  .rd-route {
+    grid-template-columns: 1fr;
+  }
+}

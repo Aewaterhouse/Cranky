@@ -91,7 +91,7 @@ Built against simulated trainers and one PC only: not yet ridden by two people o
 - [x] FIT export with position, altitude, distance and speed, so an upload to Strava shows the real map.
 - [x] Route passport: a map of Australia that fills in as you finish routes; badges for repeats and vertical metres.
 - [x] Weekly featured route and a vertical-metre challenge, paying scrap for the garage.
-- [ ] Ride history shows the route map and segment results.
+- [x] Ride history shows the route map and segment results.
 
 ### Phase G: production (M)
 - [ ] Pre-ride flyover of the route and a loading card with a fact about the place.

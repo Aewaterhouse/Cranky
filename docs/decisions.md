@@ -536,3 +536,8 @@ Assumptions made without the owner. Tune freely; numbers live in `client/src/con
 - The weekly climb is personal: 1.1 times the average of the last 4 weeks in which the rider climbed anything in free ride, to the nearest 50 m, between 300 and 6,000 m; 600 m for someone with no history. It only looks at earlier weeks, so it does not move during the week. Reaching it pays 50 scrap.
 - Both are paid at the end of a ride through the same profile update that banks bus scrap, and each at most once a week: the week's log in the profile (`weeks[week] = {vertM, paid}`) remembers what was paid, so finishing twice pays once. The profile keeps five weeks of these.
 - Only free-ride and group-ride climbing counts; workouts and the bus have no hills.
+
+### Ride history
+- A free or group ride's row in History shows a small line map of its route, the route name, the distance and "free ride" or "group ride". The ride's detail gets a route card (the map with the part ridden drawn brighter and the start marked, distance, climbing, finished or not) and the same segments card as the end-of-ride summary.
+- The map is an SVG line drawn from the bundled pack (or the imported route if this browser still has it), not Leaflet: no tiles, no network, and cheap enough for a list. A ride on a route this device no longer has shows no map.
+- The list endpoint gained `route` (the route id) and `distance`; both are null for other rides and for rides from before Phase F.

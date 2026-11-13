@@ -1,6 +1,7 @@
 import { api } from '../core/api'
 import type { Profile } from '../core/curve'
-import { fmt, h, pctStr } from './dom'
+import { fmt, h, kmStr, pctStr } from './dom'
+import { routeTrace } from './routeTrace'
 import { dateStr, rideDetail } from './historyDetail'
 
 /** One row of GET /api/rides. Rides from before a field existed have it as null. */
@@ -15,6 +16,9 @@ export interface RideRow {
   kj: number | null
   compliance: number | null
   crew: boolean
+  /** Free and group rides: the route's id and metres ridden. */
+  route: string | null
+  distance: number | null
 }
 
 const num = (v: number | null, unit = '') => (v == null ? '–' : `${Math.round(v)}${unit}`)
@@ -33,7 +37,15 @@ function list(rows: RideRow[], open: (n: number) => void) {
         h(
           'span',
           { class: 'plan' },
+          r.route ? routeTrace(r.route, 44, 28) : '',
           r.plan ?? 'Ride',
+          r.route
+            ? h(
+                'small',
+                {},
+                ` ${r.distance == null ? '' : `${kmStr(r.distance)} km `}${r.crew ? 'group ride' : 'free ride'}`,
+              )
+            : '',
           r.crew ? h('em', { class: 'crew-tag' }, 'Crew') : '',
         ),
         h('span', {}, r.secs == null ? '–' : fmt(r.secs)),

@@ -31,6 +31,8 @@ def test_ride_list_detail_and_delete():
         "kj": 300,
         "compliance": 0.9,
         "crew": True,
+        "route": None,
+        "distance": None,
     }
     assert rows[1]["crew"] is False
     detail = client.get(f"/api/rides/{rows[0]['id']}", headers=h).json()
@@ -59,3 +61,13 @@ def test_old_rides_with_missing_fields_still_list():
     client.post("/api/rides", json={"summary": {"record": {"date": "2025-01-01T00:00:00Z"}}}, headers=h)
     row = client.get("/api/rides", headers=h).json()[0]
     assert row["plan"] is None and row["tss"] is None and row["crew"] is False
+
+
+def test_free_rides_list_their_route_and_distance():
+    _, h = auth("ali", "Ali")
+    free = summary(
+        "2026-04-01T08:00:00Z", route={"id": "willunga-hill", "name": "Willunga Hill"}, distance=2900
+    )
+    client.post("/api/rides", json={"summary": free}, headers=h)
+    row = next(r for r in client.get("/api/rides", headers=h).json() if r["date"] == "2026-04-01T08:00:00Z")
+    assert (row["route"], row["distance"], row["crew"]) == ("willunga-hill", 2900, False)
