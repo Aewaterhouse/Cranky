@@ -90,7 +90,7 @@
 - `tests/builder.test.ts` builder core; `tests/compliance|cosmetics|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.
 - `tests/roadVectors.test.ts` generates and checks the vectors shared with the server; `tests/roadLink.test.ts` group-ride prediction, drafting, toasts and no ERG target.
-- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results.
+- `tests/segments.test.ts` segment derivation, split maths, the tracker and a ride's results; `tests/efforts.test.ts` bests on the device, the offline queue and the merge with the server.
 - `tests/hud.test.ts` power zones, gradient colours, climb detection, gap text, rider-list rows.
 - `public/assets/CREDITS.md` asset credits.
 
@@ -100,5 +100,6 @@
 - `session.py` rooms, lobby, server clock, broadcast; `store.py` SQLite users, tokens, profiles, rides (list rows, detail, delete).
 - `modes/zombie_bus.py` bus, horde, events, shop, awards rules; `modes/vo2_madness.py` VO2 Madness: dealing the session, effort scoring, crown, mystery box, awards.
 - `road_physics.py` and `road_route.py` Python ports of the client's ride physics, route resampling and curvature; `modes/road.py` `RoadSim`, `Mover` and the `Rules` hook for road games; `road_room.py` road rooms (lobby, late join, rejoin, finish); `road_bots.py` road bot personalities.
+- `efforts.py` segment efforts: the `efforts` table, a rider's bests, crew leaderboards, ghost traces and their endpoints (`tests/test_efforts.py`).
 - `tests/test_road_vectors.py` the shared vectors; `test_road.py` the sim, drafting, keep-together, bots, snapshot; `test_road_multiplayer.py` four riders up Willunga Hill over sockets.
 - `tests/conftest.py` fixtures; `test_accounts.py` login and auth; `test_plan.py`; `test_zombie_bus.py`; `test_rides.py` ride history endpoints; `test_multiplayer.py` 4-bot headless ride.

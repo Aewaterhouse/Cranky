@@ -288,3 +288,8 @@ ROAD_BOT_X = {
     "sprinter": {"x": 0.72, "sprint_x": 2.2, "sprint_m": 300},
     "sucker": {"x": 0.84, "sit_x": 0.66},
 }
+# Segment efforts (free ride): the longest time and trace accepted, efforts per post, rows per leaderboard.
+EFFORT_MAX_S = 24 * 3600
+EFFORT_TRACE_MAX = 6000
+EFFORT_BATCH_MAX = 500
+LEADERBOARD_ROWS = 10
