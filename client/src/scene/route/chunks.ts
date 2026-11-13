@@ -9,6 +9,8 @@ import type { Furn } from './furniture'
 import { buildFurniture, buildRails, dropFurnitureGeos } from './furnitureGeo'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
+import { buildLandmarks, dropLandmarkGeos } from './landmarkGeo'
+import type { Landmark } from './landmarkPlan'
 import { Patch } from './patch'
 import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
@@ -36,6 +38,7 @@ export interface Place {
   features: Features
   signs: Signs
   furniture: Map<number, Furn[]>
+  landmarks: Map<number, Landmark[]>
 }
 
 /** Builds road, terrain and what stands on it a chunk at a time around the rider and throws away what falls behind. */
@@ -90,7 +93,7 @@ export class Chunks {
   private build(k: number, level: Level) {
     const far = level !== 'potato'
     const t0 = performance.now()
-    const { field, cover, features, signs, furniture } = this.place
+    const { field, cover, features, signs, furniture, landmarks } = this.place
     const d0 = k * R.chunk
     const d1 = d0 + R.chunk
     field.path.poseAt(d0, pose)
@@ -109,6 +112,7 @@ export class Chunks {
     if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
+    for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     WATER.color.set(R.waterTint)
     WATER.specular.set(R.waterGlint)
     WATER.shininess = R.waterShine
@@ -148,5 +152,6 @@ export class Chunks {
     dropPlantGeos()
     dropBuildingGeos()
     dropFurnitureGeos()
+    dropLandmarkGeos()
   }
 }

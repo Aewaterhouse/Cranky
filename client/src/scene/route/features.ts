@@ -41,12 +41,13 @@ export interface ChunkFeatures {
   streets: number[]
   signs: Junction[]
   buildings: Building[]
-  pois: Poi[]
 }
 export const STREET_STRIDE = 9
 
 /** The pack's map features in scene metres, shared out to the chunk whose road is nearest. */
 export class Features {
+  /** Points of interest within reach of the route. */
+  readonly pois: Poi[] = []
   private chunks = new Map<number, ChunkFeatures>()
   /** Street pieces [ax, az, bx, bz, half width] and building indices by cell, for "is anything here". */
   private segs = new Map<number, number[]>()
@@ -71,19 +72,19 @@ export class Features {
     for (const p of f?.pois ?? []) {
       const [x, z] = [p.at[0], -p.at[1]]
       const k = this.owner(x, z, POI_REACH)
-      if (k !== undefined) this.chunk(k, true)!.pois.push({ x, z, name: p.n, kind: p.k })
+      if (k !== undefined) this.pois.push({ x, z, name: p.n, kind: p.k })
     }
   }
 
   /** The features of chunk `k`, if it has any. */
   chunk(k: number, make = false) {
     let c = this.chunks.get(k)
-    if (!c && make) this.chunks.set(k, (c = { streets: [], signs: [], buildings: [], pois: [] }))
+    if (!c && make) this.chunks.set(k, (c = { streets: [], signs: [], buildings: [] }))
     return c
   }
 
   /** Chunk index of the stretch of route nearest to (x, z), if any is within `reach`. */
-  private owner(x: number, z: number, reach: number) {
+  owner(x: number, z: number, reach: number) {
     const f = this.field
     if (f.fine.nearest(x, z, 60) < Infinity) return Math.floor(f.fine.at / R.chunk)
     return f.coarse.nearest(x, z, reach) < Infinity ? Math.floor(f.coarse.at / R.chunk) : undefined

@@ -97,4 +97,35 @@ export const PLACE = {
     summit: '#d8322a',
     finish: '#22252b',
   },
+  landmarks: {
+    /** Landmarks are pushed at least this far beyond the verge. */
+    clear: 9,
+    /** Routes that end in a ski village, have a hut at the top, or have bathing boxes on their beaches. */
+    skiVillages: ['falls-creek', 'mount-hotham', 'ben-lomond'],
+    summitHuts: ['mount-hotham'],
+    bathingBoxes: ['beach-road'],
+    /** The village: this many A-frame lodges, the first `villageFrom` metres before the end, one every `villageStep`. */
+    lodges: 9,
+    villageFrom: 120,
+    villageStep: 80,
+    lodgeOut: 15,
+    lodgeSpread: 40,
+    /** The coast is looked for every `coastStep` metres at these distances either side of the road. */
+    coastStep: 150,
+    coastProbe: [18, 30, 45, 60, 80],
+    boxesApart: 900,
+    jettiesApart: 2500,
+    towerH: 85,
+    jettyLen: 38,
+    stone: '#9a968d',
+    timber: '#9b7a52',
+    steel: '#c8ccd0',
+    towerRed: '#d8322a',
+    towerWhite: '#f1f1ee',
+    trig: '#f4f4f0',
+    signBg: '#6b4a2b',
+    umbrella: '#e8a13a',
+    lodgeTints: ['#8a5a3c', '#3f5f7a', '#7a2f2a', '#3f6b4a', '#d9c9a8'],
+    boxTints: ['#e8533f', '#3f8fd0', '#f2c230', '#3fae7a', '#e58bb0', '#f1f1ee'],
+  },
 }

@@ -166,7 +166,7 @@ describe('map features', () => {
     expect(w.features.blocked(660, -1100, 1)).toBe(false)
   })
   it('keeps points of interest within reach and drops the rest', () => {
-    expect(all.flatMap((c) => c?.pois ?? []).map((p) => p.name)).toEqual(['Top'])
+    expect(w.features.pois.map((p) => p.name)).toEqual(['Top'])
   })
   it('copes with no features at all', () => {
     const none = world(terrain(100)).features

@@ -9,6 +9,7 @@ import { Features } from './features'
 import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
 import { LandCover } from './landCover'
+import { planLandmarks } from './landmarkPlan'
 import { Signs } from './signs'
 import { RoadPath } from './roadPath'
 import { RoadRiders, type RoadRider } from './roadRiders'
@@ -75,12 +76,15 @@ export class RouteWorld {
     const path = new RoadPath(route, terrain)
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))
     // Map features share the height grid's origin, so they are only usable alongside it.
+    const cover = new LandCover(terrain, route.region)
+    const features = new Features(terrain && route.features, this.field)
     this.chunks = new Chunks({
       field: this.field,
-      cover: new LandCover(terrain, route.region),
-      features: new Features(terrain && route.features, this.field),
+      cover,
+      features,
       signs: new Signs(),
       furniture: planFurniture(path),
+      landmarks: planLandmarks(route.id, terrain, this.field, cover, features),
     })
     this.riders = new RoadRiders(path)
     path.poseAt(0, this.riders.me)

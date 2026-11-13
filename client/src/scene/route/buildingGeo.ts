@@ -8,7 +8,7 @@ export type BuildingKind = (typeof BUILDING_KINDS)[number]
 type V = [number, number, number]
 
 /** Flat faces from corner lists, each wound so it faces away from the origin-ish point `inside`. */
-function faces(list: V[][], inside: V = [0, 0.3, 0]) {
+export function faces(list: V[][], inside: V = [0, 0.3, 0]) {
   const pos: number[] = []
   for (const f of list)
     for (let i = 1; i < f.length - 1; i++) {
