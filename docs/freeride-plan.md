@@ -32,12 +32,12 @@ Already built: GPX import, ride physics, trainer gradient with a difficulty slid
 
 Each phase ends in something rideable. Sizes: S = an evening, M = a weekend, L = a week or more.
 
-### Phase A: route packs and library (M)
-- [ ] Route builder script: OpenStreetMap road plus SRTM heights to a pack, with the length and gain check.
-- [ ] Pack loader, schema and unit tests; imported GPX files become packs with no map features.
-- [ ] First ten routes: Mount Coot-tha loop, Ben Lomond (Jacob's Ladder), Mount Buffalo, Falls Creek, Mount Hotham, Mount Wellington (kunanyi), Willunga Hill, Akuna Bay / West Head, Great Ocean Road (Lorne to Apollo Bay), Beach Road (Melbourne).
-- [ ] Route picker: cards with a mini profile, distance, climb, difficulty, and an estimated time at your FTP; filter by state and length.
-- [ ] Credits on the route screen and in `CREDITS.md`.
+### Phase A: route packs and library (M) — built 2026-11-13, not yet seen in a browser
+- [x] Route builder script: OpenStreetMap road plus SRTM heights to a pack, with the length and gain check.
+- [x] Pack loader, schema and unit tests; imported GPX files become packs with no map features.
+- [x] First ten routes: Mount Coot-tha loop, Ben Lomond (Jacob's Ladder), Mount Buffalo, Falls Creek, Mount Hotham, Mount Wellington (kunanyi), Willunga Hill, Akuna Bay / West Head, Great Ocean Road (Lorne to Apollo Bay), Beach Road (Melbourne).
+- [x] Route picker: cards with a mini profile, distance, climb, difficulty, and an estimated time at your FTP; filter by state and length.
+- [x] Credits on the route screen and in `CREDITS.md`.
 
 ### Phase B: 3D road world (L)
 - [ ] Road curve, banking and chunk streaming from a pack.

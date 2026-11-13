@@ -19,6 +19,8 @@
 - Virtual gears and Zwift Click v1: 24 gears in free ride and solo Slope mode (Z/X keys or the Click), Click also steps ERG intensity and resistance level; Click test panel on `/spike.html` (no real Click tested yet, roadmap item left unticked).
 - `Steven` branch only: every rider and zombie has a huge chest (`VIS.bust`), as a joke. Zombies checked in the scene dev page; riders not yet seen from the front.
 
+- Free ride Phase A (`docs/freeride-plan.md`): ten bundled Australian routes and a card picker (not yet seen in a browser).
+
 ## In progress
 - Nothing half-built. The session of 2026-11-12 was cut short when the PC was switched off; everything from it is merged.
 

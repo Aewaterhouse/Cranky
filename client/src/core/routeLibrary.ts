@@ -27,12 +27,12 @@ export interface RoutePack {
 }
 
 export const ROUTE_INDEX: RouteSummary[] = Object.values(
-  import.meta.glob<RouteSummary[]>('../../content/routes/index.json', {
+  import.meta.glob<RouteSummary[]>('../../../content/routes/index.json', {
     eager: true,
     import: 'default',
   }),
 ).flat()
-const packs = import.meta.glob<RoutePack>(['../../content/routes/*.json', '!**/index.json'], {
+const packs = import.meta.glob<RoutePack>(['../../../content/routes/*.json', '!**/index.json'], {
   import: 'default',
 })
 
@@ -47,7 +47,7 @@ export function packToRoute(pack: RoutePack): Route {
 }
 
 export async function loadRoute(id: string): Promise<Route> {
-  const load = packs[`../../content/routes/${id}.json`]
+  const load = packs[`../../../content/routes/${id}.json`]
   if (!load) throw new Error(`No bundled route called ${id}`)
   return packToRoute(await load())
 }

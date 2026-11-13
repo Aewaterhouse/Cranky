@@ -92,7 +92,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | --- | --- | --- |
 | ✅ ★ GPX routes | Import any GPX (or a Strava route) and ride it; the trainer follows the gradient | L |
 | ✅ Ride physics | Speed from power, weight, gradient, drag and rolling resistance; trainer difficulty slider | M |
-| Route library | Famous climbs (Alpe d'Huez, Ventoux, Stelvio) and your local loops, with length and elevation | M |
+| ✅ Route library | Ten bundled Australian routes (Coot-tha, Ben Lomond, Buffalo, Falls Creek, Hotham, kunanyi, Willunga, Akuna Bay, Great Ocean Road, Beach Road) with a card picker. Overseas climbs are not included. Not yet seen in a browser | M |
 | ✅ Elevation profile and map | Live position on an elevation chart and an OpenStreetMap map. Checked by type-check, unit tests and build only; not yet looked at in a browser | M |
 | Group free ride | Ride a route together with drafting and an optional keep-together rubber band | L |
 | Segments | Timed climbs and sprints on each route with personal and crew leaderboards | M |

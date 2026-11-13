@@ -1,0 +1,370 @@
+[
+ {
+  "id": "mount-coot-tha",
+  "name": "Mount Coot-tha loop",
+  "region": "QLD",
+  "blurb": "Brisbane's backyard climb: up Mt Coot-tha Road past the lookout, round the long way on Sir Samuel Griffith Drive and back down through the bush. Plenty of company on a Saturday, and a flat white at the top if you're keen.",
+  "waypoints": [
+   [
+    -27.4783,
+    152.9824
+   ],
+   [
+    -27.4727,
+    152.9717
+   ],
+   [
+    -27.47733,
+    152.96692
+   ],
+   [
+    -27.48466,
+    152.95697
+   ],
+   [
+    -27.46372,
+    152.95022
+   ],
+   [
+    -27.46561,
+    152.96549
+   ],
+   [
+    -27.46831,
+    152.9703
+   ],
+   [
+    -27.4727,
+    152.9717
+   ],
+   [
+    -27.4783,
+    152.9824
+   ]
+  ],
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "https://streetsmarts.initiatives.qld.gov.au/app/queenslands-favourite-rides/7/mt-coot-tha-loop"
+  },
+  "notes": "Loop: starts on Mount Coot-tha Road near the Botanic Gardens entrance, climbs to the Sir Samuel Griffith Drive junction, goes to the lookout, continues round the western arm of SSG Drive to the Simpsons Road junction, returns via the short northern SSG arm and descends Mt Coot-tha Road. UNCERTAIN: no single published figure; 9 km is the Qld Streetsmarts 'Mt Coot-tha loop' (no gain given) and 210 m is the Strava-style 'Full Coot-tha back' climb segment (bikeclimbs.com), not this loop. Routed length via OSRM is about 14.6 km. Waypoint at lookout is the SSG node ~20 m from the lookout road; all waypoints snapped to roads within 20 m. Westernmost SSG arm may be shared/one-way-free but unverified for cycling restrictions. Published figures (9 km, 210 m) are for other variants, so this route is not checked against them."
+ },
+ {
+  "id": "ben-lomond",
+  "name": "Ben Lomond",
+  "region": "TAS",
+  "blurb": "A long, steady grind up Ben Lomond Road into the alpine plateau, then Jacob's Ladder: a short, savage stack of gravelly switchbacks near the top. Cold, exposed and gloriously empty.",
+  "waypoints": [
+   [
+    -41.47826,
+    147.53472
+   ],
+   [
+    -41.49952,
+    147.60259
+   ],
+   [
+    -41.51249,
+    147.66056
+   ],
+   [
+    -41.53272,
+    147.66848
+   ]
+  ],
+  "published": {
+   "km": 17.8,
+   "gainM": 1083,
+   "source": "https://mycols.app/en/climb/ben-lomond-jacobs-ladder"
+  },
+  "notes": "Starts at the Blessington Road / Ben Lomond Road junction near Upper Blessington, ends at the alpine village at the top of Jacob's Ladder. Routed length 17.8 km matches. Jacob's Ladder section is steep (up to ~60% claimed on one segment) and may be unsealed or loose in places; road closes in snow. Gain figure from one source only (mycols); not cross-checked."
+ },
+ {
+  "id": "mount-buffalo",
+  "name": "Mount Buffalo",
+  "region": "VIC",
+  "blurb": "A big, patient 20 km climb through gum forest and granite to the old Chalet. Steady gradients, lovely views and a very long way back down.",
+  "waypoints": [
+   [
+    -36.70013,
+    146.85306
+   ],
+   [
+    -36.71767,
+    146.84236
+   ],
+   [
+    -36.72236,
+    146.8054
+   ],
+   [
+    -36.72237,
+    146.82046
+   ]
+  ],
+  "published": {
+   "km": 20.9,
+   "gainM": 1013,
+   "source": "https://theclimbingcyclist.com/climbs/mt-buffalo-national-park/mt-buffalo/"
+  },
+  "notes": "Starts at the old park gate/tollbooth on Mount Buffalo Road (about 5 km past the Great Alpine Road turn-off at Porepunkah), ends at Mount Buffalo Chalet. Published distance varies 18-27 km depending on start: ~20-21 km from the gate, ~24.7 km from the Porepunkah roundabout, with gain ~1,000-1,020 m everywhere. Routed length 21.9 km. The Chalet is closed/derelict at times but the Chalet Road is open. Order of the middle waypoints along the road is unverified (the road switchbacks west of the Chalet turn-off); routing between gate and Chalet is unambiguous."
+ },
+ {
+  "id": "falls-creek",
+  "name": "Falls Creek",
+  "region": "VIC",
+  "blurb": "Thirty kilometres from Mount Beauty up the Bogong High Plains Road, with a bit of everything: valley warm-up, relentless middle, then a lung-busting finish into the ski village.",
+  "waypoints": [
+   [
+    -36.7444,
+    147.16966
+   ],
+   [
+    -36.73911,
+    147.18916
+   ],
+   [
+    -36.76711,
+    147.21438
+   ],
+   [
+    -36.82978,
+    147.23376
+   ],
+   [
+    -36.84773,
+    147.27
+   ],
+   [
+    -36.86333,
+    147.2823
+   ]
+  ],
+  "published": {
+   "km": 29.9,
+   "gainM": 1253,
+   "source": "https://climbfinder.com/en/climbs/falls-creek-mount-beauty"
+  },
+  "notes": "Starts at the Kiewa Valley Highway / Bogong High Plains Road junction in Mount Beauty, ends in Falls Creek village on Bogong High Plains Road. Sources: 29.5-30.8 km, gain 1,129-1,279 m (Climbfinder 29.9 km / 1,253 m used); outliers of 2,761 m (bikeclimbs) ignored. Routed length 29.9 km. All waypoints snapped to roads at 0 m."
+ },
+ {
+  "id": "mount-hotham",
+  "name": "Mount Hotham",
+  "region": "VIC",
+  "blurb": "Harrietville to the top of Victoria's highest sealed road: three long ramps, a few cheeky hairpins and one very large helping of 'are we there yet?'.",
+  "waypoints": [
+   [
+    -36.89353,
+    147.06325
+   ],
+   [
+    -36.93877,
+    147.05945
+   ],
+   [
+    -36.97748,
+    147.05623
+   ],
+   [
+    -36.99274,
+    147.11297
+   ],
+   [
+    -36.97616,
+    147.12465
+   ],
+   [
+    -36.97948,
+    147.14193
+   ]
+  ],
+  "published": {
+   "km": 28.9,
+   "gainM": 1279,
+   "source": "https://bicyclenetwork.com.au/newsroom/2020/02/27/the-climb-mount-hotham"
+  },
+  "notes": "Starts on Great Alpine Road in Harrietville, ends at the Hotham village/Hull Skier Bridge area on Great Alpine Road. Sources: 28.1-30 km, gain 1,261-1,480 m (1,279 m is the most common). Routed length 29.9 km. Single road, no ambiguity; Dinner Plain turn-off is beyond the finish. Route is sealed throughout."
+ },
+ {
+  "id": "mount-wellington",
+  "name": "kunanyi / Mount Wellington (Fern Tree)",
+  "region": "TAS",
+  "blurb": "From Fern Tree up Pinnacle Road to the summit pinnacle: 11 km of switchbacks, with weather that can change from mild to snowing before you reach The Springs. Check the road is open.",
+  "waypoints": [
+   [
+    -42.92234,
+    147.2599
+   ],
+   [
+    -42.91609,
+    147.24915
+   ],
+   [
+    -42.89545,
+    147.23777
+   ]
+  ],
+  "published": {
+   "km": 11.1,
+   "gainM": 822,
+   "source": "https://ctyeh.com/routes/kunanyi-mount-wellington-fern-tree?lang=en"
+  },
+  "notes": "Variant: Fern Tree (Huon Road at the Fern Tree Tavern) to the summit via Pinnacle Road; not the longer climb from Hobart CBD (PJAMM: 17.6 km / 1,156 m). Figures 11.12 km / 822 m came from a web-search summary of a Fern Tree route guide; the exact source page for those numbers is not confirmed (ctyeh.com was the likely match). Routed length 11.6 km. Pinnacle Road is often closed for snow/ice. All waypoints at 0 m from road."
+ },
+ {
+  "id": "willunga-hill",
+  "name": "Old Willunga Hill",
+  "region": "SA",
+  "blurb": "The Tour Down Under's famous finish: three kicks of 7-ish per cent that soften as you climb. Short, sharp and very proud of itself.",
+  "waypoints": [
+   [
+    -35.27641,
+    138.56171
+   ],
+   [
+    -35.27787,
+    138.56277
+   ],
+   [
+    -35.28567,
+    138.57181
+   ],
+   [
+    -35.29267,
+    138.58071
+   ]
+  ],
+  "published": {
+   "km": 3.0,
+   "gainM": 225,
+   "source": "https://climbfinder.com/us/climbs/old-willunga-hill"
+  },
+  "notes": "Old Willunga Hill Road from the Willunga end (near Main South Road bypass/Victor Harbor Road) to the top at the Victor Harbor Road crossing. Distance 3.0 km is from The Roar (2.9-3.0 km also from BikeExchange); gain 252 m is a conversion of Climbfinder/PJAMM's 827 ft (2.2 mi stated by them, so figures differ). Routed length 2.9 km. Via points are on Old Willunga Hill Road so the router doesn't take the parallel trunk road. Gain set to 225 m (3.0 km at the Tour Down Under's quoted 7.5%)."
+ },
+ {
+  "id": "akuna-bay",
+  "name": "Akuna Bay and West Head",
+  "region": "NSW",
+  "blurb": "Sydney's favourite bushland slog: out to the Akuna Bay marina, back up the big hill, then the roller-coaster to West Head for the view. It adds up to a proper day out.",
+  "waypoints": [
+   [
+    -33.6834,
+    151.23034
+   ],
+   [
+    -33.67431,
+    151.23449
+   ],
+   [
+    -33.64415,
+    151.2365
+   ],
+   [
+    -33.66707,
+    151.23123
+   ],
+   [
+    -33.66361,
+    151.25349
+   ],
+   [
+    -33.57833,
+    151.30367
+   ],
+   [
+    -33.66361,
+    151.25349
+   ],
+   [
+    -33.6834,
+    151.23034
+   ]
+  ],
+  "published": {
+   "km": null,
+   "gainM": null,
+   "source": "https://bicyclingaustralia.com.au/places/cycling-sydney-part-ii-west-head-akuna-bay-truly-spectacular-cycling/"
+  },
+  "notes": "Variant: Terrey Hills (Mona Vale Road / McCarrs Creek Road junction) -> McCarrs Creek Road -> General San Martin Drive to Akuna Bay marina (7.5 km each way, out-and-back) -> back to McCarrs Creek Road -> West Head Road to West Head lookout (out-and-back) -> Terrey Hills. Not a true loop: two spurs are retraced. UNCERTAIN figures: sources vary widely (36 km/600 m Terrey Hills-West Head return; 60 km/1,300 m Church Point version used here; 74 km/1,198 m MapMagic; 66 km/887 m Bikemap). Routed length via OSRM is about 65 km. Akuna Bay marina waypoint snapped 66 m from the nearest road, so nudge if the router wanders. Repeated waypoints retrace the same road deliberately. Published figures (60 km, 1300 m) are for other variants, so this route is not checked against them."
+ },
+ {
+  "id": "great-ocean-road",
+  "name": "Great Ocean Road: Lorne to Apollo Bay",
+  "region": "VIC",
+  "blurb": "Forty-five kilometres of cliff-hugging coast road with rolling climbs, surf on one side and rainforest on the other. Watch for the traffic and the cockatoos, not necessarily in that order.",
+  "waypoints": [
+   [
+    -38.54164,
+    143.97547
+   ],
+   [
+    -38.63524,
+    143.8908
+   ],
+   [
+    -38.66859,
+    143.86198
+   ],
+   [
+    -38.72399,
+    143.7179
+   ],
+   [
+    -38.76133,
+    143.6715
+   ]
+  ],
+  "published": {
+   "km": 45,
+   "gainM": null,
+   "source": "https://www.spokes.com.au/rides/great-ocean-road"
+  },
+  "notes": "Lorne (Great Ocean Road in town) to Apollo Bay, one way. Distance 45-46 km agrees across sources (bikeclimbs lists 41.96 km, an outlier). Routed length 45.2 km. No source found for total gain, so gainM is null (roughly 500-700 m of rolling climbing from memory, unverified). Intermediate waypoints are Wye River, Kennett River and Skenes Creek; start/Wye River/Kennett River waypoints snapped 10-13 m from road, Lorne start point is an approximate town-centre location. Busy road with narrow shoulders."
+ },
+ {
+  "id": "beach-road",
+  "name": "Beach Road: St Kilda to Mordialloc",
+  "region": "VIC",
+  "blurb": "Melbourne's bunch-ride boulevard: flat, fast and fringed by the bay. Expect pelotons, red lights and an obligatory coffee stop in Brighton.",
+  "waypoints": [
+   [
+    -37.8625,
+    144.97263
+   ],
+   [
+    -37.93011,
+    144.99145
+   ],
+   [
+    -37.94891,
+    145.00062
+   ],
+   [
+    -37.98229,
+    145.0205
+   ],
+   [
+    -37.98909,
+    145.0282
+   ],
+   [
+    -37.98592,
+    145.05173
+   ],
+   [
+    -37.99711,
+    145.07255
+   ],
+   [
+    -38.00913,
+    145.08685
+   ]
+  ],
+  "published": {
+   "km": 23,
+   "gainM": null,
+   "source": "https://www.lavelocita.cc/la-velocita-rides/melbourne-victoria-beach-road"
+  },
+  "notes": "One way from Beaconsfield Parade, St Kilda, along Beach Road to Mordialloc. La Velocita gives 46 km return (so 23 km); Bikemap gives about 22 km. Routed length 22.9 km. Gain not published (essentially flat, tens of metres), so gainM is null. Waypoints along Beach Road at Brighton, Sandringham, Black Rock, Beaumaris, Mentone, Parkdale, all snapped within 1 m. Nepean Highway runs parallel inland; vias are close enough to keep routing on Beach Road, but check geometry."
+ }
+]
