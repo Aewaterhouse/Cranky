@@ -70,6 +70,28 @@ export const CFG = {
   },
   /** TV spectator view: the HUD is laid out `designH` px tall and zoomed to fit the screen. */
   tv: { designH: 600, minZoom: 1, maxZoom: 2.4, bigSplashGrades: ['MEGA', 'LEGEND'] },
+  /** Free-ride HUD. Zone colours come from the shared palette in ui/planGraph.ts (colour-blind aware). */
+  hud: {
+    /** Zwift's power zone boundaries as fractions of FTP: Z1 below the first, Z6 from the last. */
+    zones: [0.6, 0.76, 0.9, 1.05, 1.19],
+    /** Gradient bands: the colour applies below `lt` %. */
+    gradeBands: [
+      { lt: -3, colour: '#4a9be8' },
+      { lt: 2, colour: '#8fa893' },
+      { lt: 5, colour: '#5fc34a' },
+      { lt: 8, colour: '#f2d60a' },
+      { lt: 11, colour: '#ff9f1c' },
+      { lt: 15, colour: '#ff5a4e' },
+      { lt: Infinity, colour: '#b0174f' },
+    ],
+    /** The gradient readout shows at or beyond this many % either way. */
+    gradeShowPct: 2,
+    /** A climb averages `minPct` or more for at least `minM`; dips below `minPct` shorter than `dipM` do not end it. */
+    climb: { minPct: 3, minM: 300, dipM: 100, leadM: 150, aheadM: 900, behindM: 100 },
+    /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
+    riders: { rows: 7, nameChars: 10, movingMs: 1 },
+    toastS: 3,
+  },
   freeRide: {
     defaultKg: 75,
     bikeKg: 9,
