@@ -17,6 +17,13 @@ import { portrait, shopPreview } from './shopPreview'
 import { modal, toast } from './toast'
 
 const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲', horn: '📯' }
+/** Each horn its own picture. */
+const HORN_ICON: Record<string, string> = {
+  'horn-cow': '🐄',
+  'horn-didge': '🪃',
+  'horn-cucaracha': '🎺',
+  'horn-roadtrain': '🚛',
+}
 const WHERE: Record<Slot, string> = {
   paint: 'On the bus when you drive',
   bullbar: 'On the bus when you drive',
@@ -61,7 +68,7 @@ export function garageTab(p: Profile, changed: () => void) {
     const sw = h(
       'div',
       { class: 'sw', style: c.colour ? `--sw:${c.colour}` : '' },
-      c.colour ? '' : (ICON[c.slot] ?? '★'),
+      c.colour ? '' : (HORN_ICON[c.id] ?? ICON[c.slot] ?? '★'),
     )
     // A horn has nothing to show on the rider: it keeps its 📯.
     if (c.slot !== 'horn')
@@ -118,7 +125,11 @@ export function garageTab(p: Profile, changed: () => void) {
     .map(
       (s) =>
         COSMETICS.filter(
-          (c) => c.slot === s && priceOf(c) <= p.scrap && !p.owned.includes(c.id),
+          (c) =>
+            c.slot === s &&
+            c.id !== weeklyDeal() &&
+            priceOf(c) <= p.scrap &&
+            !p.owned.includes(c.id),
         ).sort((a, b) => b.price - a.price)[0],
     )
     .filter((c) => c)

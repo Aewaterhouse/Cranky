@@ -41,7 +41,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic, who: Wearer) {
     rider.pose('ride', 0.3)
     obj = rider.root
     rider.tag.visible = false
-    frame = c.slot === 'hat' ? rider.head : rider.person
+    frame = c.slot === 'hat' ? rider.head : c.slot === 'bike' ? rider.bike.group : rider.person
   }
   scene.add(obj)
   scene.updateMatrixWorld(true)
@@ -49,7 +49,9 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic, who: Wearer) {
   const size = box.getSize(new THREE.Vector3())
   const mid = box.getCenter(new THREE.Vector3())
   // Hats get a close-up of the head; everything else a three-quarter view from the front.
-  const reach = Math.max(size.x, size.y, size.z) * (c.slot === 'hat' ? 1.6 : onBus ? 0.8 : 0.55)
+  const reach =
+    Math.max(size.x, size.y, size.z) *
+    (c.slot === 'hat' ? 1.6 : onBus ? 0.8 : c.slot === 'bike' ? 1.15 : 0.55)
   const cam = new THREE.PerspectiveCamera(32, W / H, 0.05, 200)
   cam.position.set(
     mid.x + reach * 0.9,
