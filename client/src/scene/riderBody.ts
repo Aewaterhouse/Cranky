@@ -1,7 +1,6 @@
 import * as THREE from 'three'
 import type { Body } from '../core/body'
 import { Figure, limb, SLOT } from './figure'
-import { VIS } from './params'
 import { lerp } from './util'
 
 /** The limits each body slider runs between (at 0 and at 100). Lengths in metres, the rest multipliers. */
@@ -10,6 +9,8 @@ export const BODY_RANGE = {
   thick: [0.72, 1.55],
   girth: [0.8, 1.4],
   belly: [0, 0.36],
+  /** Chest: the radius of each half, from none to well past the zombies' joke size (VIS.bust, 0.17). */
+  chest: [0, 0.3],
   shoulders: [0.19, 0.36],
   arms: [0.8, 1.2],
   legs: [0.85, 1.15],
@@ -84,20 +85,22 @@ export function buildBody(b: Body) {
       [0, 0, 0],
       [1, 0.35, deep],
     )
+  // Chest and belly are always in the mesh (shrunk to nothing at zero), so every body has the same vertices.
+  const bust = Math.max(0.001, at(BODY_RANGE.chest, b.chest))
   for (const s of [-1, 1])
-    f.add(new THREE.IcosahedronGeometry(VIS.bust * lerp(0.8, 1.2, b.build / 100), 0), SLOT.jersey, [
-      s * 0.13 * g,
+    f.add(new THREE.IcosahedronGeometry(bust, 1), SLOT.jersey, [
+      s * Math.max(0.13 * g, bust * 0.72),
       0.4,
-      -0.2 * deep + 0.02,
+      -chest * deep * 0.55 - bust * 0.45,
     ])
-  if (belly > 0.02)
-    f.add(
-      new THREE.IcosahedronGeometry(1, 1),
-      SLOT.jersey,
-      [0, 0.17 + belly * 0.1, -belly * 0.55],
-      [0, 0, 0],
-      [Math.max(waist, belly * 0.95), belly * 0.85, belly],
-    )
+  const gut = Math.max(0.001, belly)
+  f.add(
+    new THREE.IcosahedronGeometry(1, 1),
+    SLOT.jersey,
+    [0, 0.17 + gut * 0.1, -gut * 0.55],
+    [0, 0, 0],
+    [belly > 0.02 ? Math.max(waist, gut * 0.95) : gut, gut * 0.85, gut],
+  )
   f.part('hips').add(new THREE.BoxGeometry(d.hip * 2 + 0.1 * k, 0.2, 0.26 * deep), SLOT.shorts)
   f.part('neck').add(limb(0.075 * k, 0.065 * k), SLOT.skin)
   const skinLow = b.tan ? SLOT.pale : SLOT.skin

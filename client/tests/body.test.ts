@@ -71,6 +71,8 @@ describe('rider body data', () => {
   it('uses the saved body when a look has one, else the default', () => {
     const b = presetBody('Bobblehead')
     expect(b.head).toBe(100)
+    expect(presetBody('Top heavy').chest).toBe(100)
+    expect(defaultBody('luke').chest).toBe(0)
     expect(bodyOf('luke', withBody({}, b))).toEqual(b)
     expect(bodyOf('luke', { body: 'junk' })).toEqual(defaultBody('luke'))
     expect(bodyOf('luke', undefined)).toEqual(defaultBody('luke'))

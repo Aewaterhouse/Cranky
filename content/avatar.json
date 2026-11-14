@@ -32,6 +32,16 @@
    "hi": "Keg"
   },
   {
+   "key": "chest",
+   "tab": "Body",
+   "label": "Chest",
+   "type": "slider",
+   "max": 100,
+   "def": 0,
+   "lo": "None",
+   "hi": "Absurd"
+  },
+  {
    "key": "shoulders",
    "tab": "Body",
    "label": "Shoulders",
@@ -544,6 +554,19 @@
     "build": 75,
     "shoulders": 90,
     "noseShape": 1
+   }
+  },
+  {
+   "name": "Top heavy",
+   "body": {
+    "chest": 100,
+    "build": 55,
+    "shoulders": 65,
+    "legs": 35,
+    "hair": 7,
+    "hairColour": 5,
+    "mouth": 2,
+    "eyeSize": 60
    }
   }
  ]

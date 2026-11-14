@@ -27,6 +27,11 @@ describe('rider model', () => {
     expect(most).toBeGreaterThan(500)
   })
 
+  it('has the same vertices whatever the body, so chest and belly can be painted', () => {
+    const n = buildBody(all(0)).triangles
+    for (const b of bodies.slice(0, 80)) expect(buildBody(b).triangles).toBe(n)
+  })
+
   it('has every part the pose moves, and no broken vertices', () => {
     for (const b of bodies.slice(0, 60)) {
       const f = buildBody(b)

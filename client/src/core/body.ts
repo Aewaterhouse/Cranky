@@ -62,7 +62,9 @@ export function defaultBody(id: string): Body {
   return Object.fromEntries(
     BODY_FIELDS.map((f) => {
       const v = r()
-      if (f.type === 'slider') return [f.key, clampTo(f, f.def + (v - 0.5) * DEFAULT_SPREAD)]
+      // A slider that is off by default (chest) stays off.
+      if (f.type === 'slider')
+        return [f.key, f.def ? clampTo(f, f.def + (v - 0.5) * DEFAULT_SPREAD) : 0]
       if (f.normal) return [f.key, f.normal[Math.floor(v * f.normal.length)]]
       return [f.key, f.def]
     }),

@@ -18,7 +18,7 @@ Free, body only. Hats, outfits and bikes stay Garage cosmetics and must fit ever
 
 ## Options
 Sliders are 0 to 100, pickers are an index. All in one table, `content/avatar.json`, read by the client (the creator screen is generated from it) and the server (validation).
-- Body: height, build, belly, shoulders, arm length, leg length, calves, head size, neck.
+- Body: height, build, belly, chest, shoulders, arm length, leg length, calves, head size, neck.
 - Skin: tone (realistic range plus zombie green, sunburnt lobster, Smurf blue, chrome), cyclist's tan line.
 - Hair: style (bald, buzz, short, mullet, mohawk, afro, man bun, ponytail, rat tail, curtains, comb-over, spikes, big perm, bowl cut), colour (natural and silly), facial hair (none, moustache, handlebar, horseshoe, beard, goatee, mutton chops).
 - Face: eye shape, size, colour and spacing, googly eyes, eyebrows (incl. bushy and unibrow), nose size and shape, ear size, mouth and teeth (smile, grin, gap, buck teeth, frown, open).
