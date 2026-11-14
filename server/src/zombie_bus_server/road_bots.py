@@ -70,7 +70,7 @@ def drive(room: RoadRoom, rngs: dict[str, random.Random]) -> None:
     for r in room.riders.values():
         if r.bot and sim and sim.el > 0:
             rng = rngs.setdefault(r.id, random.Random(f"{room.code}:{r.id}"))
-            # Form on the day, drawn once per ride: bots split up, and no two rides in a room play out the same.
+            # Form on the day, drawn once per ride: bots split up and no two rides play out the same.
             key = f"{r.id}:form:{id(sim)}"
             form = forms.setdefault(key, random.Random(key + room.code).uniform(*C.ROAD_BOT_FORM))
             r.p = r.w = form * bot_power(BOTS[r.id][1], r.ftp, sim, sim.movers[r.id], rng)
