@@ -104,6 +104,14 @@ NUDGE = "{name}, you are the Chaperone and you have {n} card{s} left. Ruin somet
 CHAT_OPEN = "📱 The group chat has leaked."
 CHAT_EMOJI = "Date {n} · {a} → {b}: {e}"
 CHAT_QUIET = "{a} sent nothing all night. Strong, silent, or asleep."
+DRIFT_HARD = [
+    "{a} has bolted. {b} is still at the table. Ease up, it's a date.",
+    "{a} is showing off. {b} did not sign up for a time trial.",
+]
+DRIFT_EASY = [
+    "{a} is leaving {b} on read. Lift it.",
+    "{a} has gone quiet. {b} is talking to the breadsticks.",
+]
 CHAT_MATCH = "Aunty Carol: {a} and {b} on date {n}. I nearly cried."
 CARDS = {
     "ex": "surge to 110%! Will your date follow?",

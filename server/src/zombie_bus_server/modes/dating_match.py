@@ -95,6 +95,7 @@ class Matching:
                 st["out"] += secs * (not band[0] - G.DATE_BAND_TOL <= p <= band[1] + G.DATE_BAND_TOL)
                 by = st["by"].setdefault(o.id, [0.0, 0])
                 by[0], by[1] = by[0] + m, by[1] + 1
+            self.named(room, ra, rb, pa, pb, ba, bb, secs)
             held = self.spark.get(kk, 0.0)
             if held >= 0:
                 held = held + secs if self.match[kk] > G.DATE_SPARK[0] else 0.0
@@ -103,6 +104,23 @@ class Matching:
                     self.emit("match", f"{ra.name} and {rb.name} are in sync. Get a room.", a)
                     self.chat_log.append(T.CHAT_MATCH.format(a=ra.name, b=rb.name, n=self.n))
                 self.spark[kk] = held
+
+    def named(
+        self, room: Room, ra: Rider, rb: Rider, pa: float, pb: float, ba: tuple, bb: tuple, secs: float
+    ) -> None:
+        """Names a dater out of band a while when their date is holding it: kindly, and not often."""
+        for r, o, p, band, q, oband in ((ra, rb, pa, ba, pb, bb), (rb, ra, pb, bb, pa, ba)):
+            d = self.drift.setdefault(r.id, [0.0, -1e9])
+            out = not band[0] - G.DATE_BAND_TOL <= p <= band[1] + G.DATE_BAND_TOL
+            d[0] = d[0] + secs if out and oband[0] <= q <= oband[1] else 0.0
+            if d[0] >= G.DATE_DRIFT[0] and room.el >= d[1] + G.DATE_DRIFT[1] * room.plan.get("scale", 1.0):
+                d[0], d[1] = 0.0, room.el
+                lines = T.DRIFT_HARD if p > band[1] else T.DRIFT_EASY
+                self.emit(
+                    "say",
+                    self.rng("drift", r.id, round(room.el)).choice(lines).format(a=r.name, b=o.name),
+                    r.id,
+                )
 
     def react(self, room: Room, act: list[Rider]) -> None:
         """Notes when each dater first answers the prompt that is on, and settles prompts that have ended."""

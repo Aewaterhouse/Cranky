@@ -10,6 +10,7 @@ from test_script import play
 
 from zombie_bus_server import config as C
 from zombie_bus_server import config_games as G
+from zombie_bus_server.modes import dating_text as T
 from zombie_bus_server.modes import script
 from zombie_bus_server.modes.dating import Dating, key, match, prompts, rounds
 from zombie_bus_server.plan import locate
@@ -264,3 +265,20 @@ def test_a_room_plays_a_scaled_night(monkeypatch, humans):
     assert len(s["riders"]) == len(room.riders)
     lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
     assert lobby["game"] == "date" and lobby["trainers"] == "gears"
+
+
+def test_a_dater_who_leaves_their_date_behind_is_named_kindly_and_not_often():
+    night = Night(4)
+    night.to("date", 1)
+    a, b = night.game.pairs[0]
+    pw = {b: 0.3}
+    fx = night.ride(90, lambda r, band, el: pw.get(r.id, mid(band) if isinstance(band, tuple) else 1.0))
+    said = [f for f in fx if f["k"] == "say" and f["id"] == b]
+    name_a, name_b = night.riders[a].name, night.riders[b].name
+    assert len(said) == 2 and all(name_b in f["text"] and name_a in f["text"] for f in said)
+    assert said[0]["text"] in [x.format(a=name_b, b=name_a) for x in T.DRIFT_EASY]
+    assert not [f for f in fx if f["k"] == "say" and f["id"] == a]
+    pw = {b: 1.4}
+    fx = night.ride(70, lambda r, band, el: pw.get(r.id, mid(band) if isinstance(band, tuple) else 1.0))
+    said = [f["text"] for f in fx if f["k"] == "say" and f["id"] == b]
+    assert said and said[0] in [x.format(a=name_b, b=name_a) for x in T.DRIFT_HARD]

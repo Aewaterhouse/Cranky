@@ -150,6 +150,10 @@ DATE_BAND_TOL = 0.01  # a couple scores only with both inside the band, give or 
 DATE_PTS_S = 1.0  # points a second at a full match
 DATE_SMOOTH_S = 3.0  # the match shown on screen is smoothed over about this long
 DATE_SPARK = (0.9, 20)  # a match over this for this many seconds is "a match" (once a date)
+DATE_DRIFT = (
+    15,
+    60,
+)  # a dater out of band this long while their date holds it is named, at most once this often
 DATE_REACT_PTS = 15  # for reacting to a prompt at the same instant, falling to nothing at the gap below
 DATE_REACT_MAX_S = 4.0
 DATE_REACT_UNDER = 0.03  # a rider has reacted once within this of the prompt's band

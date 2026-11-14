@@ -43,6 +43,7 @@ class Dating(Social, Finale, Matching, DateView, CrewGame):
         self.pts: dict[str, float] = {}  # and their points on this date
         self.table: dict[str, float] = {}  # every couple's points over the night
         self.spark: dict[str, float] = {}  # seconds each couple has held a spark; -1 once it is called
+        self.drift: dict[str, list[float]] = {}  # rider -> [seconds out of band, ride time last named]
         self.prompts: list[dict] = []
         self.reacts: dict[str, dict[str, float]] = {}  # prompt index -> rider -> ride time they reacted
         self.stats: dict[str, dict] = {}

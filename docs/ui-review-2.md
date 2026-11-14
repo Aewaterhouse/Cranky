@@ -38,7 +38,7 @@ say where you are, and free-ride places that don't look like where they are.
 8. [x] (every rider now finishes; bots ride with form on the day and dress from the whole Garage) Let the last rider finish instead of a DNF when the winner crosses; vary bot times and kit (games 6, 7).
 
 **Games**
-9. [ ] (Kidney Stone Express names names: the hump, spikes, smoothest hands; every rider gets an MVP line in the crew results; other games' live call-outs still to do) Live, named credit and blame ("Kat bounced the patient"), and an MVP line for everyone in results (games 13, 18).
+9. [x] (Kidney Stone Express names names: the hump, spikes, smoothest hands; every rider gets an MVP line in the crew results; Speed Dating names a dater who bolts or leaves their date on read; Climate already names the top emitter, the verdict and the sea wall) Live, named credit and blame ("Kat bounced the patient"), and an MVP line for everyone in results (games 13, 18).
 10. [x] (power fallback done; the box and the timer both read the same next block on the server: most likely the screenshot caught the box mid-spin, when it flicks through names) VO2 Madness falls back to power when there is no heart rate; the box name matches the timer (games 8, 9).
 11. [x] A five-second "how this one works" splash as each game starts (games 17).
 12. [x] Labels on the Speed Dating meter and the Kidney Stone Comfort bar and ETA (games 10, 12).
@@ -47,7 +47,7 @@ say where you are, and free-ride places that don't look like where they are.
 13. [x] The sea: a water plane at sea level and a sand band (worlds 1).
 14. [ ] (retried 2026-11-14: Great Ocean Road got streets, 855 buildings and land cover, kunanyi got land cover; Overpass refused the other seven again) Map features for the nine routes that have none (worlds 2; the fetch kept failing before, retry).
 15. [x] (dusk lifted, golden hour runs to 8 pm, Settings > Free ride sky has Always sunny and Golden hour; ground in straw and lush patches) Lift the dusk look and add a sunny default (worlds 3); break up the ground colour (worlds 4).
-16. [ ] (roadside detail and the farm kit done; the 30 to 45 s spacing still to do) Close-up roadside detail for speed; a farm kit for open country; something every 30 to 45 s (worlds 5, 6, 7).
+16. [x] (roadside detail, the farm kit and a road-life director that fills any 42 s gap with chalk, a sign or traffic) Close-up roadside detail for speed; a farm kit for open country; something every 30 to 45 s (worlds 5, 6, 7).
 
 **Bugs found along the way**
 17. [ ] ("1 rides" fixed; the missing History ride and the blank postcard need a reproduction: the reviewer did not
