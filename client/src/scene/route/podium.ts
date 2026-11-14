@@ -19,8 +19,11 @@ export interface PodiumRider {
   look?: Look
 }
 
-/** What each spot does: 1st jumps and pedals the air, 2nd jogs, 3rd pulls a wheelie, the side box twirls. */
-type Act = 'jump' | 'jog' | 'wheelie' | 'twirl'
+/**
+ * What each spot does: 1st jumps and pedals the air, 2nd jogs, 3rd pulls a wheelie, the side box twirls, and the
+ * rest clap on the grass.
+ */
+type Act = 'jump' | 'jog' | 'wheelie' | 'twirl' | 'clap'
 interface Fig {
   r: ReturnType<typeof makeRider>
   act: Act
@@ -53,6 +56,7 @@ export class Podium implements CamShot {
     award: { who: PodiumRider; sign: string } | undefined,
     title: string,
     private party: (x: number, y: number, z: number) => void,
+    rest: PodiumRider[] = [],
   ) {
     const p = field.path.poseAt(d, newPose())
     // On the left verge, facing the road.
@@ -84,6 +88,18 @@ export class Podium implements CamShot {
       post.position.set(sideX - w * 0.9, P.signUpM / 2, 0.06)
       this.group.add(board, post)
     }
+    // The rest on the grass to the right of 2nd, so the camera always finds you; the last holds the wooden spoon.
+    rest.slice(0, P.restMax).forEach((who, k, all) => {
+      const last = k === all.length - 1 && all.length === rest.length
+      const x = w * 1.5 + P.sideGapM + k * P.restGapM
+      this.stand(
+        last ? { ...who, name: `${who.name} · wooden spoon` } : who,
+        x,
+        0,
+        'clap',
+        JERSEYS[3],
+      )
+    })
     const back = this.signs.plate(title, w * 5, 1.1, P.backdrop, P.backdropText)
     back.position.set(0, P.firstH + 3.2, P.depthM / 2 + 0.6)
     const legs = [-1, 1].map((s) => {
@@ -175,7 +191,14 @@ export class Podium implements CamShot {
       r.root.rotation.set(act === 'wheelie' ? 0.25 + 0.15 * Math.sin(t * 3) : 0, 0, 0)
       if (act === 'twirl') r.root.rotation.y = t * P.twirlRad
       if (act === 'jog') r.root.rotation.y = Math.sin(t * 2.2) * 0.6
-      pose.cheer = act === 'wheelie' ? 0.5 + 0.5 * Math.sin(t * 2) : 1
+      if (act === 'clap')
+        r.root.position.y = f.y + Math.abs(Math.sin(t * P.clapHz * Math.PI)) * 0.08
+      pose.cheer =
+        act === 'wheelie'
+          ? 0.5 + 0.5 * Math.sin(t * 2)
+          : act === 'clap'
+            ? 0.5 + 0.5 * Math.sin(t * P.clapHz * 6)
+            : 1
       pose.stand = act === 'wheelie' ? 1 : 0
       r.pose(act === 'jog' ? 'run' : 'ride', t * (act === 'jog' ? 9 : P.spinRad), 0, pose)
     }
@@ -208,10 +231,17 @@ export function startPodium(
   top: PodiumRider[],
   award: { who: PodiumRider; sign: string } | undefined,
   title: string,
+  rest: PodiumRider[],
   done: () => void,
 ) {
-  const p = new Podium(world.field, Math.max(0, d - P.lineM), top, award, title, (x, y, z) =>
-    world.party({ x, y, z }),
+  const p = new Podium(
+    world.field,
+    Math.max(0, d - P.lineM),
+    top,
+    award,
+    title,
+    (x, y, z) => world.party({ x, y, z }),
+    rest,
   )
   world.show(p.group)
   world.riders.group.visible = false

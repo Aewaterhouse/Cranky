@@ -32,9 +32,12 @@ export function podiumOf(g: RoadSummary, drawn: { id: string; look?: RoadRider['
     who: who(g.award.id),
     sign: g.award.kind === 'prime' ? 'PRIME' : 'POINTS',
   }
+  const up = new Set([...(g.podium ?? []), g.award?.id])
   return {
     top: (g.podium ?? []).map(who),
     award: award || undefined,
+    /** Everyone else, clapping beside the steps in finishing order; the last holds the wooden spoon. */
+    rest: g.riders.filter((r) => !up.has(r.id)).map((r) => who(r.id)),
     title: `${TITLES[g.game ?? 'race']} · ${g.name}`,
   }
 }

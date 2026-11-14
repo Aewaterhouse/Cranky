@@ -184,6 +184,8 @@ describe('group ride link', () => {
     expect(p.top[0].look).toEqual({ hat: 'hat-viking' })
     expect(p.award).toEqual({ who: { id: 'bob', name: 'Bob', look: undefined }, sign: 'PRIME' })
     expect(p.title).toBe('CRIT · Nundah')
+    expect(p.rest).toEqual([])
+    expect(podiumOf({ ...g, award: null }, []).rest.map((r) => r.name)).toEqual(['Bob'])
     expect(podiumOf({ ...g, game: 'points', award: null }, []).award).toBeUndefined()
   })
 

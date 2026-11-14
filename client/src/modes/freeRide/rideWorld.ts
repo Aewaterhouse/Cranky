@@ -143,7 +143,7 @@ export function rideWorld(
       const { startPodium } = await import('../../scene/route/podium')
       await new Promise<void>((done) => {
         const skip = () => shot.skip()
-        const shot = startPodium(w, base.distance, p.top, p.award, p.title, () => {
+        const shot = startPodium(w, base.distance, p.top, p.award, p.title, p.rest, () => {
           removeEventListener('keydown', skip)
           view.root.removeEventListener('pointerdown', skip)
           done()

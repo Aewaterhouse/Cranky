@@ -55,6 +55,10 @@ export const PODIUM = {
   stepW: 1.5,
   depthM: 1.6,
   sideGapM: 1.4,
+  /** The riders off the podium: how many stand beside it, metres apart, and how fast they clap. */
+  restMax: 5,
+  restGapM: 1.5,
+  clapHz: 2.5,
   /** The award's board on a post beside the side box: width and height of its middle. */
   signW: 1.9,
   signUpM: 2.3,

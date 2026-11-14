@@ -87,7 +87,15 @@ async function start() {
     const sign = q.get('podium')!
     const award = sign === 'none' ? undefined : { who: riders[3] ?? riders[0], sign }
     const { startPodium } = await import('./scene/route/podium')
-    startPodium(world, route.distance, riders.slice(0, 3), award, `CRIT · ${route.name}`, () => {})
+    startPodium(
+      world,
+      route.distance,
+      riders.slice(0, 3),
+      award,
+      `CRIT · ${route.name}`,
+      riders.slice(4),
+      () => {},
+    )
   }
   if (q.has('camcheck')) setTimeout(() => runCamCheck(world.cam, CAM.route, world, 1800), 6000)
 
