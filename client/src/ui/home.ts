@@ -11,6 +11,7 @@ import type { Plan } from '../types'
 import { avatar, fmt, h } from './dom'
 import { toast } from './toast'
 import { freeRideSetup } from './freeRideSetup'
+import { weekCard } from './weekCard'
 import { gamePicker } from './gamePicker'
 import { hello, mode } from './homeCards'
 import type { Game } from '../net/protocol'
@@ -228,6 +229,7 @@ export function rideTab(p: Profile, act: HomeActions) {
     boarding,
     rejoin,
     today,
+    weekCard(p, (r) => open(freeRideSetup(p, act, home, r))),
     h(
       'section',
       { class: 'hero' },

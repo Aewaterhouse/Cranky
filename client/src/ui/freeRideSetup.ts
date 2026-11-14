@@ -58,7 +58,13 @@ function routeCard(p: Profile, r: Route, selected: boolean, pick: () => void, de
 }
 
 /** Free ride setup: pick a route (or import a GPX), then go. */
-export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
+/** `start` picks a bundled route as it opens (home's route of the week). */
+export function freeRideSetup(
+  p: Profile,
+  act: HomeActions,
+  back: () => void,
+  start?: { id: string; name: string },
+) {
   let sel: Route | undefined = myRoutes()[0]
   const list = h('div', { class: 'route-grid' })
   const pickBundled = async (r: { id: string; name: string }) => {
@@ -169,6 +175,7 @@ export function freeRideSetup(p: Profile, act: HomeActions, back: () => void) {
     },
   })
   paint()
+  if (start) void pickBundled(start)
   return h(
     'div',
     { class: 'solo-setup' },
