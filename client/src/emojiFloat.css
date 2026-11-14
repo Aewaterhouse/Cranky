@@ -37,3 +37,9 @@
   padding: 2px 6px;
   font-size: 1.2rem;
 }
+/* The bus's horn is the first button: bigger, so it is easy to find mid-effort. */
+.hud-right .emoji-tray button:first-child {
+  padding: 4px 12px;
+  font-size: 1.6rem;
+  margin-right: 6px;
+}

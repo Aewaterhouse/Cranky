@@ -231,7 +231,7 @@ export function lobbyView(c: LobbyCtx) {
       )
     }
 
-    pickerBox.hidden = !isHost || !!info.fixed
+    pickerBox.hidden = !isHost || !!info.fixed || !info.plan
     if (isHost) {
       if (!picker) {
         picker = planPicker({
