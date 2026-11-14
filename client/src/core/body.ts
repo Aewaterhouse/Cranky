@@ -88,3 +88,13 @@ export const bodyOf = (id: string, look?: { body?: string }) =>
 
 /** An option's colour (skin, hair, eyes) as a hex string. */
 export const bodyColour = (b: Body, key: string) => field(key).colours![b[key]] ?? '#888888'
+
+/** A preset laid over the plain body. */
+export const presetBody = (name: string) =>
+  fullBody(BODY_PRESETS.find((p) => p.name === name)?.body)
+
+/** The look with this body saved in it (what the creator's Save does to `profile.look`). */
+export const withBody = <T extends { body?: string }>(look: T, b: Body): T => ({
+  ...look,
+  body: encodeBody(b),
+})

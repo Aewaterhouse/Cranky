@@ -13,8 +13,8 @@ export interface Cosmetic {
 /** Rarity tiers, commonest first: they set the badge and frame of an item in the Garage. */
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'] as const
 export type Rarity = (typeof RARITIES)[number]
-/** Equipped item ids by slot; what other riders see. */
-export type Look = Partial<Record<Slot, string>>
+/** Equipped item ids by slot, and the rider's body (see core/body.ts); what other riders see. */
+export type Look = Partial<Record<Slot, string>> & { body?: string }
 
 export const COSMETICS = CATALOGUE as Cosmetic[]
 export const cosmetic = (id?: string) => COSMETICS.find((c) => c.id === id)
