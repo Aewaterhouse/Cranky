@@ -55,7 +55,7 @@ end of the queue. Owner's own to-dos go first:*
    (nav 3, 4; lobby 10, 11, 16).
 9. [ ] (run picker, effort and trainer rows now hidden for scripted games) Run picker and effort rows shown for games that ignore them; game cards are walls of small text (lobby 12, 13).
 10. [x] Joining by code asks for a trainer before checking the code (nav 5).
-11. [ ] Guests have no ready state; a host who leaves leaves a ghost seat (lobby 15, 27).
+11. [ ] (leaving a lobby now frees the seat and hands over the driver's seat; no ready state yet) Guests have no ready state; a host who leaves leaves a ghost seat (lobby 15, 27).
 
 **Riding**
 12. [ ] Phone crew HUD overlaps itself (riding 6); in-ride controls are tiny on touch (nav 10, riding 22).

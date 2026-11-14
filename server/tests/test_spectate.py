@@ -79,8 +79,8 @@ def test_spectators_do_not_keep_a_room_alive_or_leave_ghosts():
         assert not any(x.connected for x in room.humans())  # idle logic sees nobody
         assert room.watchers == [tv]
         await room.disconnect("h0", tv)
-        assert room.watchers == [] and room.riders["h0"].connected is False
-        await room.handle("h0", FakeWS(), join("H0"))  # reconnecting seat still works
+        assert room.watchers == [] and "h0" not in room.riders  # a lobby seat is freed
+        await room.handle("h0", FakeWS(), join("H0"))  # coming back takes a seat again
         assert room.riders["h0"].connected
 
     asyncio.run(main())

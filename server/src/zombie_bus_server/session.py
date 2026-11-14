@@ -171,6 +171,10 @@ class Room:
             r.connected = False
             if self.host == rid:
                 self.host = next((x.id for x in self.humans() if x.connected), rid)
+            # In the lobby a seat is only a seat: free it (a rider who comes back just joins again).
+            # During a ride the seat waits, so a dropped rider can rejoin where they were.
+            if self.state == "lobby" and not r.connected:
+                del self.riders[rid]
             if not any(x.connected for x in self.humans()):
                 self.idle_since = time.monotonic()
             await self.lobby()

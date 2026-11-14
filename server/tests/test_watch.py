@@ -1,6 +1,7 @@
 import asyncio
 
 from test_bots import lobby_with
+from test_resume import join
 from test_zombie_bus import STEADY, FakeRoom, run
 
 from zombie_bus_server.modes.watch import Watch
@@ -140,3 +141,16 @@ def test_a_code_can_be_checked_before_joining():
     code = client.post("/api/rooms", headers=h).json()["code"]
     assert client.get(f"/api/rooms/{code.lower()}", headers=h).json()["code"] == code
     assert client.get("/api/rooms/ZZZZ", headers=h).status_code == 404
+
+
+def test_leaving_a_lobby_frees_the_seat_and_hands_over_the_drivers_seat():
+    async def main():
+        room, ws = await lobby_with(1, "SEAT")
+        ws2 = type(ws)()
+        await room.handle("g1", ws2, join("Guest"))
+        assert {"h0", "g1"} <= set(room.riders)
+        await room.disconnect("h0", ws)
+        return room
+
+    room = asyncio.run(main())
+    assert "h0" not in room.riders and room.host == "g1"
