@@ -84,9 +84,13 @@ export class RouteWorld {
   private sky = new Sky(true)
   private skyline = new Skyline()
   private rig = new RouteCam()
-  /** The player's orbit and zoom on top of the chase camera. */
+  /** The player's view, orbit and zoom on top of the chase camera. */
   cam!: PlayerCam
-  private pivot = new THREE.Vector3()
+  private limits = {
+    near: CAM.nearRider,
+    ground: (x: number, z: number) => this.field.ground(x + this.ox, z + this.oz) - this.oy,
+  }
+  private frame = { at: new THREE.Vector3(), right: new THREE.Vector3(), back: new THREE.Vector3() }
   private rain = new Rain()
   private confetti = new Confetti()
   private seed: number
@@ -233,11 +237,12 @@ export class RouteWorld {
     const { ox, oy, oz } = this
     if (!shot) {
       this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
-      this.pivot.copy(this.rig.subject).y += 1.1
-      this.cam.apply(this.camera, dt, this.pivot, this.rig.look, {
-        near: CAM.nearRider,
-        ground: (x, z) => this.field.ground(x + ox, z + oz) - oy,
-      })
+      const f = this.frame
+      const p = this.riders.me
+      f.at.copy(this.rig.subject)
+      f.right.set(p.rx, 0, p.rz).normalize()
+      f.back.set(-p.fx, 0, -p.fz).normalize()
+      this.cam.apply(this.camera, dt, f, this.rig.look, this.limits, CAM.route, 1.1)
     } else if (shot.update(this.camera, this.field, this.riders, ox, oy, oz)) {
       this.shot = undefined
       this.onShotEnd?.()
@@ -285,6 +290,9 @@ export class RouteWorld {
     this.lifePlan.clear()
     this.chunks.clear()
   }
+
+  /** The next camera view (Chase, High, Rear, Side); returns its name. */
+  cycleView = () => this.cam.cycle()
 
   /** PNG of the current view with every chunk in range built (render then read in the same frame). */
   snapshot(): string {

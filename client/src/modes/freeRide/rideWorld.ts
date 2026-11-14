@@ -2,9 +2,11 @@ import { CFG } from '../../config'
 import { flyStretch } from '../../core/flyover'
 import type { Route } from '../../core/route'
 import { lessMotion, settings } from '../../core/settings'
+import { VIEW_NAMES } from '../../scene/camVis'
 import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { SFX } from '../../ui/audio'
+import { camButton } from '../../ui/camButton'
 import '../../perf.css'
 import { perfOverlay } from '../../ui/perfOverlay'
 import { rideIntro } from '../../ui/rideIntro'
@@ -61,6 +63,7 @@ export function rideWorld(
         world = new m.RouteWorld(view.stage, base)
         world.state = { me: me.id, riders: [me] }
         const w = world
+        view.root.querySelector('.dock-l')?.append(camButton(cycleView))
         if (new URLSearchParams(location.search).get('perf') === '1')
           view.root.append(perfOverlay(dev.watchPerf(w)).el)
         orbit = (secs, onFront) => (w.shot = new sp.OrbitShot(secs, onFront))
@@ -73,12 +76,17 @@ export function rideWorld(
       .catch(() => (view.flat(), cardOnly()))
   else cardOnly()
 
+  function cycleView() {
+    if (world) view.toast(`Camera: ${VIEW_NAMES[world.cycleView()]}`)
+  }
   return {
     /** The pre-ride card or flyover is still up. */
     get intro() {
       return !!intro
     },
     skipIntro: () => intro && endIntro(),
+    /** The next camera view (C or the camera button), with its name in a toast. */
+    cycleView,
     /** Where the main climb tops out, when the route has one worth a moment. */
     topD: climbs ? top.d : undefined,
     /** The still for the postcard: the lookout if there was one, else the finish. */

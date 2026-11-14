@@ -12,9 +12,11 @@ export interface FreeKeyActions {
   /** Shift strength down (-1) or up (1) a step. */
   strength(d: number): void
   toggle(part: FreePart): void
+  /** The next camera view. */
+  camera(): void
 }
 
-/** The free-ride key map: Space or P pause, Esc end, + and - difficulty, Z and X gears, ; and ' shift strength, H S M R the HUD parts. */
+/** The free-ride key map: Space or P pause, Esc end, + and - difficulty, Z and X gears, ; and ' shift strength, C the camera view, H S M R the HUD parts. */
 export const freeKeys = (on: FreeKeyActions) => (e: KeyboardEvent) => {
   const tag = (e.target as HTMLElement)?.tagName
   if (tag === 'INPUT' || e.ctrlKey || e.metaKey) return
@@ -32,9 +34,11 @@ export const freeKeys = (on: FreeKeyActions) => (e: KeyboardEvent) => {
               ? () => on.shift(k === 'x' ? 1 : -1)
               : k === ';' || k === "'"
                 ? () => on.strength(k === "'" ? 1 : -1)
-              : k in HUD_KEYS
-                ? () => on.toggle(HUD_KEYS[k])
-                : null
+                : k === 'c'
+                  ? on.camera
+                  : k in HUD_KEYS
+                    ? () => on.toggle(HUD_KEYS[k])
+                    : null
   if (!act) return
   act()
   e.preventDefault()

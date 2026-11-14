@@ -1,3 +1,4 @@
+import type { CamView } from '../scene/camVis'
 import { CFG } from '../config'
 import { setZonePalette } from '../ui/planGraph'
 import { setGradePalette } from './hud'
@@ -40,6 +41,8 @@ export interface Settings {
   mixVoice: number
   /** Multiplies how much each virtual gear changes the trainer gradient (0.5 to 3). */
   shiftStrength: number
+  /** The 3D camera view: the game's chase camera, or High, Rear or Side. */
+  camView: CamView
 }
 
 const KEY = 'cranky.settings'
@@ -63,6 +66,7 @@ const DEFAULTS: Settings = {
   mixAmbience: 1,
   mixVoice: 1,
   shiftStrength: CFG.gears.strength.start,
+  camView: 'chase',
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

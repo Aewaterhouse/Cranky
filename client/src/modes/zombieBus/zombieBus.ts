@@ -18,6 +18,8 @@ import { makeHud } from '../../ui/hud'
 import type { Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
+import { camButton, camKey } from '../../ui/camButton'
+import { VIEW_NAMES } from '../../scene/camVis'
 import { busErgOn } from '../../core/gears'
 import { totalMass } from '../../core/physics'
 import { onClickShift } from '../../trainer/zwiftClick'
@@ -122,6 +124,10 @@ export function startBusRide(
   )
   hud.setTier(profile.tier)
   stage.append(hud.root)
+  // C or the camera button: the next camera view (Chase, High, Rear, Side).
+  const cycleView = () => hud.toast(`Camera: ${VIEW_NAMES[world.cycleView()]}`)
+  hud.root.querySelector('.dock-l')?.append(camButton(cycleView))
+  const offCam = camKey(() => hud.root.isConnected, cycleView)
   ride.onSprint = (r) => {
     SFX[r.grade]()
     hud.sprint(r)
@@ -236,6 +242,7 @@ export function startBusRide(
 
   const cleanup = async () => {
     offClick()
+    offCam()
     clearInterval(sender)
     clearInterval(saver)
     clearInterval(scheduler)

@@ -131,6 +131,7 @@ export function runFreeRide(
     shift,
     strength: (d) => (stepStrength(d), view.toast(`Shift strength ${strengthPct()}`)),
     toggle: (part) => view.toggle(part),
+    camera: () => scene.cycleView(),
   })
   addEventListener('keydown', onKey)
   const offClick = onClickShift(shift)

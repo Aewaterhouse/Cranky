@@ -53,6 +53,12 @@ export interface SceneState {
   mad?: MadScene | null
 }
 const BUS_LIMITS = { near: CAM.nearBus, ground: () => 0, bus: true }
+/** The bus sits at the origin facing -z. */
+const BUS_FRAME = {
+  at: new THREE.Vector3(),
+  right: new THREE.Vector3(1, 0, 0),
+  back: new THREE.Vector3(0, 0, 1),
+}
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
 /** Where the horde front sits (metres behind the bus origin) for a given gap. */
@@ -103,7 +109,6 @@ export class World {
   private slow = 0
   private rig = new CamRig()
   private pc!: PlayerCam
-  private busPivot = new THREE.Vector3(0, 2, 0)
   private last = performance.now()
   private raf = 0
 
@@ -164,6 +169,9 @@ export class World {
     this.camera.setViewOffset(w, h, 0, h * VIS.viewShift, w, h)
     this.camera.updateProjectionMatrix()
   }
+
+  /** The next camera view (Chase, High, Rear, Side); returns its name. */
+  cycleView = () => this.pc.cycle()
 
   fx(kind: FxKind) {
     if (kind === 'hit') {
@@ -274,7 +282,7 @@ export class World {
       pack: !!s.mad,
       climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
-    this.pc.apply(this.camera, dt / sm, this.busPivot, this.rig.look, BUS_LIMITS)
+    this.pc.apply(this.camera, dt / sm, BUS_FRAME, this.rig.look, BUS_LIMITS, CAM.bus, 2)
     this.strikes.view(this.camera)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)

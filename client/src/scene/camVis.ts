@@ -31,12 +31,12 @@ export const CAM = {
    * bus's subject is the bus; free ride's is the rider. Chase is the game's own camera and has no entry.
    */
   bus: {
-    high: { ex: 8, ey: 55, ez: 95, lx: 0, ly: 0, lz: 15 },
+    high: { ex: 6, ey: 110, ez: 40, lx: 0, ly: 0, lz: 10 },
     rear: { ex: 3, ey: 6, ez: -20, lx: 0, ly: 2, lz: 40 },
-    side: { ex: 26, ey: 4, ez: 4, lx: 0, ly: 2, lz: 4 },
+    side: { ex: 15, ey: 3.5, ez: 3, lx: 0, ly: 2.2, lz: 3 },
   },
   route: {
-    high: { ex: 4, ey: 28, ez: 42, lx: 0, ly: 0, lz: -12 },
+    high: { ex: 3, ey: 16, ez: 24, lx: 0, ly: 0, lz: -4 },
     rear: { ex: 1.5, ey: 2.4, ez: -9, lx: 0, ly: 1.2, lz: 25 },
     side: { ex: 9, ey: 2, ez: 0, lx: 0, ly: 1.1, lz: 0 },
   },
@@ -54,4 +54,10 @@ export const CAM = {
 }
 export type CamView = 'chase' | 'high' | 'rear' | 'side'
 export const CAM_VIEWS: CamView[] = ['chase', 'high', 'rear', 'side']
+export const VIEW_NAMES: Record<CamView, string> = {
+  chase: 'Chase',
+  high: 'High',
+  rear: 'Rear',
+  side: 'Side',
+}
 export type ViewPoint = (typeof CAM.bus)['high']

@@ -73,7 +73,21 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 | `+` / `-` | trainer difficulty +/- 5% |
 | `Z` / `X` | virtual gear down / up |
 | `;` / `'` | shift strength down / up |
+| `C` | camera view: Chase, High, Rear, Side |
 | Esc | end the ride (asks first) |
+
+## Camera
+
+In the Zombie Bus, VO2 Madness, free ride and the TV view, the 3D camera is yours to move:
+
+| Input | Effect |
+| --- | --- |
+| `C` or the 🎥 button | next view: Chase (the game's own), High, Rear, Side; remembered on this device |
+| Drag (mouse or one finger) on the 3D view | turn the camera round the bus or rider |
+| Wheel or pinch | zoom in and out |
+| Double click or double tap | straight back to the view |
+
+With no camera input for 8 s the view eases back by itself. HUD panels, buttons, the map and sliders work as before; only drags that start on the 3D view move the camera.
 
 ## Zwift Click and virtual gears
 
