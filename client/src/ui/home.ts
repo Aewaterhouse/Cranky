@@ -273,8 +273,13 @@ export function rideTab(p: Profile, act: HomeActions) {
             h('button', {}, 'Join'),
             h(
               'button',
-              { type: 'button', class: 'ghost', onclick: withCode(act.watch) },
-              '📺 TV view',
+              {
+                type: 'button',
+                class: 'ghost',
+                title: 'Show a crew ride on the telly: type its code, then tap here',
+                onclick: withCode(act.watch),
+              },
+              '📺 Watch on a TV',
             ),
           ),
         ),
