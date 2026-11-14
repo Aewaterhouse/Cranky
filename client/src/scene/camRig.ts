@@ -6,6 +6,8 @@ import { clamp, smooth } from './util'
 export class CamRig {
   pull = 0
   shake = 0
+  /** Where the chase camera aims this frame, for the player's orbit. */
+  look = new THREE.Vector3()
   private near = 0
   private fov = VIS.fov
 
@@ -44,11 +46,12 @@ export class CamRig {
         ny * sh * 0.3,
       VIS.camDist * low + this.pull * 7 + Math.sin(t * 0.17) * 0.6 * sway - o.hit * 0.8,
     )
-    cam.lookAt(
+    this.look.set(
       0,
       2.6 + (o.climb ?? 0) * VIS.climbLook - this.pull * 0.4,
       VIS.camLook + this.pull * 6,
     )
+    cam.lookAt(this.look)
     cam.rotateZ(nx * sh * 0.012 + Math.sin(t * 0.3) * 0.012 * sway)
     const fov = VIS.fov + clamp(o.speed / 20) * VIS.fovKick * 20 + o.hit * 3 + (o.slow ? -4 : 0)
     this.fov += (fov - this.fov) * clamp(dt * 4)

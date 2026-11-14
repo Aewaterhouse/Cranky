@@ -1,3 +1,4 @@
+import { CAM } from './camVis'
 import { FEEL } from './route/feelVis'
 import { FLY, ORBIT, PARTY } from './route/shotVis'
 import { PLACE } from './route/placeVis'
@@ -27,6 +28,8 @@ export interface MoodDef {
 }
 
 export const VIS = {
+  /** The player's camera: orbit, zoom, views and cinematics (scene/camVis.ts). */
+  cam: CAM,
   /** Automatic quality: frame-rate windows of `windowS` seconds; under `verySlowFps` drops `verySlowDrop` levels at once, `slowWindows` windows under `slowFps` drop one, `fastWindows` over `fastFps` climb one. */
   quality: {
     windowS: 2,

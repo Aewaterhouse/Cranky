@@ -779,3 +779,8 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Prices and rarity (2026-11-14)
 - Prices × 1.5, rounded to 10 (Python's round-half-even, so the 30-scrap cap went to 40, not 50). Rarity is stored per item in content/cosmetics.json, set from price: common < 100, rare < 250, epic < 500, legendary otherwise; a test keeps every tier dearer than the last. Already-owned items stay owned; nothing is refunded or recharged.
+
+## Player camera: orbit and zoom (2026-11-14)
+- The orbit is an offset laid on the game's own camera after it is placed, round the bus (2 m up) or the rider (1.1 m up), so with no input nothing changes. Input listens on the 3D canvas only; everything above it (HUD, map, sliders, buttons) keeps its own pointer events.
+- Limits (`VIS.cam`): 4° to 80° above the subject, zoom 0.35× to 3× of the view's distance, never nearer than 9 m to the bus or 2.2 m to the rider, 0.8 m above the ground, and lifted onto the roof if it would end up inside the bus. 0.3° of turn per pixel dragged, 12% zoom per wheel notch.
+- The gunship and the free-ride flyover and summit shots still take the camera over; the orbit applies only to the chase camera underneath them.

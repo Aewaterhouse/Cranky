@@ -8,6 +8,8 @@ import { FxLayer } from './fxLayer'
 import { Ground } from './ground'
 import { Billboards, Servo } from './landmarks'
 import { Mirror } from './mirror'
+import { PlayerCam } from './playerCam'
+import { CAM } from './camVis'
 import { MoodBlend } from './moods'
 import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
@@ -50,6 +52,7 @@ export interface SceneState {
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
   mad?: MadScene | null
 }
+const BUS_LIMITS = { near: CAM.nearBus, ground: () => 0, bus: true }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
 /** Where the horde front sits (metres behind the bus origin) for a given gap. */
@@ -99,6 +102,8 @@ export class World {
   private flash = 0
   private slow = 0
   private rig = new CamRig()
+  private pc!: PlayerCam
+  private busPivot = new THREE.Vector3(0, 2, 0)
   private last = performance.now()
   private raf = 0
 
@@ -144,6 +149,7 @@ export class World {
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
     this.mirror = new Mirror(this.host)
+    this.pc = new PlayerCam(this.renderer.domElement)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
     this.resize()
@@ -268,6 +274,7 @@ export class World {
       pack: !!s.mad,
       climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
+    this.pc.apply(this.camera, this.busPivot, this.rig.look, BUS_LIMITS)
     this.strikes.view(this.camera)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)
@@ -289,6 +296,7 @@ export class World {
     removeEventListener('resize', this.resize)
     this.fxl.dispose()
     this.mirror.dispose()
+    this.pc.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }

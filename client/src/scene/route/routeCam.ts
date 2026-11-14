@@ -1,4 +1,4 @@
-import type * as THREE from 'three'
+import * as THREE from 'three'
 import { clamp } from '../math'
 import { VIS } from '../params'
 import type { HeightField } from './heightField'
@@ -33,6 +33,9 @@ export interface CamSubject {
 export class RouteCam {
   /** The route is a closed circuit ridden lap after lap. */
   loop = false
+  /** This frame's aim point and the rider's position, less the floating origin, for the player's orbit. */
+  look = new THREE.Vector3()
+  subject = new THREE.Vector3()
   private x = 0
   private y = 0
   private z = 0
@@ -106,7 +109,8 @@ export class RouteCam {
     }
     this.y = Math.max(this.y, field.ground(this.x, this.z) + R.camClear)
     cam.position.set(this.x - ox, this.y - oy, this.z - oz)
-    cam.lookAt(this.lx - ox, this.ly - oy, this.lz - oz)
+    cam.lookAt(this.look.set(this.lx - ox, this.ly - oy, this.lz - oz))
+    this.subject.set(rx - ox, me.y - oy, rz - oz)
     // Extras: roll with the rider into the bend, and a small two-tone shake that never moves the aim far.
     const shake = fancy * shakeAmount(speed, me.grade) * VIS.shake
     const w = t * Math.PI * 2 * C.shakeHz

@@ -24,6 +24,8 @@ import { RoadPath, newPose } from './roadPath'
 import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
+import { PlayerCam } from '../playerCam'
+import { CAM } from '../camVis'
 import { Skyline } from './skyline'
 import { aimSun, setUpSun } from './sun'
 import { TerrainGrid } from './terrainGrid'
@@ -82,6 +84,9 @@ export class RouteWorld {
   private sky = new Sky(true)
   private skyline = new Skyline()
   private rig = new RouteCam()
+  /** The player's orbit and zoom on top of the chase camera. */
+  cam!: PlayerCam
+  private pivot = new THREE.Vector3()
   private rain = new Rain()
   private confetti = new Confetti()
   private seed: number
@@ -105,6 +110,7 @@ export class RouteWorld {
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowMap
     host.prepend(this.renderer.domElement)
+    this.cam = new PlayerCam(this.renderer.domElement)
     const terrain = route.points[0].lat === undefined ? undefined : route.terrain
     this.seed = seedOf(route.id)
     const path = new RoadPath(route, terrain)
@@ -225,8 +231,14 @@ export class RouteWorld {
       this.root.position.set(-this.ox, -this.oy, -this.oz)
     }
     const { ox, oy, oz } = this
-    if (!shot) this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
-    else if (shot.update(this.camera, this.field, this.riders, ox, oy, oz)) {
+    if (!shot) {
+      this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
+      this.pivot.copy(this.rig.subject).y += 1.1
+      this.cam.apply(this.camera, this.pivot, this.rig.look, {
+        near: CAM.nearRider,
+        ground: (x, z) => this.field.ground(x + ox, z + oz) - oy,
+      })
+    } else if (shot.update(this.camera, this.field, this.riders, ox, oy, oz)) {
       this.shot = undefined
       this.onShotEnd?.()
     }
@@ -288,6 +300,7 @@ export class RouteWorld {
     this.life.dispose()
     this.rain.dispose()
     this.confetti.dispose()
+    this.cam.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }
