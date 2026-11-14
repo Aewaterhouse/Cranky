@@ -38,8 +38,8 @@ end of the queue. Owner's own to-dos go first:*
 
 - [x] Power curve: 23 durations instead of 10 and a smooth (monotone cubic) line; other graphs (Trends, FTP history) still straight segments.
 
-- [ ] Results: a Main Menu button beside "Ride again with this crew", so leaving is not a guess.
-- [ ] Home: "Start a new bus" makes the bus look like the only game; free ride is a main mode too and should sit
+- [x] Results: a Main Menu button beside "Ride again with this crew", so leaving is not a guess.
+- [x] Home: "Start a new bus" makes the bus look like the only game; free ride is a main mode too and should sit
       alongside the crew games, not under them.
 - [x] Watch Party: paste a video link in the lobby, so the video is on as the ride starts.
 - [x] "Your effort" levels: say what they are (Hard is the workout as written) instead of Hard, Medium, Easy.

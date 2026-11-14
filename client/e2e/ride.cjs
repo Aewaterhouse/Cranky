@@ -14,7 +14,7 @@ async function rider(browser, name) {
   await page.click(`text=${name}`)
   await page.fill('input[placeholder="Password"]', name.toLowerCase())
   await page.keyboard.press('Enter')
-  await page.waitForSelector('text=Start a new bus').catch(async (e) => {
+  await page.waitForSelector('.home-games').catch(async (e) => {
     console.error(`${name} login failed; page says:\n${(await page.innerText('body')).slice(0, 400)}`)
     throw e
   })
@@ -37,11 +37,11 @@ async function solo(page) {
   const text = await page.innerText('body')
   if (!/Sprints/i.test(text)) throw new Error('solo results missing sprint section')
   await page.click('button:has-text("Done")')
-  await page.waitForSelector('text=Start a new bus')
+  await page.waitForSelector('.home-games')
 }
 
 async function crew(host, guest) {
-  await host.click('text=Start a new bus')
+  await host.click('.home-game:has-text("Zombie Bus")')
   await host.waitForSelector('.code-letters')
   const code = (await host.innerText('.code-letters')).replace(/\s/g, '')
   await guest.fill('input[placeholder="ABCD"]', code)
@@ -59,7 +59,7 @@ async function crew(host, guest) {
 
 // A scripted crew game with no ERG: one rider and three bots through a whole shift.
 async function shift(page) {
-  await page.click('text=Start a new bus')
+  await page.click('.home-game:has-text("Kidney Stone Express")')
   await useSim(page)
   await page.waitForSelector('.code-letters')
   await page.click('.game-card:has-text("Kidney Stone Express")')
@@ -74,7 +74,7 @@ async function shift(page) {
 
 // Speed Dating with three bots: six dates, the wedding and the divorce.
 async function night(page) {
-  await page.click('text=Start a new bus')
+  await page.click('.home-game:has-text("Speed Dating")')
   await useSim(page)
   await page.waitForSelector('.code-letters')
   await page.click('.game-card:has-text("Speed Dating")')
@@ -89,7 +89,7 @@ async function night(page) {
 
 // Climate Lawsuit with three bots: four decades, a fuel change, the Trial and Sentencing.
 async function town(page) {
-  await page.click('text=Start a new bus')
+  await page.click('.home-game:has-text("Climate Lawsuit")')
   await useSim(page)
   await page.waitForSelector('.code-letters')
   await page.click('.game-card:has-text("Climate Lawsuit")')

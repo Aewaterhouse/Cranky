@@ -115,6 +115,16 @@ function busCard(r: Room, act: HomeActions) {
   )
 }
 
+/** A big card for one of the solo modes, alongside the crew games. */
+const mode = (icon: string, name: string, tag: string, go: () => void) =>
+  h(
+    'button',
+    { class: 'home-game home-mode', onclick: go },
+    h('span', { class: 'gc-icon' }, icon),
+    h('b', {}, name),
+    h('small', {}, tag),
+  )
+
 /** Card offering to carry on a solo ride that a refresh or crash cut short. */
 function resumeCard(p: Profile, act: HomeActions) {
   const snap = loadSnap<SoloSnap>(soloKey(p.id))
@@ -154,8 +164,8 @@ export function rideTab(p: Profile, act: HomeActions) {
               'div',
               { class: 'empty' },
               h('span', { class: 'big-emoji' }, '🛣️'),
-              h('b', {}, 'No buses on the road yet'),
-              h('span', {}, 'Start one and it shows up here for the crew.'),
+              h('b', {}, 'Nobody is riding yet'),
+              h('span', {}, 'Pick a crew game above and it shows up here for your mates to join.'),
             ),
           ]),
     )
@@ -210,8 +220,25 @@ export function rideTab(p: Profile, act: HomeActions) {
     h(
       'section',
       { class: 'hero' },
-      h('h2', { class: 'label' }, 'Ride with your crew'),
-      h('h1', {}, 'Crew ride'),
+      h('h2', { class: 'label' }, 'Pick a ride'),
+      h('h1', {}, 'Ride'),
+      h(
+        'div',
+        { class: 'home-games home-modes' },
+        mode('🏔️', 'Free ride', 'Real roads, solo or with the crew', () =>
+          open(freeRideSetup(p, act, home)),
+        ),
+        mode('🚴', 'Solo workout', 'A structured workout on ERG', () =>
+          open(soloSetup(p, act, home)),
+        ),
+        mode(
+          '📅',
+          'Training plan',
+          p.plan ? 'Your calendar and what is next' : 'A few weeks, your riding days',
+          openPlan,
+        ),
+      ),
+      h('h2', { class: 'label' }, 'Crew games'),
       h(
         'p',
         { class: 'lede' },
@@ -221,17 +248,10 @@ export function rideTab(p: Profile, act: HomeActions) {
       h(
         'div',
         { class: 'hero-grid' },
-        h('div', {}, h('h2', { class: 'label' }, 'Open buses'), list),
+        h('div', {}, h('h2', { class: 'label' }, 'Open rides'), list),
         h(
           'div',
           { class: 'start' },
-          h(
-            'button',
-            { class: 'mega', onclick: needTrainer(act.create) },
-            h('span', { class: 'plus' }, '+'),
-            h('b', {}, 'Start a new bus'),
-            h('small', {}, 'Zombie Bus. You drive: pick the plan, share the code.'),
-          ),
           h(
             'form',
             { class: 'by-code', onsubmit: joinCode },
@@ -246,54 +266,6 @@ export function rideTab(p: Profile, act: HomeActions) {
           ),
         ),
       ),
-    ),
-    h(
-      'button',
-      {
-        class: 'solo',
-        onclick: () => open(soloSetup(p, act, home)),
-      },
-      h('span', { class: 'big-emoji' }, '🚴'),
-      h(
-        'span',
-        {},
-        h('b', {}, 'Solo workout'),
-        h('small', {}, 'Ride a workout on your own, no bus.'),
-      ),
-      h('span', { class: 'arrow' }, '→'),
-    ),
-    h(
-      'button',
-      { class: 'solo', onclick: openPlan },
-      h('span', { class: 'big-emoji' }, '📅'),
-      h(
-        'span',
-        {},
-        h('b', {}, 'Training plan'),
-        h(
-          'small',
-          {},
-          p.plan
-            ? 'Your calendar and what is next.'
-            : 'Pick a multi-week plan and the days you ride.',
-        ),
-      ),
-      h('span', { class: 'arrow' }, '→'),
-    ),
-    h(
-      'button',
-      {
-        class: 'solo',
-        onclick: () => open(freeRideSetup(p, act, home)),
-      },
-      h('span', { class: 'big-emoji' }, '🏔️'),
-      h(
-        'span',
-        {},
-        h('b', {}, 'Free ride'),
-        h('small', {}, 'Ride a real route. No ERG, the trainer follows the road.'),
-      ),
-      h('span', { class: 'arrow' }, '→'),
     ),
   )
   const wrap = h('div', {}, main)

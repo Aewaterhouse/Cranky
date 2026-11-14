@@ -60,6 +60,8 @@ export function finishRide(
   doneLabel = 'Done',
   road?: RoadSummary,
   still?: string,
+  /** A crew ride: a second way out, back to the home screen, beside the 'ride again' button. */
+  menu?: (p: Profile) => void,
 ) {
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
@@ -280,6 +282,7 @@ export function finishRide(
             )
           : '',
         stravaCardButton(p, s, group, still),
+        menu ? h('button', { onclick: () => menu(p) }, '⌂ Main menu') : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),
     ),

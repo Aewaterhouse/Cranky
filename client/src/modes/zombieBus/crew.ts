@@ -119,6 +119,9 @@ export async function crew(
           },
           { ...m.summary, postcard },
           '↻ Ride again with this crew',
+          undefined,
+          undefined,
+          (p) => ((profile = p), leave()),
         ),
       )
     } else if (m.t === 'error') {

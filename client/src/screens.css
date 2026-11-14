@@ -604,3 +604,10 @@ kbd {
   font-size: 0.72rem;
   opacity: 0.75;
 }
+.home-modes .home-mode {
+  min-height: 110px;
+  border: 1px solid var(--acc);
+}
+.home-modes .home-mode .gc-icon {
+  font-size: 2.2rem;
+}
