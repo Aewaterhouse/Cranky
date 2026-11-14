@@ -178,6 +178,14 @@ export function finishRide(
             h('a', { href: '#garage' }, 'Spend it in the Garage →'),
           )
         : '',
+      // The weekly streak, the same count home shows, so it is one number everywhere.
+      p !== profile && p.stats.streak > 1
+        ? h(
+            'div',
+            { class: 'card hl res-streak' },
+            `🔥 ${p.stats.streak} week streak. Ride again next week to keep it.`,
+          )
+        : '',
       // The game's outcome is the story of a crew ride: it comes before the training numbers.
       group ? groupSection(group, profile.id) : '',
       race ? roadSection(road!, profile.id) : '',

@@ -30,7 +30,7 @@ say where you are, and free-ride places that don't look like where they are.
 2. [x] Solo workouts and free rides earn scrap too (rider 2).
 3. [x] A "what you earned" card at the top of every results screen; one number for scrap, not two (rider 3).
 4. [x] Badge unlock moments and progress bars on locked badges (rider 4).
-5. [ ] One weekly streak, shown on home and results, with a freeze (rider 5).
+5. [ ] (the weekly streak now shows on home and results; Overview and Trends still count differently; no freeze yet) One weekly streak, shown on home and results, with a freeze (rider 5).
 6. [ ] Scores with context: crew best and last time (games 3, rider 14).
 
 **Races**
