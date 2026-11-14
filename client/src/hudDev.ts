@@ -2,7 +2,16 @@ import './style.css'
 import './screens.css'
 import { frameAt } from './core/plan'
 import { GAME_UI } from './modes/crew/gameUi'
-import type { AmboState, Ask, BusState, DateState, Game, RiderTick, Tick } from './net/protocol'
+import type {
+  AmboState,
+  Ask,
+  BusState,
+  ClimateState,
+  DateState,
+  Game,
+  RiderTick,
+  Tick,
+} from './net/protocol'
 import { World } from './scene/world'
 import type { Plan } from './types'
 import { h } from './ui/dom'
@@ -10,7 +19,7 @@ import { makeHud } from './ui/hud'
 
 /**
  * Dev page: a crew game's HUD over its scene, fed made-up ticks (no server). Params: `game=ambo|date`
- * (date states: `date|card|chap|wedding|divorce|cool`),
+ * (date states: `date|card|chap|wedding|divorce|cool`) `|climate` (states: `decade|gust|event|trial`),
  * `state=run|event|siren|me|brake|ramp|reverse|base|cool`, `ask=1` (a question sheet), `fx=delivered|fellout|walked|review`.
  */
 const q = new URLSearchParams(location.search)
@@ -19,7 +28,7 @@ const state = q.get('state') ?? 'run'
 const ui = GAME_UI[game]
 const stage = h('div', { class: 'stage' })
 document.getElementById('app')!.append(stage)
-const world = new World(stage)
+const world = ui?.world?.(stage) ?? new World(stage)
 const plan: Plan = {
   id: 'dev',
   name: 'Dev',
@@ -159,6 +168,44 @@ const dating = (t: number): DateState => ({
         ]
       : [],
 })
+const climate = (t: number): ClimateState => ({
+  g: 'climate',
+  phase: state === 'trial' ? 'trial' : 'decade',
+  decade: '2000s',
+  n: 2,
+  level: state === 'trial' ? 0.7 : 0.25 + ((t / 60) % 0.5),
+  stage: state === 'trial' ? 3 : 1,
+  stageName: state === 'trial' ? 'Main Street' : 'Beach',
+  walls: 1,
+  wallCost: 60,
+  cos: {
+    a: { name: 'AlexCorp', fuel: 'wind', coins: 84, on: state === 'gust' },
+    b: { name: 'Mo Power', fuel: 'coal', coins: 212, on: true },
+    c: { name: 'Kat Energy', fuel: 'solar', coins: 131, on: false },
+    d: { name: 'BazGas', fuel: 'gas', coins: 150, on: true },
+  },
+  event:
+    state === 'event'
+      ? {
+          k: 'heat',
+          name: '🥵 Heatwave',
+          text: 'Everyone to 95% or the town blacks out.',
+          left: 96,
+        }
+      : null,
+  cue: state === 'gust' ? { a: { k: 'gust', left: 11 } } : {},
+  trial: state === 'trial' ? { defendants: ['b'], target: 100, held: 0.62, verdicts: {} } : null,
+  ledger:
+    state === 'trial'
+      ? {
+          a: { emit: 12, bribed: false, walls: 1 },
+          b: { emit: 388, bribed: true, walls: 0 },
+          c: { emit: 95, bribed: false, walls: 0 },
+          d: { emit: 201, bribed: false, walls: 0 },
+        }
+      : null,
+  flooded: false,
+})
 const ask: Ask = {
   k: 'fuel',
   title: 'Pick your fuel for the 1990s',
@@ -220,7 +267,8 @@ setInterval(() => {
     },
     bus,
     fx,
-    game: game === 'date' ? { ...dating(t) } : { ...ambo(t) },
+    game:
+      game === 'date' ? { ...dating(t) } : game === 'climate' ? { ...climate(t) } : { ...ambo(t) },
   }
   const f = frameAt(plan.blocks, m.el, 'hard', 250)
   const me = m.riders.a

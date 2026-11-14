@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 import type { Look } from '../../core/cosmetics'
+import type { ClimateState } from '../../net/protocol'
+import type { SceneState } from '../world'
 import { makeRider } from '../riders'
 import { clamp, lerp } from '../util'
 import { TOPS, seawall, station, townLand, type Fuel } from './townGeo'
@@ -20,6 +22,7 @@ export const TOWN = {
   storm: '#59656f',
   rise: 0.6,
   wallStep: 1.3,
+  shiftX: 0.1,
 }
 
 export interface TownRider {
@@ -62,7 +65,7 @@ export class TownWorld {
   renderer: THREE.WebGLRenderer
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(TOWN.fov, 1, 1, 600)
-  state: TownState = { level: 0, walls: 0, riders: [] }
+  town: TownState = { level: 0, walls: 0, riders: [] }
   private water: THREE.Mesh
   private wall = seawall()
   private plants = new Map<string, Plant>()
@@ -117,6 +120,8 @@ export class TownWorld {
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
     this.renderer.setSize(w, h)
     this.camera.aspect = w / h
+    // Slide the town right of centre, clear of the game panel on the left.
+    this.camera.setViewOffset(w, h, -w * TOWN.shiftX, 0, w, h)
   }
 
   private plant(r: TownRider, i: number, n: number) {
@@ -151,7 +156,7 @@ export class TownWorld {
 
   private update(dt: number) {
     this.t += dt
-    const s = this.state
+    const s = this.town
     const t = this.t
     this.y = lerp(this.y, waterY(s.level), clamp(dt * TOWN.rise))
     this.water.position.y = this.y + Math.sin(t * 0.8) * 0.06
@@ -193,6 +198,24 @@ export class TownWorld {
     this.camera.updateProjectionMatrix()
     this.renderer.render(this.scene, this.camera)
   }
+
+  /** The ride screen hands every scene the same state; the town takes its riders and the game's own state. */
+  set state(s: SceneState) {
+    const g = s.game as unknown as ClimateState | null | undefined
+    this.town = {
+      level: g?.level ?? 0,
+      walls: g?.walls ?? 0,
+      riders: s.riders.map((r) => ({
+        id: r.id,
+        name: g?.cos[r.id]?.name ?? r.name,
+        fuel: g?.cos[r.id]?.fuel ?? 'coal',
+        cadence: r.st === 'riding' ? r.cadence : 0,
+        look: r.look,
+      })),
+    }
+  }
+  fx() {}
+  cycleView = () => null
 
   /** A still of the current frame, for the postcard. */
   snapshot = () => this.renderer.domElement.toDataURL('image/jpeg', 0.85)

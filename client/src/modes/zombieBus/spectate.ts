@@ -13,7 +13,7 @@ import { makeHeader } from '../../ui/hudHeader'
 import { eventOf, FX_DEFAULT, setEvents } from '../../ui/hudKit'
 import { makeSplash } from '../../ui/hudSplash'
 import type { GamePanel } from '../../ui/hudOpts'
-import { GAME_UI, type GameUi } from '../crew/gameUi'
+import { GAME_UI, type GameUi, type Stage } from '../crew/gameUi'
 import { GAMES } from '../crew/games'
 import { makeRoster } from '../../ui/hudRoster'
 import { VIS } from '../../scene/params'
@@ -44,7 +44,7 @@ const GRADE_RE = /: (FAIL|HIT|GREAT|MEGA|LEGEND)\b/
 export function spectate(code: string, leaveTo: () => void) {
   const stage = h('div', { class: 'stage' })
   show(stage)
-  const world = new World(stage)
+  let world: Stage = new World(stage)
   const sp = makeSplash()
   const bus = makeBusPanel()
   const board = makeRoster('crew tv-cards')
@@ -128,6 +128,10 @@ export function spectate(code: string, leaveTo: () => void) {
     const game = l.game ?? 'bus'
     if (!panel && (gui = GAME_UI[game])) {
       panel = gui.panel(() => {})
+      if (gui.world) {
+        world.dispose()
+        world = gui.world(stage)
+      }
       bus.root.replaceWith(panel.root)
       setEvents(gui.events)
     }

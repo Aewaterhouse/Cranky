@@ -56,4 +56,15 @@ export const GAMES: Record<Game, GameInfo> = {
     plan: false,
     soon: true,
   },
+  climate: {
+    icon: '🌊',
+    name: 'Climate Lawsuit',
+    blurb:
+      'Everyone runs an energy company in the same coastal town. Watts earn coins; emissions raise the sea. Flood the town and everyone loses, then the worst polluter stands trial. No ERG. 45 min.',
+    start: 'Start the 1980s',
+    countdown: 'THE 1980s START IN',
+    score: 'Town profit',
+    plan: false,
+    soon: true,
+  },
 }

@@ -1,7 +1,9 @@
 import type { AmboState, DateState, Game, Tick } from '../../net/protocol'
-import type { SceneState } from '../../scene/world'
+import { TownWorld } from '../../scene/town/townWorld'
+import type { SceneState, World } from '../../scene/world'
 import type { GamePanel } from '../../ui/hud'
 import { AMBO_EVENTS, makeAmboPanel } from '../../ui/hudAmbo'
+import { CLIMATE_EVENTS, makeClimatePanel } from '../../ui/hudClimate'
 import { DATE_EVENTS, makeDatePanel } from '../../ui/hudDate'
 import type { EventStyle } from '../../ui/hudKit'
 
@@ -12,7 +14,11 @@ export interface GameUi {
   panel: (act: (k: string, v: string) => void) => GamePanel
   /** Scene state the game sets over the bus's own. */
   scene: (m: Tick) => Partial<SceneState>
+  /** The game's own 3D scene in place of the road, when it has one. */
+  world?: (stage: HTMLElement) => Stage
 }
+/** What the ride and TV screens ask of a scene. */
+export type Stage = Pick<World, 'fx' | 'cycleView' | 'dispose' | 'snapshot'> & { state: SceneState }
 
 export const GAME_UI: Partial<Record<Game, GameUi>> = {
   ambo: {
@@ -33,5 +39,11 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
       const mad = { pts: {}, crown: null, lead: null, work: g?.phase === 'date', pairs }
       return { gap: null, armour: null, roadblock: null, mood: 'longhaul', mad }
     },
+  },
+  climate: {
+    events: CLIMATE_EVENTS,
+    panel: makeClimatePanel,
+    scene: (m) => ({ game: m.game }),
+    world: (stage) => new TownWorld(stage),
   },
 }

@@ -49,6 +49,8 @@ export interface SceneState {
   gunship?: boolean
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
   mad?: MadScene | null
+  /** A crew game's own state, for a game that brings its own scene (Climate Lawsuit's town). */
+  game?: Record<string, unknown> | null
   /** Kidney Stone Express: the bus is an ambulance; `siren` flashes the light bar. */
   ambo?: { siren: boolean } | null
 }

@@ -12,7 +12,7 @@ const world = new TownWorld(document.getElementById('stage')!)
 const st = { level: Number(q.get('level') ?? 0), walls: Number(q.get('walls') ?? 0) }
 const names = ['Alex', 'Mo', 'Kat', 'Baz', 'Shaz', 'Dazza']
 const apply = () =>
-  (world.state = {
+  (world.town = {
     ...st,
     riders: names.slice(0, Number(q.get('riders') ?? 4)).map((name, i) => ({
       id: `r${i}`,

@@ -56,10 +56,10 @@ export function startBusRide(
 ) {
   const stage = h('div', { class: 'stage' })
   show(stage)
-  const world = new World(stage)
   if (location.search.includes('debug')) debugPanel()
   let l = lobby0
   const ui = GAME_UI[l.game ?? 'bus']
+  const world = ui?.world?.(stage) ?? new World(stage)
   const plan = l.plan
   const total = planTotal(plan.blocks)
   const key = busKey(profile.id, l.code)

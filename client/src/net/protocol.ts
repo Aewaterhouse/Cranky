@@ -6,7 +6,7 @@ import type { Grade, Plan, Tier } from '../types'
 
 export type TrainerMode = 'erg' | 'gears' | 'choose'
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
-export type Game = 'bus' | 'madness' | 'ambo' | 'date'
+export type Game = 'bus' | 'madness' | 'ambo' | 'date' | 'climate'
 /** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
 export interface MadState {
   pts: Record<string, number>
@@ -150,6 +150,38 @@ export interface AmboState {
   reviews: { patient: string; icon: string; stars: number; text: string }[]
   score: number
   siren: string | null
+}
+/** Climate Lawsuit state (`tick.game` when the game is `climate`). */
+export interface ClimateState {
+  g: 'climate'
+  phase: 'eighties' | 'decade' | 'trial' | 'cool'
+  /** The decade's name ("1990s") and number, 1 to 4. */
+  decade: string | null
+  n: number
+  /** Shared sea level 0..1, the flood stage it has reached (0 none to 4 everything) and that stage's name. */
+  level: number
+  stage: number
+  stageName: string
+  walls: number
+  wallCost: number
+  /** Each company: its name, fuel, coins and whether it is earning right now. Emissions stay hidden. */
+  cos: Record<
+    string,
+    { name: string; fuel: 'coal' | 'gas' | 'solar' | 'wind'; coins: number; on: boolean }
+  >
+  event: { k: string; name: string; text: string; left: number } | null
+  /** A rider's own prompt: a wind gust or a gas surge, with seconds left. */
+  cue: Record<string, { k: 'gust' | 'surge'; left: number }>
+  trial: {
+    defendants: string[]
+    /** The effort the jury chose (% FTP) once voting closes, and how much of it has been held so far. */
+    target: number | null
+    held: number
+    verdicts: Record<string, 'acquitted' | 'guilty'>
+  } | null
+  /** Revealed at the Trial: emissions, bribes taken and seawalls bought. */
+  ledger: Record<string, { emit: number; bribed: boolean; walls: number }> | null
+  flooded: boolean
 }
 /** Speed Dating state (`tick.game` when the game is `date`). */
 export interface DateState {
