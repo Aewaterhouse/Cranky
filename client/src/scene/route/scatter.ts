@@ -103,7 +103,7 @@ export function scatter(
         if (!pt.point(j0, j1, c, rand(), v, p)) continue
         const cv = cover.at(p.x, p.z, p.y)
         const dens = isTree ? P.trees[cv] / MAX_TREES : P.under[cv] / MAX_UNDER
-        if (rand() >= dens) continue
+        if (rand() >= dens || (cv === 'g' && cover.vine(p.x, p.z, p.y))) continue
         const kind = isTree ? tree(cover, cv, p, rand) : under(cover, cv, p, rand)
         if (!kind) continue
         if (isTree) {

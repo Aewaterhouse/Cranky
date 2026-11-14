@@ -1,9 +1,9 @@
 import * as THREE from 'three'
-import { hash } from '../math'
+import { hash, noise2 } from '../math'
 import { VIS } from '../params'
 import type { Level } from '../quality'
-import { Mesher, box, cyl } from '../util'
-import { instances, pos, quat, scale, UP, type Anchor } from './chunkProps'
+import { Mesher, box, cyl, ico } from '../util'
+import { col, instances, pos, quat, scale, type Anchor } from './chunkProps'
 import type { Features } from './features'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
@@ -15,10 +15,11 @@ import { newPose } from './roadPath'
 const R = VIS.route
 const F = R.place.farm
 const pose = newPose()
-const col = new THREE.Color()
 const a3 = new Float64Array(3)
 const b3 = new Float64Array(3)
 const H = Math.PI / 2
+const euler = new THREE.Euler()
+const autumn = new THREE.Color()
 
 const MAKE = {
   bale: () => {
@@ -36,6 +37,17 @@ const MAKE = {
     return m.build()
   },
   windmill: () => BUSH.windmill(),
+  vine: () => {
+    const m = new Mesher(0.3)
+    m.add(box(0.6, 0.8, F.vineSeg), '#ffffff', [0, 1, 0])
+    return m.build()
+  },
+  rowEnd: () => {
+    const m = new Mesher(0.1)
+    m.add(box(0.1, 1.5, 0.1), F.post, [0, 0.75, 0])
+    m.add(ico(0.2), F.rose, [0, 0.45, -0.45])
+    return m.build()
+  },
 }
 type Kind = keyof typeof MAKE
 let geos: Partial<Record<Kind, THREE.BufferGeometry>> = {}
@@ -49,17 +61,22 @@ interface Prop {
   x: number
   z: number
   face: number
+  /** Vines only: their slope, middle height and how autumnal (0..1). */
+  tilt?: number
+  y?: number
+  tint?: number
 }
 
 /**
  * Farm dressing for the open grass either side of chunk `k`: a post-and-wire fence along the road (into `solid`),
- * and round bales, a shed or a windmill out in the paddock (instanced, returned). Nothing near streets or buildings.
+ * and round bales, a shed or a windmill out in the paddock, or vine rows on a vineyard route (instanced, returned).
+ * Nothing near streets or buildings.
  */
 export function buildFarm(
   k: number,
   field: HeightField,
   patches: Patch[],
-  cover: Pick<LandCover, 'at'>,
+  cover: LandCover,
   features: Features,
   level: Level,
   solid: Tris,
@@ -104,6 +121,21 @@ export function buildFarm(
       }
       last = p
     }
+    // Vine rows at right angles to the road, each in lengths that follow the ground, a rose at the road end.
+    const segs = cover.vineyard ? F.vineSegs[level] : 0
+    const before = props.length
+    for (let d = d0 + seed * F.vineGap; segs && d < d0 + R.chunk; d += F.vineGap)
+      for (let i = 0; i < segs; i++) {
+        const o = edge + F.fenceOut + F.vineOut + i * F.vineSeg
+        const [p, q] = [at(d, side * o), at(d, side * (o + F.vineSeg))]
+        if (!p.ok || !q.ok || !cover.vine(p.x, p.z, p.y) || !cover.vine(q.x, q.z, q.y)) break
+        const face = Math.atan2(q.x - p.x, q.z - p.z)
+        if (!i) props.push({ kind: 'rowEnd', x: p.x, z: p.z, face })
+        const tint = Math.max(0, F.autumnShare - noise2(p.x / 90 + 3, p.z / 90)) / F.autumnShare
+        const [x, y, z] = [(p.x + q.x) / 2, (p.y + q.y) / 2, (p.z + q.z) / 2]
+        props.push({ kind: 'vine', x, z, face, y, tint, tilt: Math.atan2(q.y - p.y, F.vineSeg) })
+      }
+    if (props.length > before) continue
     const out = (lo: number, hi: number, r: number) => {
       const d = d0 + 20 + hash(seed * 7 + r) * (R.chunk - 40)
       return at(d, side * (edge + lo + hash(seed * 11 + r) * (hi - lo)))
@@ -132,11 +164,13 @@ export function buildFarm(
     const mine = props.filter((p) => p.kind === kind)
     if (!mine.length) continue
     const m = instances((geos[kind] ??= MAKE[kind]()), mine.length, a, (i) => {
-      pos.set(mine[i].x, drawnHeight(field, patches, mine[i].x, mine[i].z), mine[i].z)
-      quat.setFromAxisAngle(UP, mine[i].face)
+      const { x, z, y, face, tilt = 0, tint } = mine[i]
+      pos.set(x, y ?? drawnHeight(field, patches, x, z), z)
+      quat.setFromEuler(euler.set(-tilt, face, 0, 'YXZ'))
       scale.setScalar(1)
+      if (tint !== undefined) col.set(F.leaf).lerp(autumn.set(F.autumn), tint)
     })
-    m.castShadow = true
+    m.castShadow = kind !== 'vine'
     meshes.push(m)
   }
   return meshes

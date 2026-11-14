@@ -4,6 +4,7 @@ import { VIS } from '../params'
 import { seaCells } from './sea'
 
 const R = VIS.route
+const F = R.place.farm
 /** g grass, f forest, b bush, s scrub, u built-up, p park, a sand, r rock, w water. */
 export type Cover = 'g' | 'f' | 'b' | 's' | 'u' | 'p' | 'a' | 'r' | 'w'
 const KNOWN = 'gfbsuparw'
@@ -16,13 +17,17 @@ export class LandCover {
   readonly mapped: boolean
   /** True when the height grid reaches the sea: sand along the shore and a sea sheet. */
   readonly coast: boolean
+  /** True on the routes through vineyards (`VIS.route.place.farm.vineRoutes`): mostly open farmland, with vines. */
+  readonly vineyard: boolean
   private grid?: Uint8Array
 
   constructor(
     private t?: TerrainData,
     region?: string,
+    id = '',
   ) {
     this.treeline = region === 'TAS' ? R.treelineTas : R.treeline
+    this.vineyard = F.vineRoutes.includes(id)
     this.mapped = !!t?.cover
     this.coast = seaCells(t) >= R.ocean.coastCells
     if (!t?.cover) return
@@ -64,6 +69,12 @@ export class LandCover {
     if (line > this.treeline + R.alpineBand) return 'r'
     if (line > this.treeline) return 's'
     const n = noise2(x / 260 + 11, z / 260 + 3)
-    return n > 0.62 ? 'f' : n < 0.2 ? 'g' : 'b'
+    return n > 0.62 ? 'f' : n < (this.vineyard ? F.guessGrass : 0.2) ? 'g' : 'b'
+  }
+
+  /** True where vines grow: grass in the vineyard patches of a vineyard route. */
+  vine(x: number, z: number, y: number) {
+    if (!this.vineyard || noise2(x / F.vinePatch + 7, z / F.vinePatch) > F.vineShare) return false
+    return this.at(x, z, y) === 'g'
   }
 }

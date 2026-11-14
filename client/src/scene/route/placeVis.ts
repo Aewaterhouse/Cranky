@@ -98,6 +98,21 @@ export const PLACE = {
     shedWall: '#c4c9cc',
     shedDark: '#3a3530',
     shedRoof: '#9aa4aa',
+    /** Vineyard routes: unmapped ground there is mostly grass (`guessGrass` of it), and grass in noise patches
+     * `vinePatch` m across (`vineShare` of it) is planted in rows `vineGap` m apart, at right angles to the road,
+     * `vineOut` m past the fence, in `vineSeg` m lengths, this many lengths deep per quality level. */
+    vineRoutes: ['willunga-hill'],
+    guessGrass: 0.66,
+    vinePatch: 170,
+    vineShare: 0.6,
+    vineGap: 3.2,
+    vineOut: 2.5,
+    vineSeg: 14,
+    vineSegs: { lowpower: 0, potato: 1, low: 1, medium: 2, high: 3 },
+    leaf: '#5f8f36',
+    autumn: '#d0a12a',
+    autumnShare: 0.4,
+    rose: '#d8324a',
   },
   furniture: {
     /** Gradient signs: a stretch averaging at least `gradeMin` over `gradeWindow` for `gradeLength`, signed `gradeAhead` early. */

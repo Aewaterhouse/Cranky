@@ -124,7 +124,7 @@ export class RouteWorld {
     const path = new RoadPath(route, terrain)
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))
     // Map features share the height grid's origin, so they are only usable alongside it.
-    const cover = new LandCover(terrain, route.region)
+    const cover = new LandCover(terrain, route.region, route.id)
     this.sea = new Sea(cover.coast ? terrain : undefined)
     this.cover = jokeCover(route.id, cover)
     const features = new Features(terrain && route.features, this.field)
