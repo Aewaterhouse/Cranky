@@ -133,13 +133,22 @@ class Store:
                           json_extract(json, '$.tss'),
                           json_extract(json, '$.record.kj'), json_extract(json, '$.compliance'),
                           json_extract(json, '$.crew'), json_extract(json, '$.route.id'),
-                          json_extract(json, '$.distance')
+                          json_extract(json, '$.distance'), json_extract(json, '$.group.mode'),
+                          json_extract(json, '$.group.score'), json_extract(json, '$.group') IS NOT NULL
                    FROM rides WHERE rider = ? ORDER BY date DESC, n DESC""",
                 (rid,),
             ).fetchall()
         keys = ("id", "date", "plan", "secs", "avgPower", "np", "tss", "kj", "compliance")
         return [
-            {**dict(zip(keys, r, strict=False)), "crew": bool(r[9]), "route": r[10], "distance": r[11]}
+            {
+                **dict(zip(keys, r, strict=False)),
+                "crew": bool(r[9]),
+                "route": r[10],
+                "distance": r[11],
+                # a crew game's name and score, for the list (bus results from before modes had none)
+                "game": r[12] or ("bus" if r[14] else None),
+                "score": r[13],
+            }
             for r in rows
         ]
 

@@ -179,3 +179,17 @@ def test_titles_change_hands_and_show_on_the_holder(tmp_path):
         "Dazza takes 🚑 Paramedic of the Week from Kat"
     ]
     assert s.titles_of("daz") == ["🚑 Paramedic of the Week"] and s.titles_of("kat") == []
+
+
+def test_history_rows_name_the_crew_game_and_its_score(tmp_path):
+    from zombie_bus_server.store import Store
+
+    s = Store(tmp_path / "h.db")
+    s.add_ride(
+        "kat",
+        {"record": {"date": "2026-11-01T08:00:00Z", "secs": 60}, "group": {"mode": "ambo", "score": 812}},
+    )
+    s.add_ride("kat", {"record": {"date": "2026-11-02T08:00:00Z", "secs": 60}, "group": {"score": 3000}})
+    s.add_ride("kat", {"record": {"date": "2026-11-03T08:00:00Z", "secs": 60}})
+    rows = s.ride_rows("kat")
+    assert [(r["game"], r["score"]) for r in rows] == [(None, None), ("bus", 3000), ("ambo", 812)]
