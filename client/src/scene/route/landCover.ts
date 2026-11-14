@@ -13,6 +13,8 @@ const KNOWN = 'gfbsuparw'
 export class LandCover {
   /** Trees thin out above this height and stop a little higher. */
   readonly treeline: number
+  /** Above this height the bush turns alpine. */
+  readonly alpine: number
   /** True when the pack came with a land cover grid; false when every answer is a guess. */
   readonly mapped: boolean
   /** True when the height grid reaches the sea: sand along the shore and a sea sheet. */
@@ -27,6 +29,7 @@ export class LandCover {
     id = '',
   ) {
     this.treeline = region === 'TAS' ? R.treelineTas : R.treeline
+    this.alpine = region === 'TAS' ? R.alpineTas : R.alpine
     this.vineyard = F.vineRoutes.includes(id)
     this.mapped = !!t?.cover
     this.coast = seaCells(t) >= R.ocean.coastCells

@@ -206,6 +206,9 @@ export const VIS = {
     treeline: 1500,
     treelineTas: 1200,
     alpineBand: 200,
+    /** The alpine biome starts here (lower in Tasmania): snow gums, granite tors, old snow and snow poles. */
+    alpine: 1200,
+    alpineTas: 1000,
     /** On the coast, ground this far above sea level is sand (about 3 m above the grid's 0). */
     sandBand: 1.5,
     /** The sea sheet on coastal routes: shallow and foam colours, foam band (m below the shore), lapping, swell. */

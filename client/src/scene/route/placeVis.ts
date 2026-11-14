@@ -7,7 +7,7 @@ export const PLACE = {
   detail: { lowpower: 0.1, potato: 0.25, low: 0.5, medium: 1, high: 1.5 },
   reach: { lowpower: 35, potato: 60, low: 230, medium: 300, high: 470 },
   /** Trees and small plants per hectare beside the road, by land cover letter. */
-  trees: { g: 3, f: 70, b: 40, s: 8, u: 14, p: 12, a: 0, r: 0, w: 0 },
+  trees: { g: 3, f: 70, b: 40, s: 8, u: 14, p: 12, a: 0, r: 3, w: 0 },
   under: { g: 40, f: 30, b: 40, s: 120, u: 20, p: 6, a: 35, r: 30, w: 0 },
   /** Beyond the near terrain band: this share of the trees, this much bigger, and no small plants past `underReach`. */
   farThin: 0.22,
@@ -19,9 +19,15 @@ export const PLACE = {
   streetClear: 2.5,
   /** Slopes steeper than this (rise over run) carry no trees. */
   treeSlope: 0.9,
-  /** Snow gums take over this far below the treeline; trees are gone this far above it. */
-  snowGumBelow: 200,
-  treelineFade: 150,
+  /** Trees are gone this far above the treeline. */
+  treelineFade: 300,
+  /**
+   * Alpine (above `VIS.route.alpine`): this share of trees are granite tors instead of snow gums, and this share of
+   * small plants are patches of old snow once `snowAbove` m higher.
+   */
+  torShare: 0.12,
+  snowShare: 0.25,
+  snowAbove: 150,
   /** Tea-tree replaces other trees below this height when sand or water is within `coastProbe` metres. */
   coastM: 25,
   coastProbe: 45,
@@ -34,8 +40,11 @@ export const PLACE = {
     scribblyTrunk: '#efece2',
     scribblyLeaf: '#86a85a',
     snowTrunk: '#d9cdb4',
-    snowStreak: '#b5604a',
+    snowStreak: '#d9875a',
     snowLeaf: '#7d9a78',
+    granite: '#a9a39a',
+    lichen: '#c9b77a',
+    oldSnow: '#f4f7fb',
     fernTrunk: '#5a4630',
     fernFrond: '#4fa046',
     teaTrunk: '#4f4336',
@@ -79,6 +88,12 @@ export const PLACE = {
     shadowEvery: 9,
     shadowChance: 0.35,
     shadowDark: 0.72,
+    /** Alpine snow poles: one every `poleEvery` m each side, `poleOut` m past the verge, orange with a black tip. */
+    poleEvery: 28,
+    poleOut: 1.2,
+    poleH: 3.6,
+    pole: '#ff8c1a',
+    poleTip: '#1b1b1b',
   },
   /** Farm dressing beside open grass: a fence `fenceOut` m past the verge with posts every `postEvery` m, and per
    * side of a chunk a chance of bales, a shed or a windmill. A side counts as farm when this share of it is grass. */
@@ -158,7 +173,14 @@ export const PLACE = {
     /** Landmarks are pushed at least this far beyond the verge. */
     clear: 9,
     /** Routes that end in a ski village, have a hut at the top, or have bathing boxes on their beaches. */
-    skiVillages: ['falls-creek', 'mount-hotham', 'ben-lomond'],
+    skiVillages: ['falls-creek', 'mount-hotham', 'ben-lomond', 'mount-buffalo'],
+    /** The first lodge of each village carries its name. */
+    villages: {
+      'falls-creek': 'Falls Creek Village',
+      'mount-hotham': 'Hotham Village',
+      'ben-lomond': 'Ben Lomond Village',
+      'mount-buffalo': 'Mount Buffalo Chalet',
+    } as Record<string, string>,
     summitHuts: ['mount-hotham'],
     bathingBoxes: ['beach-road'],
     /** The village: this many A-frame lodges, the first `villageFrom` metres before the end, one every `villageStep`. */

@@ -111,7 +111,7 @@ export function planLandmarks(
     for (let i = 0; i < L.lodges; i++) {
       const d = path.length - L.villageFrom - i * L.villageStep - hash(i * 3.1) * 30
       const at = beside(d, (i % 2 ? 1 : -1) * (L.lodgeOut + hash(i * 7.7) * L.lodgeSpread))
-      if (at && d > 0) add('lodge', at[0], at[1], '', false)
+      if (at && d > 0) add('lodge', at[0], at[1], i ? '' : (L.villages[id] ?? ''), false)
     }
   let top = 0
   for (let i = 1; i < path.n; i++) if (path.y[i] > path.y[top]) top = i

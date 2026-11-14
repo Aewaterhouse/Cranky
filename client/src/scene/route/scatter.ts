@@ -15,10 +15,12 @@ export const KINDS = [
   'shrub',
   'tussock',
   'boulder',
+  'tor',
+  'snow',
 ] as const
 export type Kind = (typeof KINDS)[number]
 /** The kinds that are trees: they keep further from the road, cast shadows and stop at the treeline. */
-export const TREES: readonly Kind[] = ['gum', 'scribbly', 'snowgum', 'teatree']
+export const TREES: readonly Kind[] = ['gum', 'scribbly', 'snowgum', 'teatree', 'tor']
 
 /** One plant: where, which, how big, which way round and a 0..1 number for its tint. */
 export interface Spot extends P3 {
@@ -46,8 +48,9 @@ const MAX_UNDER = Math.max(...Object.values(P.under))
 /** Which tree grows at this spot, or nothing: by cover, height against the treeline, and nearness to the coast. */
 function tree(cover: LandCover, c: Cover, p: P3, rand: () => number): Kind | undefined {
   const over = p.y - cover.treeline
-  if (over > rand() * P.treelineFade) return undefined
-  if (over > -P.snowGumBelow) return 'snowgum'
+  const tor = rand() < P.torShare
+  if (over > rand() * P.treelineFade) return tor && c !== 'g' ? 'tor' : undefined
+  if (p.y > cover.alpine) return tor ? 'tor' : 'snowgum'
   if (p.y < P.coastM)
     for (const [dx, dz] of [
       [1, 0],
@@ -63,6 +66,7 @@ function tree(cover: LandCover, c: Cover, p: P3, rand: () => number): Kind | und
 /** Which small plant grows at this spot. */
 function under(cover: LandCover, c: Cover, p: P3, rand: () => number): Kind {
   const r = rand()
+  if (p.y > cover.alpine + P.snowAbove && rand() < P.snowShare) return 'snow'
   if (p.y > cover.treeline) return r < 0.3 ? 'boulder' : r < 0.7 ? 'tussock' : 'shrub'
   if (c === 'f')
     return p.y < P.fernMax && noise2(p.x / 200 + 2, p.z / 200) > 0.45 && r < 0.75 ? 'fern' : 'shrub'

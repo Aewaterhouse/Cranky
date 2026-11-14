@@ -29,15 +29,31 @@ function scribbly() {
   return m.build()
 }
 
-/** Snow gum: three low twisting stems streaked with colour and a thin grey-green crown. */
+/**
+ * Snow gum: three low stems that kink and twist as they climb, white with streaks of red and orange, under a
+ * thin, ragged grey-green crown.
+ */
 function snowgum() {
-  const m = new Mesher(0.14)
-  m.add(cyl(0.12, 0.2, 2.6, 4), C.snowTrunk, [0.5, 1.2, 0], [0, 0, -0.45])
-  m.add(cyl(0.11, 0.18, 2.8, 4), C.snowStreak, [-0.5, 1.3, 0.2], [0.2, 0, 0.42])
-  m.add(cyl(0.1, 0.16, 2.4, 4), C.snowTrunk, [0, 1.15, -0.5], [-0.5, 0, 0])
-  m.add(ico(1.1), C.snowLeaf, [1.2, 2.9, 0], [0, 0.3, 0], [1.3, 0.6, 1.1])
-  m.add(ico(1.2), C.snowLeaf, [-1.2, 3.1, 0.3], [0.3, 0, 0], [1.2, 0.6, 1.2])
-  m.add(ico(1), C.snowLeaf, [0, 2.8, -1.2], [0, 0.8, 0.2], [1.1, 0.6, 1.1])
+  const m = new Mesher(0.16)
+  for (let k = 0; k < 3; k++) {
+    const a = (k / 3) * Math.PI * 2 + 0.4
+    let [x, y, z] = [Math.cos(a) * 0.2, 0, Math.sin(a) * 0.2]
+    for (let i = 0; i < 2; i++) {
+      // Each piece leans out and then back the other way: the twist.
+      const lean = (i % 2 ? -0.35 : 0.55) + k * 0.05
+      const [dx, dz] = [Math.cos(a + i * 0.9) * lean, Math.sin(a + i * 0.9) * lean]
+      const h = 1.8 - i * 0.3
+      const r = 0.2 - i * 0.06
+      m.add(
+        cyl(r * 0.8, r, h, 3),
+        i === 1 && k !== 2 ? C.snowStreak : C.snowTrunk,
+        [x + dx * h * 0.5, y + h / 2, z + dz * h * 0.5],
+        [dz, 0, -dx],
+      )
+      ;[x, y, z] = [x + dx * h, y + h * 0.9, z + dz * h]
+    }
+    m.add(ico(0.9 + k * 0.15), C.snowLeaf, [x, y + 0.3, z], [k, 0.3, 0], [1.4, 0.55, 1.2])
+  }
   return m.build()
 }
 
@@ -100,6 +116,23 @@ const boulder = () =>
     .add(ico(0.45), C.boulder, [0.85, 0.12, 0.3], [0.8, 0.1, 0.2])
     .build()
 
+/** Granite tor: big rounded boulders piled up any old how, lichen on top. Mostly sunk into the hillside. */
+const tor = () =>
+  new Mesher(0.12)
+    .add(ico(2.6), C.granite, [0, 0.6, 0], [0.2, 0.4, 0], [1.4, 0.8, 1.1])
+    .add(ico(1.8), C.granite, [2.6, 0.2, 0.8], [0.5, 0, 0.3], [1.2, 0.8, 1])
+    .add(ico(1.7), C.granite, [0.4, 2.7, 0.2], [0.1, 0.8, 0], [1.2, 0.7, 1])
+    .add(ico(1), C.lichen, [0.7, 3.9, 0.3], [0.4, 0.2, 0], [1.1, 0.6, 1])
+    .add(ico(1.2), C.granite, [-2.2, 0.1, -0.6], [0, 0.3, 0.6], [1.1, 0.7, 1.2])
+    .build()
+
+/** A patch of old snow lying in the grass: a flat white blob or two. */
+const snow = () =>
+  new Mesher(0.04)
+    .add(ico(1.6), C.oldSnow, [0, 0.12, 0], [0, 0.4, 0], [1.6, 0.12, 1])
+    .add(ico(1), C.oldSnow, [1.9, 0.1, 0.6], [0, 1.1, 0], [1.4, 0.1, 1])
+    .build()
+
 const MAKE: Record<Kind, () => THREE.BufferGeometry> = {
   gum,
   scribbly,
@@ -109,6 +142,8 @@ const MAKE: Record<Kind, () => THREE.BufferGeometry> = {
   shrub,
   tussock,
   boulder,
+  tor,
+  snow,
 }
 let geos: Partial<Record<Kind, THREE.BufferGeometry>> = {}
 

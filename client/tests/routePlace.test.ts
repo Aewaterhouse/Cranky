@@ -232,7 +232,7 @@ describe('plants', () => {
       ).spots.filter((s) => TREES.includes(s.kind)).length
     expect(trees('f')).toBeGreaterThan(trees('g') * 8)
   })
-  it('turn to snow gums near the treeline and stop above it', () => {
+  it('turn to snow gums and tors in the alpine and only tors above the treeline', () => {
     const kinds = (ele: number, region?: string) =>
       new Set(
         grow(
@@ -245,10 +245,12 @@ describe('plants', () => {
           .spots.map((s) => s.kind)
           .filter((k) => TREES.includes(k)),
       )
-    expect([...kinds(R.treeline - 100)]).toEqual(['snowgum'])
-    expect(kinds(R.treeline + P.treelineFade + 10).size).toBe(0)
-    expect(kinds(R.treelineTas + P.treelineFade + 10, 'TAS').size).toBe(0)
+    expect([...kinds(R.alpine + 50)].sort()).toEqual(['snowgum', 'tor'])
+    expect([...kinds(R.alpineTas + 50, 'TAS')]).toContain('snowgum')
+    expect([...kinds(R.treeline + P.treelineFade + 10)]).toEqual(['tor'])
+    expect([...kinds(R.treelineTas + P.treelineFade + 10, 'TAS')]).toEqual(['tor'])
     expect(kinds(400).has('gum')).toBe(true)
+    expect(kinds(R.alpine - 50).has('snowgum')).toBe(false)
   })
   it('picks pubs and servos from big footprints', () => {
     const b = { x: 0, z: 0, rot: 0 }

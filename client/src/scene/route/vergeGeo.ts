@@ -84,12 +84,13 @@ function chevron(out: Tris, x: number, y: number, z: number, yaw: number, turn: 
 
 /**
  * Close-up detail for a sense of speed, merged into the chunk's solid mesh: grass tufts beyond the verge, gravel
- * specks on it, chevron boards round sharp bends, and (where there are no real shadows) tree shadows on the road.
+ * specks on it, chevron boards round sharp bends, orange snow poles up in the alpine, and (where there are no real
+ * shadows) tree shadows on the road.
  */
 export function buildVerge(
   field: HeightField,
   patches: Patch[],
-  cover: Pick<LandCover, 'at'>,
+  cover: Pick<LandCover, 'at' | 'alpine'>,
   d0: number,
   d1: number,
   level: Level,
@@ -144,6 +145,19 @@ export function buildVerge(
       chevron(out, x, drawnHeight(field, patches, x, z), z, Math.atan2(-pose.fx, -pose.fz), turn)
     }
   }
+  // Snow poles, staggered side to side, so the road can be found under a metre of snow.
+  for (let d = Math.ceil(d0 / V.poleEvery) * V.poleEvery; d < d1; d += V.poleEvery)
+    for (const side of [-1, 1]) {
+      path.poseAt(d + (side > 0 ? V.poleEvery / 2 : 0), pose)
+      if (pose.y < cover.alpine) continue
+      const o = side * (edge + V.poleOut)
+      const [x, z] = [pose.x + pose.rx * o, pose.z + pose.rz * o]
+      if (!field.clear(x, z, Math.abs(o))) continue
+      const y = drawnHeight(field, patches, x, z)
+      const yaw = Math.atan2(pose.fx, pose.fz)
+      addBox(out, x, y + V.poleH * 0.42, z, 0.05, V.poleH * 0.42, 0.05, yaw, col.set(V.pole))
+      addBox(out, x, y + V.poleH * 0.92, z, 0.05, V.poleH * 0.08, 0.05, yaw, col.set(V.poleTip))
+    }
   // Painted-on tree shadows for levels without shadow maps, where trees grow.
   if (level === 'medium' || level === 'high') return
   for (let d = d0; d < d1; d += V.shadowEvery) {
