@@ -66,4 +66,15 @@
     left: 64%;
     max-width: min(56vw, 560px);
   }
+  /* Options side by side in equal columns, so the card stays low and short. */
+  .ch-opts {
+    flex-wrap: nowrap;
+  }
+  .ch-opt {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+  .ch-opt small {
+    font-size: 0.7rem;
+  }
 }
