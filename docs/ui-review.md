@@ -63,7 +63,7 @@ end of the queue. Owner's own to-dos go first:*
 14. [x] Watch Party panel washes out over bright video; its remote is always open and tiny (riding 10, 11).
 15. [ ] Rider name tags stack and hide your own (riding 12). Letterbox bars eat the HUD (riding 13).
 16. [ ] The servo shop opens over a short interval; Climate Lawsuit's panel grows over the controls (riding 14, 15).
-17. [ ] Crew modes show no total time left (riding 17). Zone and W/kg describe power, not the target (riding 18).
+17. [ ] (crew rides now show time to go on the bottom strip) Crew modes show no total time left (riding 17). Zone and W/kg describe power, not the target (riding 18).
 
 **Rider and Garage**
 18. [ ] Garage: no try-on preview, paint thumbnails without the bike, a 3,300 px wall without tabs (rider 3, 4, 8).

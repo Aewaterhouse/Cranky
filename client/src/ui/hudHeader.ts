@@ -58,7 +58,8 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
       )
       graph?.setProgress(elapsedS)
       set(elapsed, fmt(elapsedS))
-      set(total, fmt(totalS))
+      // Time to go, not the ride's length: nobody wants to do the subtraction at threshold.
+      set(total, `${fmt(Math.max(0, totalS - elapsedS))} to go`)
       rb.classList.toggle('on', rbProg != null)
       rbFill.style.width = `${(rbProg ?? 0) * 100}%`
     },
