@@ -22,8 +22,7 @@ function riderChip(p: Profile, act: HomeActions, admin: boolean) {
   const menu = h(
     'div',
     { class: 'menu', hidden: true },
-    h('a', { href: '#rider' }, 'Rider profile'),
-    h('a', { href: '#settings' }, 'Settings'),
+    h('a', { href: '#settings' }, 'App settings (sound, graphics, units)'),
     admin ? h('a', { href: '#admin' }, 'Admin') : '',
     h(
       'button',

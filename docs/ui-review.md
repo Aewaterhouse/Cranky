@@ -74,7 +74,7 @@ end of the queue. Owner's own to-dos go first:*
 20. [ ] (crew line colours fixed) Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
 
 **Navigation and words**
-21. [ ] Settings in two places, leaderboards in three; jargon (Ladder, Rider, scrap, tier, CTL/ATL/TSB) (nav 7, 8, 9;
+21. [ ] (the account menu now says App settings and no longer repeats the Rider tab) Settings in two places, leaderboards in three; jargon (Ladder, Rider, scrap, tier, CTL/ATL/TSB) (nav 7, 8, 9;
     rider 15).
 22. [x] Welcome tour: no Back, a wall of text, no simulator button (nav 14, 15).
 
