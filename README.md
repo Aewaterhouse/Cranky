@@ -87,6 +87,8 @@ In the Zombie Bus, VO2 Madness, free ride and the TV view, the 3D camera is your
 | Wheel or pinch | zoom in and out |
 | Double click or double tap | straight back to the view |
 
+Photo mode (free ride): pause, then 📷 Photo mode. The HUD goes, drag, zoom and the arrows (or two fingers) frame the shot, "Use as postcard" keeps it for the ride's postcard, and Done carries on.
+
 With no camera input for 8 s the view eases back by itself. HUD panels, buttons, the map and sliders work as before; only drags that start on the 3D view move the camera.
 
 ## Zwift Click and virtual gears

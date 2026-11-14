@@ -21,6 +21,8 @@ export interface FreeHandlers {
   end: () => void
   /** Trainer difficulty, 0..1. */
   difficulty: (v: number) => void
+  /** Free the camera for a photo (3D only, from the pause screen). */
+  photo?: () => void
 }
 
 export interface FreeState {
@@ -197,10 +199,14 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
       const key = msg?.join('|') ?? ''
       if (ov.dataset.k === key) return
       ov.dataset.k = key
+      const photo = s.paused === 'manual' && world && on.photo
       say(
         msg && [
           h('div', { class: `ovbig ${msg[2]}` }, msg[0]),
           h('div', { class: 'ovsub' }, msg[1]),
+          ...(photo
+            ? [h('button', { class: 'photo-btn', onclick: on.photo }, '📷 Photo mode')]
+            : []),
         ],
         msg?.[2],
       )

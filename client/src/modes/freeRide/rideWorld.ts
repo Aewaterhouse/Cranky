@@ -7,6 +7,7 @@ import { VIS } from '../../scene/params'
 import type { RoadRider, RouteWorld } from '../../scene/route/routeWorld'
 import { SFX } from '../../ui/audio'
 import { camButton } from '../../ui/camButton'
+import { photoMode } from '../../ui/photoMode'
 import '../../perf.css'
 import { perfOverlay } from '../../ui/perfOverlay'
 import { rideIntro } from '../../ui/rideIntro'
@@ -33,7 +34,7 @@ export function rideWorld(
   // Less motion: a steady camera, no flyover, no turn round the rider, no confetti.
   const still = lessMotion()
   let orbit: ((secs: number, onFront: () => void) => void) | undefined
-  const stills: Partial<Record<MomentCard['kind'], string>> = {}
+  const stills: Partial<Record<MomentCard['kind'] | 'photo', string>> = {}
   const sound = rideSound()
   const quipper = new Quipper()
   const top = route.points.reduce((a, p) => (p.ele > a.ele ? p : a))
@@ -89,9 +90,23 @@ export function rideWorld(
     cycleView,
     /** Where the main climb tops out, when the route has one worth a moment. */
     topD: climbs ? top.d : undefined,
-    /** The still for the postcard: the lookout if there was one, else the finish. */
+    /** The still for the postcard: a photo-mode frame, else the lookout if there was one, else the finish. */
     get still() {
-      return stills.summit ?? stills.finish
+      return stills.photo ?? stills.summit ?? stills.finish
+    },
+    /** Photo mode over the paused ride; `leave` carries on riding. */
+    photo(leave: () => void) {
+      const w = world
+      if (!w) return
+      photoMode({
+        root: view.root,
+        orbit: w.cam.orbit,
+        postcard: () => {
+          stills.photo = w.snapshot()
+          view.toast("Saved as this ride's postcard")
+        },
+        leave,
+      })
     },
     /** A summit or the finish: confetti, a turn of the camera, the announcer and the numbers so far. */
     celebrate(card: MomentCard) {

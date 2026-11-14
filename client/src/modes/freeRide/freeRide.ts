@@ -76,6 +76,7 @@ export function runFreeRide(
     {
       pause: () => togglePause(),
       end: () => end(),
+      photo: () => scene.photo(() => togglePause()),
       difficulty: (v) => ((difficulty = v), save()),
     },
     difficulty,

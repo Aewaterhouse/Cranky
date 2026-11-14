@@ -1,0 +1,29 @@
+/* Free-ride photo mode (ui/photoMode.ts): the HUD and pause screen hidden, a bar of photo controls */
+.fr.photo .fhud,
+.fr.photo .overlay,
+.fr.photo .rotate-hint,
+.fr.photo .perf {
+  display: none;
+}
+.photo-bar {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  translate: -50% 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 14px;
+  pointer-events: auto;
+}
+.photo-bar span {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+.overlay .photo-btn {
+  margin-top: 14px;
+  pointer-events: auto;
+}
