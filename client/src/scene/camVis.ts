@@ -47,8 +47,8 @@ export const CAM = {
   backS: 0.7,
   barH: 0.1,
   /** Air strike: the chase seat behind and beside the jet, and where the camera stops to watch the blast. */
-  jetSeat: [-10, 4, -30] as [number, number, number],
-  blastSeat: [-26, 10, -22] as [number, number, number],
+  jetSeat: [-3, 2.2, -15] as [number, number, number],
+  blastSeat: [16, 16, -30] as [number, number, number],
   /** Supply drop: a low seat at the roadside ahead of the bus. */
   dropSeat: [7, 1.3, -24] as [number, number, number],
 }

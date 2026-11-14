@@ -16,8 +16,9 @@ export class PlayerCam {
   private aim = new THREE.Vector3()
   private pivot = new THREE.Vector3()
 
-  constructor(canvas: HTMLElement) {
-    this.unbind = bindCamInput(canvas, this.orbit, () => false)
+  /** `tap` runs on every press of the 3D view first; true eats it (a cinematic skipped). */
+  constructor(canvas: HTMLElement, tap: () => boolean = () => false) {
+    this.unbind = bindCamInput(canvas, this.orbit, tap)
   }
 
   /**

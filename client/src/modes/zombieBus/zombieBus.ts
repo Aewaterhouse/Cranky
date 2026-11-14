@@ -125,7 +125,10 @@ export function startBusRide(
   hud.setTier(profile.tier)
   stage.append(hud.root)
   // C or the camera button: the next camera view (Chase, High, Rear, Side).
-  const cycleView = () => hud.toast(`Camera: ${VIEW_NAMES[world.cycleView()]}`)
+  const cycleView = () => {
+    const v = world.cycleView()
+    if (v) hud.toast(`Camera: ${VIEW_NAMES[v]}`)
+  }
   hud.root.querySelector('.dock-l')?.append(camButton(cycleView))
   const offCam = camKey(() => hud.root.isConnected, cycleView)
   ride.onSprint = (r) => {

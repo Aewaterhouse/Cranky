@@ -1,15 +1,13 @@
 import * as THREE from 'three'
 import type { Look } from '../core/cosmetics'
 import { makeBus } from './bus'
-import { CamRig } from './camRig'
+import { BusCam } from './busCam'
 import { Crew } from './crew'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
 import { Ground } from './ground'
 import { Billboards, Servo } from './landmarks'
 import { Mirror } from './mirror'
-import { PlayerCam } from './playerCam'
-import { CAM } from './camVis'
 import { MoodBlend } from './moods'
 import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
@@ -51,13 +49,6 @@ export interface SceneState {
   gunship?: boolean
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
   mad?: MadScene | null
-}
-const BUS_LIMITS = { near: CAM.nearBus, ground: () => 0, bus: true }
-/** The bus sits at the origin facing -z. */
-const BUS_FRAME = {
-  at: new THREE.Vector3(),
-  right: new THREE.Vector3(1, 0, 0),
-  back: new THREE.Vector3(0, 0, 1),
 }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
@@ -107,8 +98,8 @@ export class World {
   private hit = 0
   private flash = 0
   private slow = 0
-  private rig = new CamRig()
-  private pc!: PlayerCam
+  /** The chase rig, the player's camera and the streak cinematics. */
+  cam!: BusCam
   private last = performance.now()
   private raf = 0
 
@@ -154,7 +145,7 @@ export class World {
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
     this.mirror = new Mirror(this.host)
-    this.pc = new PlayerCam(this.renderer.domElement)
+    this.cam = new BusCam(this.host, this.renderer.domElement)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
     this.resize()
@@ -170,22 +161,25 @@ export class World {
     this.camera.updateProjectionMatrix()
   }
 
-  /** The next camera view (Chase, High, Rear, Side); returns its name. */
-  cycleView = () => this.pc.cycle()
+  /** C or the camera button: skips a cinematic if one is showing, else the next view; returns its name. */
+  cycleView = () => this.cam.cycle()
 
   fx(kind: FxKind) {
     if (kind === 'hit') {
       this.flash = 1
-      this.rig.shake = Math.max(this.rig.shake, 1)
+      this.cam.rig.shake = Math.max(this.cam.rig.shake, 1)
       this.hit = 1
       this.horde.launch()
     }
-    if (kind === 'shake') this.rig.shake = Math.max(this.rig.shake, 1.6)
+    if (kind === 'shake') this.cam.rig.shake = Math.max(this.cam.rig.shake, 1.6)
     if (kind === 'slowmo') this.slow = 1.8
-    if (kind === 'drop' || kind === 'airstrike') this.strikes.fire(kind)
+    if (kind === 'drop' || kind === 'airstrike') {
+      this.strikes.fire(kind)
+      this.cam.cine.start(kind)
+    }
     if (kind === 'smash') {
       const at = this.block.smash()
-      this.rig.shake = 2
+      this.cam.rig.shake = 2
       this.flash = Math.max(this.flash, 0.5)
       this.hit = 1.2
       smashBurst(this.sparks, this.smoke, at)
@@ -273,17 +267,10 @@ export class World {
       this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
     const hz = g === null ? null : this.hordeZ
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
-      this.rig.shake = Math.max(this.rig.shake, 1.6)
-    this.rig.update(this.camera, this.t, dt, {
-      speed: v,
-      gap: g,
-      hit: this.hit,
-      slow: sm < 1,
-      pack: !!s.mad,
-      climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
-    })
-    this.pc.apply(this.camera, dt / sm, BUS_FRAME, this.rig.look, BUS_LIMITS, CAM.bus, 2)
-    this.strikes.view(this.camera)
+      this.cam.rig.shake = Math.max(this.cam.rig.shake, 1.6)
+    const climb = (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8))
+    const o = { speed: v, gap: g, hit: this.hit, slow: sm < 1, pack: !!s.mad, climb }
+    this.cam.update(this.camera, this.t, dt, o, dt / sm, this.strikes, !!s.gunship, hz)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)
     this.sparks.update(dt, px)
@@ -304,7 +291,7 @@ export class World {
     removeEventListener('resize', this.resize)
     this.fxl.dispose()
     this.mirror.dispose()
-    this.pc.dispose()
+    this.cam.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()
   }

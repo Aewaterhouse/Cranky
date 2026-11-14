@@ -43,6 +43,8 @@ export interface Settings {
   shiftStrength: number
   /** The 3D camera view: the game's chase camera, or High, Rear or Side. */
   camView: CamView
+  /** Short letterboxed shots of air strikes and supply drops on the bus. */
+  cinematics: boolean
 }
 
 const KEY = 'cranky.settings'
@@ -67,6 +69,7 @@ const DEFAULTS: Settings = {
   mixVoice: 1,
   shiftStrength: CFG.gears.strength.start,
   camView: 'chase',
+  cinematics: true,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

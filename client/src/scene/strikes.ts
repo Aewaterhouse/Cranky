@@ -72,6 +72,15 @@ export class Strikes {
     this.ship.g.visible = this.jet.visible = this.crate.visible = false
   }
 
+  /** The jet while it is in the air, for the air-strike cinematic. */
+  get jetAt() {
+    return this.jetT >= 0 ? this.jet.position : null
+  }
+  /** The crate while it is falling, for the supply-drop cinematic. */
+  get crateAt() {
+    return this.dropT >= 0 ? this.crate.position : null
+  }
+
   fire(kind: StrikeKind) {
     if (kind === 'drop') this.dropT = 0
     else {

@@ -129,6 +129,11 @@ export function settingsTab() {
         onOff(settings.rideSounds, (rideSounds) => saveSettings({ rideSounds })),
       ),
       row(
+        'Cinematics',
+        'On the bus, a short letterboxed shot of each air strike and supply drop, and a title when the gunship arrives. Skip one with C or a tap. Off keeps your own view (the gunship still takes over).',
+        onOff(settings.cinematics, (cinematics) => saveSettings({ cinematics })),
+      ),
+      row(
         'Free ride camera',
         'How far back the camera sits, and Calm for a steady one: no shake, lean, tuck or widening view.',
         h(

@@ -1,0 +1,40 @@
+/* Streak cinematics (cinema.ts): letterbox bars and a title, under the HUD so the cockpit stays in view */
+.cine {
+  --bars: 0;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.cine.on {
+  opacity: 1;
+}
+.cine i {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: calc(var(--bars) * 1%);
+  background: #000;
+}
+.cine i:first-child {
+  top: 0;
+}
+.cine i:nth-child(2) {
+  bottom: 0;
+}
+.cine b {
+  position: absolute;
+  left: 50%;
+  top: 30%;
+  translate: -50% 0;
+  font: 400 clamp(28px, 6vw, 72px) / 1 var(--display, Impact, sans-serif);
+  letter-spacing: 0.12em;
+  color: #ffd860;
+  text-shadow:
+    0 3px 0 #000,
+    0 0 24px rgb(0 0 0 / 0.6);
+  animation: sp-rise 0.4s;
+}
+.cine b:empty {
+  display: none;
+}
