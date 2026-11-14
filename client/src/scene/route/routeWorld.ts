@@ -278,10 +278,14 @@ export class RouteWorld {
     return { cover: at(R.roadHalf + R.verge + 6), y, coast }
   }
 
-  /** Confetti and streamers over the rider: a summit, the finish. */
-  party() {
-    const { x, y, z } = this.riders.me
+  /** Confetti and streamers over the rider (a summit, the finish) or over a spot (the podium). */
+  party({ x, y, z }: { x: number; y: number; z: number } = this.riders.me) {
     this.confetti.burst(x, y, z)
+  }
+
+  /** Adds something placed in route metres (the podium) to the world. */
+  show(o: THREE.Object3D) {
+    this.root.add(o)
   }
 
   /** Drops the built chunks so visual settings changed in the debug panel show up. */

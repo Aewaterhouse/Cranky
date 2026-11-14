@@ -6,13 +6,38 @@ import type {
   RaceState,
   RoadLobbyRider,
   RoadRiderTick,
+  RoadSummary,
   RoadTick,
 } from '../../net/protocol'
+import type { PodiumRider } from '../../scene/route/podium'
 import type { RoadRider } from '../../scene/route/roadRiders'
 
 const R = CFG.road
 const ORD = ['', '1st', '2nd', '3rd']
 export const ordinal = (n: number) => ORD[n] ?? `${n}th`
+
+const TITLES = { ride: 'RIDE', race: 'RACE', points: 'POINTS RACE', crit: 'CRIT' }
+
+/**
+ * Who stands where at the end of a race: the first three across the line, the points or prime winner on the
+ * side box with its sign, and the words over the top. Looks come from the riders as last drawn.
+ */
+export function podiumOf(g: RoadSummary, drawn: { id: string; look?: RoadRider['look'] }[]) {
+  const who = (id: string): PodiumRider => ({
+    id,
+    name: g.riders.find((r) => r.id === id)?.name ?? id,
+    look: drawn.find((r) => r.id === id)?.look,
+  })
+  const award = g.award && {
+    who: who(g.award.id),
+    sign: g.award.kind === 'prime' ? 'PRIME' : 'POINTS',
+  }
+  return {
+    top: (g.podium ?? []).map(who),
+    award: award || undefined,
+    title: `${TITLES[g.game ?? 'race']} · ${g.name}`,
+  }
+}
 
 export interface LinkRider extends RoadRider {
   wkg: number

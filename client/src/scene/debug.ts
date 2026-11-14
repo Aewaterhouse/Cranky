@@ -73,6 +73,7 @@ function routeFolder(f: GUI, rebuild: () => void) {
   addAll(f.addFolder('fly: the pre-ride flyover').close(), R.fly)
   addAll(f.addFolder('orbit: summit and finish flourish').close(), R.orbit)
   addAll(f.addFolder('party: confetti and streamers').close(), R.party)
+  addAll(f.addFolder('podium: the end of a race').close(), R.podium)
   const ghost = f.addFolder('Ghost riders (next ride)').close()
   ghost.add(R.ghost, 'opacity', 0.05, 1)
   ghost.add(R.ghost, 'pale', 0, 1)

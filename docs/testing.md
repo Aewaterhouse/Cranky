@@ -356,3 +356,17 @@ Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
 - Ride a session (the simulated trainer is fine, or a 1 min ride of the same workout): after saving, the day shows ✓ Done in the calendar and the card says Done. A past session with no ride shows Missed. Any ride of 80% of the session's length also counts.
 - Log in on a second browser: the same plan and calendar. Restart from today moves week 1 to today; Leave plan asks first, then shows the picker again.
 
+## Races on the road (2026-11-14)
+
+- Free ride → Nundah → Group ride → add three bots → Game: Race, 2 laps → Start. Last-lap bell banner as the leader
+  starts the last lap; finishers wait at the line; the race ends once you and two others are home; the podium
+  shows (three on the steps, confetti, champagne, camera swinging), then results with gaps.
+- Game: Points, 3 laps. A "SPRINT n · POINTS" banner and bell 400 m before each line, "+5 points" toasts, points
+  beside each name on the crew cards, "FINAL SPRINT · DOUBLE POINTS" on the last lap. Results ranked by points with a
+  Points column and "won on points"; the podium is the order across the line with the points winner on the side box.
+- Game: Crit (laps jump to 8 on a loop). "PRIME NEXT LAP" then "PRIME!" with the winner's name around halfway; a ★
+  on their card, "won the prime" on the results and the PRIME board beside the podium.
+- Podium alone: `/route-dev.html?route=nundah-crit&riders=3&podium=PRIME` (or `POINTS`, `none`) on the dev server.
+- `e2e/ride.cjs` runs all three with three bots (1, 2 and 2 laps; about 3 min at ZB_TIME_SCALE=10) and checks the
+  results; the podium itself needs eyes.
+

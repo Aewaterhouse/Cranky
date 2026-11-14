@@ -27,7 +27,7 @@ import { recentPct } from './quips'
 import { rideExtras } from './rideExtras'
 import { rideWorld } from './rideWorld'
 import { stepStrength, strengthPct } from '../../ui/gearTile'
-import type { RoadLink } from './roadLink'
+import { podiumOf, type RoadLink } from './roadLink'
 
 const F = CFG.freeRide
 
@@ -284,6 +284,7 @@ export function runFreeRide(
     clearInterval(timer)
     removeEventListener('keydown', onKey)
     offClick()
+    if (road?.podium) await scene.podium(podiumOf(road, [me, ...(link?.others() ?? [])]))
     const still = scene.still
     scene.dispose()
     await ride.stop()

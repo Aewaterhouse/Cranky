@@ -7,7 +7,7 @@ import { draftSaving, stepSpeed, totalMass } from '../src/core/physics'
 import { buildRoute, routeAt } from '../src/core/route'
 import { trainerTarget } from '../src/modes/freeRide/feel'
 import { freePlan } from '../src/modes/freeRide/freeRide'
-import { RoadLink, ordinal } from '../src/modes/freeRide/roadLink'
+import { RoadLink, ordinal, podiumOf } from '../src/modes/freeRide/roadLink'
 import { RideController } from '../src/modes/rideController'
 import type { ClientMsg, RoadLobby, RoadRiderTick, RoadTick } from '../src/net/protocol'
 import { SimTrainer } from '../src/trainer/simTrainer'
@@ -144,6 +144,46 @@ describe('group ride link', () => {
     expect(link.banner()).toEqual(['PRIME!', 'Kev'])
     expect(link.others()[0].tag).toBe('★ prime')
     expect(link.tag('me')).toBeUndefined()
+  })
+
+  it('puts the first three across the line on the podium and the award winner on the side box', () => {
+    const row = (id: string, name: string, place: number) => ({
+      id,
+      name,
+      place,
+      bot: false,
+      time: 100,
+      dist: 1,
+      late: false,
+      avgPower: 1,
+      wkg: 1,
+      saved: 0,
+    })
+    const g = {
+      kind: 'road' as const,
+      game: 'crit' as const,
+      route: 'nundah-crit',
+      name: 'Nundah',
+      laps: 8,
+      distance: 9000,
+      secs: 900,
+      style: 'race' as const,
+      together: false,
+      podium: ['kev', 'me', 'shaz'],
+      award: { kind: 'prime' as const, id: 'bob' },
+      riders: [
+        row('kev', 'Kev', 1),
+        row('me', 'Me', 2),
+        row('shaz', 'Shaz', 3),
+        row('bob', 'Bob', 4),
+      ],
+    }
+    const p = podiumOf(g, [{ id: 'kev', look: { hat: 'hat-viking' } }])
+    expect(p.top.map((r) => r.name)).toEqual(['Kev', 'Me', 'Shaz'])
+    expect(p.top[0].look).toEqual({ hat: 'hat-viking' })
+    expect(p.award).toEqual({ who: { id: 'bob', name: 'Bob', look: undefined }, sign: 'PRIME' })
+    expect(p.title).toBe('CRIT · Nundah')
+    expect(podiumOf({ ...g, game: 'points', award: null }, []).award).toBeUndefined()
   })
 
   it('says who joined, who finished and who caught whom', () => {

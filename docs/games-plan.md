@@ -216,7 +216,7 @@ the server), with bots, results and history like the other games.
       points wins, whoever crosses first.
 - [x] Crit: a short loop, many laps, and a sprint prime rung at a random lap around halfway (a bell and a banner);
       the prime winner is the hero of the results whatever the finish.
-- [ ] A podium scene at the end: the top three on the steps in the 3D world (champagne, confetti, silly poses with
+- [x] A podium scene at the end: the top three on the steps in the 3D world (champagne, confetti, silly poses with
       the bonkers models), with the prime or points winner standing to the side on their own little box.
 - [ ] Each race in the e2e test with bots; owner checks for a real group race.
 

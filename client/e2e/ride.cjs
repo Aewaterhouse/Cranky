@@ -1,5 +1,5 @@
 // End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride, a Kidney Stone
-// Express shift, a Speed Dating night and a Climate Lawsuit game, the last three with bots.
+// Express shift, a Speed Dating night, a Climate Lawsuit game and the three road races, the last ones with bots.
 // Run with scripts/e2e.sh, which starts a sped-up server on E2E_URL.
 const { chromium } = require('playwright')
 
@@ -55,6 +55,28 @@ async function crew(host, guest) {
   for (const p of [host, guest]) await p.waitForSelector('text=Made it!', { timeout: 240000 })
   const text = await host.innerText('body')
   for (const want of ['Bus score', 'Awards', 'Crew', 'Luke']) if (!new RegExp(want, 'i').test(text)) throw new Error(`crew results missing "${want}"`)
+}
+
+// A road race with three bots on Nundah: the game picked in the group-ride lobby, the podium, then the results.
+async function race(page, game, laps, want) {
+  await page.click('.home-mode:has-text("Free ride")')
+  await page.click('text=Nundah')
+  await page.click('button:text-is("Group ride")')
+  await useSim(page).catch(() => {})
+  await page.waitForSelector('.road-lobby')
+  for (let i = 0; i < 3; i++) await page.click('[aria-label="One more bot"]'), await page.waitForTimeout(400)
+  await page.click(`.road-opts .seg >> text=${game}`)
+  await page.waitForTimeout(500)
+  const lapText = laps === 1 ? '1 lap' : `${laps} laps`
+  for (let i = 0; i < 20 && !(await page.locator(`.road-opts b:text-is("${lapText}")`).count()); i++)
+    await page.click('[aria-label="One lap fewer"]'), await page.waitForTimeout(500)
+  await page.click('text=Start the ride')
+  await page.waitForSelector('text=Back to the lobby', { timeout: 180000 })
+  const text = await page.innerText('body')
+  for (const w of want) if (!new RegExp(w, 'i').test(text)) throw new Error(`${game} results missing "${w}"`)
+  await page.click('text=Back to the lobby')
+  await page.click('text=Leave the ride')
+  await page.waitForSelector('.home-games')
 }
 
 // A scripted crew game with no ERG: one rider and three bots through a whole shift.
@@ -118,6 +140,11 @@ async function town(page) {
     console.log('Speed Dating: ok')
     await town(await rider(browser, 'Angus'))
     console.log('Climate Lawsuit: ok')
+    const racer = await rider(browser, 'Kat')
+    await race(racer, 'Race', 1, ['Nundah', 'race'])
+    await race(racer, 'Points', 2, ['points race', 'won on points'])
+    await race(racer, 'Crit', 2, ['crit', 'won the prime'])
+    console.log('road races: ok')
     if (errors.length) throw new Error(`page errors:\n${errors.join('\n')}`)
     console.log('e2e passed')
   } catch (e) {

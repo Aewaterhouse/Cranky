@@ -15,6 +15,7 @@ import { momentFlash } from '../../ui/rideMoment'
 import { rideSound } from '../../ui/rideSound'
 import { cheering } from './feel'
 import type { MomentCard } from './moments'
+import type { podiumOf } from './roadLink'
 import { Quipper, speak, type QuipState } from './quips'
 
 const F = CFG.freeRide
@@ -131,6 +132,24 @@ export function rideWorld(
       if (!still) w.party()
       if (settings.calmCamera || still || !orbit) snap()
       else orbit(CFG.moments.orbitS, snap)
+    },
+    /** The end of a race: the podium at the finish for a while (a key or a tap skips it), then on. */
+    async podium(p: ReturnType<typeof podiumOf>) {
+      const w = world
+      if (!w || still || !p.top.length) return
+      view.root.classList.add('intro-on')
+      SFX.MEGA()
+      const { startPodium } = await import('../../scene/route/podium')
+      await new Promise<void>((done) => {
+        const skip = () => shot.skip()
+        const shot = startPodium(w, base.distance, p.top, p.award, p.title, () => {
+          removeEventListener('keydown', skip)
+          view.root.removeEventListener('pointerdown', skip)
+          done()
+        })
+        addEventListener('keydown', skip)
+        view.root.addEventListener('pointerdown', skip)
+      })
     },
     /** The sky over the ride, for the wind. */
     get mood() {

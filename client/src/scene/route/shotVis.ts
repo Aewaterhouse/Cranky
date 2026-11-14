@@ -41,3 +41,45 @@ export const ORBIT = {
   /** The postcard is taken this far through the turn (0..1): three-quarters on, from the front. */
   snapAt: 0.42,
 }
+/** The podium at the end of a race (`VIS.route.podium`): steps, figures, champagne, confetti and the camera. */
+export const PODIUM = {
+  secs: 14,
+  /** Metres before the line, and back off the road edge on the left. */
+  lineM: 18,
+  setbackM: 3,
+  /** Step heights for 1st, 2nd and 3rd, the side box, and their width and depth. */
+  firstH: 1.3,
+  secondH: 0.85,
+  thirdH: 0.55,
+  sideH: 0.4,
+  stepW: 1.5,
+  depthM: 1.6,
+  sideGapM: 1.4,
+  /** The award's board on a post beside the side box: width and height of its middle. */
+  signW: 1.9,
+  signUpM: 2.3,
+  step: '#f3f0e6',
+  side: '#f2b705',
+  backdrop: '#1f2a44',
+  backdropText: '#f2b705',
+  /** The winner's jump (m, per second), the air pedalling (rad/s) and the side rider's twirl (rad/s). */
+  jumpM: 0.45,
+  jumpHz: 1.6,
+  spinRad: 14,
+  twirlRad: 2.4,
+  /** Champagne: drops, how long each flies (s), launch speed (m/s), spread and colour. */
+  drops: 260,
+  dropS: 1.3,
+  sprayMs: 6.5,
+  sprayCone: 0.35,
+  dropSize: 0.09,
+  fizz: '#fff1b8',
+  /** Confetti every this many seconds. */
+  burstS: 3.5,
+  /** Camera: distance, height, aim above the ground and a swing either side of front (rad, per second). */
+  camM: 11,
+  camUpM: 3.2,
+  aimUpM: 1.9,
+  swingRad: 1.1,
+  swingHz: 0.06,
+}

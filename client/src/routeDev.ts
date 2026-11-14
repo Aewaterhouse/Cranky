@@ -22,6 +22,7 @@ import { rideSound } from './ui/rideSound'
  *   power=0 (coasting; left out, pedalling)  effort=1.5 (share of FTP)  cheer=1 (arms up)  calm=1 (calm camera)
  *   sound=1 (the ride sounds, after a click or key; q for a gear clunk)
  *   mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower (default: by the clock, mist up high, showers)
+ *   podium=PRIME|POINTS|none (the end-of-race podium at the finish with the first four riders; needs riders=3)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel   c camera view   q clunk
  */
@@ -82,6 +83,12 @@ async function start() {
   }))
   world.state = { me: 'r0', riders }
   Object.assign(window, { world, st, jump, VIS })
+  if (q.has('podium')) {
+    const sign = q.get('podium')!
+    const award = sign === 'none' ? undefined : { who: riders[3] ?? riders[0], sign }
+    const { startPodium } = await import('./scene/route/podium')
+    startPodium(world, route.distance, riders.slice(0, 3), award, `CRIT · ${route.name}`, () => {})
+  }
   if (q.has('camcheck')) setTimeout(() => runCamCheck(world.cam, CAM.route, world, 1800), 6000)
 
   let last = performance.now()
