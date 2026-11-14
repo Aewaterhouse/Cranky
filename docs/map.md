@@ -14,6 +14,7 @@
 - `src/spike.ts` trainer test UI and Zwift Click test panel.
 - `watch-dev.html` / `src/watchDev.ts` two YouTube players following one made-up room clock (dev server only); `src/core/watchSync.ts` watch party sync steps and YouTube link parsing; `src/ui/ytPlayer.ts` YouTube IFrame player that applies them.
 - `hud-dev.html` / `src/hudDev.ts` a crew game's HUD over its scene from made-up ticks; `town-dev.html` / `src/townDev.ts` the Climate Lawsuit town (dev server only).
+- `src/core/rideMetrics.ts` variability, efficiency, HR drift, cadence bands and W′ balance; `src/ui/moreNumbers.ts` their card on results and history.
 - `src/modes/crew/games.ts` crew game names for lobby, countdown and score; `gameUi.ts` each newer game's HUD panel, event names, scene state and own 3D scene. `src/ui/hudAmbo.ts`, `hudDate.ts`, `hudClimate.ts` the three game panels; `choiceSheet.ts` a game's question to a rider; `hudOpts.ts` HUD options and the `GamePanel` type. `src/scene/ambulance.ts` ambulance dress for the bus; `src/scene/town/` the town (`townGeo.ts` geometry, `townWorld.ts` scene).
 - `src/sceneDev.ts` scene harness params and keys (see README).
 - `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README); `src/routeDevFixture.ts` made-up map features for it (`fixture=1`).

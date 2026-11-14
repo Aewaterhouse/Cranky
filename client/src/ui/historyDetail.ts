@@ -1,3 +1,4 @@
+import { moreNumbers } from './moreNumbers'
 import { api } from '../core/api'
 import { CFG } from '../config'
 import { settings } from '../core/settings'
@@ -106,6 +107,7 @@ function body(s: RideSummary) {
       : '',
     segmentSection(s.segments),
     power.length > 1 ? card('Power vs target', h('div', { class: 'res-chart' }, chart.el)) : '',
+    moreNumbers(power, s.hr ?? [], s.cadence ?? [], s.ftp ?? 200),
     h(
       'div',
       { class: 'res-two' },

@@ -10,6 +10,17 @@ export const CFG = {
   click: { backoffMs: [1000, 2000, 4000, 5000] },
   /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
   watch: { driftS: 2, duckS: 5, duckVolume: 25 },
+  /**
+   * Extra ride metrics: W′ (J) for the balance, the shortest ride they are shown for, the shortest for HR drift,
+   * the share of seconds that need a heart rate, and the cadence band edges (rpm).
+   */
+  metrics: {
+    wPrimeJ: 20000,
+    minSecs: 600,
+    driftMinSecs: 1200,
+    hrShare: 0.8,
+    cadBands: [0, 70, 80, 90, 100, 110],
+  },
   clock: { hz: 4, snapS: 1, gain: 0.2, windowS: 4, rateMin: 0.5, rateMax: 30, staleS: 3 },
   recovery: { saveMs: 5000, maxAgeMs: 30 * 60 * 1000 },
   compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },

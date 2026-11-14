@@ -358,3 +358,37 @@ tr.me td {
   white-space: normal;
   font-size: clamp(1.1rem, 2.2vw, 1.5rem);
 }
+.more-num .mn-row {
+  display: grid;
+  grid-template-columns: 7.5rem 4.5rem 1fr;
+  gap: 10px;
+  align-items: baseline;
+  padding: 4px 0;
+}
+.more-num .mn-row small {
+  opacity: 0.7;
+}
+.mn-cad {
+  display: grid;
+  grid-template-columns: 7.5rem repeat(6, 1fr);
+  gap: 6px;
+  align-items: end;
+  margin-top: 10px;
+  height: 80px;
+}
+.mn-bar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  height: 100%;
+}
+.mn-bar i {
+  width: 70%;
+  border-radius: 4px 4px 0 0;
+  background: var(--acc);
+}
+.mn-bar small {
+  font-size: 0.65rem;
+  opacity: 0.7;
+}

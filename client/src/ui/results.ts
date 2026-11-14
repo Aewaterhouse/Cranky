@@ -1,3 +1,4 @@
+import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
 import { bankScrap } from '../core/cosmetics'
@@ -210,6 +211,7 @@ export function finishRide(
       ),
       ftpBox,
       h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
+      moreNumbers(s.power, s.hr, s.cadence, s.ftp),
       h(
         'div',
         { class: 'res-two' },
