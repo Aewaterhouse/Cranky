@@ -160,3 +160,4 @@ position, through `ErgController.setGrade`.
 - `tick.hold` (bool): the game has stopped the room's clock (`CrewGame.holds`). A watch party holds while its driver has the video paused, so the workout waits too; clients freeze their local plan clock while it is set. A watch party sends `tick.game` during the countdown as well.
 - Watch party `act` keys, more: `emoji` (one of six; anyone; comes back to everyone as fx `emoji` with the rider's id), and for the host `up` and `drop` with a queued video's id.
 - Watch party sources: `add` takes a YouTube id, `tw:<channel>` (a Twitch stream: live, shown but never synced) or `url:https://…` (a .mp4, .webm, .ogv or .mov file, synced like YouTube). `title` is the source, a tab, then the title. `act` values may be up to 300 characters, for links.
+- `GET /api/rooms/{code}`: `{code, kind, state}` for a ride that exists (any case), 404 otherwise. The home screen checks a typed code with it before asking for a trainer.

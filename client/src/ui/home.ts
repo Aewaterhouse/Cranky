@@ -9,6 +9,7 @@ import type { Profile } from '../core/curve'
 import type { Route } from '../core/route'
 import type { Plan } from '../types'
 import { avatar, fmt, h } from './dom'
+import { toast } from './toast'
 import { freeRideSetup } from './freeRideSetup'
 import { gamePicker } from './gamePicker'
 import type { Game } from '../net/protocol'
@@ -183,7 +184,13 @@ export function rideTab(p: Profile, act: HomeActions) {
     if (c.length === 4) go(c)
     else code.focus()
   }
-  const joinCode = withCode((c) => needTrainer(() => act.join(c))())
+  // Check the code before asking for a trainer, so a typo is caught straight away and the letters stay put.
+  const joinCode = withCode((c) =>
+    api(`/api/rooms/${c}`).then(
+      () => needTrainer(() => act.join(c))(),
+      () => (toast(`No ride with the code ${c}. Check the letters?`, 'bad'), code.select()),
+    ),
+  )
   const goWorkout = (id: string) => needTrainer(() => act.drill(planFor(id, 0)))()
   const today = h('div')
   const home = () => (

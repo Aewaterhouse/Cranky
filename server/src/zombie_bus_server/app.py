@@ -249,6 +249,15 @@ def create_room(u: User, body: NewRoom | None = None) -> dict:
     return {"code": code}
 
 
+@app.get("/api/rooms/{code}")
+def room_exists(code: str, u: User) -> dict:
+    """Whether a code is a ride you can join, checked before a rider pairs their trainer."""
+    r = rooms.get(code.upper())
+    if not r:
+        raise HTTPException(404, "No ride with that code")
+    return {"code": r.code, "kind": r.kind, "state": r.state}
+
+
 @app.get("/api/rooms")
 def list_rooms(u: User) -> list[dict]:
     """Open buses, so friends can join without typing a code."""

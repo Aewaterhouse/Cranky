@@ -131,3 +131,12 @@ def test_every_crew_game_pays_scrap_for_distance_and_how_it_went():
     room, w, host, guest = party()
     w.dist = 12000
     assert w.summary(room)["scrap"] == crew_scrap(12000)
+
+
+def test_a_code_can_be_checked_before_joining():
+    from test_accounts import auth, client
+
+    _, h = auth("luke", "Luke")
+    code = client.post("/api/rooms", headers=h).json()["code"]
+    assert client.get(f"/api/rooms/{code.lower()}", headers=h).json()["code"] == code
+    assert client.get("/api/rooms/ZZZZ", headers=h).status_code == 404
