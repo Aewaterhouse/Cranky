@@ -72,8 +72,22 @@ export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'
 const DAY = 86400000
 const D = CFG.curveDurations
 
+/** The FTP estimate's share of FTP at `d` seconds, read between the configured durations on a log scale. */
+function defaultPct(d: number) {
+  const pct = CFG.defaultCurvePct as Record<number, number>
+  if (pct[d]) return pct[d]
+  const ks = Object.keys(pct)
+    .map(Number)
+    .sort((a, b) => a - b)
+  const hi = ks.findIndex((k) => k > d)
+  if (hi <= 0) return pct[ks[hi < 0 ? ks.length - 1 : 0]]
+  const [a, b] = [ks[hi - 1], ks[hi]]
+  const t = Math.log(d / a) / Math.log(b / a)
+  return pct[a] + (pct[b] - pct[a]) * t
+}
+
 export const defaultCurve = (ftp: number): Record<number, number> =>
-  Object.fromEntries(D.map((d) => [d, Math.round(ftp * CFG.defaultCurvePct[d])]))
+  Object.fromEntries(D.map((d) => [d, Math.round(ftp * defaultPct(d))]))
 
 /** Best average power for each curve duration from a 1 Hz power series. */
 export function bestEfforts(power: number[]): Record<number, number> {
@@ -86,6 +100,12 @@ export function bestEfforts(power: number[]): Record<number, number> {
     for (let i = d; i < pre.length; i++) m = Math.max(m, pre[i] - pre[i - d])
     out[d] = Math.round(m / d)
   }
+  // Interval rides can leave a longer best a touch above a shorter one (45 s windows straddle the efforts badly);
+  // a power curve never rises with duration, so a shorter best is at least any longer one.
+  const ds = Object.keys(out)
+    .map(Number)
+    .sort((a, b) => b - a)
+  ds.forEach((d, i) => i && (out[d] = Math.max(out[d], out[ds[i - 1]])))
   return out
 }
 
@@ -114,7 +134,25 @@ export function curves(p: Profile, now = Date.now()): Curve {
         ? { w: a.w, real: true }
         : { w: def[d], real: false }
   }
+  fill(out.allTime)
+  fill(out.d90)
   return out
+}
+
+/**
+ * A duration with no effort of its own, between two that have one, reads between them (on a log scale) rather than
+ * from the FTP estimate: a ride history from before a duration was measured still grades sprints as it did.
+ */
+function fill(c: Record<number, Point>) {
+  const real = D.filter((d) => c[d].real)
+  for (const d of D) {
+    if (c[d].real) continue
+    const lo = [...real].reverse().find((r) => r < d)
+    const hi = real.find((r) => r > d)
+    if (lo == null || hi == null) continue
+    const f = Math.log(d / lo) / Math.log(hi / lo)
+    c[d] = { w: Math.round(c[lo].w + (c[hi].w - c[lo].w) * f), real: false }
+  }
 }
 
 /** Log-time interpolation between curve points. */

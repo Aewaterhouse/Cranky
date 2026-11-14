@@ -15,7 +15,7 @@ import {
 } from '../core/powerCurve'
 import { h, seg } from './dom'
 import { crewBoard } from './riderCrew'
-import { chartBox, niceTicks, svgEl } from './svg'
+import { chartBox, niceTicks, smoothPath, svgEl } from './svg'
 
 const COLOUR: Record<CurveLine['key'], string> = {
   all: 'var(--acc)',
@@ -64,7 +64,7 @@ export function curveChart(p: Profile, mates: CrewRider[] = []) {
           String(v),
         ),
       )
-    for (const d of CFG.curveDurations.filter(
+    for (const d of CFG.curveLabels.filter(
       (d) => !narrow || [1, 15, 60, 300, 1200, 3600].includes(d),
     ))
       plot.append(
@@ -73,25 +73,23 @@ export function curveChart(p: Profile, mates: CrewRider[] = []) {
     for (const l of lines) {
       const col = colour(l)
       const y = (w: number) => c.t + (1 - yValue(w, lineKg(l, kg)) / top) * c.ph
-      const pt = (q: CurvePt) => `${x(q.d).toFixed(1)},${y(q.w).toFixed(1)}`
+      const path = (qs: CurvePt[]) =>
+        smoothPath(qs.map((q): [number, number] => [+x(q.d).toFixed(1), +y(q.w).toFixed(1)]))
       plot.append(
-        svgEl('polyline', { points: l.pts.map(pt).join(' '), class: 'cline faint', stroke: col }),
+        svgEl('path', { d: path(l.pts), class: 'cline faint', stroke: col, fill: 'none' }),
       )
       let run: CurvePt[] = []
       const flush = () => {
         if (run.length > 1)
           plot.append(
-            svgEl('polyline', {
-              points: run.map(pt).join(' '),
-              class: `cline ${l.key}`,
-              stroke: col,
-            }),
+            svgEl('path', { d: path(run), class: `cline ${l.key}`, stroke: col, fill: 'none' }),
           )
         run = []
       }
       for (const q of l.pts) q.real ? run.push(q) : flush()
       flush()
-      for (const q of l.pts)
+      // Dots only at the labelled durations: the finer points shape the line without crowding it.
+      for (const q of l.pts.filter((q) => CFG.curveLabels.includes(q.d)))
         plot.append(
           svgEl('circle', {
             cx: x(q.d),
@@ -249,13 +247,13 @@ export function powerTab(p: Profile) {
         h(
           'tbody',
           {},
-          ...CFG.curveDurations.map((d, i) =>
+          ...CFG.curveLabels.map((d) =>
             h(
               'tr',
               {},
               h('th', {}, fmtDur(d)),
-              cell(all.pts[i]),
-              cell(d90.pts[i]),
+              cell(all.pts.find((q) => q.d === d)),
+              cell(d90.pts.find((q) => q.d === d)),
               cell(last.pts.find((q) => q.d === d)),
             ),
           ),

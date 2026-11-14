@@ -39,7 +39,13 @@ export const CFG = {
   sprint: { hit: 0.75, great: 0.95, mega: 1.0, comboCap: 8 },
   sprintDur: { min: 5, max: 30 },
   net: { sendHz: 2, reconnectMs: 2000 },
-  curveDurations: [1, 5, 15, 30, 60, 120, 300, 600, 1200, 3600],
+  /** Durations (s) the power curve is measured at; the fine steps give a smooth, detailed curve. */
+  curveDurations: [
+    1, 2, 3, 5, 8, 10, 15, 20, 30, 45, 60, 90, 120, 180, 240, 300, 420, 600, 900, 1200, 1800, 2400,
+    3600,
+  ],
+  /** The ones labelled on the axis and listed in the Best efforts table. */
+  curveLabels: [1, 5, 15, 30, 60, 120, 300, 600, 1200, 3600],
   defaultCurvePct: {
     1: 4.0,
     5: 3.5,
