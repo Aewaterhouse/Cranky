@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from .. import config as C
 from ..plan import is_over
-from .common import award, compliance, rider_row, tally
+from .common import CrewGame, award, compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
@@ -22,7 +22,7 @@ def weekly_mutator(today: date | None = None) -> dict:
     return C.MUTATORS[week % len(C.MUTATORS)]
 
 
-class ZombieBus:
+class ZombieBus(CrewGame):
     """Bus state for one ride. `tick` runs at TICK_HZ; `on_sprint` applies sprint grades."""
 
     def __init__(self, level: str = "normal", mutator: dict | None = None) -> None:

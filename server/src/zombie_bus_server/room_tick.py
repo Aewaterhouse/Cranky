@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 from . import bots
 from . import config as C
-from .plan import event_for, locate
+from .plan import locate
 from .protocol import Tick
 from .ride_stats import on_target
 
@@ -33,7 +33,7 @@ def step(room: Room, dt: float) -> dict:
     blocks = room.plan["blocks"]
     loc = locate(blocks, room.el) if room.el >= 0 else None
     i, bel = loc if loc else (-1, 0.0)
-    ev = event_for(blocks, i) if i >= 0 else "warmup"
+    ev = room.mode.event(room, i) if i >= 0 else "warmup"
     fallen = sum(r.st == "fell" for r in room.riders.values())
     load = room.load = 1 + min(C.FELL_LOAD_MAX, C.FELL_LOAD * fallen)
     bots.drive(room, dt, i, bel)
@@ -49,11 +49,14 @@ def step(room: Room, dt: float) -> dict:
                 r.id: r.report(r.ftp, r.kg, on_target(r.band_s, r.comp_n), r.falls)
                 for r in room.riders.values()
             }
-    riders = {
-        r.id: {
+    riders = {}
+    for r in room.riders.values():
+        tgt, band = room.aim(r, i, bel)
+        riders[r.id] = {
             "name": r.name,
             "tier": r.tier,
-            "tgt": r.target(blocks[i], bel, load) if i >= 0 else None,
+            "tgt": tgt,
+            "band": band,
             "w": round(r.w),
             "cad": round(r.cad),
             "s": r.s,
@@ -62,8 +65,6 @@ def step(room: Room, dt: float) -> dict:
             "hrp": None if r.hrp is None else round(r.hrp, 2),
             "erg": room.erg_of(r),
         }
-        for r in room.riders.values()
-    }
     tick = Tick(
         el=room.el,
         i=i,
@@ -74,5 +75,6 @@ def step(room: Room, dt: float) -> dict:
         fx=fx,
         load=load,
         stats=stats,
+        game=room.mode.game(room, i, bel) if i >= 0 else None,
     )
     return tick.model_dump()

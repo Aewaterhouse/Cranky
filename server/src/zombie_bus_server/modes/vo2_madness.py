@@ -7,8 +7,8 @@ import random
 from typing import TYPE_CHECKING
 
 from .. import config as C
+from .common import CrewGame, compliance, rider_row, tally
 from .common import award as give
-from .common import compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
@@ -55,8 +55,10 @@ def zone(hrp: float) -> int:
     return sum(hrp >= f for f in C.MAD_ZONES)
 
 
-class Vo2Madness:
+class Vo2Madness(CrewGame):
     """Pack state for one ride. Same interface as ZombieBus so the room can run either."""
+
+    deal = staticmethod(deal)
 
     def __init__(self, level: str = "normal", mutator: dict | None = None) -> None:
         self.pts: dict[str, float] = {}

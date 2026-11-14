@@ -2,11 +2,99 @@
 
 from __future__ import annotations
 
+import copy
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar, Self
+
+from .. import config as C
+from ..plan import event_for
 
 if TYPE_CHECKING:
     from ..rider import Rider
+    from ..session import Room
+
+Band = tuple[float, float] | str | None  # (lo, hi) as fractions of FTP, "sprint", "free", or None: the plan's
+
+
+class CrewGame:
+    """What a bus room asks of its game. A game overrides what it needs; the rest are no-ops.
+
+    State lives in plain JSON-safe attributes so the default snapshot works. `fx` collects one-shot effects
+    for `tick` to hand back, `speed` (m/s) and `dist` (m) feed the default `state`.
+    """
+
+    no_erg: ClassVar[bool] = False  # True: nobody rides this game on ERG, whatever the host or rider picked
+
+    def __init__(self, level: str = "normal") -> None:
+        self.level = level
+        self.speed = self.dist = 0.0
+        self.fx: list[dict] = []
+
+    @classmethod
+    def deal(cls, minutes: int) -> dict | None:
+        """The game's own plan (dealt for the lobby and again at the start), or None: the picked workout."""
+        return None
+
+    def begin(self, room: Room) -> None:
+        """Called once as the ride starts, after the riders' stats are reset."""
+
+    def to_dict(self) -> dict:
+        return copy.deepcopy(vars(self))
+
+    @classmethod
+    def from_dict(cls, d: dict) -> Self:
+        game = cls()
+        vars(game).update(copy.deepcopy(d))
+        return game
+
+    def emit(self, k: str, text: str | None = None, rid: str | None = None) -> None:
+        self.fx.append({"k": k, "text": text, "id": rid})
+
+    def event(self, room: Room, i: int) -> str:
+        """The tick's `ev` for block `i`."""
+        return event_for(room.plan["blocks"], i)
+
+    def band(self, room: Room, r: Rider, i: int, bel: float) -> Band:
+        """This rider's target right now. None leaves it to the plan block and the rider's tier."""
+        return None
+
+    def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
+        """Advances the game by `dt` seconds in block `i`. Returns fx since the last tick."""
+        fx, self.fx = self.fx, []
+        return fx
+
+    def state(self, room: Room, i: int, bel: float) -> dict:
+        """The tick's `bus` field. Games that are not the bus send a neutral one and use `game`."""
+        return {
+            "speed": round(self.speed, 2),
+            "dist": round(self.dist),
+            "armour": 100,
+            "gap": C.GAP_MAX,
+            "scrap": 0,
+            "sync": False,
+            "tune": False,
+            "rb": None,
+            "combo": 0,
+            "shop": False,
+            "repel": 0,
+            "syncw": 0,
+        }
+
+    def game(self, room: Room, i: int, bel: float) -> dict | None:
+        """The tick's `game` field: whatever this game's HUD and scene need."""
+        return None
+
+    def summary(self, room: Room) -> dict:
+        raise NotImplementedError
+
+    def buy(self, r: Rider, item: str) -> None:
+        """A shop purchase."""
+
+    def on_sprint(self, r: Rider, blk: int, grade: str, combo: int) -> None:
+        """A rider's graded sprint."""
+
+    def on_act(self, room: Room, r: Rider, k: str, v: str | float | bool | None) -> None:
+        """A rider's game input (`act`): an emoji, a card, a vote. Unknown kinds are ignored."""
 
 
 def tally(active: Iterable[Rider], dt: float) -> None:

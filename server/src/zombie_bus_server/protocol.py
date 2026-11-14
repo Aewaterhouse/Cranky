@@ -110,6 +110,14 @@ class Buy(BaseModel):
     item: Literal["plating", "repellent", "sync"]
 
 
+class Act(BaseModel):
+    """A rider's input to the crew game: an emoji, a card, a choice, a vote. The game reads `k`."""
+
+    t: Literal["act"]
+    k: str = Field(min_length=1, max_length=24, pattern=r"^[a-z0-9_]+$")
+    v: bool | int | float | Annotated[str, Field(max_length=64)] | None = None
+
+
 ClientMsg = TypeAdapter(
     Annotated[
         Join
@@ -126,7 +134,8 @@ ClientMsg = TypeAdapter(
         | Sprint
         | Erg
         | TrainerMode
-        | Buy,
+        | Buy
+        | Act,
         Field(discriminator="t"),
     ]
 )
@@ -143,6 +152,7 @@ class RiderTick(BaseModel):
     hr: int | None = None
     hrp: float | None = None
     erg: bool = True
+    band: tuple[int, int] | Literal["sprint", "free"] | None = None  # the game's own target for this rider
 
 
 class Bus(BaseModel):
@@ -196,3 +206,4 @@ class Tick(BaseModel):
     fx: list[Fx]
     load: float = 1.0  # targets of riders still on the bus are multiplied by this while others have fallen
     stats: dict[str, RideStatsMsg] | None = None  # the ride so far, once a second at most
+    game: dict | None = None  # the crew game's own state (games newer than VO2 Madness)

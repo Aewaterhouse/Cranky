@@ -119,6 +119,12 @@ position, through `ErgController.setGrade`.
 ## Drafting (road rooms)
 - The host's `road` message can carry `draft: 'off' | 'realistic' | 'strong'` (left out keeps the room's level, strong by default). The road lobby carries `draft`.
 
+## Crew game kit (bus rooms, from 2026-11-14)
+- Tick riders carry `band`: `[lo, hi]` watts when the game sets this rider's target itself (then `tgt` is the middle of it), `"sprint"` or `"free"` for no target at all (`tgt` null), or null when the target is the plan's. Neither edge is ever over 150% of the rider's FTP.
+- `tick.game` is the game's own state (null for Zombie Bus and VO2 Madness, which use `bus`).
+- Client `{t: 'act', k, v?}`: a rider's input to the game (an emoji, a card, a choice, a vote). `k` is up to 24 of `a-z0-9_`; `v` is a boolean, a number, a string of up to 64 characters or absent. Dropped outside a running ride and past 8 in 4 s per rider. What `k` means is the game's business.
+- A game can be marked never-ERG on the server. Its lobby then reports `trainers: 'gears'` and every rider's `erg` is false, whatever the host or the rider picked. Such a game deals its own plan of `free` blocks, so no client ever has a block target to send a trainer.
+
 ## ERG or gears (bus rooms)
 - Client `{t: 'erg', on}` at any time: this rider's trainer mode (ERG, or ERG off on virtual gears). Lobby riders and tick riders carry `erg` (default true).
 - Host `{t: 'trainers', mode: 'choose' | 'erg' | 'gears'}` before the start: the ride's trainer mode, in the lobby as `trainers`. Unless it is `choose`, every rider's `erg` follows it.

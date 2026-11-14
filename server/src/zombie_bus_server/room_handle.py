@@ -12,6 +12,7 @@ from . import bots
 from . import config as C
 from .plan import load_plans
 from .protocol import (
+    Act,
     Bots,
     Buy,
     ClientMsg,
@@ -78,6 +79,12 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         room.mode.on_sprint(r, msg.blk, msg.grade, msg.combo)
     elif isinstance(msg, Buy) and room.state == "running":
         room.mode.buy(r, msg.item)
+    elif isinstance(msg, Act):
+        now, (most, window) = time.monotonic(), C.ACT_LIMIT
+        recent = room.acts[rid] = [t for t in room.acts.get(rid, []) if now - t < window]
+        if room.state == "running" and room.el >= 0 and len(recent) < most:
+            recent.append(now)
+            room.mode.on_act(room, r, msg.k, msg.v)
     elif isinstance(msg, TierMsg):
         r.tier = msg.tier
         await room.lobby()

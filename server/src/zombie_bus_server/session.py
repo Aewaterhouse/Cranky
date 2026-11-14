@@ -10,7 +10,7 @@ from fastapi import WebSocket
 
 from . import bots, discord, room_handle, room_tick
 from . import config as C
-from .modes.vo2_madness import Vo2Madness, deal
+from .modes.vo2_madness import Vo2Madness
 from .modes.zombie_bus import ZombieBus, weekly_mutator
 from .plan import generate, load_plans, total
 from .rider import Rider
@@ -33,6 +33,8 @@ class Room:
         self.paused = False  # a restored running room waits for its first rider
         self.saved_at = 0.0
         self.brains: dict[str, bots.Brain] = {}
+        self.acts: dict[str, list[float]] = {}  # when each rider's recent game inputs arrived
+        self.load = 1.0
         self.riders: dict[str, Rider] = {}
         self.watchers: list[WebSocket] = []  # TV spectators: no seat, never counted
         self.host: str | None = None
@@ -130,7 +132,7 @@ class Room:
             "minutes": self.minutes,
             "mutator": weekly_mutator() if self.difficulty != "easy" and self.game == "bus" else None,
             "difficulty": self.difficulty,
-            "trainers": self.trainers,
+            "trainers": self.trainer_mode,
             "game": self.game,
             "riders": [
                 {
@@ -174,20 +176,32 @@ class Room:
         """Applies one client message."""
         await room_handle.handle(self, rid, ws, raw)
 
+    @property
+    def trainer_mode(self) -> str:
+        """The ride's trainer mode: the host's pick, or gears for everyone in a game that is never on ERG."""
+        return "gears" if MODES[self.game].no_erg else self.trainers
+
     def erg_of(self, r: Rider) -> bool:
-        """Whether the rider is on ERG: the host's pick for the ride, or the rider's own when they choose."""
-        return r.erg if self.trainers == "choose" else self.trainers == "erg"
+        """Whether the rider is on ERG: the ride's mode, or the rider's own when they choose."""
+        return r.erg if self.trainer_mode == "choose" else self.trainer_mode == "erg"
+
+    def aim(self, r: Rider, i: int, bel: float) -> tuple[int | None, tuple[int, int] | str | None]:
+        """A rider's target watts and band in block `i`: the game's band if it sets one, else the plan's."""
+        band = self.mode.band(self, r, i, bel) if i >= 0 else None
+        if band is None:
+            return (r.target(self.plan["blocks"][i], bel, self.load) if i >= 0 else None), None
+        if isinstance(band, str):
+            return None, band
+        lo, hi = r.band_w(*band)
+        return round((lo + hi) / 2), (lo, hi)
 
     def deal(self) -> None:
-        """Builds the plan for the chosen game: the picked workout, or a fresh VO2 Madness deck."""
-        if self.game == "madness":
-            self.plan = deal(self.minutes)
-        else:
-            self.plan = generate(load_plans()[self.plan_id], self.minutes)
+        """Builds the plan for the chosen game: its own (a fresh one each time), or the picked workout."""
+        self.plan = MODES[self.game].deal(self.minutes) or generate(load_plans()[self.plan_id], self.minutes)
 
     def start(self) -> None:
-        if self.game == "madness":  # reshuffle so nobody has seen the order in the lobby
-            self.deal()
+        # a game that deals its own plan deals again, so nobody has seen the order in the lobby
+        self.plan = MODES[self.game].deal(self.minutes) or self.plan
         self.state, self.el, self.mode, self.summary = (
             "running",
             -float(C.COUNTDOWN_S),
@@ -196,6 +210,7 @@ class Room:
         )
         for r in self.riders.values():
             r.reset_stats()
+        self.mode.begin(self)
         self.task = asyncio.create_task(self.run())
 
     async def run(self) -> None:

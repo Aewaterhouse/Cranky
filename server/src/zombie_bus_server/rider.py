@@ -6,6 +6,7 @@ from dataclasses import dataclass, field, fields
 
 from fastapi import WebSocket
 
+from . import config as C
 from .plan import block_target
 from .ride_stats import RideStats
 
@@ -85,4 +86,10 @@ class Rider(RideStats):
             return None
         if self.st != "riding":
             load = 1.0
-        return min(round(f * self.ftp * load), round(self.ftp * 1.5))
+        return min(round(f * self.ftp * load), round(self.ftp * C.TARGET_CAP))
+
+    def band_w(self, lo: float, hi: float) -> tuple[int, int]:
+        """Returns a band in watts from fractions of FTP, neither edge over the cap nor out of order."""
+        cap = round(self.ftp * C.TARGET_CAP)
+        top = min(cap, round(max(lo, hi) * self.ftp))
+        return max(0, min(top, round(min(lo, hi) * self.ftp))), top

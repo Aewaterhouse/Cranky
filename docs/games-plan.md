@@ -33,7 +33,7 @@ Five games through `game === 'madness'` switches will not hold, and four files i
 
 - [x] Server: pull the shared pieces of the two modes into `modes/common.py` (compliance tally, `award`, rider result
       rows) and split `session.py` (room vs. message handling) so it is back under 300 lines.
-- [ ] Server: per-rider target band from the mode in the tick; `act` message and `mode.on_act`; force non-ERG per game;
+- [x] Server: per-rider target band from the mode in the tick; `act` message and `mode.on_act`; force non-ERG per game;
       ERG tests (no target written, 150% cap).
 - [ ] Server: script runner (`modes/script.py`): segments, seeded event scheduling, the 90 s gap test, time-scale.
 - [ ] Server: power-shape stats per rider (`ride_stats.py`): smoothness (spread of 3 s power around the rider's own

@@ -51,6 +51,7 @@ export type ClientMsg =
     }
   | { t: 'buy'; item: ShopItem }
   | { t: 'erg'; on: boolean }
+  | { t: 'act'; k: string; v?: string | number | boolean | null }
   | { t: 'trainers'; mode: TrainerMode }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
@@ -94,6 +95,8 @@ export interface RiderTick {
   hr?: number | null
   hrp?: number | null
   erg?: boolean
+  /** The game's own target for this rider: [low, high] watts, or no target at all. Null: the plan's `tgt`. */
+  band?: [number, number] | 'sprint' | 'free' | null
 }
 export interface BusState {
   speed: number
@@ -134,6 +137,8 @@ export interface Tick {
   load?: number
   /** Each rider's ride so far, at most once a second (absent on the ticks in between, and from older servers). */
   stats?: Record<string, RideStats>
+  /** The crew game's own state, for games newer than VO2 Madness. */
+  game?: Record<string, unknown> | null
 }
 /** A rider's ride so far, worked out on the server from the power it has received. */
 export interface RideStats {
