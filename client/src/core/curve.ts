@@ -16,6 +16,8 @@ export interface RideRecord {
   np?: number
   /** True when the ride had a LEGEND sprint. */
   legend?: boolean
+  /** The workout or route ridden, for comparing with last time. */
+  plan?: string
 }
 export interface Profile {
   id: string
@@ -223,10 +225,12 @@ export const rideRecord = (s: {
   tss: number
   np: number
   sprints: { grade: string }[]
+  planName?: string
 }): RideRecord => ({
   ...s.record,
   tss: s.tss,
   np: s.np,
+  plan: s.planName,
   ...(s.sprints.some((x) => x.grade === 'LEGEND') ? { legend: true } : {}),
 })
 

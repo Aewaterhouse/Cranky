@@ -2,7 +2,7 @@ import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
 import { badges } from '../core/badges'
-import { badgeCard, headline, nextUp, scoreContext } from './resultsTop'
+import { badgeCard, headline, lastTime, nextUp, scoreContext } from './resultsTop'
 import { bankScrap, soloScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
@@ -255,6 +255,7 @@ export function finishRide(
       ),
       ftpBox,
       p === profile ? '' : nextUp(p),
+      lastTime(profile, s),
       // A crew ride's story is the game: its training numbers fold away. A solo workout shows them open.
       h(
         'details',

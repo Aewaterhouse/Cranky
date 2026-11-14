@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   applyRide,
   liveStreak,
+  rideRecord,
   bestEfforts,
   curves,
   defaultCurve,
@@ -89,5 +90,14 @@ describe('removeRide', () => {
     expect([q.stats.rides, q.stats.secs, q.stats.kj, q.stats.zones[0]]).toEqual([0, 0, 0, 0])
     expect(q.allTime[5].w).toBe(500)
     expect(removeRide(p, 'nope')).toBe(p)
+  })
+})
+
+describe('rideRecord', () => {
+  it('keeps the workout name for comparing with last time', () => {
+    const record = { date: '2026-01-01', secs: 60, kj: 1, best: {}, zones: [] }
+    expect(rideRecord({ record, tss: 1, np: 200, sprints: [], planName: 'Mondo' }).plan).toBe(
+      'Mondo',
+    )
   })
 })

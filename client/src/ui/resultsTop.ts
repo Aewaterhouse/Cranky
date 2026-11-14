@@ -90,3 +90,24 @@ export function nextUp(p: Profile) {
     )
   return ''
 }
+
+/** The same workout or route last time: normalised power then and now. */
+export function lastTime(
+  p: Profile,
+  s: { planName: string; np: number; record: { secs: number } },
+) {
+  const was = [...p.rides].reverse().find((r) => r.plan === s.planName && r.np)
+  if (!was?.np || s.record.secs < 30) return ''
+  const d = s.np - was.np
+  const when = new Date(was.date).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
+  return h(
+    'div',
+    { class: 'card' },
+    h(
+      'b',
+      {},
+      d > 0 ? `Up ${d} W on last time` : d < 0 ? `${-d} W down on last time` : 'Spot on last time',
+    ),
+    ` · ${s.planName}, ${when}: ${was.np} W normalised, today ${s.np} W.`,
+  )
+}
