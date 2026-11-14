@@ -23,6 +23,8 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
     )
   }
   const view = VIEWS[g.mode ?? 'bus'] ?? VIEWS.bus
+  // No sprints in the ride, no Sprints column.
+  const sprinted = g.riders.some((r) => r.sprints.length)
   return h(
     'div',
     { class: 'res-group' },
@@ -74,9 +76,13 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
         h(
           'tr',
           {},
-          ...['Rider', 'Compliance', 'Time in zone', view.col, 'Sprints'].map((x) =>
-            h('th', {}, x),
-          ),
+          ...[
+            'Rider',
+            'Compliance',
+            'Time in zone',
+            view.col,
+            ...(sprinted ? ['Sprints'] : []),
+          ].map((x) => h('th', {}, x)),
         ),
         ...g.riders.map((r) =>
           h(
@@ -86,7 +92,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
             h('td', {}, pctStr(r.compliance)),
             h('td', {}, fmt(r.inBandSecs)),
             h('td', {}, view.cell(r)),
-            h('td', {}, r.sprints.join(' ') || '–'),
+            sprinted ? h('td', {}, r.sprints.join(' ') || '–') : '',
           ),
         ),
       ),

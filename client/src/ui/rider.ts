@@ -54,7 +54,7 @@ function overview(p: Profile, toHistory: () => void) {
     ),
     wrapCard(p),
     // A kJ of work at the pedals is about a kilocalorie burned: in pies and Tim Tams.
-    s.kj > 0
+    s.kj >= CFG.funStats.pieKj
       ? h(
           'p',
           { class: 'dim fun-stats' },

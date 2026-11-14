@@ -740,3 +740,18 @@ kbd {
   color: var(--acc);
   font-weight: 700;
 }
+.sw.try {
+  position: relative;
+}
+.sw.try::after {
+  content: 'Try on';
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #111;
+  background: var(--acc);
+}

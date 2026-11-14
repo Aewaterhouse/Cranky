@@ -28,7 +28,7 @@ class Servo:
         return {
             "k": "road",
             "title": "🗺️ Which way next?",
-            "sub": "Most votes wins when the servo closes.",
+            "sub": "Most votes wins as you pull out.",
             "opts": opts,
             "v": self.road_votes.get(r.id),
         }

@@ -15,7 +15,7 @@ describe('results headline', () => {
     const ttt = (team: string) =>
       ({ mode: 'ttt', armour: 100, teams, riders: [{ id: 'me', team }] }) as unknown as GroupSummary
     expect(headline('me', ttt('Red'))).toBe('Your team won!')
-    expect(headline('me', ttt('Blue'))).toBe('Team Red won')
+    expect(headline('me', ttt('Blue'))).toBe('Team Red won · you rode for the Blue')
     expect(headline('me', g('bus', ['me'], { armour: 0 }))).toBe('Limped home!')
   })
 })

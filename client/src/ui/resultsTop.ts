@@ -26,7 +26,9 @@ export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
   if (group.mode === 'ttt' && group.teams) {
     const mine = group.riders[at]?.team
     const won = group.teams.names[group.teams.winner]
-    return mine === won ? 'Your team won!' : `Team ${won} won`
+    return mine === won
+      ? 'Your team won!'
+      : `Team ${won} won · you rode for the ${mine ?? 'other side'}`
   }
   if (group.mode === 'galley') return group.armour <= 0 ? 'Taken by pirates' : 'Made port!'
   return 'Made it!'
