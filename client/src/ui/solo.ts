@@ -73,11 +73,15 @@ const FTP_TESTS: [string, string, string][] = [
   ],
 ]
 
+/** Big until you have set an FTP; after that a one-line fold, so the workouts lead. */
 function ftpCard(p: Profile, act: HomeActions) {
+  const tested = p.ftpHistory?.length > 0
   return h(
-    'section',
+    tested ? 'details' : 'section',
     { class: 'panel ftp-card' },
-    h('h2', { class: 'label' }, 'Test your FTP'),
+    tested
+      ? h('summary', { class: 'label' }, `Test your FTP · now ${p.ftp} W`)
+      : h('h2', { class: 'label' }, 'Test your FTP'),
     h(
       'p',
       { class: 'dim' },

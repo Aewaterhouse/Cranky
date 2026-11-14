@@ -832,3 +832,6 @@
   align-self: center;
   justify-self: start;
 }
+details.ftp-card > summary {
+  cursor: pointer;
+}
