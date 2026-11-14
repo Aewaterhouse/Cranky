@@ -32,6 +32,7 @@ from .protocol import (
     TrainerMode,
     Watch,
 )
+from .ride_stats import RideStats, on_target, profile_kg
 
 if TYPE_CHECKING:
     from .store import Store
@@ -41,7 +42,7 @@ MODES = {"bus": ZombieBus, "madness": Vo2Madness}
 
 
 @dataclass
-class Rider:
+class Rider(RideStats):
     """One rider slot. Survives disconnects for the life of the room."""
 
     id: str
@@ -73,6 +74,7 @@ class Rider:
     look: dict[str, str] = field(default_factory=dict)
     bot: bool = False
     erg: bool = True
+    kg: float | None = None  # from the rider's stored profile, for W/kg
 
     def reset_stats(self) -> None:
         fresh = Rider(
@@ -85,6 +87,7 @@ class Rider:
             look=self.look,
             bot=self.bot,
             erg=self.erg,
+            kg=self.kg,
         )
         self.__dict__.update(
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}
@@ -284,6 +287,7 @@ class Room:
                 if len(self.riders) >= C.MAX_RIDERS:  # a bot gives up its seat
                     bots.set_bots(self, len(self.riders) - len(self.humans()) - 1)
                 r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
+            r.kg = profile_kg(self.store, rid)
             r.ws, r.connected, r.last_data = ws, True, time.monotonic()
             if self.paused:
                 self.paused = False
@@ -397,6 +401,16 @@ class Room:
         bots.drive(self, dt, i, bel)
         self.update_states(dt)
         fx = self.mode.tick(self, dt, i, bel, ev) if i >= 0 else []
+        stats = None
+        if i >= 0:
+            for r in self.riders.values():
+                if r.st != "spectator":
+                    r.sample(r.p, dt)
+            if round(self.el * C.TICK_HZ) % round(C.STATS_EVERY_S * C.TICK_HZ) == 0:
+                stats = {
+                    r.id: r.report(r.ftp, r.kg, on_target(r.band_s, r.comp_n), r.falls)
+                    for r in self.riders.values()
+                }
         riders = {
             r.id: {
                 "name": r.name,
@@ -421,6 +435,7 @@ class Room:
             bus=self.mode.state(self, i, bel),
             fx=fx,
             load=load,
+            stats=stats,
         )
         return tick.model_dump()
 

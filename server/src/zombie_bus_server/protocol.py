@@ -164,6 +164,19 @@ class Fx(BaseModel):
     id: str | None = None
 
 
+class RideStatsMsg(BaseModel):
+    """A rider's ride so far: FTP, weight (None unset), average and normalised watts, share of scored time
+    on target (None before any), kJ and falls."""
+
+    ftp: int
+    kg: float | None
+    avg: int
+    np: int
+    on: float | None
+    kj: float
+    falls: int
+
+
 class Tick(BaseModel):
     t: Literal["tick"] = "tick"
     el: float
@@ -174,3 +187,4 @@ class Tick(BaseModel):
     bus: Bus
     fx: list[Fx]
     load: float = 1.0  # targets of riders still on the bus are multiplied by this while others have fallen
+    stats: dict[str, RideStatsMsg] | None = None  # the ride so far, once a second at most

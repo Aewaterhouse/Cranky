@@ -68,6 +68,8 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 `{t:'game', game:'bus'|'madness'}` (host, not while running) picks the crew game; the lobby carries `game`. In VO2 Madness the plan is dealt by the server and `bus.mad` holds `{pts, red, crown, lead, round, rounds, work, box, next, twist}`; extra fx kinds are `go, rest, box, crown, lead, sandbag`.
 
 `tick.load` is what the targets of riders still on the bus are multiplied by while others have fallen off (1 when nobody has). `tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
+
+`tick.stats` (from 2026-11-14; absent on the ticks in between and from older servers, and clients that do not know it ignore it) is each rider's ride so far, sent on the ride's whole seconds only: `{"<id>": {"ftp": 250, "kg": 72.5, "avg": 182, "np": 196, "on": 0.81, "kj": 412.3, "falls": 1}}`. The server works it out from the `p` it receives (average, NP over a rolling 30 s, kJ), the scored time on target (`on`, null before any) and its own fall count; `kg` comes from the rider's stored profile, null when they have not set a weight. Spectators are not sampled.
 `st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.
 

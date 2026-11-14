@@ -9,6 +9,8 @@ CLIENT_DIST = ROOT / "client" / "dist"
 DB_PATH = Path(os.environ.get("ZB_DB", ROOT / "server" / "zombie_bus.db"))
 
 TICK_HZ = 2
+NP_WINDOW_S = 30  # normalised power rolls over this many seconds
+STATS_EVERY_S = 1  # each rider's ride so far goes out on the tick this often
 TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5
 MAX_RIDERS = 6
