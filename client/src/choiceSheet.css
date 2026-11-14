@@ -19,6 +19,7 @@
   font: 1.05rem/1.1 var(--display);
 }
 .ch-left {
+  white-space: nowrap;
   color: var(--warn);
 }
 .ch-sub {

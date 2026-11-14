@@ -63,6 +63,7 @@ export function crewFeed(me: string) {
         {},
         h('b', {}, r.rider === me ? 'You' : r.name),
         ` rode ${what}`,
+        r.game && r.score != null ? ` · scored ${Math.round(r.score).toLocaleString()}` : '',
         r.prs ? h('span', { class: 'feed-pr' }, ` 🏅 ${r.prs} new PR${r.prs > 1 ? 's' : ''}`) : '',
         h(
           'small',
