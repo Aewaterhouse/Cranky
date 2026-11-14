@@ -68,6 +68,34 @@ export function comingUp(me: string) {
   )
   const at = h('input', { type: 'datetime-local' })
   const note = h('input', { placeholder: 'A note (optional)', maxlength: 120 })
+  // Quick picks: tonight, tomorrow morning, the weekend mornings.
+  const local = (d: Date) =>
+    new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
+  const at_ = (days: number, hour: number, min = 0) => {
+    const d = new Date()
+    d.setDate(d.getDate() + days)
+    d.setHours(hour, min, 0, 0)
+    return d
+  }
+  const nextDay = (dow: number) => (dow - new Date().getDay() + 7) % 7 || 7
+  const chips = h(
+    'span',
+    { class: 'row' },
+    ...(
+      [
+        ['Tonight 6:30 pm', at_(0, 18, 30)],
+        ['Tomorrow 6 am', at_(1, 6)],
+        ['Sat 7 am', at_(nextDay(6), 7)],
+        ['Sun 7 am', at_(nextDay(0), 7)],
+      ] as [string, Date][]
+    ).map(([label, d]) =>
+      h(
+        'button',
+        { type: 'button', class: 'chip-sel', onclick: () => (at.value = local(d)) },
+        label,
+      ),
+    ),
+  )
   const form = h(
     'form',
     {
@@ -86,6 +114,7 @@ export function comingUp(me: string) {
       },
     },
     game,
+    chips,
     at,
     note,
     h('button', { class: 'primary' }, 'Plan it'),
