@@ -55,6 +55,7 @@ export function videoStage(
       const g = s.game as unknown as WatchState | null | undefined
       if (g?.g !== 'watch') return
       room = { vid: g.vid, playing: g.playing, pos: g.pos, at: g.at }
+      yt.duck(!!s.duck)
       if (s.el != null) {
         el = s.el
         seen = performance.now()

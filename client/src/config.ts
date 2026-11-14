@@ -9,7 +9,7 @@ export const CFG = {
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
   click: { backoffMs: [1000, 2000, 4000, 5000] },
   /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
-  watch: { driftS: 2 },
+  watch: { driftS: 2, duckS: 5, duckVolume: 25 },
   clock: { hz: 4, snapS: 1, gain: 0.2, windowS: 4, rateMin: 0.5, rateMax: 30, staleS: 3 },
   recovery: { saveMs: 5000, maxAgeMs: 30 * 60 * 1000 },
   compliance: { band: 0.05, zeroAt: 0.2, avgWindowS: 3 },

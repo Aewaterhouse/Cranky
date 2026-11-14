@@ -189,6 +189,7 @@ export function startBusRide(
   }, 1000 / CFG.clock.hz)
   let lastI = -2
   let held = false
+  let duck = false // the last seconds before a change of target: a watch party dips its video
   let lastEv = ''
   let lastCount = 0
 
@@ -216,6 +217,7 @@ export function startBusRide(
       if (f) {
         if (f.i === m.i) f.tgt = me?.tgt ?? f.tgt
         ride.setFrame(f)
+        duck = !!f.next && f.next.in <= CFG.watch.duckS
         hud.frame(f, ride.live, total, m.ev)
         const count = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
         if (count !== lastCount && count > 0 && count <= 3) SFX.countdown()
@@ -242,6 +244,7 @@ export function startBusRide(
     const b = m.bus
     const calm = m.i < 0 || m.ev in { warmup: 1, cooldown: 1 } || (b.mad && m.ev === 'servo')
     world.state = {
+      duck,
       speed: b.speed,
       gap: b.mad ? null : b.gap,
       mad: b.mad,

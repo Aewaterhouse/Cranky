@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import type { Local, Step } from '../core/watchSync'
 
 // The bits of YouTube's IFrame Player API we use (https://developers.google.com/youtube/iframe_api_reference).
@@ -10,6 +11,8 @@ interface YtPlayer {
   getCurrentTime(): number
   getPlayerState(): number
   getVideoData?(): { title?: string }
+  getVolume(): number
+  setVolume(v: number): void
   destroy(): void
 }
 interface YtNs {
@@ -46,6 +49,8 @@ export const NOT_EMBEDDABLE = [101, 150]
 export function ytPlayer(host: HTMLElement, onError: (code: number) => void = () => {}) {
   let p: YtPlayer | null = null
   let vid: string | null = null
+  let ducked = false
+  let restore = 100
   const slot = document.createElement('div')
   host.append(slot)
   void loadApi().then((YT) => {
@@ -62,6 +67,13 @@ export function ytPlayer(host: HTMLElement, onError: (code: number) => void = ()
     local(): Local | null {
       if (!p?.getPlayerState) return null
       return { vid, state: p.getPlayerState(), time: p.getCurrentTime() }
+    },
+    /** Turns the sound down to `CFG.watch.duckVolume` (on) or back to where the rider had it (off). */
+    duck(on: boolean) {
+      if (!p?.setVolume || on === ducked) return
+      if (on) restore = p.getVolume()
+      p.setVolume(on ? Math.min(restore, CFG.watch.duckVolume) : restore)
+      ducked = on
     },
     /** The loaded video's title, once YouTube knows it. */
     title: () => p?.getVideoData?.()?.title || null,
