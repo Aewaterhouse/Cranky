@@ -105,3 +105,54 @@ AMBO_TWITCH_PER_S = 0.04
 AMBO_TWITCH_X = 1.3
 AMBO_LEADFOOT_X = 0.75
 AMBO_SIREN_M = 150  # metres gained when the car pulls over, lost when it does not
+
+# --- Speed Dating (`date`) ---
+DATE_BAR_S = 480  # The Bar: warm-up and profiles
+DATE_DATE_S = 180
+DATE_GAP_S = 60  # walking to the next table
+DATE_PROPOSAL_S = 240
+DATE_LEG_S = 120  # each wedding leg, and the divorce between them
+DATE_COOL_S = 180
+DATE_MIN_RIDERS = 4  # bots fill the bar to this many
+DATE_BAR = (0.55, 0.75)
+DATE_GAP = (0.50, 0.65)
+DATE_CHAP = (0.60, 0.75)  # the Chaperone's own riding while the couples date
+DATE_COOL = (0.45, 0.60)
+# Each theme: its band, and its prompt if it has one. A prompt's `at` are seconds into the date; `every` puts
+# one at a random moment in each window that long; `n` scatters that many through the middle of the date.
+DATE_THEMES = {
+    "coffee": {"name": "Coffee", "icon": "☕", "band": (0.65, 0.75)},
+    "dinner": {"name": "Dinner", "icon": "🍝", "band": (0.80, 0.90)},
+    "parents": {
+        "name": "Meeting the Parents",
+        "icon": "👨‍👩‍👧",
+        "band": (0.82, 0.88),
+        "prompt": {"k": "surge", "band": (1.00, 1.10), "secs": 8, "every": 30},
+    },
+    "ikea": {
+        "name": "Ikea",
+        "icon": "📦",
+        "band": (0.60, 0.70),
+        "prompt": {"k": "effort", "band": (1.05, 1.15), "secs": 30, "at": (20, 80, 140)},
+    },
+    "moving": {"name": "Moving In", "icon": "🏠", "band": (0.90, 0.95)},
+    "ex": {
+        "name": "The Ex Shows Up",
+        "icon": "😱",
+        "band": (0.75, 0.85),
+        "prompt": {"k": "sprint", "band": "sprint", "secs": 15, "n": 1},
+    },
+}
+DATE_ORDER = ("coffee", "dinner", "parents", "ikea", "moving", "ex")
+DATE_MATCH_FULL = 0.02  # within this share of FTP of each other is a full match
+DATE_MATCH_NONE = 0.10  # this far apart is none
+DATE_BAND_TOL = 0.01  # a couple scores only with both inside the band, give or take this
+DATE_PTS_S = 1.0  # points a second at a full match
+DATE_SMOOTH_S = 3.0  # the match shown on screen is smoothed over about this long
+DATE_SPARK = (0.9, 20)  # a match over this for this many seconds is "a match" (once a date)
+DATE_REACT_PTS = 15  # for reacting to a prompt at the same instant, falling to nothing at the gap below
+DATE_REACT_MAX_S = 4.0
+DATE_REACT_UNDER = 0.03  # a rider has reacted once within this of the prompt's band
+DATE_SPRINT_AT = 1.2  # and to a sprint once over this share of FTP
+DATE_EVENT_S = {"say": 0, "card": 15, "confetti": 10}
+DATE_MS_AT_FTP = 10.0  # the pack's speed with everyone at FTP
