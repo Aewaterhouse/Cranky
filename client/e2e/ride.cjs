@@ -125,6 +125,39 @@ async function town(page) {
     if (!new RegExp(want, 'i').test(text)) throw new Error(`climate results missing "${want}"`)
 }
 
+// Last Rider Standing with three bots: the simulator holds every step, so the bots drop out and you win.
+async function ramp(page) {
+  await page.click('.home-game:has-text("Last Rider Standing")')
+  await useSim(page)
+  await page.waitForSelector('.code-letters')
+  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
+  await page.click('text=Start the ramp')
+  await page.waitForSelector('.last-list', { timeout: 20000 })
+  await page.waitForSelector('.res-hero', { timeout: 300000 })
+  const text = await page.innerText('body')
+  for (const want of ['Last One Standing', 'Lasted to', 'Top step'])
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`ramp results missing "${want}"`)
+}
+
+// A crew game over the driver's workout with three bots: its panel shows, and the results carry its own words.
+async function workoutGame(page, name, start, panel, wants) {
+  await page.click(`.home-game:has-text("${name}")`)
+  await useSim(page)
+  await page.waitForSelector('.code-letters')
+  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
+  await page.click(`text=${start}`)
+  await page.waitForSelector(`text=${panel}`, { timeout: 30000 })
+  // E2E_SHOTS=<folder> keeps a mid-ride picture of each game, to look at its panel.
+  if (process.env.E2E_SHOTS) {
+    await page.waitForTimeout(15000)
+    await page.screenshot({ path: `${process.env.E2E_SHOTS}/${name.replace(/\W+/g, '-')}.png` })
+  }
+  await page.waitForSelector('.res-hero', { timeout: 400000 })
+  const text = await page.innerText('body')
+  for (const want of wants)
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`${name} results missing "${want}"`)
+}
+
 ;(async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
   try {
@@ -140,6 +173,13 @@ async function town(page) {
     console.log('Speed Dating: ok')
     await town(await rider(browser, 'Angus'))
     console.log('Climate Lawsuit: ok')
+    await ramp(await rider(browser, 'Steve'))
+    console.log('Last Rider Standing: ok')
+    await workoutGame(await rider(browser, 'Ali'), 'Pub Quiz', 'Open the pub', 'PUB QUIZ', ['Points', 'Quizmaster|Knows Nothing'])
+    await workoutGame(await rider(browser, 'Luke'), 'Galley Ship', 'Cast off', 'ROW AT', ['On the beat', 'Hull'])
+    await workoutGame(await rider(browser, 'Jack'), 'The Hunt', 'Release the fox', 'THE HUNT', ['Points'])
+    await workoutGame(await rider(browser, 'Angus'), 'Team Time Trial', 'Start the trial', 'TEAM TIME TRIAL', ['Team Red|Team Blue'])
+    console.log('Pub Quiz, Galley Ship, The Hunt, Team Time Trial: ok')
     const racer = await rider(browser, 'Kat')
     await race(racer, 'Race', 1, ['Nundah', 'race'])
     await race(racer, 'Points', 2, ['points race', 'won on points'])
