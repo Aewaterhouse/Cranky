@@ -232,8 +232,6 @@ export function rideTab(p: Profile, act: HomeActions) {
     rejoin,
     today,
     weekCard(p, (r) => open(freeRideSetup(p, act, home, r))),
-    comingUp(p.id),
-    crewFeed(p.id),
     h(
       'section',
       { class: 'hero' },
@@ -288,6 +286,9 @@ export function rideTab(p: Profile, act: HomeActions) {
         ),
       ),
     ),
+    // The crew's plans and rides sit under the games, so the games stay near the top.
+    comingUp(p.id),
+    crewFeed(p.id),
   )
   const wrap = h('div', {}, main)
   home()
