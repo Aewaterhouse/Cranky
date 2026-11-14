@@ -34,7 +34,7 @@ export const GAMES: Record<Game, GameInfo> = {
     name: 'VO2 Madness',
     tag: 'Mystery VO2 rounds',
     blurb:
-      'Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for heart-rate effort. Set your max heart rate first.',
+      'Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for effort: heart rate if you wear a strap, power if you don’t.',
     start: 'Start the madness',
     countdown: 'MADNESS STARTS IN',
     score: 'Pack effort points',

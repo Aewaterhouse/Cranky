@@ -50,6 +50,14 @@ def work_s(d: dict) -> int:
     return sum(b["dur"] for b in d["blocks"])
 
 
+def effort(r: Rider) -> float:
+    """How hard a rider is going, as a share of max heart rate; with no strap, from power against FTP."""
+    if r.hrp is not None:
+        return r.hrp
+    lo, per = C.MAD_POWER_EFFORT
+    return min(1.0, lo + per * r.p / max(1, r.ftp))
+
+
 def zone(hrp: float) -> int:
     """Heart-rate zone 0..4: under 60, 70, 80 and 90% of max, then over."""
     return sum(hrp >= f for f in C.MAD_ZONES)
@@ -132,8 +140,9 @@ class Vo2Madness(CrewGame):
             len(cads) >= 2 and max(cads) - min(cads) <= 2 * C.SYNC_RPM and min(cads) >= C.SYNC_MIN_CADENCE
         )
         for r in active:
-            hot = r.hrp is not None and r.hrp >= C.MAD_ZONES[-1]
-            rate = C.MAD_ZONE_PTS[zone(r.hrp)] if r.hrp is not None else C.MAD_NO_HR_PTS
+            e = effort(r)
+            hot = e >= C.MAD_ZONES[-1]
+            rate = C.MAD_ZONE_PTS[zone(e)]
             rate *= r.s if r.s is not None else 1.0
             if twist == "double":
                 rate *= 2
@@ -151,32 +160,32 @@ class Vo2Madness(CrewGame):
 
     def hardest(self, room: Room, active: list[Rider], dt: float) -> None:
         """The crown goes to whoever holds the highest share of their max heart rate."""
-        hr = [r for r in active if r.hrp is not None]
+        hr = active
         if self.crown:
             self.crown_s[self.crown] = self.crown_s.get(self.crown, 0) + dt
-        best = max(hr, key=lambda r: r.hrp, default=None)
+        best = max(hr, key=effort, default=None)
         holder = room.riders.get(self.crown or "")
-        if not best or best.id == self.crown or best.hrp < C.MAD_CROWN_MIN:
+        if not best or best.id == self.crown or effort(best) < C.MAD_CROWN_MIN:
             self.rival, self.rival_s = None, 0.0
             return
-        if holder in hr and best.hrp - holder.hrp < C.MAD_CROWN_MARGIN:
+        if holder in hr and effort(best) - effort(holder) < C.MAD_CROWN_MARGIN:
             return
         self.rival_s = self.rival_s + dt if self.rival == best.id else 0.0
         self.rival = best.id
         if self.rival_s >= C.MAD_CROWN_HOLD_S:
             self.crown, self.rival, self.rival_s = best.id, None, 0.0
-            self.emit("crown", f"{best.name} is trying hardest! {best.hrp:.0%} of max", best.id)
+            self.emit("crown", f"{best.name} is trying hardest! {effort(best):.0%} effort", best.id)
 
     def sandbag(self, room: Room, active: list[Rider], dt: float) -> None:
         """Calls out anyone coasting while the rest of the pack suffers."""
-        hr = [r for r in active if r.hrp is not None]
+        hr = active
         for r in hr:
-            others = [x.hrp for x in hr if x is not r]
-            lazy = others and r.hrp < C.MAD_SANDBAG[0] and sum(others) / len(others) >= C.MAD_SANDBAG[1]
+            others = [effort(x) for x in hr if x is not r]
+            lazy = others and effort(r) < C.MAD_SANDBAG[0] and sum(others) / len(others) >= C.MAD_SANDBAG[1]
             self.slack[r.id] = self.slack.get(r.id, 0) + dt if lazy else 0.0
             if self.slack[r.id] >= C.MAD_SANDBAG_S:
                 self.slack[r.id] = -C.MAD_SANDBAG_COOL_S
-                self.emit("sandbag", f"{r.name} is having a picnic at {r.hrp:.0%} of max.", r.id)
+                self.emit("sandbag", f"{r.name} is having a picnic at {effort(r):.0%} effort.", r.id)
 
     def buy(self, r: Rider, item: str) -> None:
         """No shop in this mode."""

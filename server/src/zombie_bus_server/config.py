@@ -180,8 +180,8 @@ MAD_TWISTS = {
     "tax": ("Leader Tax", "First place scores half."),
 }
 MAD_ZONES = (0.6, 0.7, 0.8, 0.9)  # heart-rate zone edges as fractions of max
+MAD_POWER_EFFORT = (0.45, 0.4)  # no strap: effort = 0.45 + 0.4 x power/FTP (50% FTP ~ 65% of max, FTP ~ 85%)
 MAD_ZONE_PTS = (0, 1, 2, 4, 7)  # points per second in each zone during an interval
-MAD_NO_HR_PTS = 3  # riders without a strap or a max heart rate score this flat rate
 MAD_REDLINE_PTS = 5
 MAD_SPRINT_PTS = {"FAIL": 0, "HIT": 20, "GREAT": 40, "MEGA": 70, "LEGEND": 100}
 MAD_CROWN_PTS = 1  # extra points per second for wearing the crown

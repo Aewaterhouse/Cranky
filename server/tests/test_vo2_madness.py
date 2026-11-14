@@ -7,7 +7,7 @@ from test_bots import lobby_with
 from test_zombie_bus import FakeRoom, set_all
 
 from zombie_bus_server import config as C
-from zombie_bus_server.modes.vo2_madness import Vo2Madness, deal
+from zombie_bus_server.modes.vo2_madness import Vo2Madness, deal, zone
 from zombie_bus_server.plan import block_target
 
 
@@ -59,11 +59,12 @@ def test_effort_scores_by_heart_rate_zone_and_the_hardest_trier_takes_the_crown(
     set_all(room, 1.0)
     r0, r1, r2 = room.riders.values()
     r0.hrp, r1.hrp, r2.hrp = 0.93, 0.75, None
+    r2.p = r2.ftp  # no strap: scored on power, at FTP like 85% of max
     assert run(room, mad, 20, 1) and mad.pts == {}  # nothing scores in recovery
     fx = run(room, mad, 10, 2)
     assert mad.crown == "r0" and [f["id"] for f in fx if f["k"] == "crown"] == ["r0"]
     assert mad.pts["r0"] > mad.pts["r2"] > mad.pts["r1"] > 0
-    assert mad.pts["r2"] == C.MAD_NO_HR_PTS * 10 and mad.red == {"r0": 10, "r1": 0, "r2": 0}
+    assert mad.pts["r2"] == C.MAD_ZONE_PTS[zone(0.85)] * 10 and mad.red == {"r0": 10, "r1": 0, "r2": 0}
     r1.hrp = 0.97  # a challenger must hold it before the crown moves
     run(room, mad, C.MAD_CROWN_HOLD_S - 1, 2)
     assert mad.crown == "r0"

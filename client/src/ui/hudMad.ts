@@ -114,7 +114,7 @@ export function makeMadPanel(deck: string[]) {
         row.hr.style.color = hrColour(r.hrp)
         row.fill.style.width = `${on ? Math.min(100, Math.round((r.hrp ?? 0) * 100)) : 0}%`
         row.fill.style.background = hrColour(r.hrp) || 'var(--dim)'
-        set(row.red, m.red[id] ? `${m.red[id]} s in the red` : on && !r.hrp ? 'no heart rate' : '')
+        set(row.red, m.red[id] ? `${m.red[id]} s in the red` : on && !r.hrp ? 'scored on power' : '')
       })
       for (const [id, row] of rows)
         if (!riders[id]) {

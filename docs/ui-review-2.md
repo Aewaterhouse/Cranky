@@ -39,7 +39,7 @@ say where you are, and free-ride places that don't look like where they are.
 
 **Games**
 9. [ ] Live, named credit and blame ("Kat bounced the patient"), and an MVP line for everyone in results (games 13, 18).
-10. [ ] VO2 Madness falls back to power when there is no heart rate; the box name matches the timer (games 8, 9).
+10. [ ] (power fallback done; the box name and the timer still to check) VO2 Madness falls back to power when there is no heart rate; the box name matches the timer (games 8, 9).
 11. [ ] A five-second "how this one works" splash as each game starts (games 17).
 12. [ ] Labels on the Speed Dating meter and the Kidney Stone Comfort bar and ETA (games 10, 12).
 
