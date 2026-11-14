@@ -65,7 +65,7 @@ end of the queue. Owner's own to-dos go first:*
 13. [ ] (the menu no longer covers the target card, and Escape or a tap outside closes it in every mode; contents still differ between modes) The ride menu covers the target card; its contents and keys differ between modes (riding 7, 8).
 14. [x] Watch Party panel washes out over bright video; its remote is always open and tiny (riding 10, 11).
 15. [ ] (your own tag is hidden and roof rows step up; heart-rate pills can still clip the tag behind on a full roof) Rider name tags stack and hide your own (riding 12). Letterbox bars eat the HUD (riding 13).
-16. [ ] The servo shop opens over a short interval; Climate Lawsuit's panel grows over the controls (riding 14, 15).
+16. [ ] (Climate's panel now scrolls inside a cap instead of covering the controls; the servo picks for a crew that does not shop) The servo shop opens over a short interval; Climate Lawsuit's panel grows over the controls (riding 14, 15).
 17. [ ] (crew rides now show time to go on the bottom strip) Crew modes show no total time left (riding 17). Zone and W/kg describe power, not the target (riding 18).
 
 **Rider and Garage**
