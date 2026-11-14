@@ -43,3 +43,12 @@ def test_discord_names_the_newer_games_not_the_bus():
     room, g, fx = row(None)
     text = discord.format_summary("Sweet Spot", room.summary)
     assert text.startswith("🛶 **Galley Ship** · Sweet Spot") and "Zombie Bus" not in text
+
+
+def test_strava_names_the_newer_games_too():
+    from zombie_bus_server.strava_text import describe
+
+    room, g, fx = row(None)
+    ride = {"planName": "Sweet Spot", "record": {"secs": 1800}, "group": room.summary}
+    title, text = describe(ride, "h0")
+    assert title == "🛶 Galley Ship · Sweet Spot" and "Zombie Bus" not in text

@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from .discord import GAME_NAMES
+
 SIGN_OFF = "Ridden on Cranky · cranky.life"
 
 
@@ -63,6 +65,16 @@ def describe(s: dict[str, Any], rider: str, link: str = "") -> tuple[str, str]:
             f"{me.get('company') or 'My company'}: {me.get('coins', 0)} coins · {me.get('emit', 0)} tonnes"
             + (" · took the envelope" if me.get("bribed") else ""),
             f"Town profit {g.get('score', 0)} · sea reached {g.get('stageName') or 'nothing'} · {power}",
+            f"Crew: {names}",
+            *awards,
+        ]
+    elif g.get("mode") in GAME_NAMES:
+        name, label = GAME_NAMES[g["mode"]]
+        title = f"{name.replace('**', '')} · {plan}"
+        mine = me.get("points") if me.get("points") is not None else me.get("reached")
+        lines = [
+            f"Crew {label} {g.get('score', 0)}" + (f" · mine {mine}" if mine is not None else ""),
+            power,
             f"Crew: {names}",
             *awards,
         ]
