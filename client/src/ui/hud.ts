@@ -12,6 +12,7 @@ import type { Tick } from '../net/protocol'
 import type { Frame, SprintResult, Tier } from '../types'
 import { TIERS } from '../types'
 import { h } from './dom'
+import { choiceSheet } from './choiceSheet'
 import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
 import { eventOf, FX_DEFAULT, setEvents } from './hudKit'
@@ -47,6 +48,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const mad = o.mad ? makeMadPanel(o.mad) : null
   let mask: string | undefined
   const shop = makeShop((i) => o.onBuy?.(i))
+  const sheet = choiceSheet((k, v) => o.onAct?.(k, v))
   const stats = o.rec ? makeStats(o.rec) : null
   const toast = hudToast()
   const sprint = h('div', { class: 'glass nchip sprint' }, 'SPRINT · all out · ERG off')
@@ -133,7 +135,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       { class: 'hud' },
       h('div', { class: `hud-left${mad ? ' mad' : ''}` }, o.panel?.root ?? mad?.root ?? bus.root),
       h('div', { class: 'hud-right' }, sp.feed),
-      ...(o.panel ? [] : [shop.root]),
+      ...(o.panel ? [sheet.root] : [shop.root]),
       sp.flash,
       sp.layer,
     ),
@@ -248,6 +250,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       const ms = m.bus.mad
       if (ms) mad?.update(ms, m.riders, meId)
       o.panel?.update(m, meId)
+      sheet.update(m.riders[meId]?.ask)
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m, meId)
       cues.tick(m)

@@ -118,6 +118,7 @@ export function startBusRide(
       weightKg: profile.weightKg,
       quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
       onBuy: (item) => net.send({ t: 'buy', item }),
+      onAct: (k, v) => net.send({ t: 'act', k, v }),
       game: l.game,
       panel: ui?.panel(),
       events: ui?.events,

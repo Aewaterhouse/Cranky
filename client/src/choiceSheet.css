@@ -1,0 +1,61 @@
+/* A crew game's question to the rider: cards, fuels, votes. */
+.choice {
+  position: absolute;
+  left: 50%;
+  bottom: 16%;
+  transform: translateX(-50%);
+  z-index: 6;
+  max-width: min(92vw, 760px);
+  padding: 10px 12px 12px;
+  pointer-events: auto;
+}
+.choice[hidden] {
+  display: none;
+}
+.ch-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font: 1.05rem/1.1 var(--display);
+}
+.ch-left {
+  color: var(--warn);
+}
+.ch-sub {
+  margin-top: 3px;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+.ch-opts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.ch-opt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 120px;
+  max-width: 200px;
+  padding: 8px 10px;
+  white-space: normal;
+  text-align: center;
+}
+.ch-opt.on {
+  outline: 2px solid var(--acc);
+}
+.ch-opt kbd {
+  font-size: 0.65rem;
+  opacity: 0.6;
+}
+.ch-icon {
+  font-size: 1.6rem;
+}
+.ch-opt small {
+  font-size: 0.7rem;
+  line-height: 1.2;
+  opacity: 0.8;
+}

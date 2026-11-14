@@ -83,7 +83,17 @@ export interface Lobby {
   mutator: { id: string; name: string; desc: string } | null
   riders: LobbyRider[]
 }
+/** A crew game's question to one rider; answered with `{t: 'act', k, v}`. `v` is their answer so far. */
+export interface Ask {
+  k: string
+  title: string
+  sub?: string | null
+  opts: { v: string; label: string; icon?: string | null; sub?: string | null; off?: boolean }[]
+  left?: number | null
+  v?: string | null
+}
 export interface RiderTick {
+  ask?: Ask | null
   name: string
   tier: Tier
   tgt: number | null
