@@ -1,3 +1,5 @@
+import { h } from './dom'
+import { modal } from './toast'
 import type { RideSummary } from '../core/ride'
 import { segClock } from '../core/segments'
 import { climbLabel, distLabel, type Units } from '../core/units'
@@ -111,7 +113,34 @@ export async function ridePostcard(
 }
 
 /** Saves a canvas as a PNG through the server link (see `saveFile`). */
-export const savePng = (c: HTMLCanvasElement, name: string) =>
-  new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/png')).then(
-    (b) => b && saveFile(b, `${name}.png`),
+/**
+ * Shows the postcard first, with Save and (where the browser can) Share to the group chat, instead of a silent
+ * download.
+ */
+export async function savePng(c: HTMLCanvasElement, name: string) {
+  const blob = await new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/png'))
+  if (!blob) return
+  const file = new File([blob], `${name}.png`, { type: 'image/png' })
+  const url = URL.createObjectURL(blob)
+  const share = navigator.canShare?.({ files: [file] })
+  const close = modal(
+    'Postcard',
+    h('img', { src: url, alt: 'Ride postcard', class: 'postcard-preview' }),
+    h(
+      'div',
+      { class: 'row' },
+      share
+        ? h(
+            'button',
+            { onclick: () => void navigator.share({ files: [file] }).catch(() => {}) },
+            'Share',
+          )
+        : '',
+      h(
+        'button',
+        { class: 'primary', onclick: () => (saveFile(blob, file.name), close()) },
+        'Save',
+      ),
+    ),
   )
+}

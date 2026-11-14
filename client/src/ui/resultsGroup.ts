@@ -83,7 +83,11 @@ export const postcard = async (
   g: GroupSummary,
   planName: string,
   date = new Date().toISOString(),
-) => savePng(await busCard(g, planName), `zombie-bus-${new Date(date).toLocaleDateString('en-CA')}`)
+) =>
+  savePng(
+    await busCard(g, planName),
+    `${GAMES[(g.mode ?? 'bus') as Game].name.toLowerCase().replace(/\W+/g, '-')}-${new Date(date).toLocaleDateString('en-CA')}`,
+  )
 
 /** The bus postcard: the scene still (when there is one), the score, the crew and the awards. */
 export async function busCard(g: GroupSummary, planName: string) {
