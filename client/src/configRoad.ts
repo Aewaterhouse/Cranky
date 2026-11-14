@@ -204,6 +204,8 @@ export const ROAD_CFG = {
    * client predicts with the same numbers, and content/tests/road-vectors.json fails if they drift).
    */
   road: {
+    /** HANDICAP_WKG on the server: a handicap race rides everyone at this FTP in W/kg. */
+    handicapWkg: 3.5,
     draft: {
       fullM: 1.5,
       decayM: 6,

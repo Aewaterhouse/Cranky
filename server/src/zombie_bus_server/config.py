@@ -482,6 +482,7 @@ ROAD_STOPPED_MS = 0.5  # slower than this reads as stopped
 ROAD_BOT_WKG = 3.0  # assumed W/kg when no human has a weight and FTP to copy
 ROAD_BOT_JITTER = 0.04
 ROAD_BOT_CAD = 88
+HANDICAP_WKG = 3.5  # a handicap race scales every rider to this FTP in W/kg: the share of FTP decides it
 ROAD_BOTS = [
     ("Diesel Dave", "diesel", 84, 1.0, "Sits on the same watts all day. Has never once looked back."),
     ("Surging Shaz", "surger", 62, 1.02, "Attacks, regrets it, recovers, attacks again."),

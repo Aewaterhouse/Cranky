@@ -206,6 +206,8 @@ class RoadRoom(Room):
             m = sim.movers[r.id]
             fresh = r.bot or (r.connected and now - r.last_data <= C.STALE_DATA_S)
             m.p, m.cad, m.hr, m.here = (r.p if fresh else 0.0), (r.cad if fresh else 0.0), r.hr, r.connected
+            if sim.game == "handicap":  # everyone rides as if their FTP were HANDICAP_WKG times their weight
+                m.p *= C.HANDICAP_WKG * self.kg_of(r.id) / max(1, r.ftp)
         fx = sim.step(dt)
         return {
             "t": "tick",

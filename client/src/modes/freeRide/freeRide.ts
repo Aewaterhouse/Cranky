@@ -163,7 +163,8 @@ export function runFreeRide(
       draft = link?.draft(dist) ?? 1
       band = link?.band(dist, speed >= 0.5 || live.power > 0) ?? 1
       const lim = feel.limit(dist, speed)
-      speed = stepSpeed(speed, live.power, p.grade, mass, dt * fast, wind, lim, draft)
+      const watts = link ? link.even(live.power, profile.ftp, kg) : live.power
+      speed = stepSpeed(speed, watts, p.grade, mass, dt * fast, wind, lim, draft)
       el += dt * fast
       dist = Math.min(route.distance, dist + speed * band * dt * fast)
     }

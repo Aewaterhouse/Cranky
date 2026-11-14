@@ -47,6 +47,11 @@ const GAMES: [RoadGame, string, string][] = [
     'Crit',
     'Lap after lap of a short loop, and a prime on one lap around halfway. First home wins.',
   ],
+  [
+    'handicap',
+    'Handicap',
+    'Everyone rides as if they had the same FTP for their weight, so it comes down to who goes deepest. First home wins.',
+  ],
 ]
 
 /** Group-ride lobby, built once and patched in place: who is in, the route, and the host's choices. */

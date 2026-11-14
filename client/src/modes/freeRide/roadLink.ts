@@ -16,7 +16,7 @@ const R = CFG.road
 const ORD = ['', '1st', '2nd', '3rd']
 export const ordinal = (n: number) => ORD[n] ?? `${n}th`
 
-const TITLES = { ride: 'RIDE', race: 'RACE', points: 'POINTS RACE', crit: 'CRIT' }
+const TITLES = { ride: 'RIDE', race: 'RACE', points: 'POINTS RACE', crit: 'CRIT', handicap: 'HANDICAP' }
 
 /**
  * Who stands where at the end of a race: the first three across the line, the points or prime winner on the
@@ -199,6 +199,11 @@ export class RoadLink {
     return top
       .map(([id, p]) => `${id === this.me ? 'You' : (this.info.get(id)?.name ?? 'Someone')} ${p}`)
       .join(' · ')
+  }
+
+  /** My power as the race's physics sees it: in a handicap race, scaled to the same FTP per kilo. */
+  even(p: number, ftp: number, kg: number) {
+    return this.race?.kind === 'handicap' ? (p * CFG.road.handicapWkg * kg) / Math.max(1, ftp) : p
   }
 
   /** A race's tag for a rider's card: their points, or the crit's prime. */

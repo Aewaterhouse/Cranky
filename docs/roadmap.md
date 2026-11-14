@@ -144,7 +144,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 
 | Item | What | Size |
 | --- | --- | --- |
-| Handicap race | Everyone races a route, speed scaled by FTP so it is always close | M |
+| ✅ Handicap race | Everyone races a route, speed scaled by FTP so it is always close. Built as a race kind in the group-ride lobby: everyone rides at 3.5 W/kg FTP for their weight, so the share of FTP decides it | M |
 | Chaingang | Take turns on the front; smooth rotations keep the speed up | M |
 | Last rider standing | A shared ramp test as an elimination game | S |
 | Team time trial | Two crews, same workout, compliance decides | M |

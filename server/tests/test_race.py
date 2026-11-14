@@ -207,3 +207,24 @@ def test_a_slow_human_is_not_cut_off_when_the_bots_finish():
     slow.p = 250
     race_out(sim)
     assert slow.fin is not None
+
+
+def test_a_handicap_race_is_won_by_the_share_of_ftp_not_the_watts():
+    room = RoadRoom("HCAP")
+    room.riders["big"] = Rider("big", "Big", 400, "hard", connected=True)
+    room.riders["small"] = Rider("small", "Small", 200, "hard", connected=True)
+    room.route, room.laps, room.game = "nundah-crit", 1, "handicap"
+
+    async def go():
+        room.start()
+        room.task.cancel()
+        big, small = room.riders["big"], room.riders["small"]
+        while not room.sim.rules.over(room.sim):
+            now = time.monotonic()
+            big.p, small.p = 300, 190  # 75% and 95% of FTP
+            big.last_data = small.last_data = now
+            room.step(DT)
+        await room.finish()
+
+    asyncio.run(go())
+    assert room.summary["riders"][0]["id"] == "small"

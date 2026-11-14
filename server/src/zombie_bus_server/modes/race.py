@@ -160,4 +160,10 @@ class Crit(Race):
         return {**super().extra(sim, rows), "award": award}
 
 
-RULES.update(race=Race, points=Points, crit=Crit)
+class Handicap(Race):
+    """A race on even terms: the room feeds the sim each rider's power as a share of FTP, at one W/kg."""
+
+    name = "handicap"
+
+
+RULES.update(race=Race, points=Points, crit=Crit, handicap=Handicap)
