@@ -113,10 +113,14 @@ export function lobbyView(c: LobbyCtx) {
   const gameCard = (g: Game, on: boolean, pick: boolean) =>
     h(
       'button',
-      { class: `game-card${on ? ' on' : ''}`, disabled: !pick, onclick: () => c.game(g) },
+      {
+        class: `game-card${on ? ' on' : ''}`,
+        disabled: !pick || !!GAMES[g].soon,
+        onclick: () => c.game(g),
+      },
       h('span', { class: 'gc-icon' }, GAMES[g].icon),
       h('b', {}, GAMES[g].name),
-      h('small', {}, GAMES[g].blurb),
+      h('small', {}, GAMES[g].soon ? 'Coming soon' : GAMES[g].blurb),
     )
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
