@@ -35,7 +35,7 @@ export function clickSection() {
         : h(
             'p',
             {},
-            'Pair a Zwift Click to shift virtual gears in free ride and Slope mode, change intensity in ERG mode and step the level in Resistance mode. Press a button on the Click so it shows up.',
+            'Pair a Zwift Click to shift virtual gears in free ride and Slope mode, change intensity in ERG mode and step the level in Resistance mode. Press a button on the Click so it shows up. Click v2: pair the left puck (up and right shift up; down, left and the minus button shift down). The right puck only works on days it has been unlocked in the Zwift app.',
           ),
       h(
         'div',
