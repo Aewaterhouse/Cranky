@@ -15,6 +15,7 @@ from .modes.ambulance import Ambulance
 from .modes.climate import Climate
 from .modes.dating import Dating
 from .modes.last_standing import LastStanding
+from .modes.pub_quiz import PubQuiz
 from .modes.ttt import TeamTrial
 from .modes.vo2_madness import Vo2Madness
 from .modes.watch import Watch
@@ -35,6 +36,7 @@ MODES = {
     "watch": Watch,
     "last": LastStanding,
     "ttt": TeamTrial,
+    "quiz": PubQuiz,
 }
 
 

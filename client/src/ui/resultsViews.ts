@@ -109,6 +109,11 @@ export const VIEWS: Record<
     col: 'Falls',
     cell: (r) => String(r.falls),
   },
+  quiz: {
+    tiles: () => [],
+    col: 'Points',
+    cell: (r) => String(r.points ?? 0),
+  },
   ttt: {
     tiles: (g) =>
       (g.teams?.names ?? []).map((n, k) =>

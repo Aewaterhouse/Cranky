@@ -151,4 +151,20 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Winning team on target (%)',
     plan: true,
   },
+  quiz: {
+    icon: '🍺',
+    name: 'Pub Quiz',
+    how: [
+      'Ride the workout; every 90 s a question pops up.',
+      'Tap your answer: 10 points, 5 more if you are on target.',
+      'Fastest right answer gets a bonus. Most points wins.',
+    ],
+    tag: 'Trivia on the trainer',
+    blurb:
+      'Aussie trivia over the driver’s workout. Answer while you ride: right answers score, on target scores more, and the quickest gets a bonus.',
+    start: 'Open the pub',
+    countdown: 'THE PUB OPENS IN',
+    score: 'Top score',
+    plan: true,
+  },
 }

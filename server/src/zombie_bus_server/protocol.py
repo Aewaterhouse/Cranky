@@ -59,7 +59,7 @@ class Difficulty(BaseModel):
 
 class Game(BaseModel):
     t: Literal["game"]
-    game: Literal["bus", "madness", "ambo", "date", "climate", "watch", "last", "ttt"]
+    game: Literal["bus", "madness", "ambo", "date", "climate", "watch", "last", "ttt", "quiz"]
 
 
 class RoadSetup(BaseModel):
