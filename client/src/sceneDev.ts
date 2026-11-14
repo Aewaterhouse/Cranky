@@ -104,7 +104,9 @@ function apply() {
       : q.has('mad')
         ? { pts: { a: 320, b: 140, c: 20, d: 260, f: 90 }, crown: 'a', lead: 'a', work: true }
         : null,
-    ambo: q.has('ambo') ? { siren: q.get('siren') === '1' } : null,
+    ambo: q.has('ambo')
+      ? { siren: q.get('siren') === '1', dist: num('dist', null), fell: q.has('fell') }
+      : null,
   }
 }
 apply()

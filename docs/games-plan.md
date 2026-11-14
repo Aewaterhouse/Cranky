@@ -72,7 +72,7 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
 - [x] K2 Server: the four road events and scoring, reviews, awards. Tests.
 - [x] K3 Client HUD: Comfort meter, patient card with speech bubbles, distance to hospital and ETA, event prompts,
       siren-rider callout, ramping queue screen.
-- [ ] K4 Scene (skin, light bar and siren flash done; hospital arrival and the patient on the road still to do): ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
+- [x] K4 Scene: ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
       road behind when they fall out, debug panel values.
 - [x] K5 Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
 - [ ] K6 Four-rider headless test through a 5 min script, the e2e ride, manual notes in `docs/testing.md`, tuning pass.

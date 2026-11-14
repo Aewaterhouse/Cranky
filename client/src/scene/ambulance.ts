@@ -1,5 +1,6 @@
 import * as THREE from 'three'
-import { box, canvasTex } from './util'
+import { VIS } from './params'
+import { Mesher, VC, box, canvasTex, ico } from './util'
 
 const basic = (c: string) => new THREE.MeshBasicMaterial({ color: c })
 
@@ -66,6 +67,66 @@ export function makeAmbo(shell: THREE.Object3D) {
       blue.color.set('#2a6cff').multiplyScalar(lit(!ph))
       glow.color.copy(tmp.set(ph ? '#ff2a20' : '#2a6cff'))
       glow.intensity = siren * 110
+    },
+  }
+}
+
+/**
+ * Roadside pieces for Kidney Stone Express: the hospital that slides up on the right as the run ends, and
+ * the stretcher left on the road while the crew reverses for a patient who fell out.
+ */
+export function makeAmboProps() {
+  const g = new THREE.Group()
+  const m = new Mesher(0.06)
+  m.add(box(18, 9, 12), '#eef0ee', [0, 4.5, 0])
+  m.add(box(18.2, 0.8, 12.2), '#c4161c', [0, 6.4, 0])
+  m.add(box(8, 0.4, 7), '#d8dcd8', [-11, 4.2, 2])
+  for (const z of [-1, 5]) m.add(box(0.4, 4.2, 0.4), '#9aa0a8', [-14.6, 2.1, z])
+  for (let i = 0; i < 4; i++) m.add(box(2.2, 1.6, 0.2), '#2a3d4c', [-6 + i * 4, 3, 6.05])
+  m.add(box(1, 3, 0.3), '#c4161c', [0, 10.5, 0])
+  m.add(box(3, 1, 0.3), '#c4161c', [0, 10.5, 0])
+  const hospital = new THREE.Group()
+  const body = new THREE.Mesh(m.build(), VC)
+  body.castShadow = true
+  const sign = new THREE.Mesh(
+    new THREE.PlaneGeometry(9, 1.5),
+    new THREE.MeshBasicMaterial({
+      map: canvasTex(512, 86, (c) => {
+        c.fillStyle = '#c4161c'
+        c.fillRect(0, 0, 512, 86)
+        c.fillStyle = '#fff'
+        c.textAlign = 'center'
+        c.font = '900 50px system-ui, sans-serif'
+        c.fillText('EMERGENCY · QUEUE HERE', 256, 60)
+      }),
+    }),
+  )
+  sign.position.set(0, 7.6, 6.2)
+  hospital.add(body, sign)
+  hospital.position.x = 21
+  const s = new Mesher(0.05)
+  s.add(box(0.8, 0.12, 2), '#d8dcd8', [0, 0.7, 0])
+  for (const [x, z] of [
+    [-0.35, -0.9],
+    [0.35, -0.9],
+    [-0.35, 0.9],
+    [0.35, 0.9],
+  ])
+    s.add(box(0.06, 0.7, 0.06), '#6b6f78', [x, 0.35, z])
+  s.add(box(0.6, 0.3, 1.3), '#7fc4e8', [0, 0.92, 0.2])
+  s.add(ico(0.2), '#e8b89a', [0, 0.95, -0.7])
+  const stretcher = new THREE.Mesh(s.build(), VC)
+  stretcher.position.set(-3.4, 0, 4.5)
+  stretcher.rotation.y = 0.5
+  g.add(hospital, stretcher)
+  return {
+    group: g,
+    /** `dist` is metres to the hospital (null: none in sight); `fell` shows the stretcher behind the van. */
+    update(a?: { dist?: number | null; fell?: boolean } | null) {
+      const d = a?.dist
+      hospital.visible = d != null && d < VIS.amboHospitalM
+      if (d != null) hospital.position.z = -Math.max(0, d) * VIS.amboHospitalScale - 2
+      stretcher.visible = !!a?.fell
     },
   }
 }

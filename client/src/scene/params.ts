@@ -75,6 +75,9 @@ export const VIS = {
   vignette: 0.45,
   busColour: '#f2b705',
   amboColour: '#f4f1e8',
+  /** The hospital comes into view this many metres out, drawn at this many scene metres per metre. */
+  amboHospitalM: 400,
+  amboHospitalScale: 0.4,
   /** The smart trainer under every bike: body colour, size (read once when a bike is built) and 1 to show it in free ride too. */
   trainerColour: '#ff6a1a',
   trainerSize: 1,

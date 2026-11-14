@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import type { Look } from '../core/cosmetics'
+import { makeAmboProps } from './ambulance'
 import { makeBus } from './bus'
 import { BusCam } from './busCam'
 import { Crew } from './crew'
@@ -52,7 +53,7 @@ export interface SceneState {
   /** A crew game's own state, for a game that brings its own scene (Climate Lawsuit's town). */
   game?: Record<string, unknown> | null
   /** Kidney Stone Express: the bus is an ambulance; `siren` flashes the light bar. */
-  ambo?: { siren: boolean } | null
+  ambo?: { siren: boolean; dist?: number | null; fell?: boolean } | null
 }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
@@ -80,6 +81,7 @@ export class World {
   private servo = new Servo()
   private mirror!: Mirror
   private bus = makeBus()
+  private ambo = makeAmboProps()
   private horde = new Horde()
   private block = new Roadblock()
   private strikes = new Strikes()
@@ -134,6 +136,7 @@ export class World {
       this.boards.group,
       this.servo.group,
       this.bus.group,
+      this.ambo.group,
       this.horde.group,
       this.block.group,
       this.block.debris,
@@ -270,6 +273,7 @@ export class World {
 
     // roadblock
     this.block.update(this.t, dt, night, s.roadblock)
+    this.ambo.update(s.ambo)
     if (s.mad) this.pack.update(s.riders, s.mad, this.t, dt, s.speed, this.smoke, this.sparks)
     else
       this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)

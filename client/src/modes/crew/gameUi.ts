@@ -27,7 +27,9 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     scene: (m) => {
       const g = m.game as AmboState | null | undefined
       const mood = g?.event ? 'surge' : g?.phase === 'run' ? 'longhaul' : 'drill'
-      return { gap: null, armour: null, roadblock: null, mood, ambo: { siren: !!g?.siren } }
+      const dist = g?.phase === 'run' ? g.dist : g?.phase === 'ramp' ? 0 : null
+      const ambo = { siren: !!g?.siren, dist, fell: g?.phase === 'reverse' }
+      return { gap: null, armour: null, roadblock: null, mood, ambo }
     },
   },
   date: {
