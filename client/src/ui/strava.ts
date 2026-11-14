@@ -1,4 +1,7 @@
+import { CFG } from '../config'
 import { api } from '../core/api'
+import type { RideSummary } from '../core/ride'
+import { fitBytes } from './rideExport'
 import { h } from './dom'
 import { toast } from './toast'
 import '../strava.css'
@@ -87,4 +90,30 @@ export function stravaReturn() {
   else toast(q.get('why') || "Strava wasn't connected.", 'bad')
   history.replaceState(null, '', `${location.pathname}#rider`)
   return true
+}
+
+export interface StravaJob {
+  status: 'none' | 'queued' | 'processing' | 'done' | 'failed'
+  activity: string | null
+  error: string | null
+}
+
+const base64 = (b: Uint8Array) => {
+  let s = ''
+  for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode(...b.subarray(i, i + 0x8000))
+  return btoa(s)
+}
+
+/** Sends one of my saved rides (number `n` on the server) to Strava: the .fit is built here, as for a download. */
+export const sendToStrava = async (s: RideSummary, n: number) =>
+  api<StravaJob>(`/api/strava/upload/${n}`, {
+    method: 'POST',
+    body: JSON.stringify({ fit: base64(await fitBytes(s)) }),
+  })
+
+/** After the server saves a ride: up to Strava by itself when the rider is connected with auto-upload on. */
+export async function autoStrava(s: RideSummary, n: number) {
+  if (s.record.secs < CFG.stravaMinSecs || !s.power?.length) return
+  const st = await stravaStatus().catch(() => null)
+  if (st?.connected && st.auto) await sendToStrava(s, n).catch(() => {})
 }

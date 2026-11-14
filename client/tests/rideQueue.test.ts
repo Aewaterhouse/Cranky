@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { CFG } from '../src/config'
-import { flushRides, postRide, queuedList, queuedRides } from '../src/core/rideQueue'
+import { flushRides, onRideSaved, postRide, queuedList, queuedRides } from '../src/core/rideQueue'
 
 const ride = (date: string) => ({ record: { date }, power: [1, 2, 3] })
 
@@ -25,7 +25,12 @@ describe('rides waiting for the server', () => {
     vi.stubGlobal('fetch', async (_: string, init?: RequestInit) => {
       if (!online) throw new TypeError('offline')
       if (status === 200) posted.push(JSON.parse(String(init?.body)).summary.record.date)
-      return { ok: status === 200, status, statusText: 'x', json: async () => ({ saved: true }) }
+      return {
+        ok: status === 200,
+        status,
+        statusText: 'x',
+        json: async () => ({ saved: true, id: posted.length }),
+      }
     })
   })
 
@@ -33,6 +38,21 @@ describe('rides waiting for the server', () => {
     await postRide('me', ride('a'))
     expect(posted).toEqual(['a'])
     expect(queuedRides('me')).toBe(0)
+  })
+
+  it('hands each saved ride and its server number on (Strava uploads), not a ride that waits', async () => {
+    const saved: [string, number][] = []
+    onRideSaved<ReturnType<typeof ride>>((r, id) => saved.push([r.record.date, id]))
+    online = false
+    await postRide('me', ride('a'))
+    expect(saved).toEqual([])
+    online = true
+    await postRide('me', ride('b'))
+    expect(saved).toEqual([
+      ['a', 1],
+      ['b', 2],
+    ])
+    onRideSaved(() => {})
   })
 
   it('keeps a ride finished offline and sends it when the server is back, once', async () => {

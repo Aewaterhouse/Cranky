@@ -44,6 +44,8 @@ export const CFG = {
   recordHz: 1,
   /** Finished rides kept on the device while the server cannot be reached, at most. */
   rideQueueMax: 5,
+  /** Rides shorter than this are never saved, so never sent to Strava (the server checks too). */
+  stravaMinSecs: 30,
   localStorageKey: 'zombiebus.profile',
   sim: {
     baseWatts: 150,

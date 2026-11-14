@@ -3,9 +3,9 @@ import type { RideSummary } from '../core/ride'
 import { rideTrack } from '../core/rideTrack'
 import { saveFile } from './saveFile'
 
-/** Downloads the ride as a .fit file; a free ride on a route this device still has gets its map position too. */
-export async function downloadFit(s: RideSummary) {
-  const bytes = encodeFit({
+/** The ride as a .fit file; a free ride on a route this device still has gets its map position too. */
+export const fitBytes = async (s: RideSummary) =>
+  encodeFit({
     start: s.record.date,
     power: s.power,
     cadence: s.cadence ?? [],
@@ -15,6 +15,10 @@ export async function downloadFit(s: RideSummary) {
     intensity: s.if,
     ...(await rideTrack(s).catch(() => ({}))),
   })
+
+/** Downloads the ride as a .fit file. */
+export async function downloadFit(s: RideSummary) {
+  const bytes = await fitBytes(s)
   return saveFile(
     new Blob([bytes as BlobPart], { type: 'application/octet-stream' }),
     `cranky-${s.record.date.slice(0, 16).replace(':', '')}.fit`,

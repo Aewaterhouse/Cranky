@@ -123,6 +123,12 @@ class Store:
             for r in rows
         ]
 
+    def ride_id(self, rid: str, date: str) -> int | None:
+        """The number of the rider's ride that started at `date`, or None."""
+        with self.lock:
+            row = self.db.execute("SELECT n FROM rides WHERE rider = ? AND date = ?", (rid, date)).fetchone()
+        return row[0] if row else None
+
     def ride(self, rid: str, n: int) -> dict | None:
         """The full summary of one of the rider's rides, or None."""
         with self.lock:

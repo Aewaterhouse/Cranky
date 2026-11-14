@@ -105,7 +105,7 @@ On the bus, in VO2 Madness, the TV view and group free rides, the crew is a colu
 
 ## Strava
 
-Each rider connects once under Rider → Settings → Connect with Strava, approves "upload activities" on Strava's page and comes back to Settings. The connection is kept on the server, so it works from any browser after that. On an iPad in Bluefy, Strava may open its own app instead of coming back; connect once from Safari or a laptop. The Strava app's Authorization Callback Domain (strava.com/settings/api) must be the host of `PUBLIC_URL` (`www.cranky.life`). Disconnect in the same place removes Cranky from the rider's Strava account and deletes the tokens.
+Each rider connects once under Rider → Settings → Connect with Strava, approves "upload activities" on Strava's page and comes back to Settings. The connection is kept on the server, so it works from any browser after that. On an iPad in Bluefy, Strava may open its own app instead of coming back; connect once from Safari or a laptop. The Strava app's Authorization Callback Domain (strava.com/settings/api) must be the host of `PUBLIC_URL` (`www.cranky.life`). Once connected, every ride of 30 s or more goes up by itself when it is saved, as a Virtual Ride with a title and description from the ride (switch "Upload rides automatically" off to stop that). Disconnect in the same place removes Cranky from the rider's Strava account and deletes the tokens.
 
 ## Zwift Click and virtual gears
 

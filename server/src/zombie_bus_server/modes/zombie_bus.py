@@ -406,6 +406,7 @@ class ZombieBus:
         return {
             "distance": round(self.dist),
             "armour": round(self.armour),
+            "gap": round(self.gap),
             "scrap": int(self.scrap),
             "score": score,
             "difficulty": self.level,
@@ -418,6 +419,7 @@ class ZombieBus:
                     "inBandSecs": round(r.band_s),
                     "sprints": r.sprints,
                     "falls": r.falls,
+                    "kj": round(r.rs_joules / 1000, 1),
                     "bot": r.bot,
                 }
                 for r in rs

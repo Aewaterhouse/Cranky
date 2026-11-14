@@ -18,10 +18,12 @@ from .road_room import RoadRoom
 from .session import Room
 from .store import Store, restore_pending
 from .strava import Strava
+from .strava_uploads import Uploads
 
 restore_pending()
 store = Store()
 strava = Strava(store)
+uploads = Uploads(strava)
 
 
 def backup_wait(now: float, newest: float | None) -> float:
@@ -35,7 +37,7 @@ def backup_wait(now: float, newest: float | None) -> float:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    """Backs the database up every night (and at startup if the newest backup is over a day old)."""
+    """Backs the database up every night (and at startup if over a day old) and runs the Strava uploads."""
 
     async def loop() -> None:
         while True:
@@ -44,9 +46,18 @@ async def lifespan(_: FastAPI):
             await asyncio.sleep(backup_wait(time.time(), newest))
             await asyncio.to_thread(store.backup, config.BACKUP_DIR, config.BACKUP_KEEP)
 
-    task = asyncio.create_task(loop())
+    async def strava_loop() -> None:
+        while True:
+            await asyncio.sleep(config.STRAVA_STEP_S)
+            try:
+                await asyncio.to_thread(uploads.step)
+            except Exception as e:  # one bad job must not stop the worker
+                print(f"[strava] worker error: {type(e).__name__}: {e}", flush=True)
+
+    tasks = [asyncio.create_task(loop()), asyncio.create_task(strava_loop())]
     yield
-    task.cancel()
+    for t in tasks:
+        t.cancel()
 
 
 app = FastAPI(title="Cranky", lifespan=lifespan)
@@ -72,7 +83,7 @@ def user(authorization: str = Header(default="")) -> dict:
 User = Annotated[dict, Depends(user)]
 app.include_router(efforts.router(store, User))
 app.include_router(files.router(User))
-app.include_router(strava_api.router(strava, User))
+app.include_router(strava_api.router(strava, uploads, User))
 
 
 class Login(BaseModel):
@@ -169,7 +180,13 @@ def crew_curves(u: User) -> list[dict]:
 
 @app.post("/api/rides")
 def post_ride(body: dict, u: User) -> dict:
-    return {"ok": True, "saved": store.add_ride(u["id"], body.get("summary") or {})}
+    summary = body.get("summary") or {}
+    saved = store.add_ride(u["id"], summary)
+    return {
+        "ok": True,
+        "saved": saved,
+        "id": store.ride_id(u["id"], summary.get("record", {}).get("date", "")),
+    }
 
 
 @app.get("/api/ladder")

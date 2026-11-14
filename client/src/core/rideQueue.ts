@@ -6,6 +6,11 @@ interface Queued {
   record: { date: string }
 }
 
+let onSaved: ((ride: Queued, id: number) => void) | undefined
+/** Called with each ride the server has just taken from the queue, and its number there (Strava uploads). */
+export const onRideSaved = <T extends Queued>(f: (ride: T, id: number) => void) =>
+  (onSaved = f as (ride: Queued, id: number) => void)
+
 const key = (rider: string) => `${CFG.localStorageKey}.rides.${rider}`
 
 function load(rider: string): Queued[] {
@@ -50,7 +55,11 @@ export function postRide<T extends Queued>(rider: string, summary: T) {
 export async function flushRides(rider: string) {
   for (const ride of load(rider)) {
     try {
-      await api('/api/rides', { method: 'POST', body: JSON.stringify({ summary: ride }) })
+      const r = await api<{ id?: number }>('/api/rides', {
+        method: 'POST',
+        body: JSON.stringify({ summary: ride }),
+      })
+      if (r.id) onSaved?.(ride, r.id)
     } catch (e) {
       const status = (e as { status?: number }).status ?? 0
       if (status < 400 || status >= 500) return
