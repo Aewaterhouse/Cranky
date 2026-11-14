@@ -52,6 +52,21 @@ const tile = (label: string, value: string, sub = '', cls = '') =>
   )
 
 /** Applies the ride to the profile, saves it and shows the summary screen. */
+const ORD = ['th', 'st', 'nd', 'rd']
+const ordinal = (n: number) => `${n}${n % 100 > 10 && n % 100 < 14 ? 'th' : (ORD[n % 10] ?? 'th')}`
+/** The results headline says how it went: your place in a race, a limp home, a flooded town. */
+function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
+  if (road?.game && road.game !== 'ride') {
+    const at = road.riders.findIndex((r) => r.id === me)
+    return at === 0 ? 'You won!' : at > 0 ? `${ordinal(at + 1)} place` : 'Race done'
+  }
+  if (!group) return 'Ride done'
+  if (group.flooded) return 'The town flooded'
+  if (group.mode === undefined || group.mode === 'bus')
+    return group.armour <= 0 ? 'Limped home!' : 'Made it!'
+  return 'Made it!'
+}
+
 export function finishRide(
   profile: Profile,
   s: RideSummary,
@@ -74,6 +89,7 @@ export function finishRide(
   saveProfile(p)
   // The crew's result rides along (without the scene still) so History can rebuild the bus postcard.
   const crew = group && { ...group, postcard: undefined }
+  const race = !!road?.game && road.game !== 'ride'
   if (s.record.secs >= 30) void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew })
   const prs =
     p === profile
@@ -153,11 +169,12 @@ export function finishRide(
       h(
         'div',
         { class: 'res-hero' },
-        h('h1', {}, group ? 'Made it!' : 'Ride done'),
+        h('h1', {}, headline(profile.id, group, road)),
         h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
       // The game's outcome is the story of a crew ride: it comes before the training numbers.
       group ? groupSection(group, profile.id) : '',
+      race ? roadSection(road!, profile.id) : '',
       h(
         'div',
         { class: 'res-tiles' },
@@ -205,7 +222,7 @@ export function finishRide(
             ),
           )
         : '',
-      road ? roadSection(road, profile.id) : '',
+      road && !race ? roadSection(road, profile.id) : '',
       segmentSection(s.segments),
       ...week.won.map((w) =>
         h(

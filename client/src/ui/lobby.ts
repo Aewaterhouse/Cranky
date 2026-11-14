@@ -185,7 +185,7 @@ export function lobbyView(c: LobbyCtx) {
     const info = GAMES[game]
     const ids = isHost ? (Object.keys(GAMES) as Game[]) : [game]
     gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost, c.game)))
-    diffRow.hidden = !info.plan
+    diffRow.hidden = game !== 'bus' // the horde only chases the bus
     firstRow.hidden = game !== 'watch'
     title.textContent = game === 'bus' ? 'Bus lobby' : `${info.name} lobby`
     roof.textContent = info.name.toUpperCase()
