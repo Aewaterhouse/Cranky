@@ -76,6 +76,6 @@ end of the queue. Owner's own to-dos go first:*
 **Navigation and words**
 21. [ ] Settings in two places, leaderboards in three; jargon (Ladder, Rider, scrap, tier, CTL/ATL/TSB) (nav 7, 8, 9;
     rider 15).
-22. [ ] Welcome tour: no Back, a wall of text, no simulator button (nav 14, 15).
+22. [x] Welcome tour: no Back, a wall of text, no simulator button (nav 14, 15).
 
 The polish items in each report (nav 16 to 27, riding 19 to 28, lobby 19 to 28, rider 12 to 26) follow after these.

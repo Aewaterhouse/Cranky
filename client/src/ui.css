@@ -539,3 +539,11 @@ a.button.primary {
   user-select: all;
   word-break: break-all;
 }
+.welcome-points {
+  margin: 0;
+  padding-left: 1.1em;
+  line-height: 1.45;
+}
+.welcome-points li + li {
+  margin-top: 8px;
+}

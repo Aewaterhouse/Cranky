@@ -120,7 +120,7 @@ async function connectBt() {
   }
 }
 
-function useSim(ftp: number) {
+export function useSim(ftp: number) {
   if (!sim) {
     sim = new SimTrainer()
     sim.start(4)
