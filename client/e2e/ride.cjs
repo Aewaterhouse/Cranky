@@ -1,4 +1,5 @@
-// End-to-end smoke test: a solo workout and a two-rider Zombie Bus ride in headless Chromium.
+// End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride and a Kidney Stone
+// Express shift with bots.
 // Run with scripts/e2e.sh, which starts a sped-up server on E2E_URL.
 const { chromium } = require('playwright')
 
@@ -56,6 +57,21 @@ async function crew(host, guest) {
   for (const want of ['Bus score', 'Awards', 'Crew', 'Luke']) if (!new RegExp(want, 'i').test(text)) throw new Error(`crew results missing "${want}"`)
 }
 
+// A scripted crew game with no ERG: one rider and three bots through a whole shift.
+async function shift(page) {
+  await page.click('text=Start a new bus')
+  await useSim(page)
+  await page.waitForSelector('.code-letters')
+  await page.click('.game-card:has-text("Kidney Stone Express")')
+  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
+  await page.click('text=Start the shift')
+  await page.waitForSelector('.am', { timeout: 20000 })
+  await page.waitForSelector('text=Made it!', { timeout: 240000 })
+  const text = await page.innerText('body')
+  for (const want of ['Shift score', 'Google reviews', 'Paramedic of the Week', 'Kat'])
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`shift results missing "${want}"`)
+}
+
 ;(async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
   try {
@@ -65,6 +81,8 @@ async function crew(host, guest) {
     const luke = await rider(browser, 'Luke')
     await crew(alex, luke)
     console.log('crew ride: ok')
+    await shift(await rider(browser, 'Kat'))
+    console.log('Kidney Stone Express: ok')
     if (errors.length) throw new Error(`page errors:\n${errors.join('\n')}`)
     console.log('e2e passed')
   } catch (e) {

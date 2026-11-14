@@ -312,3 +312,17 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.
 - Bike skins: with scrap (or a test profile), buy and equip Indoor Escapee in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
 - Rarity: the Garage shows a Common / Rare / Epic / Legendary badge on every item, epic and legendary cards have a coloured frame, and the four new silly items have 3D previews.
+
+## Kidney Stone Express (2026-11-14)
+
+Built against the simulated trainer and bots, and looked at in headless Chromium stills only (`docs/screenshots/games/`). Nobody has ridden it. `scripts/e2e.sh` now plays a whole shift with three bots after the bus ride. For a quick look by hand run the server with `ZB_TIME_SCALE=20` (a 41 min shift in about two minutes) or `ZB_SCRIPT_SCALE=0.125` (a five minute shift at real speed).
+
+- Lobby: the game picker is a row of cards; Kidney Stone Express is live, Speed Dating and Climate Lawsuit say "Coming soon". Pick it, add three bots, "Start the shift". Everyone is on gears whatever was chosen: no ERG target is ever sent.
+- Ride: the game panel sits under the power panel and a smaller gear tile. It shows the patient and their latest line, Comfort (green, amber, red), the van on its way to the hospital with distance, speed and ETA against par, and the last review. The power panel's chip shows your band in watts and the needle is green anywhere inside it.
+- Events: a green wave, M1 roadworks, a speed hump and "somebody won't pull over" each fill the orange box with a countdown. As the siren rider the box turns red, says YOU, the power panel reads Sprint and the light bar flashes. Bluey (a bot) is fined in every roadworks.
+- Hospital: the last 15 s shows "Hospital ahead"; the hospital slides up on the right. Arrive hot and the splash says "OUT THE BACK DOORS", the phase reads Reversing for 30 s and a stretcher sits by the van. Let Comfort hit zero and "THE PATIENT IS WALKING".
+- Ramping: "Sweet-talk triage" fills when the crew spins easy and fast; a full bar gives "One free spike" or "Green wave next run".
+- Results: Shift score, Delivered n / 5, Rating, a Google review per patient, the awards (Paramedic of the Week, Learner Driver, Lead Foot) and the crew table with spread, spikes and fines.
+- TV view (`/?watch=CODE`): the same panel in place of the bus status, the ambulance and the hospital.
+- Dev pages: `/hud-dev.html?game=ambo&state=run|event|siren|me|brake|ramp|reverse|base|cool` (add `&fx=fellout` or `&ask=1`), `/scene-dev.html?ambo=1&siren=1&dist=40&fell=1`.
+- Not checked: any of it on a real trainer (how noisy real power is against the Comfort tolerances is the big unknown), phones and tablets, the announcer's lines, the postcard, Strava text against the real Strava.

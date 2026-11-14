@@ -75,7 +75,7 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
 - [x] K4 Scene: ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
       road behind when they fall out, debug panel values.
 - [x] K5 Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
-- [ ] K6 Four-rider headless test through a 5 min script, the e2e ride, manual notes in `docs/testing.md`, tuning pass.
+- [x] K6 (tuning waits for a real ride: Comfort tolerances against real trainer noise) Four-rider headless test through a 5 min script, the e2e ride, manual notes in `docs/testing.md`, tuning pass.
 
 ## Phase 2: Speed Dating
 
@@ -102,7 +102,7 @@ Scene: the Madness road pack at dusk, riders side by side in their pairs, a hear
   report: gap by date, who led and who followed, reaction times, best and worst match, red flags.
 
 **Checklist**
-- [ ] D1 Server: `modes/dating.py`: pairing schedule, six themes as bands and prompts, match scoring. Tests.
+- [x] D1 Server: `modes/dating.py`: pairing schedule, six themes as bands and prompts, match scoring. Tests.
 - [ ] D2 Server: Chaperone cards, emoji with limits, profiles, Proposal, Wedding, Divorce, the house. Tests.
 - [x] D3 Client HUD: date intro card, your bar against theirs, chemistry meter, emoji tray, Chaperone card hand.
 - [ ] D4 (couples, heart and Chaperone done; confetti, tandem and rope still to do) Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
