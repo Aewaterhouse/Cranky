@@ -477,3 +477,9 @@ tr.me td {
 .res-more[open] > summary::after {
   content: ' ▾';
 }
+.next-up {
+  display: grid;
+  gap: 8px;
+  color: inherit;
+  text-decoration: none;
+}
