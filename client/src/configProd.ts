@@ -22,6 +22,8 @@ export const PROD_CFG = {
     settleS: 3,
     /** Points in the card's mini profile. */
     profilePts: 80,
+    /** The world waits at most this long (ms) for the crew's names to chalk on the road. */
+    crewWaitMs: 1500,
   },
   /** Summit and finish moments. */
   moments: {

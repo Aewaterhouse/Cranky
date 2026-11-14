@@ -1,6 +1,7 @@
 import { VIS } from '../params'
 import type { Features } from './features'
-import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
+import { byChunk, planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
+import type { Paint } from './paintPlan'
 import { FUN } from './funVis'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
@@ -34,7 +35,8 @@ export function fillGaps(marks: number[], length: number, max: number, rand: () 
 /**
  * The road-life director: plans the funny signs and chalk, then finds every stretch where nothing worth a look
  * (oddity, animal, landmark, sign, chalk, traffic) comes up for `maxS` seconds at riding speed, and fills it with
- * chalk (not on tight bends), a funny sign, or a vehicle coming the other way (handed to `life`). Seeded by route.
+ * chalk (not on tight bends), a funny sign, or a vehicle coming the other way (handed to `life`). Road `paint`
+ * counts as something to look at and chalk keeps clear of its words. Seeded by route.
  */
 export function planRoadLife(
   id: string,
@@ -45,12 +47,13 @@ export function planRoadLife(
   odd: Oddities,
   life: LifePlan,
   landmarks: Map<number, unknown[]>,
-): { signs: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> } {
+  paint: { lines: Paint[]; words: Chalk[] } = { lines: [], words: [] },
+): { signs: Map<number, FunSign[]>; chalk: Map<number, Chalk[]>; paint: Map<number, Paint[]> } {
   const { path } = field
   life.traffic = []
   life.clear()
   odd.clear()
-  const marks: number[] = []
+  const marks = [...paint.lines, ...paint.words].map((p) => p.d)
   for (let k = 0; k * R.chunk < path.length; k++) {
     for (const o of [...odd.chunk(k), ...life.chunk(k)]) if (o.rank < D.shown) marks.push(o.d)
     if (landmarks.get(k)?.length) marks.push((k + 0.5) * R.chunk)
@@ -70,5 +73,8 @@ export function planRoadLife(
   const meet = (L.trafficSee * L.trafficMs) / (D.speed + L.trafficMs)
   life.traffic = [...fill.traffic, ...fill.sign.filter((d) => !placed.has(d))].map((d) => d + meet)
   life.clear()
-  return { signs, chalk: planChalk(id, path, fill.chalk) }
+  // Road paint goes down first; chalk keeps out of its way.
+  const clash = (d: number) => paint.words.some((w) => Math.abs(w.d - d) < D.paintClear)
+  const chalk = [...planChalk(id, path, fill.chalk).values()].flat().filter((c) => !clash(c.d))
+  return { signs, chalk: byChunk([...chalk, ...paint.words]), paint: byChunk(paint.lines) }
 }

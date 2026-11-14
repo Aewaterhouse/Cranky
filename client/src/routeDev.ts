@@ -23,6 +23,7 @@ import { rideSound } from './ui/rideSound'
  *   sound=1 (the ride sounds, after a click or key; q for a gear clunk)
  *   mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower (default: by the clock, mist up high, showers)
  *   podium=PRIME|POINTS|none (the end-of-race podium at the finish with the first four riders; needs riders=3)
+ *   names=Bec,Mo (names chalked near the tops of climbs)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
  * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel   c camera view   q clunk
  */
@@ -56,7 +57,8 @@ async function start() {
   const route: Route = id === 'nomap' ? noMap() : await loadRoute(id)
   if (q.get('terrain') === '0') delete route.terrain
   if (q.get('fixture') === '1') addFixture(route)
-  const world = new RouteWorld(document.getElementById('stage')!, route)
+  const names = (q.get('names') ?? 'Bec,Dazza,Mo,Kaz').split(',')
+  const world = new RouteWorld(document.getElementById('stage')!, route, names)
   const st = { d: num('d', 0), speed: num('speed', 8) }
   const jump = (sort: string) => {
     const at = nextThing(world, sort, st.d + num('back', 14) + 1, q.get('kind') ?? undefined)

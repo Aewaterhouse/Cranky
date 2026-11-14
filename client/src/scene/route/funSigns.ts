@@ -31,6 +31,8 @@ export interface Chalk {
   d: number
   text: string
   tint: number
+  /** Paint rather than chalk: this colour instead of a tint. */
+  colour?: string
 }
 
 /** A chalk message as painted: one or two words a line. */
@@ -120,7 +122,7 @@ const COVER_TAG: Record<string, SignTag> = {
   s: 'bush',
   a: 'sea',
 }
-const byChunk = <T extends { d: number }>(list: T[]) => {
+export const byChunk = <T extends { d: number }>(list: T[]) => {
   const by = new Map<number, T[]>()
   for (const f of list) {
     const k = Math.floor(f.d / R.chunk)

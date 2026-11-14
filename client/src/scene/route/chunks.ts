@@ -5,7 +5,7 @@ import { VC } from '../util'
 import { dropBuildingGeos } from './buildingGeo'
 import { buildBuildings, buildPlants } from './chunkProps'
 import type { Features } from './features'
-import { buildChalk, buildFunSigns } from './funSignGeo'
+import { buildChalk, buildFunSigns, buildPaint } from './funSignGeo'
 import { chalkSpan, type Chalk, type FunSign } from './funSigns'
 import type { Furn } from './furniture'
 import { buildFurniture, buildRails, dropFurnitureGeos } from './furnitureGeo'
@@ -15,6 +15,7 @@ import { buildLandmarks, dropLandmarkGeos } from './landmarkGeo'
 import type { Landmark } from './landmarkPlan'
 import { buildOddities, dropOddGeos } from './oddGeo'
 import type { Oddities } from './oddPlan'
+import type { Paint } from './paintPlan'
 import { Patch, drawnHeight } from './patch'
 import { dropPlantGeos } from './plantGeo'
 import { Tris, buildRoad } from './roadGeo'
@@ -49,6 +50,7 @@ export interface Place {
   odd: Oddities
   funSigns: Map<number, FunSign[]>
   chalk: Map<number, Chalk[]>
+  paint: Map<number, Paint[]>
 }
 
 /** Builds road, terrain and what stands on it a chunk at a time around the rider and throws away what falls behind. */
@@ -143,6 +145,7 @@ export class Chunks {
     const { funSigns, chalk } = this.place
     for (const m of buildFunSigns(funSigns.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     for (const m of buildChalk(chalk.get(k) ?? [], field.path, solid, signs)) g.add(m)
+    buildPaint(this.place.paint.get(k) ?? [], field.path, strips)
     WATER.color.set(R.waterTint)
     WATER.specular.set(R.waterGlint)
     WATER.shininess = R.waterShine

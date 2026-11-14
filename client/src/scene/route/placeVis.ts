@@ -129,6 +129,25 @@ export const PLACE = {
     autumnShare: 0.4,
     rose: '#d8324a',
   },
+  /**
+   * Painted on the road: kilometres to go every km (not on circuits), a polka-dot KOM line at the top of each
+   * timed climb with dots on the road over its last `dotsFrom` m, sprint lines, and riders' names chalked
+   * `namesFrom` m before the top of each climb, `names` of them.
+   */
+  paint: {
+    dotsFrom: 300,
+    dotsEvery: 45,
+    namesFrom: 260,
+    nameGap: 70,
+    names: 3,
+    wordsBefore: 14,
+    band: 1.2,
+    dot: 0.42,
+    white: '#f4f4ee',
+    red: '#d8322a',
+    green: '#2f9e5a',
+    cheers: ['ALLEZ {n}', 'GO {n}', '{n} {n} {n}', 'VAMOS {n}', 'GO {n} GO', 'HUP {n}'],
+  },
   furniture: {
     /** Gradient signs: a stretch averaging at least `gradeMin` over `gradeWindow` for `gradeLength`, signed `gradeAhead` early. */
     gradeMin: 0.06,

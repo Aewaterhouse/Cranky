@@ -1,4 +1,5 @@
 import { CFG } from '../../config'
+import { riders } from '../../core/api'
 import { flyStretch } from '../../core/flyover'
 import type { Route } from '../../core/route'
 import { lessMotion, settings } from '../../core/settings'
@@ -19,6 +20,13 @@ import type { podiumOf } from './roadLink'
 import { Quipper, speak, type QuipState } from './quips'
 
 const F = CFG.freeRide
+
+/** The crew's names for the road chalk, or none if the server is slow or away. */
+const crewNames = () =>
+  Promise.race([
+    riders().then((list) => list.map((r) => r.name)),
+    new Promise<string[]>((ok) => setTimeout(() => ok([]), CFG.intro.crewWaitMs)),
+  ]).catch(() => [] as string[])
 
 /**
  * The look-and-listen side of a ride: the 3D world (when the setting and WebGL allow), the ride sounds and the
@@ -57,13 +65,14 @@ export function rideWorld(
       import('../../scene/route/routeWorld'),
       import('../../scene/route/camShots'),
       import('../../scene/route/worldDev'),
+      crewNames(),
     ])
-      .then(([m, sp, dev]) => {
+      .then(([m, sp, dev, crew]) => {
         if (gone) return
         VIS.route.feel.cam.calm = settings.calmCamera || still ? 1 : 0
         VIS.route.camDist = CFG.camDist[settings.camDist]
         VIS.route.mood.pick = { clock: 'auto', sunny: 'route', golden: 'routeGolden' }[settings.sky]
-        world = new m.RouteWorld(view.stage, base)
+        world = new m.RouteWorld(view.stage, base, [me.name, ...crew.filter((n) => n !== me.name)])
         world.state = { me: me.id, riders: [me] }
         const w = world
         view.root.querySelector('.dock-l')?.append(camButton(cycleView))

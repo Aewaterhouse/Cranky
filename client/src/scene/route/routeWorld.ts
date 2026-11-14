@@ -11,6 +11,7 @@ import { Chunks } from './chunks'
 import { Confetti } from './confetti'
 import { Features } from './features'
 import { planRoadLife } from './director'
+import { planPaint, type Paint } from './paintPlan'
 import type { Chalk, FunSign } from './funSigns'
 import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
@@ -72,7 +73,11 @@ export class RouteWorld {
   readonly lifePlan: LifePlan
   private cover: Pick<LandCover, 'at'>
   private life: Life
-  readonly things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
+  readonly things: {
+    sign: Map<number, FunSign[]>
+    chalk: Map<number, Chalk[]>
+    paint: Map<number, Paint[]>
+  }
   /** Works out the oddities, life, funny signs and chalk again, for when their tunables change. */
   private replan: () => void
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
@@ -111,6 +116,8 @@ export class RouteWorld {
   constructor(
     private host: HTMLElement,
     route: Route,
+    /** Riders whose names get chalked near the tops of climbs, the rider's own first. */
+    names: string[] = [],
   ) {
     // Smoothing edges is the dearest thing a weak device does, so a world that starts low goes without.
     const smooth = R.antialias > 0 && LEVELS.indexOf(startLevel()) >= LEVELS.indexOf('medium')
@@ -130,12 +137,13 @@ export class RouteWorld {
     const features = new Features(terrain && route.features, this.field)
     const furniture = planFurniture(path)
     const taken = [...furniture.values()].flat().map((f) => f.d)
-    this.things = { sign: new Map(), chalk: new Map() }
+    this.things = { sign: new Map(), chalk: new Map(), paint: new Map() }
+    const paint = planPaint(route, names)
     this.landmarks = planLandmarks(route.id, terrain, this.field, cover, features)
     this.odd = new Oddities(route.id, this.field, cover, features)
     this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.replan = () => {
-      const { sign, chalk } = this.things
+      const { sign, chalk, paint: lines } = this.things
       const p = planRoadLife(
         route.id,
         this.field,
@@ -145,11 +153,16 @@ export class RouteWorld {
         this.odd,
         this.lifePlan,
         this.landmarks,
+        paint,
       )
-      sign.clear()
-      chalk.clear()
-      p.signs.forEach((v, k) => sign.set(k, v))
-      p.chalk.forEach((v, k) => chalk.set(k, v))
+      for (const [to, from] of [
+        [sign, p.signs],
+        [chalk, p.chalk],
+        [lines, p.paint],
+      ] as const) {
+        to.clear()
+        from.forEach((v, k) => (to as Map<number, unknown>).set(k, v))
+      }
     }
     this.replan()
     this.chunks = new Chunks({
@@ -160,6 +173,7 @@ export class RouteWorld {
       furniture,
       funSigns: this.things.sign,
       chalk: this.things.chalk,
+      paint: this.things.paint,
       landmarks: this.landmarks,
       odd: this.odd,
     })

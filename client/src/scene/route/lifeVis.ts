@@ -83,7 +83,14 @@ export const LIFE = {
    * thing, gaps being filled with chalk, a funny sign or something coming the other way (weights in `mix`). Only
    * oddities and herds below rank `shown` count, so a low quality level still gets its moments.
    */
-  director: { speed: 8.5, maxS: 42, shown: 0.7, mix: { chalk: 2, sign: 1.5, traffic: 1.5 } },
+  director: {
+    speed: 8.5,
+    maxS: 42,
+    shown: 0.7,
+    mix: { chalk: 2, sign: 1.5, traffic: 1.5 },
+    /** Chalk keeps this far (m) from painted words. */
+    paintClear: 25,
+  },
   utes: ['#d8d2bf', '#b3261e', '#2f5f8a', '#e9e6dc'],
   col: {
     roo: '#9a7b5f',
