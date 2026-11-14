@@ -11,6 +11,8 @@ export interface MadScene {
   crown: string | null
   lead: string | null
   work: boolean
+  /** Speed Dating: the couples on this date with their match (0..1). Anyone left over is the Chaperone. */
+  pairs?: [string, string, number][]
 }
 
 const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5']
@@ -48,9 +50,30 @@ export class Pack {
   private crown = emoji('👑')
   private medal = emoji('🥇')
   private crowned: string | null = null
+  private hearts = [0, 1, 2].map(() => emoji('💗'))
+  private eyes = emoji('👀')
 
   constructor() {
-    this.group.add(this.crown, this.medal)
+    this.group.add(this.crown, this.medal, this.eyes, ...this.hearts)
+  }
+
+  /** Speed Dating places: couples side by side with a heart between them, the Chaperone lurking behind. */
+  private dates(pairs: [string, string, number][], t: number) {
+    const spot = new Map<string, [number, number]>()
+    const mid = (VIS.packBack + VIS.packFront) / 2
+    this.hearts.forEach((s, j) => {
+      const p = pairs[j]
+      s.visible = !!p
+      if (!p) return
+      const x = (j - (pairs.length - 1) / 2) * VIS.packLane * 2.6
+      const z = mid + (j % 2) * 2.5
+      spot.set(p[0], [x - VIS.packLane * 0.55, z])
+      spot.set(p[1], [x + VIS.packLane * 0.55, z])
+      s.position.set(x, 1.8 + Math.sin(t * 3 + j) * 0.1, z)
+      s.scale.setScalar((0.5 + p[2] * 1.5) * (1 + Math.sin(t * (4 + p[2] * 8)) * 0.1 * p[2]))
+      s.material.opacity = 0.35 + p[2] * 0.65
+    })
+    return spot
   }
 
   update(
@@ -71,7 +94,9 @@ export class Pack {
     const pts = riders.map((r) => mad.pts[r.id] ?? 0)
     const top = Math.max(0, ...pts)
     const low = Math.min(top, ...pts)
-    this.crown.visible = this.medal.visible = false
+    this.crown.visible = this.medal.visible = this.eyes.visible = false
+    const spot = mad.pairs ? this.dates(mad.pairs, t) : null
+    if (!spot) this.hearts.forEach((s) => (s.visible = false))
     riders.forEach((sr, i) => {
       let e = this.map.get(sr.id)
       if (!e) {
@@ -86,9 +111,16 @@ export class Pack {
       const r = e.r
       const out = sr.st !== 'riding'
       const k = top > low ? ((mad.pts[sr.id] ?? 0) - low) / (top - low) : 0.5
-      const want = out ? VIS.packBack + 5 : VIS.packBack + (VIS.packFront - VIS.packBack) * k
+      const at = spot?.get(sr.id)
+      const want = at
+        ? at[1]
+        : out || spot
+          ? VIS.packBack + 5
+          : VIS.packBack + (VIS.packFront - VIS.packBack) * k
       e.z += (want - e.z) * clamp(dt * 0.8)
-      const x = (i - (riders.length - 1) / 2) * VIS.packLane + Math.sin(t * 0.6 + e.seed) * 0.25
+      const lane = spot ? 0 : (i - (riders.length - 1) / 2) * VIS.packLane
+      const wantX = (at ? at[0] : lane) + Math.sin(t * 0.6 + e.seed) * (at ? 0.08 : 0.25)
+      const x = spot ? r.root.position.x + (wantX - r.root.position.x) * clamp(dt * 1.5) : wantX
       r.root.position.set(x, 0, e.z)
       r.label(sr.name, sr.c, sr.st, sr.hr, sr.hrp)
       r.setLook(sr.look)
@@ -100,6 +132,7 @@ export class Pack {
         s.scale.setScalar(size * (1 + Math.sin(t * 6) * 0.08))
         s.position.set(x, y + Math.sin(t * 3) * 0.12, e.z - 0.3)
       }
+      if (spot && !at && !out) mark(this.eyes, 3.6, 1.1)
       if (sr.id === mad.lead) mark(this.medal, 0.5, 0.8)
       if (sr.id !== mad.crown) return
       mark(this.crown, 3.9, 1.4)
