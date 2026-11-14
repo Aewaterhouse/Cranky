@@ -22,6 +22,7 @@ import { LifePlan } from './lifePlan'
 import { Oddities, jokeCover, seedOf } from './oddPlan'
 import { Signs } from './signs'
 import { Rain } from './rain'
+import { Weather } from './weather'
 import { RoadPath, newPose } from './roadPath'
 import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
@@ -101,6 +102,7 @@ export class RouteWorld {
   }
   private frame = { at: new THREE.Vector3(), right: new THREE.Vector3(), back: new THREE.Vector3() }
   private rain = new Rain()
+  private weather = new Weather()
   private sea: Sea
   private city: CityGhost
   private confetti = new Confetti()
@@ -193,6 +195,7 @@ export class RouteWorld {
       this.skyline.mesh,
       this.city.group,
       this.confetti.mesh,
+      this.weather.spray,
     )
     if (this.sea.mesh) this.root.add(this.sea.mesh)
     this.scene.add(this.root, this.sky.group, this.rain.lines, k, k.target, this.hemi, this.camera)
@@ -285,6 +288,9 @@ export class RouteWorld {
     }
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
+    const { level } = this.quality
+    const figs = this.riders.group.children
+    this.weather.update(mood, level, dt, this.t, figs, this.riders.meSpeed, ox, oz)
     this.confetti.update(dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt, this.sea.wet)
     this.city.update(this.field, me.x, me.y, me.z, env)

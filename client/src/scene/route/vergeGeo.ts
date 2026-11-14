@@ -95,6 +95,7 @@ export function buildVerge(
   d1: number,
   level: Level,
   out: Tris,
+  road = out,
 ) {
   const { path } = field
   const k = V.density[level]
@@ -166,6 +167,6 @@ export function buildVerge(
     if (!/[fb]/.test(cover.at(pose.x + pose.rx * 12, pose.z + pose.rz * 12, pose.y))) continue
     col.set(R.tarmac).multiplyScalar(V.shadowDark)
     const o = (hash(d) - 0.5) * R.roadHalf
-    blob(out, path, d, o, 2 + hash(d * 3) * 2, 1 + hash(d * 5) * 1.5, 7, d)
+    blob(road, path, d, o, 2 + hash(d * 3) * 2, 1 + hash(d * 5) * 1.5, 7, d)
   }
 }

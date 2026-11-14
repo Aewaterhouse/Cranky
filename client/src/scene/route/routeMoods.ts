@@ -24,6 +24,26 @@ export const MOOD = {
   rainMs: 16,
   rainLean: 0.18,
   rainTint: '#cfd9e2',
+  /**
+   * The wet: the road gets wet over `inS` seconds of shower and dries over `outS`, darkening to `tint` with a
+   * `spec` sheen; `puddles` per 200 m chunk lie in the lanes; spray flies off each rider's back wheel (`spray`
+   * drops at most, `rate` a second at riding speed, carried along at `carry` of the rider's speed).
+   */
+  wet: {
+    inS: 25,
+    outS: 90,
+    tint: '#7d828c',
+    spec: '#5c6470',
+    shine: 50,
+    puddles: 7,
+    puddle: '#a9b8c6',
+    spray: 160,
+    rate: 70,
+    carry: 0.65,
+    sprayTint: '#e4ebf2',
+  },
+  /** Cloud shadows on sunny days: how dark, the share of sky that is cloud, their size (m) and drift (m/s). */
+  cloud: { shade: 0.3, cover: 0.55, scale: 520, windX: 7, windZ: 3 },
 }
 
 export const ROUTE_MOODS = [

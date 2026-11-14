@@ -26,24 +26,15 @@ import { buildStreets } from './streetGeo'
 import { buildTerrain } from './terrainGeo'
 import { buildVerge } from './vergeGeo'
 import { buildFarm, dropFarmGeos } from './farmGeo'
+import { PUDDLE, ROAD, STREET, UNDER, buildPuddles } from './weather'
 
 const R = VIS.route
 const P = R.place
 const pose = newPose()
 const NONE: Patch[] = []
-/** Water catches the sun; streets lie on the ground and win the depth test against it by a growing margin. */
+/** Water catches the sun; streets lie on the ground and win the depth test against it by a growing margin. Overlapped
+ * road sits between the two (materials in weather.ts). */
 const WATER = new THREE.MeshPhongMaterial({ vertexColors: true, flatShading: true })
-const STREET = new THREE.MeshLambertMaterial({
-  vertexColors: true,
-  flatShading: true,
-  polygonOffset: true,
-})
-/** Road where another stretch overlaps it: in front of the ground, behind the later stretch (in `STREET`). */
-const UNDER = new THREE.MeshLambertMaterial({
-  vertexColors: true,
-  flatShading: true,
-  polygonOffset: true,
-})
 
 /** Everything a chunk is built from. */
 export interface Place {
@@ -130,8 +121,11 @@ export class Chunks {
     const water = new Tris(pose.x, pose.y, pose.z)
     const strips = new Tris(pose.x, pose.y, pose.z)
     const chalked = [k - 1, k, k + 1].flatMap((c) => this.place.chalk.get(c) ?? []).map(chalkSpan)
+    const road = new Tris(pose.x, pose.y, pose.z)
     const under = new Tris(pose.x, pose.y, pose.z)
-    buildRoad(field.path, d0, d1, solid, chalked, { index: field.fine, under, over: strips })
+    const puddles = new Tris(pose.x, pose.y, pose.z)
+    buildPuddles(field.path, k, d0, puddles)
+    buildRoad(field.path, d0, d1, road, chalked, { index: field.fine, under, over: strips })
     const patches = [new Patch(field, d0, d1, far, -1), new Patch(field, d0, d1, far, 1)]
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)
@@ -145,7 +139,7 @@ export class Chunks {
     if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
-    buildVerge(field, patches, cover, d0, d1, level, solid)
+    buildVerge(field, patches, cover, d0, d1, level, solid, road)
     for (const m of buildFarm(k, field, patches, cover, features, level, solid)) g.add(m)
     for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     for (const m of buildOddities(odds, field, patches, solid, signs)) g.add(m)
@@ -162,6 +156,8 @@ export class Chunks {
     UNDER.polygonOffsetUnits = STREET.polygonOffsetUnits / 2
     for (const [tris, mat] of [
       [solid, VC],
+      [road, ROAD],
+      [puddles, PUDDLE],
       [water, WATER],
       [strips, STREET],
       [under, UNDER],
