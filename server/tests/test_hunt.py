@@ -14,6 +14,7 @@ def hunt(fox_s, hound_s, secs=G.HUNT_ROUND_S + 10):
         room.start()
         room.task.cancel()
         g, fx = room.mode, []
+        g.mut = {}  # the plain hunt, whatever this week's twist is
         for _ in range(int(secs / 0.5)):
             room.el += 0.5
             for r in room.riders.values():

@@ -278,6 +278,11 @@ GAME_MUTATORS = {
         {"id": "grants", "name": "Green Grants", "desc": "Leaving coal costs half.", "cost": 0.5},
         {"id": "normal", "name": "An Ordinary Year", "desc": "No help, no extra trouble.", "sea": 1.0},
     ],
+    "hunt": [
+        {"id": "long", "name": "Long Head Start", "desc": "The fox starts 90 m up the road.", "start": 90},
+        {"id": "short", "name": "Short Head Start", "desc": "The fox starts only 40 m up.", "start": 40},
+        {"id": "normal", "name": "Tally Ho", "desc": "The fox starts 60 m up, as usual.", "start": 60},
+    ],
 }
 
 # Last Rider Standing: steps of LAST_STEP % FTP a minute from LAST_FROM to the 150% cap, LAST_HOLDS more

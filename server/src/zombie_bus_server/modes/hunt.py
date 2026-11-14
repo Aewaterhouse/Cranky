@@ -49,7 +49,11 @@ class Hunt(CrewGame):
         if n != self.round and n >= 0:
             if self.fox is not None and self.gap > 0:
                 self.end_round(room, False)
-            self.round, self.fox, self.gap = n, self.order[n % len(self.order)], float(G.HUNT_START)
+            self.round, self.fox, self.gap = (
+                n,
+                self.order[n % len(self.order)],
+                float(self.mut.get("start", G.HUNT_START)),
+            )
             name = room.riders[self.fox].name if self.fox in room.riders else "?"
             self.emit("fox", f"{name} is the fox! Hounds, ride clean to run them down.", self.fox)
         if self.fox is not None and self.gap > 0:
