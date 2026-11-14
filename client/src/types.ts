@@ -56,6 +56,8 @@ export interface Frame {
   dur: number
   /** Target watts, or null when ERG is off (sprint, free). */
   tgt: number | null
+  /** A crew game's own band in watts (then `tgt` is its middle), or its all-out sprint with no target. */
+  band?: [number, number] | 'sprint'
   /** Cadence band for this block, when the plan sets one. */
   cad?: [number, number]
   next?: { type: BlockType; label: string; in: number; tgt: number | null }

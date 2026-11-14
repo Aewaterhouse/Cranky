@@ -15,7 +15,7 @@ import type { Mood } from '../../scene/params'
 import { mood as moodAudio, SFX, stopAudio } from '../../ui/audio'
 import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
-import type { Trainer } from '../../types'
+import type { Frame, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
 import { camButton, camKey } from '../../ui/camButton'
@@ -165,9 +165,12 @@ export function startBusRide(
   // Block changes are scheduled off a local estimate of the server clock, not the 2 Hz tick.
   const clock = new ClockSync()
   let running = false
+  // A crew game's own target for me, from the last tick; it holds between ticks and across the game's blocks.
+  let mine: { tgt: number | null; band?: Frame['band'] } | null = null
   const localFrame = () => {
     const el = running ? clock.now(performance.now()) : null
-    return el === null ? null : frameAt(plan.blocks, el, profile.tier, profile.ftp)
+    const f = el === null ? null : frameAt(plan.blocks, el, profile.tier, profile.ftp)
+    return f && mine ? { ...f, ...mine } : f
   }
   const scheduler = setInterval(() => {
     const f = localFrame()
@@ -185,6 +188,8 @@ export function startBusRide(
       saveProfile(profile)
     }
     clock.tick(m.el, performance.now())
+    const mb = me?.band
+    mine = mb ? { tgt: me.tgt ?? null, band: mb === 'free' ? undefined : mb } : null
     running = m.i >= 0
     if (m.i < 0) {
       hud.countdown(Math.ceil(-m.el), ride.live)

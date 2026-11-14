@@ -68,8 +68,8 @@ export class RideController {
       power,
       cadence,
       avg,
-      c: score(avg, tgt),
-      band: inBand(avg, tgt),
+      c: score(avg, tgt, this.frame?.band),
+      band: inBand(avg, tgt, this.frame?.band),
       hr: this.hrNow(),
     }
     if (this.sprint) this.sprint.samples.push(power)
