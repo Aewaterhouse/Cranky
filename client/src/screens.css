@@ -641,3 +641,24 @@ kbd {
     box-shadow: 0 0 22px rgb(127 209 59 / 0.35);
   }
 }
+.hello {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+}
+.hello > span:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+}
+.hello b {
+  font-size: 1.1rem;
+}
+.hello .arrow {
+  font-weight: 800;
+  color: var(--acc);
+  white-space: nowrap;
+}

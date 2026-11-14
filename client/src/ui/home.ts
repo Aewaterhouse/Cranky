@@ -12,6 +12,7 @@ import { avatar, fmt, h } from './dom'
 import { toast } from './toast'
 import { freeRideSetup } from './freeRideSetup'
 import { gamePicker } from './gamePicker'
+import { hello, mode } from './homeCards'
 import type { Game } from '../net/protocol'
 import { soloSetup } from './solo'
 import { planScreen, todayCard } from './planCalendar'
@@ -115,16 +116,6 @@ function busCard(r: Room, act: HomeActions) {
   )
 }
 
-/** A big card for one of the solo modes, alongside the crew games. */
-const mode = (icon: string, name: string, tag: string, go: () => void) =>
-  h(
-    'button',
-    { class: 'home-game home-mode', onclick: go },
-    h('span', { class: 'gc-icon' }, icon),
-    h('b', {}, name),
-    h('small', {}, tag),
-  )
-
 /** Card offering to carry on a solo ride that a refresh or crash cut short. */
 function resumeCard(p: Profile, act: HomeActions) {
   const snap = loadSnap<SoloSnap>(soloKey(p.id))
@@ -224,7 +215,7 @@ export function rideTab(p: Profile, act: HomeActions) {
   const today = h('div')
   const home = () => (
     setBack(null),
-    today.replaceChildren(todayCard(p, goWorkout, openPlan)),
+    today.replaceChildren(p.plan ? todayCard(p, goWorkout, openPlan) : hello(p, act)),
     wrap.replaceChildren(main)
   )
   /** A screen inside the Ride tab; Back (or its own back button) returns to the tab. */
