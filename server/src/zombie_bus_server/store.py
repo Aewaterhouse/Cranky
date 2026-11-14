@@ -300,7 +300,7 @@ class Store:
 
         A results row knows its plan, the day the bus finished (server time) and every rider on it, so a
         crew ride by one of those riders, on that plan, finishing that day, is the same ride. Same-day repeats
-        pair up in order. VO2 Madness rides never reach the ladder, so they stay without one.
+        pair up in order. Results from before every game reached the ladder are all bus rides.
 
         Returns:
             How many rides were given a result.

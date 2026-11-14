@@ -50,3 +50,14 @@ def test_ladder_endpoint_and_store_round_trip():
     assert out["season"] == season and any(r["score"] == 4321 for r in out["runs"])
     assert c.get("/api/ladder?season=nope", headers=h).status_code == 400
     assert c.get("/api/ladder?season=2001-Q1", headers=h).json()["runs"] == []
+
+
+def test_every_game_counts_rides_and_awards_but_only_the_bus_is_scored():
+    ambo = {
+        **result(900, [("Kat", 0.9), ("Bot Shaz", 1.0)], [("Paramedic of the Week", "Kat")]),
+        "game": "ambo",
+    }
+    out = ladder.build("2026-Q4", [result(2000, [("Kat", 0.9), ("Alex", 0.8)]), ambo])
+    assert [r["score"] for r in out["runs"]] == [2000]
+    assert out["games"][0] == {"name": "Kat", "rides": 2, "awards": 1, "by": {"bus": 1, "ambo": 1}}
+    assert {r["name"] for r in out["games"]} == {"Kat", "Alex"}

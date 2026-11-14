@@ -1,4 +1,4 @@
-"""Season ladder: the crew's bus rides ranked per calendar quarter."""
+"""Season ladder: the crew's bus runs ranked per quarter, and everyone's rides and awards in every game."""
 
 from collections import Counter, defaultdict
 from datetime import date
@@ -24,8 +24,28 @@ def bounds(season: str) -> tuple[str, str]:
     return f"{year}-{q * 3 - 2:02d}-01", f"{end[0]}-{end[1]:02d}-01"
 
 
+def every_game(results: list[dict]) -> list[dict]:
+    """Each human's rides and awards this season across every crew game, most rides first."""
+    rows: dict[str, dict] = defaultdict(lambda: {"rides": 0, "awards": 0, "by": Counter()})
+    for res in results:
+        game = res.get("game", "bus")
+        humans = {r["name"] for r in res["riders"] if not r.get("bot")}
+        for name in humans:
+            rows[name]["rides"] += 1
+            rows[name]["by"][game] += 1
+        for a in res.get("awards", []):
+            if a["name"] in humans:
+                rows[a["name"]]["awards"] += 1
+    table = [
+        {"name": n, "rides": r["rides"], "awards": r["awards"], "by": dict(r["by"])} for n, r in rows.items()
+    ]
+    return sorted(table, key=lambda r: (-r["rides"], -r["awards"]))
+
+
 def build(season: str, results: list[dict]) -> dict:
-    """Top runs, a per-rider table and the season's titles from raw bus results."""
+    """Top runs, a per-rider table and the season's titles from the bus results, and every game's table."""
+    games = every_game(results)
+    results = [r for r in results if r.get("game", "bus") == "bus"]
     runs = sorted(results, key=lambda r: -r["score"])[:20]
     riders: dict[str, dict] = defaultdict(lambda: {"rides": 0, "best": 0, "comp": 0.0, "awards": 0})
     awards: dict[str, Counter] = defaultdict(Counter)
@@ -73,4 +93,5 @@ def build(season: str, results: list[dict]) -> dict:
         ],
         "riders": table,
         "titles": titles,
+        "games": games,
     }

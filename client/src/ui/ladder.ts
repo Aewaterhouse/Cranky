@@ -1,3 +1,5 @@
+import { GAMES } from '../modes/crew/games'
+import type { Game } from '../net/protocol'
 import { api } from '../core/api'
 import { avatar, h, pctStr } from './dom'
 
@@ -13,6 +15,8 @@ interface Ladder {
   }[]
   riders: { name: string; rides: number; best: number; compliance: number; awards: number }[]
   titles: { title: string; award: string; name: string; count: number }[]
+  /** Every crew game: each rider's rides (by game) and awards this season. */
+  games?: { name: string; rides: number; awards: number; by: Record<string, number> }[]
 }
 
 const prev = (s: string) => {
@@ -40,13 +44,13 @@ export function ladderTab() {
         ),
       ),
     )
-    if (!l.runs.length)
+    if (!l.runs.length && !l.games?.length)
       return body.replaceChildren(
         h(
           'div',
           { class: 'card empty' },
-          h('b', {}, 'No bus runs this season yet'),
-          h('p', { class: 'dim' }, 'Finish a Zombie Bus ride and it lands here.'),
+          h('b', {}, 'Nothing on the ladder this season yet'),
+          h('p', { class: 'dim' }, 'Finish any crew game and it lands here.'),
         ),
       )
     const table = (head: string[], rows: (string | number | Node)[][]) =>
@@ -78,10 +82,29 @@ export function ladderTab() {
             ),
           )
         : '',
+      l.games?.length
+        ? h(
+            'section',
+            { class: 'card' },
+            h('h2', { class: 'label' }, 'Every game'),
+            table(
+              ['#', 'Rider', 'Rides', 'Awards', 'Games'],
+              l.games.map((r, i) => [
+                i + 1,
+                h('span', { class: 'ladder-who' }, avatar(r.name, 'sm'), ` ${r.name}`),
+                r.rides,
+                r.awards,
+                Object.entries(r.by)
+                  .map(([g, n]) => `${GAMES[g as Game]?.icon ?? '🎲'} ${n}`)
+                  .join('  '),
+              ]),
+            ),
+          )
+        : '',
       h(
         'section',
-        { class: 'card' },
-        h('h2', { class: 'label' }, 'Standings'),
+        { class: 'card', hidden: !l.runs.length },
+        h('h2', { class: 'label' }, 'Zombie Bus standings'),
         table(
           ['#', 'Rider', 'Best score', 'Rides', 'Avg compliance', 'Awards'],
           l.riders.map((r, i) => [
@@ -96,8 +119,8 @@ export function ladderTab() {
       ),
       h(
         'section',
-        { class: 'card' },
-        h('h2', { class: 'label' }, 'Top runs'),
+        { class: 'card', hidden: !l.runs.length },
+        h('h2', { class: 'label' }, 'Top bus runs'),
         table(
           ['#', 'Score', 'Run', 'Horde', 'Distance', 'Crew', 'Date'],
           l.runs.map((r, i) => [
@@ -118,7 +141,11 @@ export function ladderTab() {
     'div',
     { class: 'ladder' },
     h('h1', {}, 'Season ladder'),
-    h('p', { class: 'lede' }, 'Zombie Bus runs this season. Scores reset every quarter.'),
+    h(
+      'p',
+      { class: 'lede' },
+      'Every crew game this season, and the best Zombie Bus runs. It resets every quarter.',
+    ),
     picker,
     body,
   )

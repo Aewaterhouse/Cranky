@@ -263,8 +263,10 @@ class Room:
         if hasattr(self.store, "take_titles") and self.summary.get("awards"):
             self.summary["titles"] = self.store.take_titles(self.summary["awards"])
         await self.broadcast({"t": "end", "summary": self.summary})
-        if self.store and self.game == "bus":  # the season ladder ranks bus scores only
-            self.store.add_result(self.plan["name"], self.summary)
+        if (
+            self.store and self.game != "watch"
+        ):  # the season ladder: bus scores, and rides and awards in every game
+            self.store.add_result(self.plan["name"], {**self.summary, "game": self.game})
         text = discord.format_summary(self.plan["name"], self.summary)
         self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))
         await self.lobby()
