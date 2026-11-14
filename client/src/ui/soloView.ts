@@ -185,7 +185,14 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
       say(
         big === null
           ? null
-          : [h('div', { class: `ovbig ${cls}` }, big), h('div', { class: 'ovsub' }, sub)],
+          : [
+              h('div', { class: `ovbig ${cls}` }, big),
+              h('div', { class: 'ovsub' }, sub),
+              // A paused rider on a tablet has no Space bar: give them the button too.
+              ...(big === 'PAUSED' && /Resume/.test(sub)
+                ? [h('button', { class: 'primary resume-btn', onclick: on.pause }, '▶ Resume')]
+                : []),
+            ],
         cls,
       )
       key = k

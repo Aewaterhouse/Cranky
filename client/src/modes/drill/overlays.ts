@@ -34,7 +34,7 @@ export function pickOverlay(c: OverlayCtx): Overlay {
     return [
       'PAUSED',
       c.manual
-        ? `Press Space to resume.${c.ergOn ? ' ERG is easing off.' : ''}`
+        ? `Tap Resume or press Space.${c.ergOn ? ' ERG is easing off.' : ''}`
         : 'Auto-paused. Start pedalling to carry on.',
       'pause',
     ]

@@ -162,3 +162,9 @@
     height: calc(6 * var(--u));
   }
 }
+.overlay .resume-btn {
+  margin-top: 14px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  pointer-events: auto;
+}

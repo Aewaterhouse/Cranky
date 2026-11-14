@@ -192,7 +192,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
           : s.starting
             ? ['Start pedalling', 'The clock starts when you do', 'count']
             : s.paused === 'manual'
-              ? ['Paused', 'Press Space to carry on', 'pause']
+              ? ['Paused', 'Tap Resume or press Space', 'pause']
               : s.paused === 'auto'
                 ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
                 : null
@@ -204,6 +204,9 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
         msg && [
           h('div', { class: `ovbig ${msg[2]}` }, msg[0]),
           h('div', { class: 'ovsub' }, msg[1]),
+          ...(s.paused === 'manual'
+            ? [h('button', { class: 'primary resume-btn', onclick: on.pause }, '▶ Resume')]
+            : []),
           ...(photo
             ? [h('button', { class: 'photo-btn', onclick: on.photo }, '📷 Photo mode')]
             : []),
