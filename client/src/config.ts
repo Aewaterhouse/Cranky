@@ -59,7 +59,8 @@ export const CFG = {
     3600: 1.0,
   } as Record<number, number>,
   crewDurations: [5, 60, 300, 1200],
-  crewColours: ['#e2b93b', '#c77dff', '#ff7a59', '#5fd38d', '#ff6fb5', '#8ab4ff'],
+  /** Crewmates' lines: none of them near your own yellow, green or cyan. */
+  crewColours: ['#c77dff', '#ff7a59', '#ff6fb5', '#d8dee9', '#8ab4ff', '#d4a373'],
   bestWindowDays: 90,
   ftpSuggestThreshold: 0.03,
   trends: { ctlDays: 42, atlDays: 7, fitnessDays: 90, weeks: 12, heatWeeks: 26 },

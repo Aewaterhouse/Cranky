@@ -68,7 +68,7 @@ end of the queue. Owner's own to-dos go first:*
 **Rider and Garage**
 18. [ ] Garage: no try-on preview, paint thumbnails without the bike, a 3,300 px wall without tabs (rider 3, 4, 8).
 19. [ ] Phone Settings wider than the screen; clipped "OPTIONAL" placeholders in the display font (rider 9, 10).
-20. [ ] Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
+20. [ ] (crew line colours fixed) Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
 
 **Navigation and words**
 21. [ ] Settings in two places, leaderboards in three; jargon (Ladder, Rider, scrap, tier, CTL/ATL/TSB) (nav 7, 8, 9;
