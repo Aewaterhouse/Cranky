@@ -265,6 +265,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
         if (CARD_FX.has(fx.k)) continue
         o.panel?.fx?.(fx, sp)
+        if (fx.k === 'emoji') continue
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
         const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
         if (fx.k === 'fell')

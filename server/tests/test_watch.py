@@ -96,3 +96,20 @@ def test_the_drivers_pause_stops_the_workout_clock_too():
 
     room, held, going = asyncio.run(main())
     assert held["hold"] and not going["hold"] and held["game"]["vid"] == VID
+
+
+def test_the_driver_reorders_and_drops_queued_videos_and_anyone_reacts():
+    room, w, host, guest = party()
+    a, b, c = "aaaaaaaaaaa", "bbbbbbbbbbb", "ccccccccccc"
+    for v in (VID, a, b, c):
+        w.on_act(room, guest, "add", v)
+    w.on_act(room, guest, "up", c)
+    assert [q["vid"] for q in w.queue] == [a, b, c]
+    w.on_act(room, host, "up", c)
+    w.on_act(room, host, "up", a)
+    w.on_act(room, host, "drop", b)
+    assert [q["vid"] for q in w.queue] == [a, c]
+    w.on_act(room, guest, "emoji", "🔥")
+    w.on_act(room, guest, "emoji", "not an emoji")
+    fx = w.tick(room, 0.5, 1, 0, "longhaul")
+    assert [(f["k"], f["text"], f["id"]) for f in fx if f["k"] == "emoji"] == [("emoji", "🔥", guest.id)]

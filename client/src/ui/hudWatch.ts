@@ -36,6 +36,13 @@ export function makeWatchPanel(
     btn('30 s ⏩', 'seek', '30'),
     btn('⏭ Next', 'next'),
   )
+  const EMOJI = ['😂', '🔥', '😱', '👏', '🥵', '💀']
+  const tray = h(
+    'div',
+    { class: 'dt-tray' },
+    ...EMOJI.map((e) => h('button', { onclick: () => act('emoji', e) }, e)),
+  )
+  const float = h('div', { class: 'wp-float' })
   const root = h(
     'section',
     { class: 'hud-glass am wp' },
@@ -45,7 +52,9 @@ export function makeWatchPanel(
     h('div', { class: 'wp-add' }, input, h('button', { onclick: add }, 'Add')),
     note,
     queue,
+    tray,
   )
+  let queueKey = ''
   return {
     root,
     update(m: Tick) {
@@ -60,18 +69,42 @@ export function makeWatchPanel(
       remote.hidden = !host()
       set(playBtn, g.playing ? '⏸ Pause' : '▶ Play')
       playBtn.onclick = () => act(g.playing ? 'pause' : 'play', '')
-      queue.replaceChildren(
-        ...g.queue
-          .slice(0, 5)
-          .map((q, i) =>
-            h(
-              'div',
-              { class: 'dt-row' },
-              h('span', {}, `${i + 1}. ${q.title ?? q.vid}`),
-              h('small', {}, q.by),
+      const key = JSON.stringify([g.queue, host()])
+      if (key !== queueKey) {
+        queueKey = key
+        queue.replaceChildren(
+          ...g.queue
+            .slice(0, 6)
+            .map((q, n) =>
+              h(
+                'div',
+                { class: 'dt-row wp-q' },
+                h('span', {}, `${n + 1}. ${q.title ?? q.vid}`),
+                host()
+                  ? h(
+                      'span',
+                      {},
+                      n
+                        ? h('button', { title: 'Move up', onclick: () => act('up', q.vid) }, '↑')
+                        : '',
+                      h('button', { title: 'Remove', onclick: () => act('drop', q.vid) }, '✕'),
+                    )
+                  : h('small', {}, q.by),
+              ),
             ),
-          ),
-      )
+        )
+      }
+    },
+    fx(fx) {
+      if (fx.k !== 'emoji' || !fx.text) return
+      // A reaction floats up the right of the screen and fades.
+      const e = h('i', {}, fx.text)
+      e.style.setProperty('--x', `${Math.random() * 18}vw`)
+      // The HUD is zoomed, so the layer lives on the page itself to float over the right of the screen.
+      if (!float.isConnected) document.body.append(float)
+      float.append(e)
+      if (!root.isConnected) float.remove()
+      setTimeout(() => e.remove(), 3200)
     },
   }
 }

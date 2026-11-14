@@ -231,3 +231,4 @@ CLIM_BOT_ASK_S = (3, 12)  # a bot answers a question after this many seconds
 WATCH_QUEUE_MAX = 20
 WATCH_SEEK_MAX = 600
 WATCH_SPEED = 8.0
+WATCH_EMOJI = ("😂", "🔥", "😱", "👏", "🥵", "💀")  # reactions anyone can float over the video

@@ -63,8 +63,16 @@ class Watch(CrewGame):
                 if q["vid"] == vid:
                     q["title"] = title
             return
+        if k == "emoji" and v in G.WATCH_EMOJI:
+            self.emit("emoji", str(v), r.id)
+            return
         if r.id != room.host:
             return
+        at = next((n for n, q in enumerate(self.queue) if q["vid"] == v), None)
+        if k == "up" and at:
+            self.queue[at - 1], self.queue[at] = self.queue[at], self.queue[at - 1]
+        elif k == "drop" and at is not None:
+            self.queue.pop(at)
         if k in ("play", "pause") and self.vid:
             self.pos, self.at, self.playing = self.where(room.el), room.el, k == "play"
             self.held = k == "pause" and room.el >= 0
