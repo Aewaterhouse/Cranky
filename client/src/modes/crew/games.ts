@@ -135,4 +135,20 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Highest step (% FTP)',
     plan: false,
   },
+  ttt: {
+    icon: '⏱',
+    name: 'Team Time Trial',
+    how: [
+      'Two teams, Red and Blue, on the same workout.',
+      'Your team scores by staying on target, all of you.',
+      'The team more on target at the end wins.',
+    ],
+    tag: 'Red against Blue',
+    blurb:
+      'The crew splits into two teams for the same workout. Every rider counts: the team that holds its targets better wins.',
+    start: 'Start the trial',
+    countdown: 'THE TRIAL STARTS IN',
+    score: 'Winning team on target (%)',
+    plan: true,
+  },
 }

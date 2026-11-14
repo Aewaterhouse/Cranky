@@ -7,6 +7,7 @@ import { CLIMATE_EVENTS, makeClimatePanel } from '../../ui/hudClimate'
 import { DATE_EVENTS, makeDatePanel } from '../../ui/hudDate'
 import { makeWatchPanel } from '../../ui/hudWatch'
 import { LAST_EVENTS, makeLastPanel } from '../../ui/hudLast'
+import { makeTttPanel } from '../../ui/hudTtt'
 import { videoStage } from '../../scene/videoStage'
 import type { EventStyle } from '../../ui/hudKit'
 
@@ -84,5 +85,15 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
         mad: { pts: {}, crown: winner, lead: null, work: true },
       }
     },
+  },
+  ttt: {
+    events: {},
+    panel: makeTttPanel,
+    scene: () => ({
+      gap: null,
+      armour: null,
+      roadblock: null,
+      mad: { pts: {}, crown: null, lead: null, work: true },
+    }),
   },
 }

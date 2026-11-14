@@ -20,6 +20,8 @@ export interface GroupSummary {
     redSecs?: number
     /** Last Rider Standing: the last step held, % FTP. */
     reached?: number
+    /** Team Time Trial: the rider's team. */
+    team?: string
     /** Kidney Stone Express: power spread (% FTP), spikes and fines. */
     spread?: number
     spikes?: number
@@ -48,6 +50,8 @@ export interface GroupSummary {
   crewBest?: number | null
   /** Held titles that changed hands or stayed put this ride ("Kat takes 🚑 Paramedic of the Week from Dazza"). */
   titles?: string[]
+  /** Team Time Trial: the teams, their scores (0..1) and the winner's index. */
+  teams?: { names: string[]; scores: number[]; winner: number }
   /** A campaign ride: how the leg went. */
   campaign?: string
   /** The bus ride's best moments: ride seconds and what happened. */
@@ -104,6 +108,17 @@ export const VIEWS: Record<
     ],
     col: 'Falls',
     cell: (r) => String(r.falls),
+  },
+  ttt: {
+    tiles: (g) =>
+      (g.teams?.names ?? []).map((n, k) =>
+        tile(
+          `Team ${n}${k === g.teams!.winner ? ' 🏆' : ''}`,
+          `${Math.round(g.teams!.scores[k] * 100)}%`,
+        ),
+      ),
+    col: 'Team',
+    cell: (r) => r.team ?? '–',
   },
   last: {
     tiles: (g) => [tile('Top step', `${g.score}% FTP`)],
