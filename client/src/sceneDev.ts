@@ -26,7 +26,7 @@ const stage = document.getElementById('stage')!
 const world = new World(stage)
 ;(window as unknown as { world: World }).world = world
 const st = {
-  mood: q.get('mood') ?? 'drill',
+  mood: q.get('mood') ?? (q.has('date') ? 'date' : 'drill'),
   gap: num('gap', 40) as number | null,
   armour: num('armour', 100) as number | null,
   speed: num('speed', 12) as number,

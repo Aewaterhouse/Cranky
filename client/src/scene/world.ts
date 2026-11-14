@@ -4,6 +4,7 @@ import { makeAmboProps } from './ambulance'
 import { makeBus } from './bus'
 import { BusCam } from './busCam'
 import { Crew } from './crew'
+import { DateDress } from './dateDress'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
 import { Ground, ROAD_HALF, groundH } from './ground'
@@ -83,6 +84,7 @@ export class World {
   private props = new Props(0)
   private boards = new Billboards(0)
   private servo = new Servo()
+  private dateDress = new DateDress(0)
   private mirror!: Mirror
   private bus = makeBus()
   private ambo = makeAmboProps()
@@ -139,6 +141,7 @@ export class World {
       this.props.group,
       this.boards.group,
       this.servo.group,
+      this.dateDress.group,
       this.bus.group,
       this.ambo.group,
       this.horde.group,
@@ -236,8 +239,12 @@ export class World {
     const dz = v * dt
     this.dist += dz
     this.ground.update(this.dist, env)
-    this.props.update(dz, this.dist)
+    const date = !!s.mad?.pairs
+    this.props.update(dz, this.dist, date)
+    this.boards.theme(date)
     this.boards.update(dz, this.dist)
+    this.dateDress.group.visible = date
+    if (date) this.dateDress.update(dz, this.dist)
     this.servo.update(dz, s.mood === 'servo', dt)
     this.sky.update(env, this.t, this.camera.position)
 

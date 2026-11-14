@@ -1,4 +1,5 @@
 import { CAM } from './camVis'
+import { DATE } from './dateVis'
 import { FEEL } from './route/feelVis'
 import { FLY, ORBIT, PARTY, PODIUM } from './route/shotVis'
 import { PLACE } from './route/placeVis'
@@ -100,6 +101,8 @@ export const VIS = {
   mirrorY: 0.03,
   mirrorHeight: 3.6,
   moodBlend: 1.6,
+  /** Speed Dating's road dressing and its dusk (scene/dateVis.ts). */
+  date: DATE,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {
     roadHalf: 3.1,
@@ -368,6 +371,7 @@ export const VIS = {
       stars: 0,
       fogFar: 1100,
     },
+    date: DATE.mood,
     ...ROUTE_MOOD_DEFS,
   } as Record<string, MoodDef>,
 }

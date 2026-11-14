@@ -54,7 +54,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
         rite,
         tug: g?.tug,
       }
-      return { gap: null, armour: null, roadblock: null, mood: 'longhaul', mad }
+      return { gap: null, armour: null, roadblock: null, mood: 'date', mad }
     },
   },
   climate: {

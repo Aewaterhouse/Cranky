@@ -9,8 +9,10 @@ const CAR_COLS = ['#b8412f', '#d8d4c8', '#3f6aa0', '#c8a838', '#5a7a58', '#8a8a9
 const GREENS = ['#ffffff', '#e8f0d0', '#d0e8c0', '#f0e8b8', '#c8e0b0']
 const WHITE = ['#ffffff']
 
-interface Spec {
+export interface Spec {
   geo: THREE.BufferGeometry
+  /** Lit vertex colours unless given (fairy lights glow with a basic material). */
+  mat?: THREE.Material
   n: number
   /** Absolute x range; side picks left, right or both. */
   xr: [number, number]
@@ -23,9 +25,12 @@ interface Spec {
   show?: (wz: number) => boolean
   wild?: boolean
   sink?: number
+  /** Ruins, wrecks and burnt trees: hidden on a date. */
+  grim?: boolean
 }
 
-class Scatter {
+/** One kind of roadside thing, instanced, each one sent back `LOOP` m once it passes the camera. */
+export class Scatter {
   mesh: THREE.InstancedMesh
   private z: Float32Array
   private sides: Int8Array
@@ -35,10 +40,10 @@ class Scatter {
   private c = new THREE.Color()
 
   constructor(
-    private spec: Spec,
+    readonly spec: Spec,
     dist: number,
   ) {
-    this.mesh = new THREE.InstancedMesh(spec.geo, VC, spec.n)
+    this.mesh = new THREE.InstancedMesh(spec.geo, spec.mat ?? VC, spec.n)
     this.mesh.frustumCulled = false
     this.mesh.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(spec.n * 3), 3)
     this.z = new Float32Array(spec.n)
@@ -106,13 +111,40 @@ export class Props {
     const specs: Spec[] = [
       { geo: g.live, n: 70, xr: [12, 70], s: [0.8, 1.6], tint: GREENS },
       { geo: g.pine, n: 60, xr: [14, 90], s: [0.9, 1.8], tint: GREENS },
-      { geo: g.dead, n: 36, xr: [9, 50], s: [0.8, 1.4] },
+      { geo: g.dead, n: 36, xr: [9, 50], s: [0.8, 1.4], grim: true },
       { geo: g.bush, n: 70, xr: [8.8, 40], s: [0.7, 1.5], tint: GREENS },
       { geo: g.rock, n: 50, xr: [8.5, 60], s: [0.6, 2.2], sink: 0.1 },
-      { geo: g.sedan, n: 7, xr: [5.8, 13], s: [1, 1], yaw: vehicleYaw, tint: CAR_COLS, wild: true },
-      { geo: g.ute, n: 5, xr: [5.8, 13], s: [1, 1], yaw: vehicleYaw, tint: CAR_COLS, wild: true },
-      { geo: g.van, n: 3, xr: [6.2, 12], s: [1, 1], yaw: vehicleYaw, tint: CAR_COLS, wild: true },
-      { geo: g.junk, n: 9, xr: [8.8, 14], s: [1, 1.2] },
+      {
+        geo: g.sedan,
+        n: 7,
+        xr: [5.8, 13],
+        s: [1, 1],
+        yaw: vehicleYaw,
+        tint: CAR_COLS,
+        wild: true,
+        grim: true,
+      },
+      {
+        geo: g.ute,
+        n: 5,
+        xr: [5.8, 13],
+        s: [1, 1],
+        yaw: vehicleYaw,
+        tint: CAR_COLS,
+        wild: true,
+        grim: true,
+      },
+      {
+        geo: g.van,
+        n: 3,
+        xr: [6.2, 12],
+        s: [1, 1],
+        yaw: vehicleYaw,
+        tint: CAR_COLS,
+        wild: true,
+        grim: true,
+      },
+      { geo: g.junk, n: 9, xr: [8.8, 14], s: [1, 1.2], grim: true },
       { geo: g.pole, n: 11, xr: [10.5, 0], side: -1, gap: 40, yaw: () => 0 },
       { geo: g.pylon, n: 4, xr: [60, 0], side: 1, gap: LOOP / 4, yaw: () => 0, s: [1.2, 1.2] },
       {
@@ -139,6 +171,7 @@ export class Props {
         xr: [14, 40],
         yaw: (s) => (s > 0 ? -0.2 : 0.2) + rand(-0.3, 0.3),
         tint: ['#ffffff', '#e0d0c0'],
+        grim: true,
       },
       { geo: g.warn, n: 8, xr: [8.6, 9.6], yaw: () => rand(-0.2, 0.2) },
       { geo: g.green, n: 4, xr: [8.8, 9.6], yaw: () => rand(-0.15, 0.15) },
@@ -148,7 +181,10 @@ export class Props {
     this.sets.forEach((s) => this.group.add(s.mesh))
   }
 
-  update(dz: number, dist: number) {
-    for (const s of this.sets) s.update(dz, dist)
+  update(dz: number, dist: number, date = false) {
+    for (const s of this.sets) {
+      s.mesh.visible = !(date && s.spec.grim)
+      s.update(dz, dist)
+    }
   }
 }

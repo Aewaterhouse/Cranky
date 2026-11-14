@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { DATE_SLOGANS } from './dateDress'
 import { groundH } from './ground'
 import { LOOP } from './props'
 import { VIS } from './params'
@@ -36,6 +37,8 @@ function boardTexture(slot: [string, string, string, string]) {
 /** A few big roadside billboards with silly slogans, recycled as they pass. */
 export class Billboards {
   group = new THREE.Group()
+  /** Speed Dating: date-night slogans instead (all three boards repaint when it changes). */
+  private date = false
   private items: { g: THREE.Group; z: number; face: THREE.Mesh; wz: number }[] = []
 
   constructor(dist: number) {
@@ -73,13 +76,23 @@ export class Billboards {
       it.z += dz
       if (it.z > 45) {
         it.z -= LOOP * 0.85
-        const mat = it.face.material as THREE.MeshBasicMaterial
-        mat.map?.dispose()
-        mat.map = boardTexture(pick(SLOGANS))
+        this.paint(it)
         this.place(it, dist, Math.random() < 0.5 ? -1 : 1)
       }
       it.g.position.z = it.z
     }
+  }
+
+  private paint(it: (typeof this.items)[number]) {
+    const mat = it.face.material as THREE.MeshBasicMaterial
+    mat.map?.dispose()
+    mat.map = boardTexture(pick(this.date ? DATE_SLOGANS : SLOGANS))
+  }
+
+  theme(date: boolean) {
+    if (date === this.date) return
+    this.date = date
+    for (const it of this.items) this.paint(it)
   }
 }
 
