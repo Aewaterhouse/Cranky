@@ -308,8 +308,9 @@ QUIZ_PTS, QUIZ_ON_PTS, QUIZ_FAST, QUIZ_ON_TARGET = 10, 5, 3, 0.9
 # GALLEY_SMOOTH_S); the pirates hold GALLEY_PIRATES m/s. Caught: GALLEY_HIT hull, then GALLEY_KNOCK m back.
 GALLEY_BEATS = [85, 95, 80, 100, 90]
 GALLEY_BEAT_S, GALLEY_TOL, GALLEY_SMOOTH_S = 120, 4, 4
-GALLEY_V, GALLEY_PIRATES = (6.0, 10.0), 8.5
-GALLEY_GAP, GALLEY_GAP_MAX, GALLEY_HIT, GALLEY_KNOCK = 40, 120, 15, 25
+GALLEY_V, GALLEY_PIRATES = (6.0, 10.0), 7.5
+GALLEY_BOT_SPELL_S, GALLEY_BOT_OFF = 20, 0.15  # bots row to the drum, off it for 15% of their 20 s spells
+GALLEY_GAP, GALLEY_GAP_MAX, GALLEY_HIT, GALLEY_KNOCK = 40, 120, 10, 25
 
 # The Hunt: rounds of HUNT_ROUND_S, the fox starting HUNT_START m ahead. Speed maps compliance 0..1 onto
 # HUNT_V for the fox and the hounds' mean; the hounds get HUNT_HOUND_EDGE m/s, so the fox must ride cleaner.

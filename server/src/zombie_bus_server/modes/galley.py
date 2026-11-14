@@ -3,6 +3,7 @@ runs from the pirates. Over the driver's workout, so ERG holds the power and cad
 
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 
 from .. import config_games as G
@@ -35,6 +36,12 @@ class Galley(CrewGame):
         if beat != self.beat:
             self.beat = beat
             self.emit("drum", f"The drum changes: row at {beat} rpm!")
+        for r in rowing:  # bots row to the drum, now and then a few beats off it
+            if r.bot:
+                rng = random.Random(f"{room.code}:{r.id}:{int(room.el // G.GALLEY_BOT_SPELL_S)}")
+                r.cad = beat + (
+                    rng.uniform(-2, 2) if rng.random() > G.GALLEY_BOT_OFF else rng.choice((-9, 9))
+                )
         on = [r for r in rowing if abs(r.cad - beat) <= self.tol()]
         for r in on:
             self.on[r.id] = self.on.get(r.id, 0.0) + dt

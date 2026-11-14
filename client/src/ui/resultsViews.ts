@@ -1,4 +1,4 @@
-import { h, stars } from './dom'
+import { fmt, h, stars } from './dom'
 
 export interface GroupSummary {
   /** The crew game's id; absent for the bus. */
@@ -119,7 +119,7 @@ export const VIEWS: Record<
   galley: {
     tiles: (g) => [tile('Hull', String(Math.round(g.armour)))],
     col: 'On the beat',
-    cell: (r) => `${r.beat ?? 0} s`,
+    cell: (r) => fmt(r.beat ?? 0),
   },
   quiz: {
     tiles: () => [],
