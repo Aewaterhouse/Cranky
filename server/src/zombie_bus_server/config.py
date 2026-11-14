@@ -520,4 +520,8 @@ TITLES = {
     "Paramedic of the Week": "🚑 Paramedic of the Week",
     "Best Match": "💘 Best Match",
     "Red Flag": "🚩 Red Flag",
+    "Last One Standing": "🏁 Last One Standing",
+    "Quizmaster": "🍺 Quizmaster",
+    "Drummer's Pet": "🥁 Drummer's Pet",
+    "Top Dog": "🦊 Top Dog",
 }
