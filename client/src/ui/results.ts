@@ -69,7 +69,6 @@ export function finishRide(
   // The crew's result rides along (without the scene still) so History can rebuild the bus postcard.
   const crew = group && { ...group, postcard: undefined }
   const race = !!road?.game && road.game !== 'ride'
-  if (s.record.secs >= 30) void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew })
   const prs =
     p === profile
       ? []
@@ -77,6 +76,9 @@ export function finishRide(
           // New bests at the familiar durations only: the curve's in-between ones would crowd the row.
           ([d, w]) => d in DUR_LABEL && (!before[+d] || w > before[+d].w),
         )
+  // The new bests ride along, so the crew feed can say so.
+  if (s.record.secs >= 30)
+    void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew, prs: prs.length })
   const sug = ftpSuggestion(p)
   const ftpBox = h('div')
   if (sug)

@@ -105,13 +105,27 @@ class CrewStore:
                 """SELECT r.n, r.rider, COALESCE(u.name, r.rider), r.date, json_extract(r.json, '$.planName'),
                           json_extract(r.json, '$.record.secs'), json_extract(r.json, '$.group.mode'),
                           json_extract(r.json, '$.group.score'), json_extract(r.json, '$.route.id'),
+                          json_extract(r.json, '$.prs'),
                           (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n),
                           (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n AND k.giver = ?)
                    FROM rides r LEFT JOIN users u ON u.id = r.rider ORDER BY r.date DESC, r.n DESC LIMIT ?""",
                 (me, n),
             ).fetchall()
-        keys = ("n", "rider", "name", "date", "plan", "secs", "game", "score", "route", "kudos", "mine")
-        return [{**dict(zip(keys, r, strict=True)), "mine": bool(r[10])} for r in rows]
+        keys = (
+            "n",
+            "rider",
+            "name",
+            "date",
+            "plan",
+            "secs",
+            "game",
+            "score",
+            "route",
+            "prs",
+            "kudos",
+            "mine",
+        )
+        return [{**dict(zip(keys, r, strict=True)), "mine": bool(r[11])} for r in rows]
 
     def give_kudos(self, me: str, ride: int) -> bool:
         """A kudos from `me` on someone else's ride, once each. False if it is their own or already given."""

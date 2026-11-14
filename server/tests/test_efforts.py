@@ -114,9 +114,11 @@ def test_the_crew_feed_lists_rides_and_takes_kudos_once():
         "record": {"date": "2026-11-15T07:00:00Z", "secs": 1800},
         "planName": "Morning spin",
         "group": {"mode": "quiz", "score": 42},
+        "prs": 2,
     }
     client.post("/api/rides", json={"summary": ride}, headers=ali)
     top = client.get("/api/feed", headers=kat).json()[0]
+    assert top["prs"] == 2
     assert (top["name"], top["plan"], top["game"], top["score"], top["kudos"]) == (
         "Ali",
         "Morning spin",

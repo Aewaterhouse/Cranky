@@ -13,6 +13,7 @@ interface FeedRow {
   game: Game | null
   score: number | null
   kudos: number
+  prs: number | null
   mine: boolean
 }
 
@@ -62,6 +63,7 @@ export function crewFeed(me: string) {
         {},
         h('b', {}, r.rider === me ? 'You' : r.name),
         ` rode ${what}`,
+        r.prs ? h('span', { class: 'feed-pr' }, ` 🏅 ${r.prs} new PR${r.prs > 1 ? 's' : ''}`) : '',
         h(
           'small',
           { class: 'dim' },
