@@ -1,6 +1,7 @@
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
+import { gameCard } from './gameCard'
 import { TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
 import { avatar, h, seg } from './dom'
@@ -110,18 +111,6 @@ export function lobbyView(c: LobbyCtx) {
   )
   const mutRow = h('div', { class: 'bot-row mut-row' })
   const gameRow = h('div', { class: 'game-cards' })
-  const gameCard = (g: Game, on: boolean, pick: boolean) =>
-    h(
-      'button',
-      {
-        class: `game-card${on ? ' on' : ''}`,
-        disabled: !pick || !!GAMES[g].soon,
-        onclick: () => c.game(g),
-      },
-      h('span', { class: 'gc-icon' }, GAMES[g].icon),
-      h('b', {}, GAMES[g].name),
-      h('small', {}, GAMES[g].soon ? 'Coming soon' : GAMES[g].blurb),
-    )
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -171,8 +160,11 @@ export function lobbyView(c: LobbyCtx) {
     const game = l.game ?? 'bus'
     const info = GAMES[game]
     const ids = isHost ? (Object.keys(GAMES) as Game[]) : [game]
-    gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost)))
+    gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost, c.game)))
     diffRow.hidden = !info.plan
+    title.textContent = game === 'bus' ? 'Bus lobby' : `${info.name} lobby`
+    roof.textContent = info.name.toUpperCase()
+    effort.hidden = trainRow.hidden = !!info.fixed
     const trainers = l.trainers ?? 'choose'
     trainSeg.set(trainers)
     trainSeg.hidden = !isHost
@@ -222,7 +214,7 @@ export function lobbyView(c: LobbyCtx) {
       )
     }
 
-    pickerBox.hidden = !isHost
+    pickerBox.hidden = !isHost || !!info.fixed
     if (isHost) {
       if (!picker) {
         picker = planPicker({
@@ -247,10 +239,21 @@ export function lobbyView(c: LobbyCtx) {
     )
   }
 
+  const title = h('span', {}, 'Bus lobby')
+  const roof = h('span', {}, 'ZOMBIE BUS')
+  const effort = h(
+    'section',
+    { class: 'panel' },
+    h('h2', { class: 'label' }, 'Your effort'),
+    tierSeg,
+    tierNote,
+    ergSeg,
+    ergNote,
+  )
   const el = h(
     'div',
     { class: 'lobby page' },
-    h('h1', {}, 'Bus lobby ', c.status),
+    h('h1', {}, title, ' ', c.status),
     h(
       'div',
       { class: 'lobby-cols' },
@@ -260,7 +263,7 @@ export function lobbyView(c: LobbyCtx) {
         h(
           'section',
           { class: 'bus' },
-          h('div', { class: 'bus-roof' }, h('span', {}, 'ZOMBIE BUS')),
+          h('div', { class: 'bus-roof' }, roof),
           seats,
           botRow,
           gameRow,
@@ -280,15 +283,7 @@ export function lobbyView(c: LobbyCtx) {
         'div',
         {},
         run,
-        h(
-          'section',
-          { class: 'panel' },
-          h('h2', { class: 'label' }, 'Your effort'),
-          tierSeg,
-          tierNote,
-          ergSeg,
-          ergNote,
-        ),
+        effort,
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Trainer'), trainerCheck()),
         startSlot,
         h('button', { class: 'ghost leave', onclick: c.leave }, 'Leave the bus'),

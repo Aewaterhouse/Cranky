@@ -10,6 +10,8 @@ export interface GameInfo {
   score: string
   /** The host picks a workout and a difficulty; false when the game deals its own session. */
   plan: boolean
+  /** The game runs its own script with no ERG: no workout, effort tier or trainer mode to choose. */
+  fixed?: boolean
   /** Listed in the lobby but not yet playable. */
   soon?: boolean
 }
@@ -43,6 +45,7 @@ export const GAMES: Record<Game, GameInfo> = {
     countdown: 'SHIFT STARTS IN',
     score: 'Shift score',
     plan: false,
+    fixed: true,
   },
   date: {
     icon: '💘',
@@ -53,6 +56,7 @@ export const GAMES: Record<Game, GameInfo> = {
     countdown: 'THE BAR OPENS IN',
     score: 'Chemistry',
     plan: false,
+    fixed: true,
     soon: true,
   },
   climate: {
@@ -64,6 +68,7 @@ export const GAMES: Record<Game, GameInfo> = {
     countdown: 'THE 1980s START IN',
     score: 'Town profit',
     plan: false,
+    fixed: true,
     soon: true,
   },
 }
