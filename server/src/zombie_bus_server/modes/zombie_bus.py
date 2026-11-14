@@ -74,7 +74,7 @@ class ZombieBus(CrewGame):
     def to_dict(self) -> dict:
         """JSON-safe copy of all state (the roadblock's rider sets become sorted lists)."""
         d = copy.deepcopy(vars(self))
-        for k in ("expect", "reported"):
+        for k in ("expect", "reported", "landed"):
             if d["rb"]:
                 d["rb"][k] = sorted(d["rb"][k])
         return d
@@ -83,9 +83,9 @@ class ZombieBus(CrewGame):
     def from_dict(cls, d: dict) -> ZombieBus:
         bus = cls()
         vars(bus).update(copy.deepcopy(d))
-        for k in ("expect", "reported"):
+        for k in ("expect", "reported", "landed"):
             if bus.rb:
-                bus.rb[k] = set(bus.rb[k])
+                bus.rb[k] = set(bus.rb.get(k, []))
         return bus
 
     def emit(self, k: str, text: str | None = None, rid: str | None = None) -> None:
@@ -236,6 +236,7 @@ class ZombieBus(CrewGame):
                 "deadline": room.el + b["dur"] + C.RB_GRACE_S,
                 "expect": ids,
                 "reported": set(),
+                "landed": set(),  # riders whose sprint was HIT or better: all of them fires the harpoon
             }
             self.emit("roadblock", "ROADBLOCK! Sprint to smash it!")
         elif ev == "servo":
@@ -421,6 +422,8 @@ class ZombieBus(CrewGame):
         if not rb or rb["blk"] != blk or r.id in rb["reported"]:
             return
         rb["reported"].add(r.id)
+        if grade != "FAIL":
+            rb["landed"].add(r.id)
         mult = 1 + C.COMBO_STEP * max(0, combo - 1)
         self.combo = max(self.combo, combo)
         dmg = C.RB_DAMAGE[grade] * mult * (C.RAM_MULT if self.ram else 1)
@@ -444,6 +447,10 @@ class ZombieBus(CrewGame):
             self.scrap += C.RB_SMASH_SCRAP
             self.gap += C.RB_SMASH_GAP
             self.emit("smash", f"Roadblock SMASHED! +{C.RB_SMASH_SCRAP} scrap")
+            # A team move: every rider on the bus landed their sprint, so the harpoon drags the bus clear.
+            if len(rb["expect"]) > 1 and rb["expect"] <= rb["landed"]:
+                self.gap += C.HARPOON_GAP
+                self.emit("harpoon", f"Everyone sprinted together: HARPOON! +{C.HARPOON_GAP} m on the horde")
         else:
             self.damage(C.RB_CRASH_ARMOUR, "Ploughed through the roadblock. Ouch.")
             self.emit("crash")

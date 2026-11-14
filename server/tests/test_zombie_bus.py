@@ -78,8 +78,10 @@ def test_roadblock_smash_and_fail():
     run(room, bus, 1, i=1, ev="roadblock")
     for r in room.riders.values():
         bus.on_sprint(r, 1, "GREAT", 2)
+    gap = bus.gap
     fx = run(room, bus, 1, i=1, ev="roadblock", bel0=1)
     assert any(f["k"] == "smash" for f in fx) and bus.rb is None
+    assert any(f["k"] == "harpoon" for f in fx) and bus.gap >= gap + C.RB_SMASH_GAP + C.HARPOON_GAP - 5
 
     run(room, bus, 1, i=2, ev="longhaul")
     room.plan["blocks"].append({"type": "sprint", "dur": 10})
@@ -368,3 +370,17 @@ def test_riders_and_the_fallen_can_honk_and_heckle():
     bus.on_act(room, room.riders["r1"], "emoji", "📯")
     bus.on_act(room, room.riders["r0"], "emoji", "🍆")
     assert [(f["k"], f["text"], f["id"]) for f in bus.fx] == [("emoji", "📯", "r1")]
+
+
+def test_no_harpoon_unless_every_rider_lands_their_sprint():
+    blocks = [STEADY[0], {"type": "sprint", "dur": 10}, STEADY[1]]
+    room, bus = FakeRoom(blocks), ZombieBus()
+    set_all(room, None)
+    run(room, bus, 1, i=1, ev="roadblock")
+    for r in list(room.riders.values())[:3]:
+        bus.on_sprint(r, 1, "LEGEND", 3)
+    bus.on_sprint(room.riders["r3"], 1, "FAIL", 0)
+    snap = ZombieBus.from_dict(bus.to_dict())
+    assert snap.rb["landed"] == {"r0", "r1", "r2"}
+    fx = run(room, bus, 1, i=1, ev="roadblock", bel0=1)
+    assert any(f["k"] == "smash" for f in fx) and not any(f["k"] == "harpoon" for f in fx)

@@ -225,6 +225,7 @@ RB_FAIL_ARMOUR = 6
 RB_FAIL_GAP = 10
 RB_SMASH_SCRAP = 20
 RB_SMASH_GAP = 20
+HARPOON_GAP = 25  # every rider landed their roadblock sprint (HIT or better): the team move's extra metres
 RB_CRASH_ARMOUR = 10
 RB_GRACE_S = 4
 COMBO_STEP = 0.25
