@@ -171,6 +171,27 @@ export const VIS = {
     fogNear: 140,
     skyR: 1500,
     skyJag: 60,
+    /**
+     * A far city (cityGhost.ts) is drawn shrunk to `at` × skyR away, in front of the hills ring, while its top is
+     * in sight over the ground between (checked every `lookEvery` m, from `lookFrom` to `lookTo` m out in
+     * `lookStep` steps; nearer ground is drawn and hides it anyway, and further out the height grid has run out).
+     * Seen only between `minSee` and `maxSee` m; tinted from the hills towards the fog by `haze`.
+     */
+    ghostCity: {
+      at: 0.95,
+      minSee: 2500,
+      maxSee: 45000,
+      eye: 3,
+      lookEvery: 60,
+      lookFrom: 600,
+      lookTo: 3000,
+      lookStep: 120,
+      haze: 0.3,
+      dark: 0.62,
+      /** Towers stand this many times their real height, so a city 10 km off still reads. */
+      boost: 1.7,
+      glow: '#ffd88a',
+    },
     snowLine: 1650,
     /** Faces whose normal points up less than this are rock. */
     rockSlope: 0.8,

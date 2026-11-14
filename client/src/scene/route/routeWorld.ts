@@ -30,6 +30,7 @@ import { Sea } from './sea'
 import { PlayerCam } from '../playerCam'
 import { CAM } from '../camVis'
 import { Skyline } from './skyline'
+import { CityGhost } from './cityGhost'
 import { aimSun, setUpSun } from './sun'
 import { TerrainGrid } from './terrainGrid'
 
@@ -101,6 +102,7 @@ export class RouteWorld {
   private frame = { at: new THREE.Vector3(), right: new THREE.Vector3(), back: new THREE.Vector3() }
   private rain = new Rain()
   private sea: Sea
+  private city: CityGhost
   private confetti = new Confetti()
   private seed: number
   private hour = 12
@@ -133,6 +135,7 @@ export class RouteWorld {
     // Map features share the height grid's origin, so they are only usable alongside it.
     const cover = new LandCover(terrain, route.region, route.id)
     this.sea = new Sea(cover.coast ? terrain : undefined)
+    this.city = new CityGhost(route.id, terrain)
     this.cover = jokeCover(route.id, cover)
     const features = new Features(terrain && route.features, this.field)
     const furniture = planFurniture(path)
@@ -188,6 +191,7 @@ export class RouteWorld {
       this.riders.group,
       this.life.group,
       this.skyline.mesh,
+      this.city.group,
       this.confetti.mesh,
     )
     if (this.sea.mesh) this.root.add(this.sea.mesh)
@@ -283,6 +287,7 @@ export class RouteWorld {
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
     this.confetti.update(dt)
     this.skyline.update(this.field, me.x, me.y, me.z, env, dt, this.sea.wet)
+    this.city.update(this.field, me.x, me.y, me.z, env)
     this.sea.update(me.x, me.z, this.t)
     aimSun(this.key, env, me.x - ox, me.y - oy, me.z - oz)
   }
