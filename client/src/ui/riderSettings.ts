@@ -13,6 +13,7 @@ import {
 } from '../core/riderMetrics'
 import { TIERS, type Tier } from '../types'
 import { h, seg } from './dom'
+import { toast } from './toast'
 import { ZONE_COLOURS } from './planGraph'
 import { chartBox, niceTicks, svgEl } from './svg'
 import { stravaPanel } from './strava'
@@ -175,7 +176,15 @@ export function riderSettings(p: Profile, changed: () => void) {
     )
   }
   const setFtp = () => {
-    recordFtp(p, Math.max(50, Math.min(600, Math.round(+ftp.value) || 200)))
+    // An FTP outside 50 to 600 W is a typo: say so and put the old one back, rather than clamping it into history.
+    const v = Math.round(+ftp.value)
+    if (!(v >= 50 && v <= 600)) {
+      toast(`${ftp.value || 'That'} W doesn't look like an FTP. Kept ${p.ftp} W.`, 'bad')
+      ftp.value = String(p.ftp)
+      return
+    }
+    if (v === p.ftp) return
+    recordFtp(p, v)
     ftp.value = String(p.ftp)
     kg.textContent = wkgStr(p.ftp, p.weightKg)
     save()
