@@ -49,7 +49,13 @@ export function equip(p: Profile, id: string): Profile {
   return { ...p, look }
 }
 
-/** Personal scrap earned from a crew ride: the bus haul plus a bonus per award. */
+/**
+ * Personal scrap banked from a crew ride: a share of what the crew gathered in the ride (where it is also spent, at
+ * the servo) plus a bonus per award. About 60 to 150 a ride, against a Garage of 40 to 640 an item.
+ */
 export const AWARD_BONUS = 25
+export const BANK_SHARE = 0.1
 export const bankScrap = (busScrap: number, awards: number) =>
-  Math.max(0, Math.round(busScrap)) + awards * AWARD_BONUS
+  Math.max(0, Math.round(busScrap * BANK_SHARE)) + awards * AWARD_BONUS
+/** Scrap for riding on your own (a workout or a free ride): a little a minute, nothing for a ride under 10 min. */
+export const soloScrap = (secs: number) => (secs < 600 ? 0 : Math.round((secs / 60) * 1.5))

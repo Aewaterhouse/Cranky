@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { bankScrap, buy, COSMETICS, equip, RARITIES, TRAINER_SKIN } from '../src/core/cosmetics'
+import {
+  bankScrap,
+  soloScrap,
+  buy,
+  COSMETICS,
+  equip,
+  RARITIES,
+  TRAINER_SKIN,
+} from '../src/core/cosmetics'
 import { newProfile, type Profile } from '../src/core/curve'
 
 describe('cosmetics', () => {
@@ -36,7 +44,12 @@ describe('cosmetics', () => {
     expect(equip(p, 'hat-cone').look.hat).toBeUndefined()
     expect(equip(p, 'spikes')).toBe(p)
   })
-  it('banks scrap with award bonus', () => {
-    expect(bankScrap(340.7, 2)).toBe(391)
+  it('banks a share of the crew scrap, with an award bonus', () => {
+    expect(bankScrap(340.7, 2)).toBe(34 + 50)
+    expect(bankScrap(1187, 0)).toBe(119)
+  })
+  it('pays a solo ride by the minute, nothing under ten minutes', () => {
+    expect(soloScrap(9 * 60)).toBe(0)
+    expect(soloScrap(45 * 60)).toBe(68)
   })
 })

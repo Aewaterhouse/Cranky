@@ -89,7 +89,6 @@ export const VIEWS: Record<
     tiles: (g) => [
       tile('Armour', String(Math.round(g.armour))),
       tile('Sync', `${Math.round(g.syncPct)}%`),
-      tile('Scrap', String(g.scrap)),
     ],
     col: 'Falls',
     cell: (r) => String(r.falls),

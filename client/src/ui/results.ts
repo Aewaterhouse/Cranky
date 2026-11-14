@@ -1,7 +1,7 @@
 import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
-import { bankScrap } from '../core/cosmetics'
+import { bankScrap, soloScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
 import { saveProfile } from '../core/profile'
@@ -81,7 +81,8 @@ export function finishRide(
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
-  const banked = group ? bankScrap(group.scrap, myAwards) : 0
+  const banked =
+    s.record.secs < 30 ? 0 : group ? bankScrap(group.scrap, myAwards) : soloScrap(s.record.secs)
   if (banked) p = { ...p, scrap: p.scrap + banked }
   // A free ride goes in the passport and may pay this week's rewards (each once a week).
   const week = weeklyRewards(stampRide(p, s), s, ROUTE_INDEX)
@@ -172,6 +173,16 @@ export function finishRide(
         h('h1', {}, headline(profile.id, group, road)),
         h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
+      // What you earned leads, then the game's story, then the training numbers.
+      banked
+        ? h(
+            'div',
+            { class: 'card hl res-scrap' },
+            h('b', {}, `+${banked} scrap`),
+            ` earned${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. You have ${p.scrap}. `,
+            h('a', { href: '#garage' }, 'Spend it in the Garage →'),
+          )
+        : '',
       // The game's outcome is the story of a crew ride: it comes before the training numbers.
       group ? groupSection(group, profile.id) : '',
       race ? roadSection(road!, profile.id) : '',
@@ -267,14 +278,6 @@ export function finishRide(
             )
           : '',
       ),
-      banked
-        ? h(
-            'div',
-            { class: 'card hl res-scrap' },
-            h('b', {}, `+${banked} scrap`),
-            ` banked${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. Balance: ${p.scrap}. Spend it in the garage.`,
-          )
-        : '',
       blocksCard(s),
       h(
         'div',
