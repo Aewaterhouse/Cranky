@@ -164,7 +164,7 @@ export const VIS = {
     snowLine: 1650,
     /** Faces whose normal points up less than this are rock. */
     rockSlope: 0.8,
-    tarmac: '#3f3f47',
+    tarmac: '#5a606c',
     line: '#ecebe0',
     gravel: '#a39272',
     snow: '#f3f6fa',

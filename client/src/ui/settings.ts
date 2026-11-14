@@ -175,6 +175,19 @@ export function settingsTab() {
         ),
       ),
       row(
+        'Free ride sky',
+        'By the clock gives dawn, midday, golden hour and dusk from the time of day, with passing showers and mist up high.',
+        seg<Settings['sky']>(
+          [
+            ['clock', 'By the clock'],
+            ['sunny', 'Always sunny'],
+            ['golden', 'Golden hour'],
+          ],
+          settings.sky,
+          (sky) => saveSettings({ sky }),
+        ),
+      ),
+      row(
         'Free ride wind',
         'A headwind or tailwind that depends on which way the road points. It changes with the route, the day and the weather.',
         seg<Settings['wind']>(

@@ -23,6 +23,8 @@ export interface Settings {
   freeRideView: '3d' | '2d'
   /** Chainring teeth on the bike on the trainer (with a 14T Zwift Cog), for virtual gears. */
   chainring: number
+  /** Free ride: the sky follows the clock (with showers and mountain mist), or it is always sunny or golden hour. */
+  sky: 'clock' | 'sunny' | 'golden'
   /** Free ride: wind along the road (off unless asked for). */
   wind: 'off' | 'breeze' | 'blowy'
   /** Free ride: a steady camera with no shake, lean, tuck or widening view. */
@@ -60,6 +62,7 @@ const DEFAULTS: Settings = {
   quips: true,
   freeRideView: '3d',
   chainring: CFG.gears.chainring,
+  sky: 'clock',
   wind: 'off',
   calmCamera: false,
   rideSounds: true,

@@ -62,6 +62,7 @@ export function rideWorld(
         if (gone) return
         VIS.route.feel.cam.calm = settings.calmCamera || still ? 1 : 0
         VIS.route.camDist = CFG.camDist[settings.camDist]
+        VIS.route.mood.pick = { clock: 'auto', sunny: 'route', golden: 'routeGolden' }[settings.sky]
         world = new m.RouteWorld(view.stage, base)
         world.state = { me: me.id, riders: [me] }
         const w = world
