@@ -132,7 +132,8 @@ const byChunk = <T extends { d: number }>(list: T[]) => {
 /**
  * Every funny sign on the route, by chunk. The ones tied to the road come first (before a ramp, after a hairpin,
  * on a false flat, at the top, 1 km to go, at the snowline, down at sea level), then fillers that suit the land
- * they stand on. None within `apart` of another or right beside a real sign (`taken` distances).
+ * they stand on, then any the director asks for (`extra`). None within `apart` of another or right beside a real
+ * sign (`taken` distances).
  */
 export function planFunSigns(
   id: string,
@@ -140,6 +141,7 @@ export function planFunSigns(
   cover: LandCover,
   features: Features,
   taken: number[],
+  extra: number[] = [],
 ): Map<number, FunSign[]> {
   const { path } = field
   const L = path.length
@@ -172,6 +174,10 @@ export function planFunSigns(
     const tag = COVER_TAG[land.at(pose.x, pose.z, pose.y)] ?? 'any'
     want.push([d, rand() < S.anyShare ? 'any' : tag])
   }
+  for (const d of extra) {
+    path.poseAt(d, pose)
+    want.push([d, COVER_TAG[land.at(pose.x, pose.z, pose.y)] ?? 'any'])
+  }
 
   const out: FunSign[] = []
   const edge = R.roadHalf + R.verge + S.out
@@ -195,9 +201,14 @@ export function planFunSigns(
 
 /**
  * Chalk on the road, by chunk: every couple of hundred metres up each sustained ramp, with words that suit how
- * steep it is and how much is left, and the odd message on the flat. Not on the tightest bends.
+ * steep it is and how much is left, the odd message on the flat, and any the director asks for (`extra`). Not on
+ * the tightest bends.
  */
-export function planChalk(id: string, path: HeightField['path']): Map<number, Chalk[]> {
+export function planChalk(
+  id: string,
+  path: HeightField['path'],
+  extra: number[] = [],
+): Map<number, Chalk[]> {
   const rand = rng(seedOf(id) ^ 0xc4a1)
   const deal = dealer(CHALK_LINES, rand)
   const out: Chalk[] = []
@@ -231,5 +242,6 @@ export function planChalk(id: string, path: HeightField['path']): Map<number, Ch
     if (hills.some((r) => d > r.d0 - C.flatClear && d < r.d1 + C.flatClear)) continue
     if (Math.abs(path.poseAt(d, pose).grade) < C.flatGrade) add(d, 'flat')
   }
+  for (const d of extra) add(d, 'flat')
   return byChunk(out)
 }

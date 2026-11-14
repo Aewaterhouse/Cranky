@@ -10,7 +10,8 @@ import type { CamShot } from './camShots'
 import { Chunks } from './chunks'
 import { Confetti } from './confetti'
 import { Features } from './features'
-import { planChalk, planFunSigns, type Chalk, type FunSign } from './funSigns'
+import { planRoadLife } from './director'
+import type { Chalk, FunSign } from './funSigns'
 import { planFurniture } from './furniture'
 import { HeightField } from './heightField'
 import { LandCover } from './landCover'
@@ -72,7 +73,7 @@ export class RouteWorld {
   private cover: Pick<LandCover, 'at'>
   private life: Life
   readonly things: { sign: Map<number, FunSign[]>; chalk: Map<number, Chalk[]> }
-  /** Works out the funny signs and chalk again, for when their tunables change. */
+  /** Works out the oddities, life, funny signs and chalk again, for when their tunables change. */
   private replan: () => void
   /** Everything placed in route metres lives here, shifted so the rider is always near (0, 0, 0). */
   private root = new THREE.Group()
@@ -130,12 +131,25 @@ export class RouteWorld {
     const furniture = planFurniture(path)
     const taken = [...furniture.values()].flat().map((f) => f.d)
     this.things = { sign: new Map(), chalk: new Map() }
+    this.landmarks = planLandmarks(route.id, terrain, this.field, cover, features)
+    this.odd = new Oddities(route.id, this.field, cover, features)
+    this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.replan = () => {
-      this.things.sign.clear()
-      this.things.chalk.clear()
-      for (const [k, v] of planFunSigns(route.id, this.field, cover, features, taken))
-        this.things.sign.set(k, v)
-      for (const [k, v] of planChalk(route.id, path)) this.things.chalk.set(k, v)
+      const { sign, chalk } = this.things
+      const p = planRoadLife(
+        route.id,
+        this.field,
+        cover,
+        features,
+        taken,
+        this.odd,
+        this.lifePlan,
+        this.landmarks,
+      )
+      sign.clear()
+      chalk.clear()
+      p.signs.forEach((v, k) => sign.set(k, v))
+      p.chalk.forEach((v, k) => chalk.set(k, v))
     }
     this.replan()
     this.chunks = new Chunks({
@@ -146,12 +160,11 @@ export class RouteWorld {
       furniture,
       funSigns: this.things.sign,
       chalk: this.things.chalk,
-      landmarks: (this.landmarks = planLandmarks(route.id, terrain, this.field, cover, features)),
-      odd: (this.odd = new Oddities(route.id, this.field, cover, features)),
+      landmarks: this.landmarks,
+      odd: this.odd,
     })
     this.riders = new RoadRiders(path)
     this.rig.loop = !!route.loop
-    this.lifePlan = new LifePlan(route.id, this.field, cover, features)
     this.life = new Life(this.lifePlan, path, this.chunks.height)
     path.poseAt(0, this.riders.me)
     const k = setUpSun(this.key)
@@ -296,8 +309,6 @@ export class RouteWorld {
   /** Drops the built chunks so visual settings changed in the debug panel show up. */
   rebuild() {
     this.replan()
-    this.odd.clear()
-    this.lifePlan.clear()
     this.chunks.clear()
   }
 

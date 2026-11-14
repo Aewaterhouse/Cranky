@@ -43,6 +43,8 @@ export class LifePlan {
   private cover: Pick<LandCover, 'at'>
   private seed: number
   private alpine: boolean
+  /** Extra oncoming vehicles the director wants, by route metres (director.ts). */
+  traffic: number[] = []
 
   constructor(
     id: string,
@@ -124,13 +126,13 @@ export class LifePlan {
       }
     // On the road: a magpie with a grudge, or something coming the other way.
     const mid = d0 + R.chunk / 2
+    const kinds = TRAFFIC.filter((q) => q !== 'coach' || this.alpine)
     if (mid > L.endClear && mid < path.length - L.endClear) {
       const { x, y, z } = path.poseAt(mid, pose)
       const [um, ut, uk] = [rand(), rand(), rand()]
       if (um < L.magpieChance && L.kinds.magpie.on.includes(cover.at(x, z, y)) && y < R.snowLine)
         add('magpie', mid, 1, x, z)
-      else if (ut < L.trafficChance) {
-        const kinds = TRAFFIC.filter((q) => q !== 'coach' || this.alpine)
+      else if (ut < L.trafficChance)
         add(
           weighted(kinds, (q) => L.kinds[q].w, uk)!,
           mid,
@@ -138,8 +140,19 @@ export class LifePlan {
           x,
           z,
         )
-      }
     }
+    for (const d of this.traffic)
+      if (Math.floor(d / R.chunk) === k && d < path.length - L.endClear) {
+        const { x, z } = path.poseAt(d, pose)
+        add(
+          weighted(kinds, (q) => L.kinds[q].w, rand())!,
+          d,
+          1,
+          x,
+          z,
+        )
+        out[out.length - 1].rank = 0
+      }
     return out.sort((a, b) => a.d - b.d)
   }
 }

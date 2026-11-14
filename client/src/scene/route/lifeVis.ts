@@ -78,6 +78,12 @@ export const LIFE = {
     caravan: { w: 2, on: '', near: 0, far: 0, r: 0, min: 1, max: 1 },
     coach: { w: 2.5, on: '', near: 0, far: 0, r: 0, min: 1, max: 1 },
   } satisfies Record<string, OddDef & { min: number; max: number }>,
+  /**
+   * The road-life director: at `speed` m/s nothing worth a look is ever more than `maxS` seconds after the last
+   * thing, gaps being filled with chalk, a funny sign or something coming the other way (weights in `mix`). Only
+   * oddities and herds below rank `shown` count, so a low quality level still gets its moments.
+   */
+  director: { speed: 8.5, maxS: 42, shown: 0.7, mix: { chalk: 2, sign: 1.5, traffic: 1.5 } },
   utes: ['#d8d2bf', '#b3261e', '#2f5f8a', '#e9e6dc'],
   col: {
     roo: '#9a7b5f',
