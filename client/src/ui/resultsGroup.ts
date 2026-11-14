@@ -1,71 +1,12 @@
 import type { Game } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
-import { fmt, h, pctStr, stars } from './dom'
+import { fmt, h, pctStr } from './dom'
+import { VIEWS, tile } from './resultsViews'
 import type { GroupSummary } from './results'
 import { savePng } from './ridePostcard'
 
 const TROPHY =
   '<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M7 3h10v6a5 5 0 0 1-10 0V3z"/><path d="M3 4h4v2H5a2 2 0 0 0 2 3v2a4 4 0 0 1-4-4V4zm18 0h-4v2h2a2 2 0 0 1-2 3v2a4 4 0 0 0 4-4V4z"/><rect x="11" y="14" width="2" height="4"/><rect x="8" y="18" width="8" height="3" rx="1"/></svg>'
-
-const tile = (label: string, value: string, cls = '') =>
-  h('div', { class: `res-tile ${cls}` }, h('span', {}, label), h('b', {}, value))
-
-type Row = GroupSummary['riders'][number]
-/** What differs between games on the crew card: the tiles after distance, one table column and an extra card. */
-const VIEWS: Record<
-  string,
-  {
-    tiles: (g: GroupSummary) => Node[]
-    col: string
-    cell: (r: Row) => string
-    extra?: (g: GroupSummary) => Node | ''
-  }
-> = {
-  bus: {
-    tiles: (g) => [
-      tile('Armour', String(Math.round(g.armour))),
-      tile('Sync', `${Math.round(g.syncPct)}%`),
-      tile('Scrap', String(g.scrap)),
-    ],
-    col: 'Falls',
-    cell: (r) => String(r.falls),
-  },
-  madness: {
-    tiles: () => [],
-    col: 'Points · in the red',
-    cell: (r) => `${r.points ?? 0} · ${r.redSecs ?? 0} s`,
-  },
-  ambo: {
-    tiles: (g) => {
-      const rv = g.reviews ?? []
-      const avg = rv.reduce((a, r) => a + r.stars, 0) / (rv.length || 1)
-      return [
-        tile('Delivered', `${rv.filter((r) => r.stars > 1).length} / ${rv.length}`),
-        tile('Rating', `${avg.toFixed(1)} ★`),
-      ]
-    },
-    col: 'Spread · spikes · fines',
-    cell: (r) => `${(r.spread ?? 0).toFixed(1)}% · ${r.spikes ?? 0} · ${r.fines ?? 0}`,
-    extra: (g) =>
-      g.reviews?.length
-        ? h(
-            'div',
-            { class: 'card' },
-            h('h2', {}, 'Google reviews'),
-            ...g.reviews.map((r) =>
-              h(
-                'p',
-                { class: 'res-review' },
-                h('b', {}, `${r.icon} ${r.patient} `),
-                h('span', { class: 'res-stars' }, stars(r.stars)),
-                h('br', {}),
-                r.text,
-              ),
-            ),
-          )
-        : '',
-  },
-}
 
 /** Bus-ride extras: score, distance, armour, sync, award trophies and the crew table. */
 export function groupSection(g: GroupSummary, myId: string) {
