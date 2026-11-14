@@ -78,7 +78,10 @@ export function finishRide(
   const prs =
     p === profile
       ? []
-      : Object.entries(s.record.best).filter(([d, w]) => !before[+d] || w > before[+d].w)
+      : Object.entries(s.record.best).filter(
+          // New bests at the familiar durations only: the curve's in-between ones would crowd the row.
+          ([d, w]) => d in DUR_LABEL && (!before[+d] || w > before[+d].w),
+        )
   const sug = ftpSuggestion(p)
   const ftpBox = h('div')
   if (sug)
