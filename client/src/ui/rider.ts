@@ -1,4 +1,5 @@
 import { portrait } from './shopPreview'
+import { monthWrap } from '../core/wrap'
 import { CFG } from '../config'
 import { TIER_NAME } from '../types'
 import { level, liveStreak, type Profile } from '../core/curve'
@@ -51,6 +52,7 @@ function overview(p: Profile, toHistory: () => void) {
       stat(s.kj.toLocaleString('en-AU'), 'kJ'),
       stat(liveStreak(p), 'week streak'),
     ),
+    wrapCard(p),
     // A kJ of work at the pedals is about a kilocalorie burned: in pies and Tim Tams.
     s.kj > 0
       ? h(
@@ -71,6 +73,21 @@ function overview(p: Profile, toHistory: () => void) {
     ),
     badgeGrid(p),
   )
+}
+
+/** This month so far, in a sentence or two. */
+function wrapCard(p: Profile) {
+  const w = monthWrap(p.rides)
+  if (!w) return ''
+  const bits = [
+    `${w.rides} ride${w.rides > 1 ? 's' : ''}`,
+    `${w.hours} h`,
+    `${w.kj.toLocaleString('en-AU')} kJ`,
+    `longest ${w.longest} min`,
+    w.best20 ? `best 20 min ${w.best20} W` : '',
+    w.fav ? `most ridden: ${w.fav}` : '',
+  ].filter(Boolean)
+  return h('p', { class: 'month-wrap' }, h('b', {}, `${w.month} so far: `), bits.join(' · '))
 }
 
 /** Level and the bar to the next one. */

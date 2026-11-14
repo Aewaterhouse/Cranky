@@ -854,3 +854,6 @@ details.ftp-card > summary {
 .ready-tick {
   color: var(--tox);
 }
+.month-wrap {
+  margin: 0 0 12px;
+}
