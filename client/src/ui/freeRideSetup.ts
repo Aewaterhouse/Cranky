@@ -186,7 +186,6 @@ export function freeRideSetup(
       { class: 'lede' },
       'No ERG. Your power moves you along a real route and the trainer follows the gradient.',
     ),
-    weekCard(p, pickBundled),
     h(
       'section',
       { class: 'panel' },
@@ -202,6 +201,7 @@ export function freeRideSetup(
       ),
       lib.el,
     ),
+    weekCard(p, pickBundled),
     h(
       'section',
       { class: 'panel' },
