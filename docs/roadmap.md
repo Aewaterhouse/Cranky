@@ -172,7 +172,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ Scheduled rides | Put a ride in the calendar; everyone gets a link and a reminder. Built: Coming up on home (plan a game at a time, I'm in or out, the host can cancel), a 📅 calendar file with a 10 minute alarm, a toast on home 15 minutes before, and a Discord post when one is planned | M |
-| ✅ Crew feed | Who rode what, new PRs, kudos. Built: the crew's last eight rides on home (the game or workout, how long, how long ago) with a 👏 kudos each, once and never your own. PRs in the feed still to do | M |
+| ✅ Crew feed | Who rode what, new PRs, kudos. Built: the crew's last eight rides on home (the game or workout, how long, how long ago) with a 👏 kudos each (once, never your own) and how many new PRs the ride set | M |
 | ✅ Achievements | Long-term badges shown on the profile and the bus. Done as the 23 badges on Rider → Overview (unlock cards, progress bars), held titles in lobbies, and LEGEND trophies on the bus roof | M |
 | Proper accounts | Real passwords and invite links if it ever leaves the friend group | M |
 | ✅ Backups | A dated copy of the database at server start and every 24 h, newest 14 kept, in `server/backups/` (`ZB_BACKUPS` to move it) | S |
