@@ -301,6 +301,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
         else if (fx.k === 'turn' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR TURN ON THE FRONT', 'Hold your target for a minute', 2600, 1)
+        else if (fx.k === 'boss') sp.splash('sp-fell', '☠ BOSS FIGHT', text, 3600, 3)
+        else if (fx.k === 'bosswin') sp.splash('sp-smash', '🏆 BOSS BEATEN', text, 3600, 3)
         else if (fx.k === 'harpoon') sp.splash('sp-smash', '🔱 HARPOON!', text, 3200, 2)
         else if (fx.k === 'leg') sp.splash('sp-smash', '🗺️ NEXT LEG', text, 3200, 2)
         if (fx.k === 'buy') shop.bought(text)

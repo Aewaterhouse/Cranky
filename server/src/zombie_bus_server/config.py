@@ -233,6 +233,33 @@ WEATHER = {
     "dust": {"weight": 12, "name": "Dust storm"},
     "night": {"weight": 13, "name": "Night run", "scrap": 1.25},
 }
+# Boss fight: the last long effort before the cool-down. The crew wears it down by riding on target: beaten
+# once BOSS_SHARE of the block's seconds have been ridden at full compliance (the crew's mean).
+BOSS_EVENTS = ("longhaul", "surge", "rampup")
+BOSS_SHARE = 0.75
+BOSS_SCRAP = 60
+BOSS_ARMOUR = 15
+BOSS_HIT = 30
+BOSSES = {
+    "roadtrain": {
+        "name": "THE ROAD TRAIN",
+        "start": "BOSS: a zombie road train, three trailers long, is right on the bumper. Hold your targets!",
+        "win": "The road train jackknifed into a servo. Boss beaten!",
+        "lose": "The road train rammed the bus. Big hit.",
+    },
+    "giant": {
+        "name": "THE BIG ZOMBIE",
+        "start": "BOSS: a zombie the size of the Big Pineapple is stomping after you. Hold your targets!",
+        "win": "The Big Zombie tripped on a power line. Boss beaten!",
+        "lose": "The Big Zombie got a foot on the bus. Big hit.",
+    },
+    "bridge": {
+        "name": "THE COLLAPSING BRIDGE",
+        "start": "BOSS: the bridge behind is falling in, horde and all. Hold your targets to outrun it!",
+        "win": "Off the bridge as it fell in. Boss beaten!",
+        "lose": "The bridge dropped the back wheels. Big hit.",
+    },
+}
 FRONT_S = 60  # rolling turns: each rider's time on the front
 FRONT_CLEAN = 0.9  # mean compliance on the front that counts as a clean turn
 FRONT_GAP = 4  # metres on the horde for a clean turn

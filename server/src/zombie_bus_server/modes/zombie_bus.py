@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 
 from .. import config as C
 from .. import config_games as G
-from ..plan import is_over
+from ..plan import event_for, is_over
 from .common import CrewGame, award, compliance, rider_row, tally
 
 if TYPE_CHECKING:
@@ -65,6 +65,7 @@ class ZombieBus(CrewGame):
         self.fx: list[dict] = []
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
+        self.boss: dict | None = None  # the final fight: {i, kind, need (s on target), done}
         self.weather = "clear"  # rolled by the room as the ride starts (`roll_weather`)
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
@@ -117,6 +118,8 @@ class ZombieBus(CrewGame):
         tally(active, dt)
         self.hauling(room, active, dt)
         self.turns(room, active, ev)
+        if self.boss and self.boss["i"] == i and not self.boss.get("over"):
+            self.boss["done"] += comp * dt
         self.cadence_sync(active, dt)
 
         self.run_challenge(room, active, ev)
@@ -232,6 +235,12 @@ class ZombieBus(CrewGame):
             self.emit("gunship", f"{need} s streak: the crew is up in the gunship for {C.GUNSHIP_S} s!")
 
     def block_change(self, room: Room, i: int, b: dict, ev: str) -> None:
+        if self.boss and self.last_i == self.boss["i"] and not self.boss.get("over"):
+            self.end_boss()
+        if self.boss is None:
+            self.boss = self.pick_boss(room)
+        if self.boss and i == self.boss["i"]:
+            self.emit("boss", C.BOSSES[self.boss["kind"]]["start"])
         if self.rb:
             self.rb["deadline"] = min(self.rb["deadline"], room.el + C.RB_GRACE_S)
         self.last_i = i
@@ -351,6 +360,27 @@ class ZombieBus(CrewGame):
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
+
+    def pick_boss(self, room: Room) -> dict:
+        """The ride's last long effort before the cool-down is the boss; which boss is drawn for the room."""
+        blocks = room.plan["blocks"]
+        fights = [j for j in range(1, len(blocks) - 1) if event_for(blocks, j) in C.BOSS_EVENTS]
+        if not fights:
+            return {"i": -1, "over": True}
+        i = fights[-1]
+        kind = random.Random(f"{room.code}:boss").choice(sorted(C.BOSSES))
+        return {"i": i, "kind": kind, "need": blocks[i]["dur"] * C.BOSS_SHARE, "done": 0.0}
+
+    def end_boss(self) -> None:
+        """The boss block is over: beaten for scrap and armour, or it lands its blow."""
+        b, boss = self.boss, C.BOSSES[self.boss["kind"]]
+        b["over"] = True
+        if b["done"] >= b["need"]:
+            self.scrap += C.BOSS_SCRAP
+            self.armour = min(100.0, self.armour + C.BOSS_ARMOUR)
+            self.emit("bosswin", f"{boss['win']} +{C.BOSS_SCRAP} scrap")
+        else:
+            self.damage(C.BOSS_HIT, boss["lose"])
 
     def turns(self, room: Room, active: list[Rider], ev: str) -> None:
         """Rolling turns, a team move: each rider takes the front for FRONT_S; a clean turn gains metres."""
@@ -513,6 +543,14 @@ class ZombieBus(CrewGame):
             "shop": self.ev == "servo" and not self.mut.get("no_shop"),
             "wares": self.wares,
             "weather": self.weather,
+            "boss": (
+                {
+                    "name": C.BOSSES[self.boss["kind"]]["name"],
+                    "left": round(max(0.0, 1 - self.boss["done"] / self.boss["need"]), 3),
+                }
+                if self.boss and self.boss["i"] == i and not self.boss.get("over")
+                else None
+            ),
             "repel": self.repel,
             "syncw": self.syncw,
             "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),

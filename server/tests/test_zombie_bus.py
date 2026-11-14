@@ -423,3 +423,37 @@ def test_weather_is_mostly_clear_and_each_kind_bites():
     run(room2, night, 10)
     assert night.scrap == pytest.approx(clear.scrap * 1.25, rel=0.01)
     assert night.state(room2, 1, 0)["weather"] == "night"
+
+
+BOSS_PLAN = [
+    STEADY[0],
+    {"type": "steady", "dur": 120, "pct": 90},
+    {"type": "steady", "dur": 100, "pct": 95},
+    STEADY[0],
+]
+
+
+def boss_ride(s):
+    room, bus = FakeRoom(BOSS_PLAN), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, i=0, ev="warmup")
+    run(room, bus, 5, i=1)
+    fx = run(room, bus, 1, i=2)
+    assert bus.boss["i"] == 2 and any(f["k"] == "boss" for f in fx)
+    assert bus.state(room, 2, 0)["boss"]["left"] > 0.9
+    set_all(room, s)
+    run(room, bus, 99, i=2)
+    armour, scrap = bus.armour, bus.scrap
+    fx = run(room, bus, 1, i=3, ev="cooldown")
+    assert bus.state(room, 3, 0)["boss"] is None
+    return bus, fx, armour, scrap
+
+
+def test_the_last_long_effort_is_a_boss_and_riding_on_target_beats_it():
+    bus, fx, armour, scrap = boss_ride(1.0)
+    assert any(f["k"] == "bosswin" for f in fx) and bus.scrap >= scrap + C.BOSS_SCRAP
+
+
+def test_a_boss_the_crew_cannot_hold_lands_a_big_hit():
+    bus, fx, armour, scrap = boss_ride(0.5)
+    assert not any(f["k"] == "bosswin" for f in fx) and bus.armour < armour

@@ -131,6 +131,8 @@ export interface BusState {
   wares?: ShopItem[]
   /** The ride's weather: rain hurts more, a night run pays more scrap, dust hides the gap. */
   weather?: 'clear' | 'rain' | 'dust' | 'night'
+  /** The boss fight while it is on: its name and the share of its health left. */
+  boss?: { name: string; left: number } | null
   repel: number
   syncw: number
   nitro: number

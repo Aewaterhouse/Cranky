@@ -30,6 +30,15 @@ export function makeBusPanel() {
   const busIco = h('span', { class: 'bs-bus' }, '🚌')
   const gapTrack = h('div', { class: 'bs-gap' }, zombie, busIco)
   const armour = h('div', { class: 'bs-bar' }, armourFill)
+  // The boss fight: its name and a health bar that empties as the crew rides on target.
+  const bossName = h('label', {})
+  const bossFill = h('i', {})
+  const boss = h(
+    'div',
+    { class: 'bs-boss', hidden: true },
+    h('div', { class: 'bs-head' }, bossName, h('span', {}, '☠')),
+    h('div', { class: 'bs-bar boss' }, bossFill),
+  )
   const syncState = h('span', { class: 'bs-sync-s' })
   const syncTrack = h('div', { class: 'bs-sync-t' }, h('i', { class: 'bs-win' }))
   const win = syncTrack.firstElementChild as HTMLElement
@@ -43,6 +52,7 @@ export function makeBusPanel() {
   const root = h(
     'section',
     { class: 'hud-glass bs' },
+    boss,
     h('div', { class: 'bs-head' }, h('label', {}, '🛡 ARMOUR'), armourN),
     armour,
     h('div', { class: 'bs-head' }, h('label', {}, 'HORDE GAP'), gapN),
@@ -84,6 +94,11 @@ export function makeBusPanel() {
         pulse(armour, 'hit')
       }
       lastArmour = b.armour
+      boss.hidden = !b.boss
+      if (b.boss) {
+        set(bossName, b.boss.name)
+        bossFill.style.width = `${b.boss.left * 100}%`
+      }
       // In a dust storm nobody can see how far back the horde is.
       const dust = b.weather === 'dust'
       set(gapN, dust ? '?? m' : `${Math.round(b.gap)} m`)

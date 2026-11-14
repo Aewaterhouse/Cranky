@@ -207,3 +207,13 @@
     filter: brightness(1.6);
   }
 }
+.bs-boss {
+  margin-bottom: 8px;
+  color: #ff6b5a;
+}
+.bs-boss[hidden] {
+  display: none;
+}
+.bs-bar.boss > i {
+  background: #d8342a;
+}
