@@ -248,6 +248,8 @@ export interface Tick {
   stats?: Record<string, RideStats>
   /** The crew game's own state, for games newer than VO2 Madness. */
   game?: Record<string, unknown> | null
+  /** The game has stopped the clock (a watch party paused by its driver): the workout waits. */
+  hold?: boolean
 }
 /** A rider's ride so far, worked out on the server from the power it has received. */
 export interface RideStats {

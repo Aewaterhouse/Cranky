@@ -229,11 +229,12 @@ class Room:
         total_s = total(self.plan["blocks"])
         while self.state == "running":
             await asyncio.sleep(dt / C.TIME_SCALE)
-            self.el += dt
+            held = self.mode.holds(self)
+            self.el += 0 if held else dt
             if self.el >= total_s:
                 await self.finish()
                 return
-            await self.broadcast(self.step(dt))
+            await self.broadcast(self.step(0 if held else dt))
             if time.monotonic() - self.saved_at >= C.SNAPSHOT_S:
                 self.save()
 

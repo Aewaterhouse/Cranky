@@ -214,3 +214,4 @@ class Tick(BaseModel):
     load: float = 1.0  # targets of riders still on the bus are multiplied by this while others have fallen
     stats: dict[str, RideStatsMsg] | None = None  # the ride so far, once a second at most
     game: dict | None = None  # the crew game's own state (games newer than VO2 Madness)
+    hold: bool = False  # the game has stopped the clock (a watch party paused by its driver)

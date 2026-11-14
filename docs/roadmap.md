@@ -134,7 +134,7 @@ A shared room where the crew does the same ERG workout while watching the same v
 | ✅ Layout | Video takes most of the screen; a slim workout strip shows target, power, the band gauge, interval clock and the workout graph | M |
 | Shared queue | Anyone can add videos to the playlist; the host can reorder and skip (adding and skipping done; reordering and playlists still to do) | S |
 | Crew strip | Small row of everyone's watts, compliance and heart rate, plus emoji reactions over the video | S |
-| Pause rules | Workout pause and video pause are linked: if the host pauses, both stop for everyone | S |
+| ✅ Pause rules | Workout pause and video pause are linked: if the host pauses, both stop for everyone | S |
 | Workout-aware video | Optional: dip the video volume and flash the strip a few seconds before each interval change | S |
 | Other sources | Twitch streams and direct video links, where they can be embedded | M |
 

@@ -188,6 +188,7 @@ export function startBusRide(
     if (f) ride.setFrame(f)
   }, 1000 / CFG.clock.hz)
   let lastI = -2
+  let held = false
   let lastEv = ''
   let lastCount = 0
 
@@ -201,7 +202,12 @@ export function startBusRide(
     clock.tick(m.el, performance.now())
     const mb = me?.band
     mine = mb ? { tgt: me.tgt ?? null, band: mb === 'free' ? undefined : mb } : null
-    running = m.i >= 0
+    running = m.i >= 0 && !m.hold
+    if (!!m.hold !== held)
+      hud.banner(
+        (held = !!m.hold) ? 'Paused by the driver: the workout waits too' : 'Back on',
+        2500,
+      )
     if (m.i < 0) {
       hud.countdown(Math.ceil(-m.el), ride.live)
       ride.setFrame(null)

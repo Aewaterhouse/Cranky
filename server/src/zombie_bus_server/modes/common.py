@@ -102,6 +102,10 @@ class CrewGame:
     def on_act(self, room: Room, r: Rider, k: str, v: str | float | bool | None) -> None:
         """A rider's game input (`act`): an emoji, a card, a vote. Unknown kinds are ignored."""
 
+    def holds(self, room: Room) -> bool:
+        """True stops the room's clock: the workout waits (a watch party paused by its driver)."""
+        return False
+
     def ask(self, room: Room, r: Rider) -> dict | None:
         """The game's question to this rider right now, sent in their tick entry, or None.
 

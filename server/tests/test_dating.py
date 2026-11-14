@@ -34,6 +34,7 @@ class Night:
         self.el = 0.0
         self.riders = {f"r{i}": Rider(f"r{i}", f"R{i}", 200, "hard", connected=True) for i in range(n)}
         self.game = Dating()
+        random.seed(7)  # the game draws its event seed at the start; tests want the same night every time
         self.game.begin(self)
         if not events:
             self.game.events = []

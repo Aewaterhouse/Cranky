@@ -33,6 +33,7 @@ class Watch(CrewGame):
         self.queue: list[dict] = []
         self.added: dict[str, int] = {}
         self.title: str | None = None
+        self.held = False  # the driver paused: the workout waits with the video
         self.played: list[dict] = []  # queue entries already played, for their titles
 
     def where(self, el: float) -> float:
@@ -66,6 +67,7 @@ class Watch(CrewGame):
             return
         if k in ("play", "pause") and self.vid:
             self.pos, self.at, self.playing = self.where(room.el), room.el, k == "play"
+            self.held = k == "pause" and room.el >= 0
         elif k == "seek" and self.vid:
             try:
                 step = max(-G.WATCH_SEEK_MAX, min(G.WATCH_SEEK_MAX, float(v)))  # type: ignore[arg-type]
@@ -77,6 +79,10 @@ class Watch(CrewGame):
             if nxt:
                 self.played.append(nxt)
             self.cue(room, nxt["vid"] if nxt else None, True)
+            self.held = False
+
+    def holds(self, room: Room) -> bool:
+        return self.held
 
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
         tally([r for r in room.riders.values() if r.st == "riding"], dt)

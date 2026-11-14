@@ -77,6 +77,7 @@ def step(room: Room, dt: float) -> dict:
         fx=fx,
         load=load,
         stats=stats,
-        game=room.mode.game(room, i, bel) if i >= 0 else None,
+        game=room.mode.game(room, i, bel) if i >= 0 or room.mode.early_acts else None,
+        hold=room.mode.holds(room),
     )
     return tick.model_dump()

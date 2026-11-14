@@ -80,3 +80,19 @@ def test_a_player_names_the_video_for_everyone():
     assert w.game(room, 1, 0)["title"] == "Big Buck Bunny"
     w.on_act(room, host, "next", None)
     assert w.game(room, 1, 0)["title"] == "Never Gonna Give You Up"
+
+
+def test_the_drivers_pause_stops_the_workout_clock_too():
+    async def main():
+        room, ws = await lobby_with(1, "WTCH")
+        await room.handle("h0", ws, {"t": "game", "game": "watch"})
+        room.start()
+        room.el = 10.0
+        await room.handle("h0", ws, {"t": "act", "k": "add", "v": VID})
+        await room.handle("h0", ws, {"t": "act", "k": "pause"})
+        held = room.step(0)
+        await room.handle("h0", ws, {"t": "act", "k": "play"})
+        return room, held, room.step(0.5)
+
+    room, held, going = asyncio.run(main())
+    assert held["hold"] and not going["hold"] and held["game"]["vid"] == VID

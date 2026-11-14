@@ -157,4 +157,4 @@ position, through `ErgController.setGrade`.
 ## Watch party (`game: "watch"`, from 2026-11-14)
 - A crew game on the host's workout, with ERG as in the bus. `tick.game` is `{g: "watch", vid, title, playing, pos, at, queue: [{vid, title, by}]}`: the video is `pos` seconds in at ride time `at`, and runs on from there while `playing`. Each client keeps its player within 2 s of that.
 - `act` keys: `add` (an 11-character YouTube video id; anyone; the first one starts playing, the rest queue, at most 20), and for the host only `play`, `pause`, `seek` (seconds, plus or minus, at most 600) and `next`. A watch party takes `act` during the countdown too (`CrewGame.early_acts`).
-
+- `tick.hold` (bool): the game has stopped the room's clock (`CrewGame.holds`). A watch party holds while its driver has the video paused, so the workout waits too; clients freeze their local plan clock while it is set. A watch party sends `tick.game` during the countdown as well.
