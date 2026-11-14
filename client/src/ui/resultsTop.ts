@@ -38,6 +38,15 @@ export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
  */
 export function scoreContext(me: string, g: GroupSummary) {
   const key = `cranky.scores.${me}.${g.mode ?? 'bus'}`
+  // The ranked games score each rider: the big number is the crew's top, so lead with your own.
+  const row = g.riders.find((r) => r.id === me)
+  const own =
+    g.mode === 'last'
+      ? row?.reached
+      : g.mode === 'quiz' || g.mode === 'hunt'
+        ? row?.points
+        : undefined
+  const score = own ?? g.score
   let was: { best: number; last: number } | null = null
   try {
     was = JSON.parse(localStorage.getItem(key) ?? 'null')
@@ -47,11 +56,13 @@ export function scoreContext(me: string, g: GroupSummary) {
   try {
     localStorage.setItem(
       key,
-      JSON.stringify({ best: Math.max(was?.best ?? 0, g.score), last: g.score }),
+      JSON.stringify({ best: Math.max(was?.best ?? 0, score), last: score }),
     )
   } catch {
     /* storage blocked: the score still shows */
   }
+  if (own != null)
+    return `You: ${own.toLocaleString()}${was ? ` · your best ${was.best.toLocaleString()}` : ' · your first go'}`
   const crew = g.crewBest
   if (crew != null && g.score > crew)
     return `New crew record! The old best was ${crew.toLocaleString()}.`

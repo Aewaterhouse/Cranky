@@ -132,7 +132,7 @@ export const GAMES: Record<Game, GameInfo> = {
       'A shared ramp test as an elimination game. One-minute steps climb to 150% of FTP; drop off your step for 10 s and you are out. Last one standing wins.',
     start: 'Start the ramp',
     countdown: 'THE RAMP STARTS IN',
-    score: 'Highest step (% FTP)',
+    score: 'Crew’s top step (% FTP)',
     plan: false,
   },
   ttt: {
@@ -164,7 +164,7 @@ export const GAMES: Record<Game, GameInfo> = {
       'Aussie trivia over the driver’s workout. Answer while you ride: right answers score, on target scores more, and the quickest gets a bonus.',
     start: 'Open the pub',
     countdown: 'THE PUB OPENS IN',
-    score: 'Top score',
+    score: 'Crew’s top score',
     plan: true,
   },
   galley: {
@@ -196,7 +196,7 @@ export const GAMES: Record<Game, GameInfo> = {
       'A round each as the fox over the driver’s workout. Riding on target is speed, so the fox escapes by holding steadier than the whole pack, and the hounds run them down by doing better.',
     start: 'Release the fox',
     countdown: 'THE HUNT STARTS IN',
-    score: 'Top points',
+    score: 'Crew’s top points',
     plan: true,
   },
 }

@@ -19,3 +19,18 @@ describe('results headline', () => {
     expect(headline('me', g('bus', ['me'], { armour: 0 }))).toBe('Limped home!')
   })
 })
+
+describe('score context', () => {
+  it('leads with your own score in the ranked games', async () => {
+    const { scoreContext } = await import('../src/ui/resultsTop')
+    const quiz = {
+      mode: 'quiz',
+      score: 237,
+      riders: [
+        { id: 'me', points: 40 },
+        { id: 'kat', points: 237 },
+      ],
+    }
+    expect(scoreContext('me', quiz as unknown as GroupSummary)).toBe('You: 40 · your first go')
+  })
+})
