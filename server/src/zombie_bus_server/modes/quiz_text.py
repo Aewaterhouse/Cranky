@@ -33,4 +33,54 @@ QUESTIONS = [
         "A zombie's top speed in this app is limited by...",
         ["Your FTP", "The bus", "The weather", "Nothing at all"],
     ),
+    (
+        "Which Aussie won the 2009 road world championship?",
+        ["Cadel Evans", "Simon Gerrans", "Robbie McEwen", "Michael Matthews"],
+    ),
+    ("What colour jersey does the Tour de France leader wear?", ["Yellow", "Green", "Pink", "Red"]),
+    (
+        "Which Grand Tour gives its leader a pink jersey?",
+        ["Giro d'Italia", "Vuelta a España", "Tour de France", "Tour Down Under"],
+    ),
+    (
+        "What does FTP stand for?",
+        ["Functional threshold power", "Fast tempo pace", "Full training power", "Final test power"],
+    ),
+    (
+        "What is the capital of the Northern Territory?",
+        ["Darwin", "Alice Springs", "Katherine", "Tennant Creek"],
+    ),
+    ("How many states does Australia have?", ["Six", "Five", "Seven", "Eight"]),
+    ("A 'thongs' wearer has what on their feet?", ["Flip-flops", "Socks", "Boots", "Nothing"]),
+    ("Where is the Big Pineapple?", ["Woombye, Sunshine Coast", "Cairns", "Bundaberg", "Byron Bay"]),
+    ("What is a 'bogan' most likely to drive?", ["A ute", "A Prius", "A tandem", "A tram"]),
+    ("Which animal lays eggs and has a duck's bill?", ["Platypus", "Wombat", "Echidna", "Bilby"]),
+    (
+        "Uluru is in which state or territory?",
+        ["Northern Territory", "South Australia", "Western Australia", "Queensland"],
+    ),
+    (
+        "What is 'fairy bread' topped with?",
+        ["Hundreds and thousands", "Vegemite", "Sugar and cinnamon", "Honey"],
+    ),
+    (
+        "What does a cyclist 'bonk' from?",
+        ["Running out of fuel", "A flat tyre", "Too much coffee", "A crash"],
+    ),
+    ("A 'Pav' is a...", ["Pavlova", "Cycle path", "Pavement", "Pub"]),
+    ("Which bird laughs?", ["Kookaburra", "Cockatoo", "Emu", "Lorikeet"]),
+    ("Bells Beach in Victoria is famous for...", ["Surfing", "Skiing", "A cycling climb", "A pub"]),
+    (
+        "Who was the first Australian to wear the Tour's yellow jersey?",
+        ["Phil Anderson", "Cadel Evans", "Robbie McEwen", "Stuart O'Grady"],
+    ),
+    (
+        "What does 'chuck a sickie' mean?",
+        ["Take a day off work, not quite sick", "Throw up", "Do a U-turn", "Buy a round"],
+    ),
+    ("Which state is the Barossa Valley in?", ["South Australia", "Victoria", "NSW", "WA"]),
+    (
+        "What is a cyclist's 'domestique'?",
+        ["A rider who works for the team leader", "A support car", "A bike mechanic", "The race cook"],
+    ),
 ]
