@@ -57,7 +57,9 @@ def road_graph(waypoints: list[Point]) -> tuple[dict[int, Point], dict[int, list
     """Fetches the public roads around the waypoints as nodes and an undirected graph."""
     lats, lons = [w[0] for w in waypoints], [w[1] for w in waypoints]
     box = f"{min(lats) - PAD_DEG},{min(lons) - PAD_DEG},{max(lats) + PAD_DEG},{max(lons) + PAD_DEG}"
-    query = f'[out:json][timeout:120];way["highway"~"^({ROADS})(_link)?$"]({box});out geom;'
+    query = (
+        f'[out:json][timeout:120];way["highway"~"^({ROADS})(_link)?$"]({box});out geom;'
+    )
     pos: dict[int, Point] = {}
     adj: dict[int, list] = {}
     for way in fetch(OVERPASS, {"data": query})["elements"]:
@@ -103,7 +105,9 @@ def drop_spurs(nodes: list[int], pos: dict[int, Point]) -> list[int]:
         while c - k > 0 and c + k < len(out) - 1 and out[c - k - 1] == out[c + k + 1]:
             k += 1
         stub = out[c : c + k + 1]
-        length = sum(haversine(pos[a], pos[b]) for a, b in zip(stub, stub[1:], strict=False))
+        length = sum(
+            haversine(pos[a], pos[b]) for a, b in zip(stub, stub[1:], strict=False)
+        )
         if k and length <= SPUR_MAX_M:
             del out[c - k + 1 : c + k + 1]
             c = max(1, c - k)
@@ -191,14 +195,17 @@ def stats(ele: list[float]) -> dict:
         sm.append(sum(el[i - w : i + w + 1]) / (2 * w + 1))
     rises = sum(max(0.0, b - a) for a, b in zip(sm, sm[1:], strict=False))
     grades = sorted(
-        max(-MAX_GRADE, min(MAX_GRADE, (b - a) / space * 100)) for a, b in zip(sm, sm[1:], strict=False)
+        max(-MAX_GRADE, min(MAX_GRADE, (b - a) / space * 100))
+        for a, b in zip(sm, sm[1:], strict=False)
     )
     return {
         "km": round((n - 1) * space / 1000, 1),
         "gainM": round(rises),
         "avgGrade": round((sm[-1] - sm[0]) / ((n - 1) * space) * 100, 1),
         "maxGrade": round(max(0.0, grades[int(len(grades) * 0.99)]), 1),
-        "profile": [round(sm[round(i * (n - 1) / (PROFILE_N - 1))], 1) for i in range(PROFILE_N)],
+        "profile": [
+            round(sm[round(i * (n - 1) / (PROFILE_N - 1))], 1) for i in range(PROFILE_N)
+        ],
     }
 
 
@@ -219,13 +226,19 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     """Builds one pack; returns (pack, index entry, problems)."""
     if "gpx" in spec:
         nodes, snap = None, 0.0
-        fine, ele = gpx.route(ROOT / spec["gpx"], *spec["cutKm"], spec.get("loop", False))
+        fine, ele = gpx.route(
+            ROOT / spec["gpx"], *spec["cutKm"], spec.get("loop", False)
+        )
     else:
         line, snap, nodes = trace([tuple(w) for w in spec["waypoints"]])
         fine, ele = road_heights(line)
     pub = spec["published"]
     # A recorded ride's altimeter is far smoother than SRTM, so it needs only a light pass.
-    ele, window = (smooth(ele, GPX_SMOOTH_M), GPX_SMOOTH_M) if nodes is None else calibrate(ele, pub["gainM"])
+    ele, window = (
+        (smooth(ele, GPX_SMOOTH_M), GPX_SMOOTH_M)
+        if nodes is None
+        else calibrate(ele, pub["gainM"])
+    )
     s = {**stats(ele), "smoothM": window}
     problems = []
     if snap > SNAP_MAX_M:
@@ -235,7 +248,10 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     if pub["gainM"] and abs(s["gainM"] - pub["gainM"]) > GAIN_TOL * pub["gainM"]:
         problems.append(f"climb {s['gainM']} m vs published {pub['gainM']} m")
     head = {k: spec[k] for k in ("id", "name", "region", "blurb", "loop") if k in spec}
-    pts = [[round(la, 5), round(lo, 5), round(e, 1)] for (la, lo), e in zip(fine, ele, strict=False)]
+    pts = [
+        [round(la, 5), round(lo, 5), round(e, 1)]
+        for (la, lo), e in zip(fine, ele, strict=False)
+    ]
     s.pop("smoothM")
     grid = terrain.grid(fine)
     pack = {**head, "published": pub, "pts": pts, "terrain": grid}
@@ -246,12 +262,16 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
         old_file = OUT / f"{spec['id']}.json"
         old = json.loads(old_file.read_text()) if old_file.exists() else {}
         same = {k: v for k, v in old.get("terrain", {}).items() if k != "cover"} == grid
-        if "features" in old and same:
+        # Keep each part an earlier build got: land cover can come through when the streets were refused.
+        if same and "features" in old:
             pack["features"] = old["features"]
-            grid["cover"] = old["terrain"].get("cover")
+        if same and old.get("terrain", {}).get("cover"):
+            grid["cover"] = old["terrain"]["cover"]
         kept = "old" if "features" in pack else "no"
         print(f"     {spec['id']}: map server refused ({err}); kept {kept} features")
-    real = {"real": True} if "gpx" in spec else {}  # cut from a crew recording, not drawn from map data
+    real = (
+        {"real": True} if "gpx" in spec else {}
+    )  # cut from a crew recording, not drawn from map data
     return pack, {**head, **real, **s, "smoothM": window}, problems
 
 
@@ -268,7 +288,11 @@ def main(argv: list[str]) -> int:
     specs = json.loads((HERE / "routes.json").read_text())
     OUT.mkdir(parents=True, exist_ok=True)
     index_file = OUT / "index.json"
-    index = {e["id"]: e for e in json.loads(index_file.read_text())} if index_file.exists() else {}
+    index = (
+        {e["id"]: e for e in json.loads(index_file.read_text())}
+        if index_file.exists()
+        else {}
+    )
     failed = 0
     for spec in specs:
         if want and spec["id"] not in want:
@@ -291,7 +315,9 @@ def main(argv: list[str]) -> int:
         put(OUT / f"{spec['id']}.json", json.dumps(pack, separators=(",", ":")))
         index[spec["id"]] = entry
     order = [s["id"] for s in specs]
-    kept = sorted(index.values(), key=lambda e: order.index(e["id"]) if e["id"] in order else 99)
+    kept = sorted(
+        index.values(), key=lambda e: order.index(e["id"]) if e["id"] in order else 99
+    )
     put(index_file, json.dumps(kept, indent=1) + "\n")
     return 1 if failed else 0
 
