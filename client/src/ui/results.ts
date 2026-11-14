@@ -24,7 +24,7 @@ import { segsFromSeries } from './soloSegs'
 import { workoutChart } from './workoutChart'
 
 export interface GroupSummary {
-  /** Set to 'madness' for a VO2 Madness ride; absent for the bus. */
+  /** The crew game's id; absent for the bus. */
   mode?: string
   distance: number
   armour: number
@@ -41,7 +41,13 @@ export interface GroupSummary {
     /** VO2 Madness: effort points and seconds over 90% of max heart rate. */
     points?: number
     redSecs?: number
+    /** Kidney Stone Express: power spread (% FTP), spikes and fines. */
+    spread?: number
+    spikes?: number
+    fines?: number
   }[]
+  /** Kidney Stone Express: each patient's Google review. */
+  reviews?: { patient: string; icon: string; stars: number; text: string }[]
   awards: { award: string; id: string; name: string; why: string }[]
   postcard?: string
 }

@@ -1,6 +1,6 @@
 import type { Game } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
-import { fmt, h, pctStr } from './dom'
+import { fmt, h, pctStr, stars } from './dom'
 import type { GroupSummary } from './results'
 import { savePng } from './ridePostcard'
 
@@ -9,6 +9,63 @@ const TROPHY =
 
 const tile = (label: string, value: string, cls = '') =>
   h('div', { class: `res-tile ${cls}` }, h('span', {}, label), h('b', {}, value))
+
+type Row = GroupSummary['riders'][number]
+/** What differs between games on the crew card: the tiles after distance, one table column and an extra card. */
+const VIEWS: Record<
+  string,
+  {
+    tiles: (g: GroupSummary) => Node[]
+    col: string
+    cell: (r: Row) => string
+    extra?: (g: GroupSummary) => Node | ''
+  }
+> = {
+  bus: {
+    tiles: (g) => [
+      tile('Armour', String(Math.round(g.armour))),
+      tile('Sync', `${Math.round(g.syncPct)}%`),
+      tile('Scrap', String(g.scrap)),
+    ],
+    col: 'Falls',
+    cell: (r) => String(r.falls),
+  },
+  madness: {
+    tiles: () => [],
+    col: 'Points · in the red',
+    cell: (r) => `${r.points ?? 0} · ${r.redSecs ?? 0} s`,
+  },
+  ambo: {
+    tiles: (g) => {
+      const rv = g.reviews ?? []
+      const avg = rv.reduce((a, r) => a + r.stars, 0) / (rv.length || 1)
+      return [
+        tile('Delivered', `${rv.filter((r) => r.stars > 1).length} / ${rv.length}`),
+        tile('Rating', `${avg.toFixed(1)} ★`),
+      ]
+    },
+    col: 'Spread · spikes · fines',
+    cell: (r) => `${(r.spread ?? 0).toFixed(1)}% · ${r.spikes ?? 0} · ${r.fines ?? 0}`,
+    extra: (g) =>
+      g.reviews?.length
+        ? h(
+            'div',
+            { class: 'card' },
+            h('h2', {}, 'Google reviews'),
+            ...g.reviews.map((r) =>
+              h(
+                'p',
+                { class: 'res-review' },
+                h('b', {}, `${r.icon} ${r.patient} `),
+                h('span', { class: 'res-stars' }, stars(r.stars)),
+                h('br', {}),
+                r.text,
+              ),
+            ),
+          )
+        : '',
+  },
+}
 
 /** Bus-ride extras: score, distance, armour, sync, award trophies and the crew table. */
 export function groupSection(g: GroupSummary, myId: string) {
@@ -24,7 +81,7 @@ export function groupSection(g: GroupSummary, myId: string) {
       h('div', { class: 'dim' }, a.why),
     )
   }
-  const mad = g.mode === 'madness'
+  const view = VIEWS[g.mode ?? 'bus'] ?? VIEWS.bus
   return h(
     'div',
     { class: 'res-group' },
@@ -38,14 +95,9 @@ export function groupSection(g: GroupSummary, myId: string) {
         h('b', {}, g.score.toLocaleString()),
       ),
       tile('Distance', `${(g.distance / 1000).toFixed(1)} km`),
-      ...(mad
-        ? []
-        : [
-            tile('Armour', String(Math.round(g.armour))),
-            tile('Sync', `${Math.round(g.syncPct)}%`),
-            tile('Scrap', String(g.scrap)),
-          ]),
+      ...view.tiles(g),
     ),
+    view.extra?.(g) ?? '',
     g.awards.length
       ? h(
           'div',
@@ -64,13 +116,9 @@ export function groupSection(g: GroupSummary, myId: string) {
         h(
           'tr',
           {},
-          ...[
-            'Rider',
-            'Compliance',
-            'Time in zone',
-            mad ? 'Points · in the red' : 'Falls',
-            'Sprints',
-          ].map((x) => h('th', {}, x)),
+          ...['Rider', 'Compliance', 'Time in zone', view.col, 'Sprints'].map((x) =>
+            h('th', {}, x),
+          ),
         ),
         ...g.riders.map((r) =>
           h(
@@ -79,7 +127,7 @@ export function groupSection(g: GroupSummary, myId: string) {
             h('td', {}, r.name),
             h('td', {}, pctStr(r.compliance)),
             h('td', {}, fmt(r.inBandSecs)),
-            h('td', {}, mad ? `${r.points ?? 0} · ${r.redSecs ?? 0} s` : String(r.falls)),
+            h('td', {}, view.cell(r)),
             h('td', {}, r.sprints.join(' ') || '–'),
           ),
         ),
@@ -119,7 +167,7 @@ export async function busCard(g: GroupSummary, planName: string) {
   x.fillRect(0, 470, 1200, 330)
   x.fillStyle = '#f2b705'
   x.font = '900 64px system-ui'
-  x.fillText('ZOMBIE BUS', 40, 80)
+  x.fillText(GAMES[(g.mode ?? 'bus') as Game].name.toUpperCase(), 40, 80)
   x.font = 'bold 40px system-ui'
   x.fillText(`Score ${g.score}`, 40, 530)
   x.fillStyle = '#eee'

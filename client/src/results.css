@@ -345,3 +345,11 @@ tr.me td {
 .seg-pr {
   color: var(--acc);
 }
+.res-review {
+  margin: 0 0 10px;
+  line-height: 1.35;
+}
+.res-stars {
+  color: var(--acc);
+  letter-spacing: 1px;
+}

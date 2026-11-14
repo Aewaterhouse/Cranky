@@ -70,3 +70,6 @@ export function seg<T extends string>(
   set(value)
   return Object.assign(el, { set })
 }
+
+/** A rating out of five as stars. */
+export const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n))

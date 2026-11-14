@@ -1,7 +1,7 @@
 import '../hudAmbo.css'
 import type { AmboState, Fx, Tick } from '../net/protocol'
 import type { GamePanel } from './hud'
-import { h } from './dom'
+import { h, stars } from './dom'
 import { set, type EventStyle } from './hudKit'
 import type { makeSplash } from './hudSplash'
 
@@ -19,7 +19,6 @@ const PERKS: Record<string, string> = {
 }
 const clock = (s: number) =>
   `${Math.floor(Math.max(0, s) / 60)}:${String(Math.floor(Math.max(0, s) % 60)).padStart(2, '0')}`
-export const stars = (n: number) => '★'.repeat(n) + '☆'.repeat(Math.max(0, 5 - n))
 
 /** Kidney Stone Express panel: the patient, their Comfort, the road to the hospital and whatever is in the way. */
 export function makeAmboPanel(): GamePanel {
