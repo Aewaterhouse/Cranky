@@ -49,7 +49,8 @@ function shade(cover: LandCover, x: number, y: number, z: number, up: number, ve
   if (cover.coast && c === 'w') tint.copy(sand)
   if (c !== 'w') {
     if (verge) tint.lerp(gravel, 0.2)
-    if (cover.coast) tint.lerp(sand, smooth(R.seaLevel + R.sandBand, R.seaLevel + R.sandBand * 0.4, y))
+    if (cover.coast)
+      tint.lerp(sand, smooth(R.seaLevel + R.sandBand, R.seaLevel + R.sandBand * 0.4, y))
     tint.lerp(rock, smooth(R.rockSlope, R.rockSlope - 0.12, up))
     const line = y + (noise2(x / 120, z / 120 + 7) - 0.5) * 200
     tint.lerp(snow, smooth(R.snowLine, R.snowLine + 150, line) * smooth(0.45, 0.7, up))

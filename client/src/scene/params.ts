@@ -188,8 +188,8 @@ export const VIS = {
     treeline: 1500,
     treelineTas: 1200,
     alpineBand: 200,
-    /** On the coast, ground this far above sea level is sand. */
-    sandBand: 3,
+    /** On the coast, ground this far above sea level is sand (about 3 m above the grid's 0). */
+    sandBand: 1.5,
     /** The sea sheet on coastal routes: shallow and foam colours, foam band (m below the shore), lapping, swell. */
     ocean: {
       shallow: '#62c6c4',
