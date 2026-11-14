@@ -86,3 +86,23 @@ export function workoutInfo(id: string) {
   }
   return i
 }
+
+/**
+ * How the rider's plan went: sessions ridden of those scheduled, and whether its weeks are over and at least
+ * `CFG.trainingPlan.gradFrac` of them were ridden (the Plan Graduate badge). Null with no plan.
+ */
+export function planDone(
+  pick: PlanPick | undefined,
+  tp: TrainingPlan | undefined,
+  rides: RideLite[],
+  now = Date.now(),
+) {
+  if (!pick || !tp) return null
+  const today = dayKey(now)
+  const ss = schedule(tp, pick)
+  const done = ss.filter(
+    (s) => sessionState(s, workoutInfo(s.workout), rides, today) === 'done',
+  ).length
+  const need = Math.ceil(ss.length * CFG.trainingPlan.gradFrac)
+  return { done, need, graduated: !!ss.length && ss[ss.length - 1].date < today && done >= need }
+}

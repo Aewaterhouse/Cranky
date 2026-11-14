@@ -74,7 +74,7 @@ export const CFG = {
   /** The daily challenge: its scrap and the numbers in its goals. */
   daily: { scrap: 25, kj: 500, rpm: 90 },
   /** Training plans: a ride this share of a session's length on its day counts it done, whatever was ridden. */
-  trainingPlan: { doneFrac: 0.8 },
+  trainingPlan: { doneFrac: 0.8, gradFrac: 0.8 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
   recordHz: 1,
   /** Finished rides kept on the device while the server cannot be reached, at most. */

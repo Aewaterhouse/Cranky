@@ -3,6 +3,7 @@ import { planById, TRAINING_PLANS } from '../src/content'
 import {
   addDays,
   perWeek,
+  planDone,
   schedule,
   sessionState,
   workoutInfo,
@@ -82,5 +83,20 @@ describe('sessionState', () => {
     ]
     expect(sessionState(s, info, r, addDays(MON, 1))).toBe('missed')
     expect(sessionState(s, info, [], addDays(MON, -1))).toBe('upcoming')
+  })
+})
+
+describe('plan graduate', () => {
+  it('graduates once the weeks are over with enough sessions ridden', () => {
+    const tp = { id: 't', name: 'T', emoji: '', blurb: '', weeks: [['ss-2x15'], ['ss-2x15']] }
+    const pick = { id: 't', start: '2026-01-05', days: [1] }
+    const name = workoutInfo('ss-2x15').name
+    const one = [{ date: '2026-01-05T07:00:00', plan: name, secs: 60 }]
+    const after = Date.parse('2026-02-01T12:00:00')
+    expect(planDone(pick, tp, one, after)).toEqual({ done: 1, need: 2, graduated: false })
+    const both = [...one, { date: '2026-01-12T07:00:00', plan: name, secs: 60 }]
+    expect(planDone(pick, tp, both, after)?.graduated).toBe(true)
+    expect(planDone(pick, tp, both, Date.parse('2026-01-12T12:00:00'))?.graduated).toBe(false)
+    expect(planDone(undefined, tp, both)).toBeNull()
   })
 })

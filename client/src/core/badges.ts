@@ -1,5 +1,7 @@
 import { isoWeek, type Profile, type RideRecord } from './curve'
 import { passportBadges } from './passport'
+import { planDone } from './trainingPlan'
+import { TRAINING_PLANS } from '../content'
 import { ROUTE_INDEX } from './routeLibrary'
 
 export interface Badge {
@@ -53,6 +55,11 @@ export function badges(p: Profile): Badge[] {
   const n = p.stats.rides
   const first = byDate(p.rides)[0]?.date
   const streak = weekStreak(p.rides)
+  const grad = planDone(
+    p.plan,
+    TRAINING_PLANS.find((t) => t.id === p.plan?.id),
+    p.rides,
+  )
   const big = byDate(p.rides).find((r) => r.kj >= 1000)
   const def: [
     string,
@@ -174,6 +181,16 @@ export function badges(p: Profile): Badge[] {
       'gold',
       !!p.badges?.legend,
       p.badges?.legend,
+    ],
+    [
+      'graduate',
+      'Plan Graduate',
+      'Finish a training plan, riding at least 80% of its sessions',
+      'GRAD',
+      'gold',
+      !!grad?.graduated,
+      undefined,
+      grad ? [grad.done, grad.need] : undefined,
     ],
     ...passportBadges(p, ROUTE_INDEX),
   ]
