@@ -4,6 +4,7 @@ import type { Features, Poi } from './features'
 import type { HeightField } from './heightField'
 import type { LandCover } from './landCover'
 import { newPose, project } from './roadPath'
+import { planStart } from './startTown'
 
 const R = VIS.route
 const L = R.place.landmarks
@@ -18,6 +19,11 @@ export const LANDMARK_KINDS = [
   'hut',
   'bathingBox',
   'jetty',
+  'gateway',
+  'bakery',
+  'car',
+  'ute',
+  'bunting',
 ] as const
 export type LandmarkKind = (typeof LANDMARK_KINDS)[number]
 /** Something to look at: where, which way its front (+z) points, a name for its sign and a 0..1 tint number. */
@@ -57,7 +63,7 @@ const KNOWN: Record<string, [Poi['kind'], string, number, number][]> = {
 /**
  * Every landmark on the route, by chunk: mapped points of interest (peak, lookout, tower, cafe), the ones we
  * know by heart, a ski village at the top of the alpine routes, a summit hut, and jetties and bathing boxes
- * where the road runs beside sand.
+ * where the road runs beside sand, and the start village.
  */
 export function planLandmarks(
   id: string,
@@ -144,5 +150,9 @@ export function planLandmarks(
         add('jetty', px + rx * s * (wet - 6) + fx * 14, pz + rz * s * (wet - 6) + fz * 14, '', true)
       }
     }
+  for (const l of planStart(id, field, cover, features)) {
+    const k = features.owner(l.x, l.z, 200) ?? 0
+    by.set(k, [...(by.get(k) ?? []), l])
+  }
   return by
 }

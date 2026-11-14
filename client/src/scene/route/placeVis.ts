@@ -184,5 +184,56 @@ export const PLACE = {
     umbrella: '#e8a13a',
     lodgeTints: ['#8a5a3c', '#3f5f7a', '#7a2f2a', '#3f6b4a', '#d9c9a8'],
     boxTints: ['#e8533f', '#3f8fd0', '#f2c230', '#3fae7a', '#e58bb0', '#f1f1ee'],
+    /**
+     * The start village: a town gateway sign `gateway` m along on the right, a bakery `bakery` m along on the
+     * left, `cars` parked cars along both verges and bunting over the road at each of `bunting`.
+     */
+    start: {
+      gateway: 38,
+      gatewayOut: 7,
+      bakery: 62,
+      bakeryOut: 13,
+      cars: 6,
+      carFrom: 16,
+      carStep: 11,
+      carOut: 1.6,
+      bunting: [12, 26],
+      wall: '#c9a46b',
+      board: '#2c5f3a',
+      bakeryWall: '#efe2c4',
+      bakeryFront: '#b5442e',
+      pie: '#d9973a',
+      carTints: ['#c23b2f', '#f1efe8', '#2f5f8a', '#e2b33c', '#4f7a4a', '#8a8f96', '#6b3e7a'],
+      flags: ['#e8533f', '#f2c230', '#3f8fd0', '#3fae7a', '#f1f1ee'],
+    },
+    /** The town at each route's start, for its gateway sign and bakery; others use the route's region. */
+    towns: {
+      'mount-coot-tha': 'Toowong',
+      'mount-coot-tha-back': 'Brookfield',
+      mondo: 'Ashgrove',
+      'full-gas-friday': 'Brisbane',
+      'ben-lomond': 'Upper Blessington',
+      'mount-buffalo': 'Porepunkah',
+      'falls-creek': 'Mount Beauty',
+      'mount-hotham': 'Harrietville',
+      'mount-wellington': 'Fern Tree',
+      'willunga-hill': 'Willunga',
+      'akuna-bay': 'Terrey Hills',
+      'great-ocean-road': 'Lorne',
+      'beach-road': 'Brighton',
+      'darren-smith': 'Kalbar',
+      'metros-road-race': 'Peak Crossing',
+      'nundah-crit': 'Nundah',
+      'howick-street-crit': 'Launceston',
+    } as Record<string, string>,
+    /** The small print under the town's name, one picked per route. */
+    townLines: [
+      'Drive carefully',
+      'Tidy Town finalist 1987',
+      'Please slow down, we have pies',
+      'Twinned with nowhere',
+      'Home of the 6 am bunch',
+      'Lycra tolerated',
+    ],
   },
 }

@@ -7,6 +7,7 @@ import type { HeightField } from './heightField'
 import { LANDMARK_KINDS, type Landmark, type LandmarkKind } from './landmarkPlan'
 import { drawnHeight, type Patch } from './patch'
 import type { Signs } from './signs'
+import { START_GEO, START_PLATES } from './startTown'
 
 const R = VIS.route
 const L = R.place.landmarks
@@ -172,6 +173,7 @@ const MAKE: Record<LandmarkKind, () => THREE.BufferGeometry> = {
   hut,
   bathingBox,
   jetty,
+  ...START_GEO,
 }
 let geos: Partial<Record<LandmarkKind, THREE.BufferGeometry>> = {}
 export function dropLandmarkGeos() {
@@ -193,7 +195,7 @@ export function buildLandmarks(
   for (const kind of LANDMARK_KINDS) {
     const mine = list.filter((l) => l.kind === kind)
     if (!mine.length) continue
-    const tints = kind === 'lodge' ? L.lodgeTints : kind === 'bathingBox' ? L.boxTints : undefined
+    const tints = TINTS[kind]
     const m = instances((geos[kind] ??= MAKE[kind]()), mine.length, a, (i) => {
       const l = mine[i]
       pos.set(l.x, ground(l), l.z)
@@ -205,6 +207,20 @@ export function buildLandmarks(
     out.push(m)
   }
   for (const l of list) {
+    const at = START_PLATES[l.kind]
+    if (at) {
+      // Words on the thing itself, a line to a plate: each plate's offset turned with it.
+      const [c, s] = [Math.cos(l.face), Math.sin(l.face)]
+      const y = drawnHeight(field, patches, l.x, l.z)
+      const lines = l.name.split('\n')
+      at.forEach(([px, py, pz, w, h, bg, fg], i) => {
+        const m = signs.plate(lines[i] ?? '', w, h, bg, fg)
+        m.position.set(l.x + px * c + pz * s - a.ax, y + py - a.ay, l.z - px * s + pz * c - a.az)
+        m.rotation.y = l.face
+        out.push(m)
+      })
+      continue
+    }
     if (!l.name) continue
     // Beside the landmark, turned to face back down the way its front looks.
     const [x, z] = [l.x + Math.cos(l.face) * 5.5, l.z - Math.sin(l.face) * 5.5]
@@ -221,5 +237,11 @@ export function buildLandmarks(
     out.push(m, post)
   }
   return out
+}
+const TINTS: Partial<Record<LandmarkKind, string[]>> = {
+  lodge: L.lodgeTints,
+  bathingBox: L.boxTints,
+  car: L.start.carTints,
+  ute: L.start.carTints,
 }
 const postGeo = new Mesher(0).add(box(0.14, 2.4, 0.14), '#ffffff', [0, 1.2, 0]).build()
