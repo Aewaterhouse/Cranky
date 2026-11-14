@@ -237,7 +237,7 @@ export function lobbyView(c: LobbyCtx) {
         picker = planPicker({
           plan: l.plan.id,
           minutes: l.minutes,
-          first: 'bus',
+          first: game === 'bus' ? 'bus' : 'workout',
           onChange: c.setup,
         })
         pickerBox.replaceChildren(h('h2', { class: 'label' }, 'Choose the run'), picker)
