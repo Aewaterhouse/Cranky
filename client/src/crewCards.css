@@ -64,6 +64,10 @@
   font-size: 0.68em;
   font-weight: 700;
 }
+.ccol.road .cc-tier {
+  font-size: 0.85em;
+  background: rgba(255, 196, 0, 0.3);
+}
 .cc-mode:empty {
   display: none;
 }

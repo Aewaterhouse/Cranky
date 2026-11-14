@@ -34,7 +34,7 @@ say where you are, and free-ride places that don't look like where they are.
 6. [x] (crew best from the server, your best and last time per device) Scores with context: crew best and last time (games 3, rider 14).
 
 **Races**
-7. [ ] (live place and gap done: "P3 of 6 · 4 s to Kat" under the speed panel; sprint points still badges) Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).
+7. [x] (live place and gap: "P3 of 6 · 4 s to Kat" under the speed panel; after each sprint a SPRINT POINTS banner with the top three and you; bigger gold points tags on the cards) Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).
 8. [x] (every rider now finishes; bots ride with form on the day and dress from the whole Garage) Let the last rider finish instead of a DNF when the winner crosses; vary bot times and kit (games 6, 7).
 
 **Games**

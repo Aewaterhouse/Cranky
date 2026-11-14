@@ -104,6 +104,7 @@ export class RoadLink {
         this.notes.push(fx.id === this.me ? `Finished: ${place}` : `${name} finished ${place}`)
       } else if (fx.k === 'points' && fx.id) {
         this.notes.push(`${fx.id === this.me ? 'You' : name} ${fx.text} points`)
+        this.flash = ['SPRINT POINTS', this.table(), this.got + R.bannerS]
       } else if (fx.k === 'bell') {
         this.flash = [fx.text ?? '', fx.id ? name : '', this.got + R.bannerS]
         this.onBell(fx.text ?? '')
@@ -183,6 +184,18 @@ export class RoadLink {
     const secs = Math.round(Math.abs(r.d - me.d) / Math.max(me.v, 3))
     const who = this.info.get(id)?.name ?? 'Someone'
     return `${place} · ${secs} s ${r.d > me.d ? 'to' : 'on'} ${who}`
+  }
+
+  /** The points table after a sprint: the top three and me ("Shaz 9 · Dave 6 · Kat 4 · You 1"). */
+  private table() {
+    const pts = this.race?.pts ?? {}
+    const rows = [...this.info.keys()]
+      .map((id) => [id, pts[id] ?? 0] as const)
+      .sort((a, b) => b[1] - a[1])
+    const top = rows.filter(([id], i) => i < 3 || id === this.me)
+    return top
+      .map(([id, p]) => `${id === this.me ? 'You' : (this.info.get(id)?.name ?? 'Someone')} ${p}`)
+      .join(' · ')
   }
 
   /** A race's tag for a rider's card: their points, or the crit's prime. */

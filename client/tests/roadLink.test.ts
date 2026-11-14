@@ -133,6 +133,7 @@ describe('group ride link', () => {
     const m = tick(60, { me: at(500), kev: at(600) }, [{ k: 'points', id: 'kev', text: '+5' }])
     link.tick({ ...m, game: { kind: 'points', lap: 2, laps: 3, pts: { kev: 5 } } })
     expect(link.takeNotes()).toEqual(['Kev +5 points'])
+    expect(link.banner()).toEqual(['SPRINT POINTS', 'Kev 5 · You 0'])
     expect(link.tag('me')).toBe('0 pts')
     expect(link.others()[0].tag).toBe('5 pts')
   })
