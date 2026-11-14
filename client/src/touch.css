@@ -156,3 +156,40 @@ html.no-zoom,
 html.no-zoom body {
   touch-action: pan-x pan-y;
 }
+/* The solo workout held upright on a phone: the clock goes under the target instead of on top of it, the ±60 s chart
+   (squashed to a line at this width) gives way to the interval list, and the dock wraps. */
+@media (orientation: portrait) and (max-width: 600px) {
+  .solo-ride .rotate-hint {
+    position: fixed;
+    left: 50%;
+    bottom: 6px;
+    z-index: 25;
+    display: block;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    padding: 10px 16px;
+    border: 0;
+    border-radius: 12px;
+    background: rgb(17 18 20 / 0.8);
+    color: var(--fg);
+    font: 600 0.95rem var(--ui);
+    transform: translateX(-50%);
+  }
+  .shud .hud-tc {
+    top: calc(var(--st) + 30 * var(--u));
+  }
+  .solo-ride .solo-stage {
+    display: none;
+  }
+  .shud .hud-tr {
+    top: calc(var(--st) + 46 * var(--u));
+    bottom: calc(var(--sb) + 32 * var(--u));
+    left: var(--sl);
+    right: var(--sr);
+    align-items: stretch;
+  }
+  .shud .dock {
+    flex-wrap: wrap;
+    gap: var(--u);
+  }
+}

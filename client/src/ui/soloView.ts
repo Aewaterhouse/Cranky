@@ -121,10 +121,17 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     h('span', { class: 'ctag' }, 'Current interval ±60 s'),
     zoom.el,
   )
+  // Upright on a phone (touch.css shows this only then); a tap puts it away.
+  const rotate: HTMLElement = h(
+    'button',
+    { class: 'rotate-hint', onclick: () => rotate.remove() },
+    '↻ Turn the phone sideways for the chart',
+  )
   const root: HTMLElement = h(
     'div',
     { class: `solo-ride rh${plan.test ? ' testing' : ''}${phone ? '' : ' hud-riders'}` },
     stage,
+    rotate,
     h(
       'div',
       { class: 'rhud shud' },
