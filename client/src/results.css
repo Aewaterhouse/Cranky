@@ -458,3 +458,9 @@ tr.me td {
   margin-top: 4px;
   opacity: 0.8;
 }
+.res-group td .mvp {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  opacity: 0.75;
+}

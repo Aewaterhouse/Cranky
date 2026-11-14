@@ -1,7 +1,7 @@
 import type { Game } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
 import { fmt, h, pctStr } from './dom'
-import { VIEWS, tile } from './resultsViews'
+import { VIEWS, mvpLine, tile } from './resultsViews'
 import type { GroupSummary } from './results'
 import { savePng } from './ridePostcard'
 
@@ -66,7 +66,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
           h(
             'tr',
             { class: r.id === myId ? 'me' : '' },
-            h('td', {}, r.name),
+            h('td', {}, r.name, h('small', { class: 'mvp' }, mvpLine(r, g.riders))),
             h('td', {}, pctStr(r.compliance)),
             h('td', {}, fmt(r.inBandSecs)),
             h('td', {}, view.cell(r)),

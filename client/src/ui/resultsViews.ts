@@ -177,3 +177,27 @@ export const VIEWS: Record<
         : '',
   },
 }
+
+/** Everyone's best bit of the ride, as one line: the stat where they ranked highest in the crew. */
+const MVP: [string, (r: Row) => number | undefined][] = [
+  ['Most on target', (r) => r.compliance],
+  ['Longest in the zone', (r) => r.inBandSecs],
+  ['Smoothest legs', (r) => (r.spread == null ? undefined : -r.spread)],
+  ['Best matched', (r) => r.match],
+  ['Richest company', (r) => r.coins],
+  ['Top points', (r) => r.points],
+  ['Most sprints', (r) => r.sprints.length || undefined],
+]
+export function mvpLine(r: Row, all: Row[]) {
+  let best: [string, number] | null = null
+  for (const [label, get] of MVP) {
+    const v = get(r)
+    if (v == null) continue
+    const rank = all.filter((o) => (get(o) ?? -Infinity) > v).length
+    if (!best || rank < best[1]) best = [label, rank]
+  }
+  if (!best) return ''
+  return best[1] === 0
+    ? `🏅 ${best[0]}`
+    : `${best[0]}: ${best[1] + 1}${['st', 'nd', 'rd'][best[1]] ?? 'th'} in the crew`
+}
