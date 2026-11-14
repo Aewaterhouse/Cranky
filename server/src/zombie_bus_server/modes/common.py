@@ -120,6 +120,22 @@ def award(
         awards.append({"award": name, "id": best.id, "name": best.name, "why": why(best)})
 
 
+def shape_awards(
+    awards: list[dict],
+    rs: list[Rider],
+    names: tuple[str, str, str] = ("Smoothest", "Spikiest", "Most Punished"),
+) -> None:
+    """Gives the three awards any game can make from ride data: smoothest, spikiest and most punished."""
+    smooth, spiky, punished = names
+    rode = [r for r in rs if r.rs_dev_n >= C.SHAPE_MIN_S]
+    if rode:
+        best = min(rode, key=lambda r: r.spread(r.ftp))
+        why = f"power within {best.spread(best.ftp):.1%} of FTP"
+        awards.append({"award": smooth, "id": best.id, "name": best.name, "why": why})
+    award(awards, rs, spiky, lambda r: r.rs_spikes, lambda r: f"{r.rs_spikes} spikes")
+    award(awards, rs, punished, lambda r: r.rs_punished, lambda r: f"{r.rs_punished:.0f} s of punishment")
+
+
 def rider_row(r: Rider, comp: dict[str, float], **extra: object) -> dict:
     """A rider's row on the results screen; a game adds its own columns through `extra`."""
     return {

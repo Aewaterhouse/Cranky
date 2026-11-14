@@ -10,6 +10,9 @@ DB_PATH = Path(os.environ.get("ZB_DB", ROOT / "server" / "zombie_bus.db"))
 
 TICK_HZ = 2
 NP_WINDOW_S = 30  # normalised power rolls over this many seconds
+SHAPE_WINDOW_S = 30  # power shape: 3 s power is compared with the rider's own mean over this long
+SPIKE_PCT = 0.15  # 3 s power this share of FTP off that mean is a spike
+SHAPE_MIN_S = 60  # a rider needs this much riding to be up for the smoothest award
 STATS_EVERY_S = 1  # each rider's ride so far goes out on the tick this often
 TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from statistics import fmean
 from typing import TYPE_CHECKING
 
 from . import config as C
@@ -17,6 +18,11 @@ class RideStats:
 
     NP is the fourth-power mean of the rolling `NP_WINDOW_S` average of one-second powers; before a full
     window it rolls over the seconds there are.
+
+    Power shape: each second, the rider's 3 s power is compared with their own mean 3 s power over the last
+    `SHAPE_WINDOW_S`. `rs_dev` is that gap in watts right now; the mean gap is the rider's spread (low is
+    smooth), and a spike is each time 3 s power jumps more than `SPIKE_PCT` of FTP above that mean.
+    `rs_punished` is seconds of penalty, which only games add to.
     """
 
     rs_secs: float = 0.0
@@ -26,9 +32,16 @@ class RideStats:
     rs_roll: list[float] = field(default_factory=list)
     rs_np4: float = 0.0
     rs_np_n: int = 0
+    rs_p3: list[float] = field(default_factory=list)
+    rs_dev: float = 0.0
+    rs_dev_sum: float = 0.0
+    rs_dev_n: int = 0
+    rs_spikes: int = 0
+    rs_spiking: bool = False
+    rs_punished: float = 0.0
 
-    def sample(self, watts: float, dt: float) -> None:
-        """Adds `dt` seconds at `watts`."""
+    def sample(self, watts: float, dt: float, ftp: int = 0) -> None:
+        """Adds `dt` seconds at `watts`. Spikes are only counted when `ftp` is given."""
         self.rs_secs += dt
         self.rs_joules += watts * dt
         self.rs_bucket += watts * dt
@@ -39,6 +52,30 @@ class RideStats:
         self.rs_np4 += (sum(self.rs_roll) / len(self.rs_roll)) ** 4
         self.rs_np_n += 1
         self.rs_bucket = self.rs_bucket_t = 0.0
+        self.rs_p3 = [*self.rs_p3, fmean(self.rs_roll[-3:])][-C.SHAPE_WINDOW_S :]
+        over = self.rs_p3[-1] - fmean(self.rs_p3)
+        self.rs_dev = abs(over)
+        self.rs_dev_sum += self.rs_dev
+        self.rs_dev_n += 1
+        spiking = bool(ftp) and over > C.SPIKE_PCT * ftp
+        self.rs_spikes += spiking and not self.rs_spiking
+        self.rs_spiking = spiking
+
+    def punish(self, dt: float) -> None:
+        """Adds `dt` seconds of penalty (a fine, a forced recovery): the game decides what counts."""
+        self.rs_punished += dt
+
+    def spread(self, ftp: int) -> float:
+        """Mean gap between 3 s power and the rider's own rolling mean, as a share of FTP. Low is smooth."""
+        return self.rs_dev_sum / self.rs_dev_n / ftp if self.rs_dev_n and ftp else 0.0
+
+    def shape(self, ftp: int) -> dict:
+        """The rider's power shape for a results row."""
+        return {
+            "spread": round(100 * self.spread(ftp), 1),
+            "spikes": self.rs_spikes,
+            "punished": round(self.rs_punished),
+        }
 
     @property
     def avg(self) -> float:

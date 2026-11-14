@@ -43,7 +43,7 @@ def step(room: Room, dt: float) -> dict:
     if i >= 0:
         for r in room.riders.values():
             if r.st != "spectator":
-                r.sample(r.p, dt)
+                r.sample(r.p, dt, r.ftp)
         if round(room.el * C.TICK_HZ) % round(C.STATS_EVERY_S * C.TICK_HZ) == 0:
             stats = {
                 r.id: r.report(r.ftp, r.kg, on_target(r.band_s, r.comp_n), r.falls)

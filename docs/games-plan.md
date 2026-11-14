@@ -36,7 +36,7 @@ Five games through `game === 'madness'` switches will not hold, and four files i
 - [x] Server: per-rider target band from the mode in the tick; `act` message and `mode.on_act`; force non-ERG per game;
       ERG tests (no target written, 150% cap).
 - [x] Server: script runner (`modes/script.py`): segments, seeded event scheduling, the 90 s gap test, time-scale.
-- [ ] Server: power-shape stats per rider (`ride_stats.py`): smoothness (spread of 3 s power around the rider's own
+- [x] Server: power-shape stats per rider (`ride_stats.py`): smoothness (spread of 3 s power around the rider's own
       30 s mean, as % FTP), spike count, time punished. Feeds Comfort, dating reports and awards.
 - [ ] Client: a game registry (`modes/crew/games.ts`): per game its name, blurb, HUD panel, scene set-up, event styles,
       results card and TV panel. Lobby, `hud.ts`, `world.ts`, `spectate.ts` and `resultsGroup.ts` read the registry

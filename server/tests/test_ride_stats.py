@@ -94,3 +94,55 @@ def test_room_sends_the_ride_so_far_once_a_second():
         assert s["r0"]["kj"] == 2.5  # 250 W for 10 s
 
     asyncio.run(go())
+
+
+def shaped(watts: list[float], ftp=200) -> Rider:
+    r = Rider("a", "A", ftp, "hard")
+    for w in watts:
+        for _ in range(C.TICK_HZ):
+            r.sample(w, DT, ftp)
+    return r
+
+
+def test_steady_power_is_smooth_and_surging_is_not():
+    steady, wobbly = shaped([200] * 120), shaped([180, 220] * 60)
+    surger = shaped(([180] * 20 + [300] * 10) * 4)
+    assert steady.spread(200) == 0 and steady.rs_spikes == 0 and steady.rs_dev == 0
+    assert 0 < wobbly.spread(200) < 0.05 and wobbly.rs_spikes == 0  # 3 s power smooths a 1 s wobble
+    assert surger.spread(200) > wobbly.spread(200)
+    assert surger.rs_spikes == 4  # one per surge, however long it lasts
+    assert surger.shape(200) == {"spread": round(100 * surger.spread(200), 1), "spikes": 4, "punished": 0}
+
+
+def test_a_spike_is_measured_against_the_riders_own_ftp():
+    assert shaped([150] * 40 + [185] * 10, ftp=200).rs_spikes == 1  # 35 W is over 15% of 200
+    assert shaped([150] * 40 + [185] * 10, ftp=300).rs_spikes == 0
+    assert shaped([150] * 40 + [185] * 10, ftp=0).rs_spikes == 0  # no FTP given: not counted
+
+
+def test_punished_time_adds_up_and_survives_a_snapshot():
+    r = shaped([200] * 5)
+    r.punish(30)
+    r.punish(0.5)
+    back = Rider.from_dict(r.to_dict())
+    assert back.rs_punished == 30.5 and back.rs_p3 == r.rs_p3 and back.shape(200)["punished"] == 30
+    back.reset_stats()
+    assert back.rs_punished == 0 and back.rs_p3 == []
+
+
+def test_shape_awards_pick_smoothest_spikiest_and_most_punished():
+    from zombie_bus_server.modes.common import shape_awards
+
+    a, b, c = shaped([200] * 90), shaped(([180] * 20 + [300] * 10) * 3), shaped([200, 210] * 10)
+    a.id, b.id, c.id = "a", "b", "c"
+    b.punish(45)
+    awards: list[dict] = []
+    shape_awards(awards, [a, b, c], ("Paramedic of the Week", "Learner Driver", "Lead Foot"))
+    assert [(x["award"], x["id"]) for x in awards] == [
+        ("Paramedic of the Week", "a"),
+        ("Learner Driver", "b"),
+        ("Lead Foot", "b"),
+    ]
+    none: list[dict] = []
+    shape_awards(none, [c])  # too short a ride to judge, no spikes, no punishment
+    assert none == []
