@@ -13,6 +13,8 @@ const snow = new THREE.Color()
 const gravel = new THREE.Color()
 const sea = new THREE.Color()
 const sand = new THREE.Color()
+const straw = new THREE.Color()
+const lush = new THREE.Color()
 const tint = new THREE.Color()
 const other = new THREE.Color()
 const mix = new THREE.Color()
@@ -48,6 +50,14 @@ function shade(cover: LandCover, x: number, y: number, z: number, up: number, ve
   // On the coast the sea sheet is the water; ground poking through it is beach.
   if (cover.coast && c === 'w') tint.copy(sand)
   if (c !== 'w') {
+    // Patches: open ground goes straw or lush, bush and forest go darker; steep banks dry out before rock.
+    const n = noise2(x / G.patchScale + 17, z / G.patchScale - 4)
+    if ('gsp'.includes(c))
+      tint
+        .lerp(straw, smooth(0.5, 0.8, n) * G.patchMix)
+        .lerp(lush, smooth(0.4, 0.15, n) * G.patchMix * 0.6)
+    else if ('fb'.includes(c)) tint.multiplyScalar(1 - smooth(0.3, 0.75, n) * G.shadeMix)
+    if (c !== 'u') tint.lerp(straw, smooth(0.97, 0.86, up) * G.bankMix)
     if (verge) tint.lerp(gravel, 0.2)
     if (cover.coast)
       tint.lerp(sand, smooth(R.seaLevel + R.sandBand, R.seaLevel + R.sandBand * 0.4, y))
@@ -55,7 +65,7 @@ function shade(cover: LandCover, x: number, y: number, z: number, up: number, ve
     const line = y + (noise2(x / 120, z / 120 + 7) - 0.5) * 200
     tint.lerp(snow, smooth(R.snowLine, R.snowLine + 150, line) * smooth(0.45, 0.7, up))
   }
-  tint.multiplyScalar(0.9 + hash(x * 13.7 + z * 7.3) * 0.2)
+  tint.multiplyScalar(1 - G.speckle + hash(x * 13.7 + z * 7.3) * G.speckle * 2)
   return c === 'w'
 }
 
@@ -129,6 +139,8 @@ export function buildTerrain(
   gravel.set(R.gravel)
   sea.set(R.sea)
   sand.set(G.sand)
+  straw.set(G.straw)
+  lush.set(G.lush)
   const { p, end, cut, NI, NC, full } = pt
   const at = (j: number, c: number) => pt.at(j, c)
   /** True when the triangle a, b, c keeps `r` metres clear of every road (centre and edge midpoints). */

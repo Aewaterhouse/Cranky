@@ -183,6 +183,14 @@ export const VIS = {
       sand: '#e6d49a',
       rock: '#8b8780',
       waterBed: '#2f6f8f',
+      /** Patches on open ground (wavelength in m, how strong), darker stands in bush, dry banks, per-face speckle. */
+      straw: '#cbb46a',
+      lush: '#5e9c3c',
+      patchScale: 55,
+      patchMix: 0.65,
+      shadeMix: 0.2,
+      bankMix: 0.35,
+      speckle: 0.13,
     },
     /** Without a map: trees thin out above the treeline (lower in Tasmania), rock begins `alpineBand` higher. */
     treeline: 1500,

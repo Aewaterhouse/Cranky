@@ -46,7 +46,7 @@ say where you are, and free-ride places that don't look like where they are.
 **Free ride and worlds**
 13. [x] The sea: a water plane at sea level and a sand band (worlds 1).
 14. [ ] Map features for the nine routes that have none (worlds 2; the fetch kept failing before, retry).
-15. [ ] (dusk lifted, golden hour runs to 8 pm, Settings > Free ride sky has Always sunny and Golden hour; the ground colour still to do) Lift the dusk look and add a sunny default (worlds 3); break up the ground colour (worlds 4).
+15. [x] (dusk lifted, golden hour runs to 8 pm, Settings > Free ride sky has Always sunny and Golden hour; ground in straw and lush patches) Lift the dusk look and add a sunny default (worlds 3); break up the ground colour (worlds 4).
 16. [ ] Close-up roadside detail for speed; a farm kit for open country; something every 30 to 45 s (worlds 5, 6, 7).
 
 **Bugs found along the way**
