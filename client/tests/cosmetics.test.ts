@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
   bankScrap,
+  priceOf,
+  weeklyDeal,
   soloScrap,
   buy,
   COSMETICS,
@@ -51,5 +53,18 @@ describe('cosmetics', () => {
   it('pays a solo ride by the minute, nothing under ten minutes', () => {
     expect(soloScrap(9 * 60)).toBe(0)
     expect(soloScrap(45 * 60)).toBe(68)
+  })
+})
+
+describe('deal of the week', () => {
+  it('takes a share off one rare-or-better item that changes week to week', () => {
+    const deals = new Set(Array.from({ length: 8 }, (_, w) => weeklyDeal(w)))
+    expect(deals.size).toBeGreaterThan(4)
+    const deal = COSMETICS.find((c) => c.id === weeklyDeal(3))!
+    expect(deal.rarity).not.toBe('common')
+    expect(priceOf(deal, 3)).toBeLessThan(deal.price)
+    const p = { ...newProfile('a'), scrap: priceOf(deal, 3) }
+    expect((buy(p, deal.id, 3) as Profile).scrap).toBe(0)
+    expect(buy(p, deal.id, 4)).toMatch(/more scrap/)
   })
 })

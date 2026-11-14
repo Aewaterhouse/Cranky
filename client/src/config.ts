@@ -11,7 +11,8 @@ export const CFG = {
   /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
   watch: { driftS: 2, duckS: 5, duckVolume: 25 },
   /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */
-  garage: { confirmMs: 3000, lockMs: 800 },
+  /** `dealOff`: the share off this week's deal (one rare-or-better item, the same for the whole crew). */
+  garage: { confirmMs: 3000, lockMs: 800, dealOff: 0.3 },
   /** The body creator saves itself this long after the last change. */
   bodySaveMs: 1200,
   /**

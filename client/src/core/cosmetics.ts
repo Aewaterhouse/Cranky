@@ -1,5 +1,7 @@
 import CATALOGUE from '../../../content/cosmetics.json'
+import { CFG } from '../config'
 import type { Profile } from './curve'
+import { weekOf } from './weekly'
 
 export type Slot = 'paint' | 'bullbar' | 'spikes' | 'hat' | 'outfit' | 'bike'
 export interface Cosmetic {
@@ -30,13 +32,26 @@ export const SLOT_NAMES: Record<Slot, string> = {
 /** The bike skin that brings your indoor trainer out on the road with you. */
 export const TRAINER_SKIN = 'bike-trainer'
 
+/** This week's deal: one rare-or-better item, stepping through them by week so everyone gets a turn. */
+export function weeklyDeal(week = weekOf()): string {
+  const pool = COSMETICS.filter((c) => c.rarity !== 'common').sort((a, b) =>
+    a.id.localeCompare(b.id),
+  )
+  return pool[(((week * 7) % pool.length) + pool.length) % pool.length].id
+}
+
+/** What an item costs this week: the deal is cheaper. */
+export const priceOf = (c: Cosmetic, week = weekOf()) =>
+  c.id === weeklyDeal(week) ? Math.round(c.price * (1 - CFG.garage.dealOff)) : c.price
+
 /** Returns the updated profile, or an error message. */
-export function buy(p: Profile, id: string): Profile | string {
+export function buy(p: Profile, id: string, week = weekOf()): Profile | string {
   const c = cosmetic(id)
   if (!c) return 'Unknown item'
   if (p.owned.includes(id)) return 'Already owned'
-  if (p.scrap < c.price) return `Need ${c.price - p.scrap} more scrap`
-  return equip({ ...p, scrap: p.scrap - c.price, owned: [...p.owned, id] }, id)
+  const price = priceOf(c, week)
+  if (p.scrap < price) return `Need ${price - p.scrap} more scrap`
+  return equip({ ...p, scrap: p.scrap - price, owned: [...p.owned, id] }, id)
 }
 
 /** Equips an owned item, or unequips it if already equipped. */

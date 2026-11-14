@@ -1,5 +1,15 @@
 import { CFG } from '../config'
-import { buy, COSMETICS, equip, SLOT_NAMES, type Cosmetic, type Slot } from '../core/cosmetics'
+import {
+  buy,
+  COSMETICS,
+  cosmetic,
+  equip,
+  priceOf,
+  SLOT_NAMES,
+  weeklyDeal,
+  type Cosmetic,
+  type Slot,
+} from '../core/cosmetics'
 import type { Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import { h } from './dom'
@@ -26,14 +36,15 @@ export function garageTab(p: Profile, changed: () => void) {
   const item = (c: Cosmetic) => {
     const owned = p.owned.includes(c.id)
     const on = p.look[c.slot] === c.id
-    const short = c.price - p.scrap
+    const price = priceOf(c)
+    const short = price - p.scrap
     const act = (e: Event) => {
       // Buying takes two taps (Buy, then Confirm), and a fresh purchase ignores taps for a moment, so a double
       // tap can never buy something and take it off again.
       if (performance.now() < lockUntil) return
       if (!owned && armed !== c.id) {
         armed = c.id
-        ;(e.target as HTMLElement).textContent = `Confirm ⚙ ${c.price}`
+        ;(e.target as HTMLElement).textContent = `Confirm ⚙ ${price}`
         setTimeout(() => armed === c.id && ((armed = ''), changed()), CFG.garage.confirmMs)
         return
       }
@@ -63,13 +74,23 @@ export function garageTab(p: Profile, changed: () => void) {
       h(
         'span',
         { class: 'meta' },
-        on ? 'Equipped' : owned ? 'Owned' : h('span', {}, scrapIcon(), ` ${c.price}`),
+        on
+          ? 'Equipped'
+          : owned
+            ? 'Owned'
+            : h(
+                'span',
+                {},
+                scrapIcon(),
+                ` ${price}`,
+                price < c.price ? h('s', { class: 'dim' }, ` ${c.price}`) : '',
+              ),
       ),
       !owned && short > 0
         ? h(
             'div',
-            { class: 'need-bar', title: `${p.scrap} of ${c.price} scrap` },
-            h('i', { style: `width:${Math.round((p.scrap / c.price) * 100)}%` }),
+            { class: 'need-bar', title: `${p.scrap} of ${price} scrap` },
+            h('i', { style: `width:${Math.round((p.scrap / price) * 100)}%` }),
             h('span', {}, `${short} to go`),
           )
         : h(
@@ -84,9 +105,9 @@ export function garageTab(p: Profile, changed: () => void) {
   const treats = slots
     .map(
       (s) =>
-        COSMETICS.filter((c) => c.slot === s && c.price <= p.scrap && !p.owned.includes(c.id)).sort(
-          (a, b) => b.price - a.price,
-        )[0],
+        COSMETICS.filter(
+          (c) => c.slot === s && priceOf(c) <= p.scrap && !p.owned.includes(c.id),
+        ).sort((a, b) => b.price - a.price)[0],
     )
     .filter((c) => c)
     .slice(0, 4)
@@ -110,6 +131,17 @@ export function garageTab(p: Profile, changed: () => void) {
         h('span', {}, 'scrap'),
         h('small', {}, 'Earned on every ride of 10 minutes or more, plus a bonus per award'),
       ),
+    ),
+    h(
+      'section',
+      { class: 'slot' },
+      h(
+        'h2',
+        { class: 'label' },
+        'Deal of the week',
+        h('small', {}, `${Math.round(CFG.garage.dealOff * 100)}% off until Monday`),
+      ),
+      h('div', { class: 'shopgrid' }, item(cosmetic(weeklyDeal())!)),
     ),
     treats.length
       ? h(
