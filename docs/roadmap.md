@@ -161,7 +161,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | ✅ Onboarding | First-run tutorial: pair the trainer, set FTP, what compliance means | M |
 | ✅ Settings | Volume, graphics quality, in-ride display size and colour-blind zone colours, under the rider menu. Units (miles, pounds) are not done: everything is metric | M |
 | ✅ Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |
-| Proper icons | SVG icon set in place of emoji so every device looks the same | S |
+| Proper icons | SVG icon set in place of emoji so every device looks the same. **Needs the owner:** the good sets (Lucide, Tabler) are ISC or MIT, not CC0, so they need approval; the emoji are also part of the charm | S |
 | ✅ Rider avatars | Body, face and bike customisation beyond hats and kit. Done by the body creator (Rider → Body, 24 options) and the Garage bikes | M |
 | More cosmetics | Done: 20 more items (6 paints, zombie plough, pirate flags, roof esky and surfboard, 6 hats, 5 kits). Horns done: a Horn shelf in the Garage (Cow Moo, Didgeridoo, La Cucaracha, Road Train Air Horn) that your 📯 plays for everyone on the bus. Still to do: paint patterns, decals, exhaust flames, rider celebrations | M |
 | ✅ Installable app | Add-to-home-screen with offline solo mode | S |
