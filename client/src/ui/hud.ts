@@ -22,6 +22,7 @@ import { powerPanel } from './hudPower'
 import { makeRoster } from './hudRoster'
 import { makeShop } from './hudShop'
 import { makeSplash } from './hudSplash'
+import { VIS } from '../scene/params'
 import { makeStats } from './hudStats'
 
 export interface HudOpts {
@@ -161,6 +162,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const fit = () => {
     const z = hudUnit() / CFG.hud.designU
     if (z !== gz) root.style.setProperty('--gz', String((gz = z)))
+    // The crew cards start under the rear-view mirror (the bus only; Madness has no mirror).
+    const mb = `calc(${VIS.mirrorY * 100}vh + ${(VIS.mirrorW * 100) / 3}vw)`
+    root.style.setProperty('--mirror-b', VIS.mirror && !mad ? mb : '0px')
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)

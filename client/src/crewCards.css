@@ -1,0 +1,103 @@
+/* Crew cards (ui/crewCards.ts): a narrow column down the right edge, one card per rider */
+.ccol {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.5 * var(--u));
+  width: min(calc(15 * var(--u)), 15vw);
+  min-height: 0;
+  max-height: 100%;
+  padding: calc(0.5 * var(--u));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  touch-action: pan-y;
+  font-size: calc(1.6 * var(--u));
+  scrollbar-width: thin;
+}
+.cc-list {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.5 * var(--u));
+}
+.ccard {
+  display: flex;
+  flex-direction: column;
+  gap: calc(0.3 * var(--u));
+  padding: calc(0.5 * var(--u)) calc(0.7 * var(--u));
+  border-left: calc(0.4 * var(--u)) solid transparent;
+  border-radius: calc(0.6 * var(--u));
+  background: rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.ccard.me {
+  background: rgba(255, 255, 255, 0.2);
+  border-left-color: var(--acc);
+}
+.ccard[data-st='spectator'],
+.ccard[data-st='away'] {
+  opacity: 0.55;
+}
+.ccard[data-st='fell'] {
+  box-shadow: inset 0 0 0 calc(0.2 * var(--u)) var(--bad);
+}
+.cc-top,
+.cc-mid {
+  display: flex;
+  align-items: baseline;
+  gap: calc(0.4 * var(--u));
+  min-width: 0;
+}
+.cc-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.cc-tier,
+.cc-mode {
+  padding: 0 0.35em;
+  border-radius: 0.3em;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 0.68em;
+  font-weight: 700;
+}
+.cc-mode:empty {
+  display: none;
+}
+.cc-w {
+  font-weight: 700;
+}
+.cc-share {
+  font-size: 0.72em;
+  opacity: 0.75;
+}
+.cc-hr {
+  margin-left: auto;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+.cc-bar {
+  position: relative;
+  height: calc(1.5 * var(--u));
+  border-radius: calc(0.3 * var(--u));
+  background: rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+.cc-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  opacity: 0.85;
+}
+.cc-note {
+  position: relative;
+  display: block;
+  padding: 0 calc(0.4 * var(--u));
+  font-size: calc(1.1 * var(--u));
+  line-height: calc(1.5 * var(--u));
+  font-weight: 700;
+  text-align: right;
+  text-shadow: 0 1px 2px #000;
+}

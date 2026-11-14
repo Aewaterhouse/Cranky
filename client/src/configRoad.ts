@@ -33,6 +33,8 @@ export const ROAD_CFG = {
     climb: { minPct: 3, minM: 300, dipM: 100, leadM: 150, aheadM: 900, behindM: 100 },
     /** Rider list: rows shown, name length, and the speed (m/s) below which gaps are in metres. */
     riders: { rows: 7, nameChars: 10, movingMs: 1 },
+    /** Crew cards (right edge): name length on a card, and the haul-back countdown a fallen rider shows. */
+    cards: { nameChars: 9, haulS: 20 },
     toastS: 3,
     /** Tolerance bar: green inside the compliance band, amber out to `warn` off target, red beyond; the bar spans ±`span`. */
     tol: { warn: 0.1, span: 0.3 },

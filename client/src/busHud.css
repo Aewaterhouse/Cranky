@@ -90,46 +90,15 @@
   background: none;
 }
 
-/* Right edge: the crew, in the rider list's rows */
-.rhud .crew .rrow {
-  grid-template-columns: 12ch 9.5ch 8.5ch 5ch;
-  align-items: baseline;
+/* Right edge: the crew cards (crewCards.css), under the rear-view mirror and clear of the bottom panels.
+   --mirror-b (set by hud.ts from VIS) is the mirror's bottom edge. */
+.rhud .ccol.crew {
+  display: none;
+  margin-top: max(0px, calc(var(--mirror-b, 0px) - var(--st) + var(--u)));
 }
-.crew .rn {
-  overflow: hidden;
-  text-overflow: ellipsis;
+.hud-riders .rhud .ccol.crew {
+  display: flex;
 }
-.crew .rn small {
-  margin: 0 0 0 0.5em;
-  padding: 0 0.35em;
-  border-radius: 0.3em;
-  background: rgba(255, 255, 255, 0.16);
-  font-size: 0.7em;
-  font-weight: 700;
-}
-.crew .rw {
-  font-weight: 700;
-  opacity: 1;
-}
-.crew .rw small {
-  margin-left: 0.4em;
-  font-size: 0.7em;
-  opacity: 0.75;
-}
-.crew .rg {
-  font-weight: 700;
-}
-.crew .rb {
-  text-align: right;
-  font-weight: 500;
-}
-.crew [data-st='spectator'] {
-  opacity: 0.55;
-}
-.crew [data-st='fell'] {
-  box-shadow: inset 0 0 0 calc(0.2 * var(--u)) var(--bad);
-}
-
 /* Stats drawer extras: time in zone and sprint grades */
 .bhud .hstats .st-zones {
   height: calc(1.2 * var(--u));
