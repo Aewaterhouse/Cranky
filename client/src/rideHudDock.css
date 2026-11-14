@@ -35,6 +35,8 @@
 .dock-l > button {
   font-size: calc(2 * var(--u));
   opacity: 0.85;
+  /* Quick taps on the camera button are a double tap to Safari, which zoomed the page towards the corner. */
+  touch-action: manipulation;
 }
 .dock-r {
   justify-content: flex-end;
