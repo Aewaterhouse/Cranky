@@ -8,6 +8,24 @@ I couldn't review the servo stop's upgrade shop. This week's Zombie Bus modifier
 
 There's a lot of good stuff here. The Zombie Bus HUD is rich, the route vote is clear, the awards are funny and the lobbies get you riding in three taps. The five new games are the weak spot: they feel like the Zombie Bus with a different panel bolted on. Every one of them defaulted to the *Bus Crew 45* workout, so you ride "Long haul", "Servo stop" and "Horde surge" blocks, get a red **FAIL!** for a servo sprint in a pub quiz, and the results page is titled "Bus Crew 45". The game itself barely shows in the 3D world (no fox in The Hunt, no team colours in the Team Time Trial, knocked-out riders keep pedalling in the bunch). Results lead with the crew's best number as if it were yours. Give each game its own workout, its own words and one visible thing on the road, and they'll feel like five new games instead of five HUD widgets.
 
+## Done already (2026-11-15)
+
+- 1: workout games start on a workout of their own (quiz Coffee Spin, galley Tempo 2x20, hunt Sweet Spot 2x15, TTT Threshold 2x15) and name segments plainly (Steady, Climb, Easy spin); results lead with the game's name.
+- 2: ranked games' results lead with your own score; the big number says it is the crew's.
+- 3 (partly): the fox rides at the front with a 🦊; riders out of Last Rider Standing drop out of the bunch; TTT is now State of Origin, everyone in maroon or sky blue.
+- 4 (partly): while a question card is up, splashes go small and high.
+- 5, 6: Galley bots row to the drum, the pirates ease off, time on the beat reads m:ss; Last Rider Standing bots go at their breaking point (100 to 140%), ERG gets 15 s of grace a step, out after 12 s under 70%.
+- 7 (partly): the timer stays on one line (number keys already show on the options).
+- 8, 9: the feed shows a game's score and calls bus rides the Zombie Bus; Coming up and the feed sit below the games.
+- 10: the vote no longer mentions the servo closing.
+- 13, 14, 15: a Try on label on Garage pictures, each horn its own picture, the horn a bigger first button.
+- 16: TTT results say which team you rode for.
+- 17 (partly): Last Rider Standing and VO2 Madness no longer offer a run picker.
+- 18, 19, 20: no empty Sprints column, no "about 0 pies", quick time chips for planning a ride.
+- Bugs 1, 2, 3, 4, 5, 9 fixed (bike thumbnails show the bike; the deal is not repeated in Treat yourself).
+
+Still open: 11 (your role as a badge under the target), 12 (the boss in the chase camera when the gap is wide), the iPad overlaps (bugs 7, 8), the sticky lobby header covering the game card.
+
 ## Ideas, ranked
 
 | # | What I saw | The change | Who does it well | Effort |
