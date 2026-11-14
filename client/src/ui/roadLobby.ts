@@ -37,6 +37,11 @@ async function copy(text: string) {
 const GAMES: [RoadGame, string, string][] = [
   ['ride', 'Ride', 'Ride together. No winner, just a crew on the road.'],
   ['race', 'Race', 'Everyone from the line. First across it after the last lap wins.'],
+  [
+    'points',
+    'Points',
+    'A sprint every lap: 5, 3, 2 and 1 points, double on the last. Most points wins.',
+  ],
 ]
 
 /** Group-ride lobby, built once and patched in place: who is in, the route, and the host's choices. */

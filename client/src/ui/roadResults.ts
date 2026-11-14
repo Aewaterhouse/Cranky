@@ -6,11 +6,12 @@ import { UNIT } from './units'
 
 const km = (m: number) => UNIT.dist(m)
 const lapsText = (n: number) => (n > 1 ? ` · ${n} laps` : '')
-const GAME_NAME = { ride: 'social ride', race: 'race' }
+const GAME_NAME = { ride: 'social ride', race: 'race', points: 'points race' }
 
 /** The crew table for a road ride: place, time (or how far they got), average power, W/kg and watts saved drafting. */
 export function roadTable(g: RoadSummary, myId = '', faces = false) {
-  const head = ['', 'Rider', 'Time', 'Avg power', 'W/kg', 'Draft saved']
+  const pts = g.game === 'points'
+  const head = ['', 'Rider', ...(pts ? ['Points'] : []), 'Time', 'Avg power', 'W/kg', 'Draft saved']
   return h(
     'table',
     { class: 'road-table' },
@@ -21,6 +22,7 @@ export function roadTable(g: RoadSummary, myId = '', faces = false) {
         { class: r.id === myId ? 'me' : '' },
         h('td', {}, r.time == null ? '–' : ordinal(r.place)),
         h('td', {}, faces ? avatar(r.name, 'sm') : '', r.name, r.bot ? ' 🤖' : ''),
+        pts ? h('td', {}, h('b', {}, String(r.pts ?? 0))) : '',
         h(
           'td',
           {},

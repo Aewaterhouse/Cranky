@@ -91,3 +91,61 @@ def test_four_riders_race_to_the_end_with_bots():
     assert s["game"] == "race" and len(s["riders"]) == 4 and len(s["podium"]) == 3
     assert s["riders"][0]["gap"] == 0 and s["riders"][0]["id"] == s["podium"][0]
     assert room.lobby_msg()["game"] == "race"
+
+
+def spread(sim: RoadSim) -> RoadSim:
+    """No wheels to sit on and a big spread of watts: the same order every lap."""
+    sim.drafting = "off"
+    for k, m in enumerate(sim.movers.values()):
+        m.p = 400 - 90 * k
+    return sim
+
+
+def test_points_on_every_lap_double_on_the_last():
+    sim = spread(racers("points"))
+    fx = race_out(sim)
+    pts = sim.rules.pts
+    assert sorted(pts.values(), reverse=True) == [20, 12, 8, 4]  # 5+5+10, 3+3+6, 2+2+4, 1+1+2
+    got = sorted(f["text"] for f in fx if f["k"] == "points")
+    assert got == sorted(["+5", "+3", "+2", "+1"] * 2 + ["+10", "+6", "+4", "+2"])
+    bells = [f["text"] for f in fx if f["k"] == "bell"]
+    assert bells == ["SPRINT 1 · POINTS", "SPRINT 2 · POINTS", "LAST LAP", "FINAL SPRINT · DOUBLE POINTS"]
+    rows = sim.rules.results(sim)
+    assert [r["pts"] for r in rows] == [20, 12, 8, 4] and rows[0]["line"] == 1
+    assert sim.rules.state(sim)["pts"] == pts
+    extra = sim.rules.extra(sim, rows)
+    assert extra["award"] == {"kind": "points", "id": rows[0]["id"]} and extra["podium"][0] == rows[0]["id"]
+
+
+def test_points_ties_go_to_the_better_finish():
+    sim = spread(racers("points", 2))
+    race_out(sim)
+    line = [r["id"] for r in by_line(sim)]
+    sim.rules.pts = {line[3]: 9, line[1]: 9, line[0]: 1}
+    rows = sim.rules.results(sim)
+    assert [r["id"] for r in rows] == [line[1], line[3], line[0], line[2]]
+    assert sim.rules.extra(sim, rows)["podium"] == line[:3]  # the podium is still the line
+
+
+def by_line(sim: RoadSim) -> list[dict]:
+    return sorted(sim.rules.results(sim), key=lambda r: r["line"])
+
+
+def test_points_survive_a_snapshot_and_a_late_joiner_scores_only_what_they_ride():
+    sim = racers("points", 4)
+    while sim.rules.lead < 1:
+        sim.step(DT)
+    late = sim.add("late", 70, 250)
+    late.p, late.d = 400, max(m.d for m in sim.movers.values())
+    back = RoadSim.from_dict(sim.to_dict())
+    assert back.rules.pts == sim.rules.pts and back.rules.seen == sim.rules.seen
+    race_out(back)
+    assert back.rules.n == {"1": 4, "2": 5, "3": 5, "4": 5}  # the late joiner missed the first line
+
+
+def test_four_riders_points_race_with_bots():
+    room = bot_room("points", 3)
+    run_room(room)
+    s = room.summary
+    assert s["game"] == "points" and s["award"]["kind"] == "points"
+    assert sum(r["pts"] for r in s["riders"]) >= 11 * 2 + 20  # the fourth may still be out at the end

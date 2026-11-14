@@ -19,6 +19,7 @@ export function roadCards(cls = '') {
         .map((r) => ({
           id: r.id,
           name: r.name,
+          tier: r.tag,
           w: r.power ?? 0,
           st: r.st === 'away' ? 'away' : 'riding',
           note:

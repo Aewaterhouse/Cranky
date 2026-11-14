@@ -46,6 +46,8 @@ export interface ListRider {
   ftp?: number
   kg?: number | null
   st?: 'riding' | 'stopped' | 'away' | 'finished'
+  /** Races: a short tag beside the name on the crew card (points, the prime). */
+  tag?: string
 }
 export interface RiderRow {
   id: string

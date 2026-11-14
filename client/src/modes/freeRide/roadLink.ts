@@ -3,6 +3,7 @@ import { bandFactor, draftFactor, type DraftLevel } from '../../core/physics'
 import type {
   ClientMsg,
   RoadLobby,
+  RaceState,
   RoadLobbyRider,
   RoadRiderTick,
   RoadTick,
@@ -19,6 +20,7 @@ export interface LinkRider extends RoadRider {
   hr: number | null
   ftp?: number
   kg?: number | null
+  tag?: string
 }
 
 /**
@@ -38,6 +40,7 @@ export class RoadLink {
   private together = false
   private drafting: DraftLevel = 'strong'
   private flash: [string, string, number] | undefined
+  private race: RaceState | null = null
   /** Rings the bell for a race's last lap, sprint or prime. */
   onBell: (text: string) => void = () => {}
 
@@ -67,12 +70,15 @@ export class RoadLink {
     this.el = m.el
     this.got = this.now()
     this.riders = m.riders
+    this.race = m.game as RaceState | null
     const mine = m.riders[this.me]
     for (const fx of m.fx) {
       const name = this.info.get(fx.id ?? '')?.name ?? 'Someone'
       if (fx.k === 'finish' && fx.id) {
         const place = ordinal(+(fx.text ?? 0))
         this.notes.push(fx.id === this.me ? `Finished: ${place}` : `${name} finished ${place}`)
+      } else if (fx.k === 'points' && fx.id) {
+        this.notes.push(`${fx.id === this.me ? 'You' : name} ${fx.text} points`)
       } else if (fx.k === 'bell') {
         this.flash = [fx.text ?? '', fx.id ? name : '', this.got + R.bannerS]
         this.onBell(fx.text ?? '')
@@ -133,6 +139,12 @@ export class RoadLink {
     return [isFinite(count) ? String(Math.ceil(count)) : 'Get ready', 'The ride starts together']
   }
 
+  /** A race's tag for a rider's card: their points. */
+  tag(id: string) {
+    const pts = this.race?.pts
+    return pts ? `${pts[id] ?? 0} pts` : undefined
+  }
+
   /** Everyone else, carried on from the last tick at their speed. */
   others(): LinkRider[] {
     const age = this.age()
@@ -156,6 +168,7 @@ export class RoadLink {
           hr: r.hr,
           ftp: i?.ftp,
           kg: i?.weightKg,
+          tag: this.tag(id),
         }
       })
   }

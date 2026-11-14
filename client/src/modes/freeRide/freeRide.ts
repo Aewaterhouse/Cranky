@@ -242,6 +242,7 @@ export function runFreeRide(
           hr: live.hr ?? null,
           ftp: profile.ftp,
           kg: profile.weightKg || null,
+          tag: link?.tag(me.id),
         },
         ...others,
       ],

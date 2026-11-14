@@ -53,7 +53,61 @@ class Race(Rules):
         return [{**r, "gap": None if r["time"] is None else round(r["time"] - best, 1)} for r in rows]
 
     def extra(self, sim: RoadSim, rows: list[dict]) -> dict:
-        return {"podium": [r["id"] for r in rows if r["time"] is not None][: C.RACE_PODIUM]}
+        home = sorted((r for r in rows if r["time"] is not None), key=lambda r: r.get("line", r["place"]))
+        return {"podium": [r["id"] for r in home][: C.RACE_PODIUM]}
 
 
-RULES.update(race=Race)
+class Points(Race):
+    """A sprint at the end of every lap: points to the first four across, more on the last. Most wins."""
+
+    name = "points"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.pts: dict[str, int] = {}
+        self.seen: dict[str, int] = {}  # lap lines each rider has crossed
+        self.n: dict[str, int] = {}  # riders across each line so far (string keys survive a snapshot)
+        self.warned = 0  # sprints the bell has gone for
+
+    def line(self, sim: RoadSim, m: Mover) -> float:
+        return min(sim.road.distance, (self.laps_done(sim, m) + 1) * sim.road.lap.distance)
+
+    def after(self, sim: RoadSim, dt: float) -> list[dict]:
+        fx = super().after(sim, dt)
+        lap, laps = sim.road.lap.distance, sim.road.laps
+        cross = []
+        for m in sim.movers.values():
+            done = self.laps_done(sim, m)
+            cross += [
+                (self.crossed(sim, m, k * lap), k, m.id)
+                for k in range(self.seen.get(m.id, done) + 1, done + 1)
+            ]
+            self.seen[m.id] = done
+        for _, k, rid in sorted(cross):
+            place = self.n.get(str(k), 0)
+            self.n[str(k)] = place + 1
+            if place < len(C.POINTS):
+                got = C.POINTS[place] * (C.POINTS_LAST_X if k == laps else 1)
+                self.pts[rid] = self.pts.get(rid, 0) + got
+                fx.append({"k": "points", "id": rid, "text": f"+{got}"})
+        lead = max((m.d for m in sim.movers.values()), default=0.0)
+        if self.warned < laps and lead >= (self.warned + 1) * lap - C.POINTS_WARN_M:
+            self.warned += 1
+            text = "FINAL SPRINT · DOUBLE POINTS" if self.warned == laps else f"SPRINT {self.warned} · POINTS"
+            fx.append({"k": "bell", "id": None, "text": text})
+        return fx
+
+    def state(self, sim: RoadSim) -> dict | None:
+        return {**super().state(sim), "pts": self.pts}
+
+    def results(self, sim: RoadSim) -> list[dict]:
+        rows = [{**r, "line": r["place"], "pts": self.pts.get(r["id"], 0)} for r in super().results(sim)]
+        rows.sort(key=lambda r: (-r["pts"], r["line"]))
+        return [{**r, "place": k + 1} for k, r in enumerate(rows)]
+
+    def extra(self, sim: RoadSim, rows: list[dict]) -> dict:
+        top = rows[0] if rows and rows[0]["pts"] else None
+        return {**super().extra(sim, rows), "award": top and {"kind": "points", "id": top["id"]}}
+
+
+RULES.update(race=Race, points=Points)

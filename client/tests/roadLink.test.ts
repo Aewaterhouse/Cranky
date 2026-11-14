@@ -128,6 +128,15 @@ describe('group ride link', () => {
     expect(link.banner()).toBeUndefined()
   })
 
+  it("a points race tags each card with the rider's points and toasts each sprint", () => {
+    const { link } = make()
+    const m = tick(60, { me: at(500), kev: at(600) }, [{ k: 'points', id: 'kev', text: '+5' }])
+    link.tick({ ...m, game: { kind: 'points', lap: 2, laps: 3, pts: { kev: 5 } } })
+    expect(link.takeNotes()).toEqual(['Kev +5 points'])
+    expect(link.tag('me')).toBe('0 pts')
+    expect(link.others()[0].tag).toBe('5 pts')
+  })
+
   it('says who joined, who finished and who caught whom', () => {
     const { link } = make()
     link.lobby(lobby(['me', 'kev', 'shaz']))
