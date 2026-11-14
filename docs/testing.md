@@ -335,3 +335,14 @@ Same footing as Kidney Stone Express: simulated trainer and bots, headless still
 - Climate Lawsuit: pick it, add three bots, "Start the 1980s". The town replaces the road; your station and its rider sit on the ridge. Before each decade a sheet offers coal, gas, solar and wind with their costs. Solar earns only in its band ("Clouds came over" when you leave it), wind only on gusts. The sea rises through Beach, Surf club, Main Street and Everything; "Build a seawall" spends coins. At the Trial everyone's emissions and bribes come out, the jury votes on an effort and the defendant holds it or is found guilty. A guilty rider in a flooded town wears a red GUILTY ribbon on their name tag in every game for 30 days.
 - Not checked: real trainers, phones and tablets, the announcer, and whether the flood mark suits real riders (bots ride band middles; real riders above them will flood sooner).
 - Test speed-up artefact: with `?fast=` in the browser and `ZB_TIME_SCALE` on the server, your own Time in zone (server game time) can read longer than the Duration (the browser's sped-up recording). They agree at normal speed.
+
+## Watch Party (2026-11-14)
+
+Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
+
+- In the lobby pick Watch Party, pick a workout (ERG works as on the bus), "Start the show". Paste a YouTube link in the panel and Add: the video starts behind the workout HUD for everyone. Later links queue; anyone can add.
+- Driver only: ⏪ 30 s, Pause/Play, 30 s ⏩ and Next. Everyone's video follows within a couple of seconds. A guest's panel has no remote.
+- Join late from a second browser: the video starts at the room's spot, not the beginning. Drag a guest's own YouTube scrubber away: it jumps back.
+- A guest whose browser blocks sound on autoplay sees "▶ Tap to start the video" after about three seconds.
+- A video whose owner blocks embedding shows a toast saying so. An ad on one rider's video holds only that rider's video; it jumps to the room's spot when the ad ends.
+- `/watch-dev.html` has two players on one clock with play, pause, +30 s and load.

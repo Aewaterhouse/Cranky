@@ -78,6 +78,5 @@ export const GAMES: Record<Game, GameInfo> = {
     countdown: 'THE SHOW STARTS IN',
     score: 'Crew score',
     plan: true,
-    soon: true,
   },
 }

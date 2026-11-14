@@ -19,7 +19,7 @@ export function makeWatchPanel(
   const note = h('small', { class: 'wp-note' })
   const add = () => {
     const v = videoId(input.value)
-    set(note, v ? 'Added to the queue.' : 'That doesn’t look like a YouTube link.')
+    set(note, v ? 'Added.' : 'That doesn’t look like a YouTube link.')
     if (v) {
       act('add', v)
       input.value = ''

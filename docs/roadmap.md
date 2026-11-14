@@ -129,10 +129,10 @@ A shared room where the crew does the same ERG workout while watching the same v
 
 | Item | What | Size |
 | --- | --- | --- |
-| Watch party room | Join by code like a bus. The host picks a workout and a YouTube video or playlist; everyone's ERG follows the shared workout clock at their own FTP and tier | M |
-| Synced playback | Play, pause, seek and next-video stay in step for everyone, driven by the server clock; late joiners land at the right spot | M |
-| Layout | Video takes most of the screen; a slim workout strip shows target, power, the band gauge, interval clock and the workout graph | M |
-| Shared queue | Anyone can add videos to the playlist; the host can reorder and skip | S |
+| ✅ Watch party room | Join by code like a bus. The host picks a workout and a YouTube video or playlist; everyone's ERG follows the shared workout clock at their own FTP and tier | M |
+| ✅ Synced playback | Play, pause, seek and next-video stay in step for everyone, driven by the server clock; late joiners land at the right spot | M |
+| ✅ Layout | Video takes most of the screen; a slim workout strip shows target, power, the band gauge, interval clock and the workout graph | M |
+| Shared queue | Anyone can add videos to the playlist; the host can reorder and skip (adding and skipping done; reordering and playlists still to do) | S |
 | Crew strip | Small row of everyone's watts, compliance and heart rate, plus emoji reactions over the video | S |
 | Pause rules | Workout pause and video pause are linked: if the host pauses, both stop for everyone | S |
 | Workout-aware video | Optional: dip the video volume and flash the strip a few seconds before each interval change | S |

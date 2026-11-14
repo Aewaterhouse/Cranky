@@ -24,9 +24,21 @@ export function videoStage(host: HTMLElement, onError: (text: string) => void) {
   let el = 0
   let seen = performance.now()
   const now = () => el + (performance.now() - seen) / 1000
+  // Browsers block a video starting with sound until the page has been tapped; after a few refused plays, ask.
+  const tap = document.createElement('button')
+  tap.className = 'video-tap primary'
+  tap.textContent = '▶ Tap to start the video'
+  tap.hidden = true
+  tap.onclick = () => (yt.apply({ k: 'play' }), (tap.hidden = true), (refused = 0))
+  host.append(tap)
+  let refused = 0
   const timer = setInterval(() => {
     const me = yt.local()
-    if (me) yt.apply(syncStep(room, me, now()))
+    if (!me) return
+    const step = syncStep(room, me, now())
+    refused = step?.k === 'play' ? refused + 1 : me.state === 1 ? 0 : refused
+    tap.hidden = refused < 6
+    yt.apply(step)
   }, 500)
   return {
     set state(s: SceneState & { el?: number }) {
@@ -45,6 +57,7 @@ export function videoStage(host: HTMLElement, onError: (text: string) => void) {
       clearInterval(timer)
       yt.dispose()
       box.remove()
+      tap.remove()
     },
   }
 }
