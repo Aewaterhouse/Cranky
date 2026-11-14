@@ -611,3 +611,33 @@ kbd {
 .home-modes .home-mode .gc-icon {
   font-size: 2.2rem;
 }
+.boarding {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  border: 2px solid var(--ok);
+  border-radius: var(--r);
+  background: linear-gradient(90deg, rgb(127 209 59 / 0.18), var(--card));
+  text-align: left;
+  animation: boarding 1.6s ease-in-out infinite alternate;
+}
+.boarding > span:nth-child(2) {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+.boarding b {
+  font-size: 1.1rem;
+}
+.boarding .arrow {
+  font-weight: 800;
+  color: var(--ok);
+}
+@keyframes boarding {
+  to {
+    box-shadow: 0 0 22px rgb(127 209 59 / 0.35);
+  }
+}

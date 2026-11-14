@@ -148,6 +148,8 @@ function resumeCard(p: Profile, act: HomeActions) {
 export function rideTab(p: Profile, act: HomeActions) {
   const list = h('div', { class: 'buses' })
   const rejoin = h('div')
+  // A mate's ride that is still boarding goes to the very top, loud, so nobody scrolls past it.
+  const boarding = h('div')
   let seen = ''
   const render = (rooms: Room[] | null) => {
     const key = JSON.stringify(rooms)
@@ -155,6 +157,23 @@ export function rideTab(p: Profile, act: HomeActions) {
     seen = key
     const mine = rooms?.find((r) => r.code === rememberedBus(p.id))
     rejoin.replaceChildren(mine ? rejoinCard(mine, act.join) : '')
+    const open = rooms?.find((r) => r !== mine && r.state === 'lobby' && r.host !== p.name)
+    boarding.replaceChildren(
+      open
+        ? h(
+            'button',
+            { class: 'boarding', onclick: needTrainer(() => act.join(open.code)) },
+            h('span', { class: 'big-emoji' }, '🟢'),
+            h(
+              'span',
+              {},
+              h('b', {}, `${open.host ?? 'Someone'}'s ${open.plan} is boarding`),
+              h('small', {}, `${open.riders.join(', ')} · code ${open.code}`),
+            ),
+            h('span', { class: 'arrow' }, 'Join →'),
+          )
+        : '',
+    )
     if (!rooms) return list.replaceChildren(h('p', { class: 'dim' }, 'Looking for buses…'))
     list.replaceChildren(
       ...(rooms.length
@@ -215,6 +234,7 @@ export function rideTab(p: Profile, act: HomeActions) {
     'div',
     { class: 'ride' },
     resumeCard(p, act),
+    boarding,
     rejoin,
     today,
     h(
