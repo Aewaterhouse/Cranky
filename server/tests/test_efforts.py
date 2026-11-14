@@ -129,3 +129,19 @@ def test_the_crew_feed_lists_rides_and_takes_kudos_once():
     assert client.post(f"/api/kudos/{top['n']}", headers=ali).json() == {"given": False}  # not your own
     again = client.get("/api/feed", headers=kat).json()[0]
     assert again["kudos"] == 1 and again["mine"]
+
+
+def test_a_planned_ride_takes_rsvps_and_only_its_host_can_cancel_it():
+    _, ali = auth("ali", "Ali")
+    _, kat = auth("kat", "Kat")
+    n = client.post(
+        "/api/schedule", json={"at": "2099-01-01T08:00", "game": "quiz", "note": "Pub night"}, headers=ali
+    ).json()["n"]
+    plan = next(p for p in client.get("/api/schedule", headers=kat).json() if p["n"] == n)
+    assert (plan["hostName"], plan["game"], plan["names"]) == ("Ali", "quiz", ["Ali"])
+    assert client.post(f"/api/schedule/{n}/rsvp?on=true", headers=kat).json() == {"ok": True}
+    plan = next(p for p in client.get("/api/schedule", headers=kat).json() if p["n"] == n)
+    assert plan["names"] == ["Ali", "Kat"]
+    assert client.delete(f"/api/schedule/{n}", headers=kat).json() == {"ok": False}
+    assert client.delete(f"/api/schedule/{n}", headers=ali).json() == {"ok": True}
+    assert all(p["n"] != n for p in client.get("/api/schedule", headers=kat).json())

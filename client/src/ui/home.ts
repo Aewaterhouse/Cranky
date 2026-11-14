@@ -13,6 +13,7 @@ import { toast } from './toast'
 import { freeRideSetup } from './freeRideSetup'
 import { weekCard } from './weekCard'
 import { crewFeed } from './crewFeed'
+import { comingUp } from './comingUp'
 import { gamePicker } from './gamePicker'
 import { hello, mode } from './homeCards'
 import type { Game } from '../net/protocol'
@@ -231,6 +232,7 @@ export function rideTab(p: Profile, act: HomeActions) {
     rejoin,
     today,
     weekCard(p, (r) => open(freeRideSetup(p, act, home, r))),
+    comingUp(p.id),
     crewFeed(p.id),
     h(
       'section',

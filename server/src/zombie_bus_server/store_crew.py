@@ -120,3 +120,38 @@ class CrewStore:
             if not row or row[0] == me:
                 return False
             return self.db.execute("INSERT OR IGNORE INTO kudos VALUES (?, ?)", (ride, me)).rowcount == 1
+
+    def schedule(self, now: str) -> list[dict]:
+        """Crew rides still to come (or under an hour old), soonest first, with who is in."""
+        with self.lock:
+            rows = self.db.execute(
+                "SELECT n, at, game, note, host, json FROM plans WHERE at >= ? ORDER BY at", (now,)
+            ).fetchall()
+        return [
+            {"n": n, "at": at, "game": g, "note": note, "host": h, "in": json.loads(j)}
+            for n, at, g, note, h, j in rows
+        ]
+
+    def plan_ride(self, host: str, at: str, game: str, note: str) -> int:
+        """Puts a crew ride on the calendar with its host already in. Returns its number."""
+        with self.lock, self.db:
+            cur = self.db.execute(
+                "INSERT INTO plans (at, game, note, host, json) VALUES (?, ?, ?, ?, ?)",
+                (at, game, note, host, json.dumps([host])),
+            )
+        return int(cur.lastrowid or 0)
+
+    def rsvp(self, n: int, rid: str, on: bool) -> bool:
+        """Says a rider is in (or out) for a planned ride. False if there is no such ride."""
+        with self.lock, self.db:
+            row = self.db.execute("SELECT json FROM plans WHERE n = ?", (n,)).fetchone()
+            if not row:
+                return False
+            who = [x for x in json.loads(row[0]) if x != rid] + ([rid] if on else [])
+            self.db.execute("UPDATE plans SET json = ? WHERE n = ?", (json.dumps(who), n))
+        return True
+
+    def unplan(self, n: int, rid: str) -> bool:
+        """Takes a planned ride off the calendar: only its host can."""
+        with self.lock, self.db:
+            return self.db.execute("DELETE FROM plans WHERE n = ? AND host = ?", (n, rid)).rowcount == 1

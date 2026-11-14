@@ -10,9 +10,9 @@ from typing import Annotated, Literal
 
 from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, ValidationError
+from pydantic import BaseModel, Field, ValidationError
 
-from . import config, efforts, files, ladder, strava_api
+from . import config, discord, efforts, files, ladder, strava_api
 from .avatars import clean_look
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
@@ -199,6 +199,44 @@ def get_ladder(u: User, season: str | None = None) -> dict:
     if not re.fullmatch(r"\d{4}-Q[1-4]", season):
         raise HTTPException(400, "Season looks like 2026-Q4")
     return ladder.build(season, store.results(*ladder.bounds(season)))
+
+
+class PlanRide(BaseModel):
+    at: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}")  # ISO time, UTC
+    game: str = Field(max_length=20)
+    note: str = Field(default="", max_length=120)
+
+
+@app.get("/api/schedule")
+def get_schedule(u: User) -> list[dict]:
+    """Crew rides on the calendar, soonest first (ones that started under an hour ago stay)."""
+    since = time.strftime("%Y-%m-%dT%H:%M", time.gmtime(time.time() - 3600))
+    names = {x["id"]: x["name"] for x in store.users()}
+    return [
+        {**p, "hostName": names.get(p["host"], p["host"]), "names": [names.get(i, i) for i in p["in"]]}
+        for p in store.schedule(since)
+    ]
+
+
+@app.post("/api/schedule")
+def plan_ride(body: PlanRide, u: User) -> dict:
+    """Puts a crew ride on the calendar and tells the Discord channel."""
+    n = store.plan_ride(u["id"], body.at, body.game, body.note)
+    text = f"🗓️ {u['name']} has planned a ride: {body.game} at {body.at} UTC. {body.note}".strip()
+    discord.post(text)  # a no-op without a webhook
+    return {"n": n}
+
+
+@app.post("/api/schedule/{n}/rsvp")
+def rsvp(n: int, on: bool, u: User) -> dict:
+    if not store.rsvp(n, u["id"], on):
+        raise HTTPException(404)
+    return {"ok": True}
+
+
+@app.delete("/api/schedule/{n}")
+def unplan(n: int, u: User) -> dict:
+    return {"ok": store.unplan(n, u["id"])}
 
 
 @app.get("/api/feed")

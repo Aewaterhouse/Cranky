@@ -723,3 +723,16 @@ kbd {
 .kudos.on {
   color: var(--acc);
 }
+.plan-ride {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0;
+}
+.plan-ride[hidden] {
+  display: none;
+}
+.panel h2 .link {
+  margin-left: 12px;
+  text-transform: none;
+  letter-spacing: 0;
+}
