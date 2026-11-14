@@ -491,7 +491,7 @@ kbd {
   .logo {
     font-size: 1.05rem;
   }
-  .who,
+  .top .who,
   .caret {
     display: none;
   }
