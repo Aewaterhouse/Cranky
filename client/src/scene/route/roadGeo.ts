@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { hash } from '../math'
 import { VIS } from '../params'
+import type { RoadIndex } from './roadIndex'
 import { newPose, type Pose, type RoadPath } from './roadPath'
 
 const R = VIS.route
@@ -45,13 +46,18 @@ export function across(p: Pose, o: number, out: Float64Array, i: number) {
   out[i + 2] = p.z + p.rz * o
 }
 
-/** Road ribbon for d0..d1: gravel verges, edge lines, tarmac and a dashed centre line, left out inside `gaps`. */
+/**
+ * Road ribbon for d0..d1: gravel verges, edge lines, tarmac and a dashed centre line, left out inside `gaps`. Rows
+ * that overlap another stretch of road (the way home beside the way out) go in `twin.under` or, when the other
+ * stretch comes first, `twin.over`, so the later one is drawn on top and neither flickers or lets grass through.
+ */
 export function buildRoad(
   path: RoadPath,
   d0: number,
   d1: number,
   out: Tris,
   gaps: [number, number][] = [],
+  twin?: { index: RoadIndex; under: Tris; over: Tris },
 ) {
   tarmac.set(R.tarmac)
   line.set(R.line)
@@ -69,6 +75,14 @@ export function buildRoad(
     path.poseAt(d, pose)
     path.poseAt(d + R.rowStep, next)
     const row = Math.round(d / R.rowStep)
+    let to = out
+    if (twin) {
+      const k = twin.index.scan(pose.x, pose.z, 2 * E)
+      for (let i = 0; i < k && to !== twin.over; i++) {
+        const o = twin.index.d[i]
+        if (Math.abs(o - d) > R.chunk / 4) to = o < d ? twin.over : twin.under
+      }
+    }
     offs.forEach((o, c) => {
       across(pose, o, p, c * 3)
       across(next, o, p, (n + c) * 3)
@@ -80,8 +94,8 @@ export function buildRoad(
       tint.copy(base).multiplyScalar(0.94 + hash(row * 7 + c) * (base === gravel ? 0.2 : 0.08))
       const a = c * 3
       const f = (n + c) * 3
-      out.add(p, a, a + 3, f + 3, tint)
-      out.add(p, a, f + 3, f, tint)
+      to.add(p, a, a + 3, f + 3, tint)
+      to.add(p, a, f + 3, f, tint)
     }
   }
 }

@@ -38,6 +38,12 @@ const STREET = new THREE.MeshLambertMaterial({
   flatShading: true,
   polygonOffset: true,
 })
+/** Road where another stretch overlaps it: in front of the ground, behind the later stretch (in `STREET`). */
+const UNDER = new THREE.MeshLambertMaterial({
+  vertexColors: true,
+  flatShading: true,
+  polygonOffset: true,
+})
 
 /** Everything a chunk is built from. */
 export interface Place {
@@ -124,7 +130,8 @@ export class Chunks {
     const water = new Tris(pose.x, pose.y, pose.z)
     const strips = new Tris(pose.x, pose.y, pose.z)
     const chalked = [k - 1, k, k + 1].flatMap((c) => this.place.chalk.get(c) ?? []).map(chalkSpan)
-    buildRoad(field.path, d0, d1, solid, chalked)
+    const under = new Tris(pose.x, pose.y, pose.z)
+    buildRoad(field.path, d0, d1, solid, chalked, { index: field.fine, under, over: strips })
     const patches = [new Patch(field, d0, d1, far, -1), new Patch(field, d0, d1, far, 1)]
     for (const p of patches) buildTerrain(p, field.fine, cover, solid, water)
     const cf = features.chunk(k)
@@ -151,10 +158,13 @@ export class Chunks {
     WATER.shininess = R.waterShine
     STREET.polygonOffsetFactor = -R.streetBias
     STREET.polygonOffsetUnits = -R.streetBias * 60
+    UNDER.polygonOffsetFactor = STREET.polygonOffsetFactor / 2
+    UNDER.polygonOffsetUnits = STREET.polygonOffsetUnits / 2
     for (const [tris, mat] of [
       [solid, VC],
       [water, WATER],
       [strips, STREET],
+      [under, UNDER],
     ] as const) {
       if (!tris.pos.length) continue
       const m = new THREE.Mesh(tris.build(), mat)
