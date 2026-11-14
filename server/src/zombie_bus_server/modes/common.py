@@ -25,6 +25,7 @@ class CrewGame:
     """
 
     no_erg: ClassVar[bool] = False  # True: nobody rides this game on ERG, whatever the host or rider picked
+    early_acts: ClassVar[bool] = False  # True: riders' input counts during the countdown too
 
     def __init__(self, level: str = "normal") -> None:
         self.level = level

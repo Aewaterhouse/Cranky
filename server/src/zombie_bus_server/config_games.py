@@ -226,3 +226,8 @@ CLIM_SERVICE = {"band": (0.97, 1.03), "secs": 120}  # community service at sente
 CLIM_SASH_DAYS = 30
 CLIM_BOTS = ("baron", "greenie", "fence")  # by the bot's place in BOT_NAMES
 CLIM_BOT_ASK_S = (3, 12)  # a bot answers a question after this many seconds
+
+# Watch party: queue length, the biggest remote jump, and a pretend speed for the results' distance.
+WATCH_QUEUE_MAX = 20
+WATCH_SEEK_MAX = 600
+WATCH_SPEED = 8.0

@@ -153,3 +153,8 @@ position, through `ErgController.setGrade`.
 - Summary: `mode: 'ambo'`, `score`, `distance`, `delivered`, `reviews`, `awards` and rider rows with `spread` (mean roughness, % of FTP), `spikes` and `fines`. Not on the season ladder.
 - No `act` keys: the game takes no input but power and cadence.
 - `tick.ev` is now read from the game after its tick (it was read before), so it always matches `game.phase`.
+
+## Watch party (`game: "watch"`, from 2026-11-14)
+- A crew game on the host's workout, with ERG as in the bus. `tick.game` is `{g: "watch", vid, title, playing, pos, at, queue: [{vid, title, by}]}`: the video is `pos` seconds in at ride time `at`, and runs on from there while `playing`. Each client keeps its player within 2 s of that.
+- `act` keys: `add` (an 11-character YouTube video id; anyone; the first one starts playing, the rest queue, at most 20), and for the host only `play`, `pause`, `seek` (seconds, plus or minus, at most 600) and `next`. A watch party takes `act` during the countdown too (`CrewGame.early_acts`).
+

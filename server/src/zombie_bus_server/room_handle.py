@@ -84,7 +84,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
     elif isinstance(msg, Act):
         now, (most, window) = time.monotonic(), C.ACT_LIMIT
         recent = room.acts[rid] = [t for t in room.acts.get(rid, []) if now - t < window]
-        if room.state == "running" and room.el >= 0 and len(recent) < most:
+        if room.state == "running" and (room.el >= 0 or room.mode.early_acts) and len(recent) < most:
             recent.append(now)
             room.mode.on_act(room, r, msg.k, msg.v)
     elif isinstance(msg, TierMsg):

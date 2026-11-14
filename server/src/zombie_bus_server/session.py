@@ -14,6 +14,7 @@ from .modes.ambulance import Ambulance
 from .modes.climate import Climate
 from .modes.dating import Dating
 from .modes.vo2_madness import Vo2Madness
+from .modes.watch import Watch
 from .modes.zombie_bus import ZombieBus, weekly_mutator
 from .plan import generate, load_plans, total
 from .rider import Rider
@@ -22,7 +23,14 @@ if TYPE_CHECKING:
     from .store import Store
 
 __all__ = ["MODES", "Rider", "Room"]
-MODES = {"bus": ZombieBus, "madness": Vo2Madness, "ambo": Ambulance, "date": Dating, "climate": Climate}
+MODES = {
+    "bus": ZombieBus,
+    "madness": Vo2Madness,
+    "ambo": Ambulance,
+    "date": Dating,
+    "climate": Climate,
+    "watch": Watch,
+}
 
 
 class Room:
