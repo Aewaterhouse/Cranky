@@ -10,10 +10,13 @@ const cache = new Map<string, string>()
 export interface Wearer {
   id: string
   body?: string
+  /** Their whole look, for a portrait rather than one item. */
+  look?: Look
 }
 const queue: [Cosmetic, Wearer, (url: string) => void][] = []
 let busy = false
-const key = (c: Cosmetic, who: Wearer) => `${c.id}|${who.id}|${who.body ?? ''}`
+const key = (c: Cosmetic, who: Wearer) =>
+  `${c.id}|${who.id}|${who.body ?? ''}|${who.look ? JSON.stringify(who.look) : ''}`
 
 /** The bus or the rider (their own body) wearing just this item, framed for its slot, drawn to a PNG data URL. */
 function draw(r: THREE.WebGLRenderer, c: Cosmetic, who: Wearer) {
@@ -22,7 +25,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic, who: Wearer) {
   const sun = new THREE.DirectionalLight('#ffffff', 1.6)
   sun.position.set(-4, 8, -6)
   scene.add(sun)
-  const look: Look = { [c.slot]: c.id, body: who.body }
+  const look: Look = who.look ?? { [c.slot]: c.id, body: who.body }
   const onBus = c.slot === 'paint' || c.slot === 'bullbar' || c.slot === 'spikes'
   let obj: THREE.Object3D
   let frame: THREE.Object3D // what the camera frames: the shell, or the rider without bike and name tag
@@ -91,6 +94,10 @@ function pump() {
   }
   requestAnimationFrame(step)
 }
+
+/** The rider in their whole look from the Garage, for the Rider header. */
+export const portrait = (who: Wearer & { look: Look }, done: (url: string) => void) =>
+  shopPreview({ id: 'portrait', slot: 'outfit' } as Cosmetic, who, done)
 
 /** Calls `done` with a 3D preview of the item once it is drawn (straight away when cached). */
 export function shopPreview(c: Cosmetic, who: Wearer, done: (url: string) => void) {

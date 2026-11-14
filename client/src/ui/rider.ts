@@ -1,3 +1,4 @@
+import { portrait } from './shopPreview'
 import { CFG } from '../config'
 import { TIER_NAME } from '../types'
 import { liveStreak, type Profile } from '../core/curve'
@@ -68,13 +69,25 @@ function overview(p: Profile) {
   )
 }
 
+/** Initials straight away, swapped for the rider in their Garage look once it is drawn. */
+function face(p: Profile) {
+  let el: HTMLElement = avatar(p.name, 'xl')
+  // A cached portrait comes back straight away, before the initials are on the page.
+  portrait({ id: p.id, look: p.look }, (src) => {
+    const img = h('img', { class: 'rider-portrait', src, alt: p.name })
+    el.replaceWith(img)
+    el = img
+  })
+  return el
+}
+
 /** The Rider tab: header, then the sub-tabs. */
 export function riderTab(p: Profile) {
   const head = () =>
     h(
       'header',
       { class: 'rider-head' },
-      avatar(p.name, 'xl'),
+      face(p),
       h(
         'div',
         {},

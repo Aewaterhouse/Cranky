@@ -835,3 +835,10 @@
 details.ftp-card > summary {
   cursor: pointer;
 }
+.rider-portrait {
+  width: 144px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 14px;
+  background: var(--card2);
+}
