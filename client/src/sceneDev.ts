@@ -48,7 +48,7 @@ const CREW: SceneRider[] = [
     cadence: 90,
     hr: 171,
     hrp: 0.95,
-    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis' },
+    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis', sash: q.has('sash') },
   },
   {
     id: 'b',

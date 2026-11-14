@@ -68,7 +68,7 @@ export function makeRider(colour: string, id: string, road = false) {
   const head = new THREE.Group()
   head.add(skull)
   person.add(bodyMesh, head)
-  const { tag, label } = makeTag()
+  const { tag, label, brand } = makeTag()
   person.add(tag)
 
   let body: Body = defaultBody(id)
@@ -155,6 +155,7 @@ export function makeRider(colour: string, id: string, road = false) {
   let bare = false
   let bodyKey: string | undefined
   const setLook = (look: Look = {}) => {
+    brand(!!look.sash)
     const key = `${look.hat}|${look.outfit}|${look.bike}|${look.body}`
     if (key === hatKey) return
     hatKey = key

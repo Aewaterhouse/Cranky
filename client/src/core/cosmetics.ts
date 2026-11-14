@@ -14,7 +14,8 @@ export interface Cosmetic {
 export const RARITIES = ['common', 'rare', 'epic', 'legendary'] as const
 export type Rarity = (typeof RARITIES)[number]
 /** Equipped item ids by slot, and the rider's body (see core/body.ts); what other riders see. */
-export type Look = Partial<Record<Slot, string>> & { body?: string }
+/** `sash` is set by the server, never by the rider: convicted in Climate Lawsuit and not yet acquitted. */
+export type Look = Partial<Record<Slot, string>> & { body?: string; sash?: boolean }
 
 export const COSMETICS = CATALOGUE as Cosmetic[]
 export const cosmetic = (id?: string) => COSMETICS.find((c) => c.id === id)
