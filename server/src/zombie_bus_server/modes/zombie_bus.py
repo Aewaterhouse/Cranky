@@ -9,6 +9,7 @@ from datetime import date
 from typing import TYPE_CHECKING
 
 from .. import config as C
+from .. import config_games as G
 from ..plan import is_over
 from .common import CrewGame, award, compliance, rider_row, tally
 
@@ -16,10 +17,11 @@ if TYPE_CHECKING:
     from ..session import Rider, Room
 
 
-def weekly_mutator(today: date | None = None) -> dict:
-    """This ISO week's mutator."""
+def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
+    """This ISO week's twist for a game, or None for a game without any."""
     week = (today or date.today()).isocalendar().week
-    return C.MUTATORS[week % len(C.MUTATORS)]
+    twists = C.MUTATORS if game == "bus" else G.GAME_MUTATORS.get(game)
+    return twists[week % len(twists)] if twists else None
 
 
 class ZombieBus(CrewGame):

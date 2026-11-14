@@ -234,7 +234,7 @@ class Ambulance(RoadEvents, AmboView, CrewGame):
                 self.emit("say", T.nag(r.name, p.get("name", "the patient")), r.id)
             self.spiking[r.id] = spiking
             out = max(0.0, band[0] - pct, pct - band[1])
-            cost += G.AMBO_ROUGH_RATE * max(0.0, jerk - p["tol"])
+            cost += G.AMBO_ROUGH_RATE * self.mut.get("rough", 1.0) * max(0.0, jerk - p["tol"])
             cost += G.AMBO_OUT_RATE * max(0.0, out - G.AMBO_OUT_DEAD)
         return cost / len(act) * p["strict"] if act else 0.0
 

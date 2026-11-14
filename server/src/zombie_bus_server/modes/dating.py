@@ -139,7 +139,9 @@ class Dating(Social, Finale, Matching, DateView, CrewGame):
         self.match = {key(a, b): 0.0 for a, b in self.pairs}
         self.pts = {key(a, b): 0.0 for a, b in self.pairs}
         self.spark, self.card, self.used, self.pick = {}, None, {}, None
-        self.emoji_left = {x: G.DATE_EMOJI_N for p in self.pairs for x in p}
+        self.emoji_left = {
+            x: round(G.DATE_EMOJI_N * self.mut.get("emoji", 1.0)) for p in self.pairs for x in p
+        }
 
     def start_date(self, room: Room, b: dict, start: float) -> None:
         k = room.plan.get("scale", 1.0)

@@ -182,3 +182,34 @@ def test_host_can_put_the_whole_ride_on_erg_or_gears():
     forced, free = asyncio.run(main())
     assert forced["trainers"] == "erg" and all(r["erg"] for r in forced["riders"])
     assert {r["id"]: r["erg"] for r in free["riders"]} == {"h0": True, "h1": False}
+
+
+def test_the_room_hands_the_weeks_twist_to_the_game(monkeypatch):
+    from zombie_bus_server import config_games as G
+    from zombie_bus_server import session
+
+    async def main():
+        for game, want in (("bus", config.MUTATORS[3]), ("ambo", G.GAME_MUTATORS["ambo"][0])):
+            monkeypatch.setattr(session, "weekly_mutator", lambda game="bus", w=want: w)
+            room, ws = await lobby_with(1, code=game.upper()[:4])
+            room.game = game
+            assert room.lobby_msg()["mutator"] == want
+            room.start()
+            room.task.cancel()
+            assert room.mode.mut == want
+            if game == "bus":
+                assert room.mode.armour == want["armour"]
+
+    asyncio.run(main())
+
+
+def test_every_crew_game_twist_has_a_name_and_a_line():
+    from datetime import date
+
+    from zombie_bus_server import config_games as G
+    from zombie_bus_server.modes.zombie_bus import weekly_mutator
+
+    for game, twists in G.GAME_MUTATORS.items():
+        assert all(t["name"] and t["desc"] for t in twists)
+        assert weekly_mutator(date(2026, 11, 12), game) in twists
+    assert weekly_mutator(game="watch") is None

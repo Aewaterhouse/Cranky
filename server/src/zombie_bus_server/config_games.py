@@ -243,3 +243,23 @@ SCRAP_WEDDING = 50
 SCRAP_TOWN_SAVED = 100
 AMBO_NAG_S = 60  # a rider is told about a spike at most once a minute
 AMBO_CREDIT_COMFORT = 60  # a run delivered at this Comfort or more credits its smoothest rider
+
+# Weekly twists for the crew games, one per ISO week like the bus MUTATORS, shown in the lobby. Kidney Stone:
+# rough (x Comfort lost to rough riding). Speed Dating: emoji (x emoji each dater gets per date).
+GAME_MUTATORS = {
+    "ambo": [
+        {
+            "id": "wet",
+            "name": "Wet Roads",
+            "desc": "Every bump costs the patient twice as much.",
+            "rough": 2.0,
+        },
+        {"id": "hotmix", "name": "Fresh Hotmix", "desc": "New bitumen: bumps cost half.", "rough": 0.5},
+        {"id": "normal", "name": "Council Roads", "desc": "Potholes as usual.", "rough": 1.0},
+    ],
+    "date": [
+        {"id": "silent", "name": "Silent Disco", "desc": "No emoji this week. Ride the room.", "emoji": 0.0},
+        {"id": "chatty", "name": "Chatty Night", "desc": "Double emoji for everyone.", "emoji": 2.0},
+        {"id": "normal", "name": "Regular Night", "desc": "The usual handful of emoji.", "emoji": 1.0},
+    ],
+}

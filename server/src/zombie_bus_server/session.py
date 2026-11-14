@@ -141,7 +141,7 @@ class Room:
             "state": self.state,
             "plan": self.plan,
             "minutes": self.minutes,
-            "mutator": weekly_mutator() if self.difficulty != "easy" and self.game == "bus" else None,
+            "mutator": weekly_mutator(game=self.game) if self.difficulty != "easy" else None,
             "difficulty": self.difficulty,
             "trainers": self.trainer_mode,
             "game": self.game,
@@ -217,12 +217,11 @@ class Room:
     def start(self) -> None:
         # a game that deals its own plan deals again, so nobody has seen the order in the lobby
         self.plan = MODES[self.game].deal(self.minutes) or self.plan
-        self.state, self.el, self.mode, self.summary = (
-            "running",
-            -float(C.COUNTDOWN_S),
-            MODES[self.game](self.difficulty),
-            None,
-        )
+        mut = weekly_mutator(game=self.game) if self.difficulty != "easy" else None
+        mode = ZombieBus(self.difficulty, mut) if self.game == "bus" else MODES[self.game](self.difficulty)
+        if self.game != "bus":
+            mode.mut = mut or {}
+        self.state, self.el, self.mode, self.summary = ("running", -float(C.COUNTDOWN_S), mode, None)
         for r in self.riders.values():
             r.reset_stats()
         self.mode.begin(self)

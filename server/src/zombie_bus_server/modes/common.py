@@ -26,6 +26,9 @@ class CrewGame:
 
     no_erg: ClassVar[bool] = False  # True: nobody rides this game on ERG, whatever the host or rider picked
     early_acts: ClassVar[bool] = False  # True: riders' input counts during the countdown too
+    mut: dict = (
+        {}
+    )  # noqa: RUF012  this week's twist (`config_games.GAME_MUTATORS`), set by the room as it starts
 
     def __init__(self, level: str = "normal") -> None:
         self.level = level
