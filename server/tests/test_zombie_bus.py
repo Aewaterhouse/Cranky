@@ -360,3 +360,11 @@ def test_each_stop_offers_three_upgrades_and_only_those_sell():
     for k in bus.wares:
         bus.buy(room.riders["r0"], k)
     assert bus.nitro == 1.0 and bus.ram and bus.magnet == C.MAGNET_SCRAP
+
+
+def test_riders_and_the_fallen_can_honk_and_heckle():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    room.riders["r1"].st = "fell"
+    bus.on_act(room, room.riders["r1"], "emoji", "📯")
+    bus.on_act(room, room.riders["r0"], "emoji", "🍆")
+    assert [(f["k"], f["text"], f["id"]) for f in bus.fx] == [("emoji", "📯", "r1")]

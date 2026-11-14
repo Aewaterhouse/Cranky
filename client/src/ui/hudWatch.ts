@@ -2,6 +2,7 @@ import '../hudWatch.css'
 import { sourceName, videoSource } from '../core/watchSync'
 import type { Tick, WatchState } from '../net/protocol'
 import { h } from './dom'
+import { emojiFloat } from './emojiFloat'
 import type { GamePanel } from './hudOpts'
 import { set } from './hudKit'
 
@@ -36,13 +37,11 @@ export function makeWatchPanel(
     btn('30 s ⏩', 'seek', '30'),
     btn('⏭ Next', 'next'),
   )
-  const EMOJI = ['😂', '🔥', '😱', '👏', '🥵', '💀']
-  const tray = h(
-    'div',
-    { class: 'dt-tray' },
-    ...EMOJI.map((e) => h('button', { onclick: () => act('emoji', e) }, e)),
+  const emoji = emojiFloat(
+    ['😂', '🔥', '😱', '👏', '🥵', '💀'],
+    (e) => act('emoji', e),
+    () => root,
   )
-  const float = h('div', { class: 'wp-float' })
   const root = h(
     'section',
     { class: 'hud-glass am wp' },
@@ -52,7 +51,7 @@ export function makeWatchPanel(
     h('div', { class: 'wp-add' }, input, h('button', { onclick: add }, 'Add')),
     note,
     queue,
-    tray,
+    emoji.tray,
   )
   let queueKey = ''
   return {
@@ -96,15 +95,7 @@ export function makeWatchPanel(
       }
     },
     fx(fx) {
-      if (fx.k !== 'emoji' || !fx.text) return
-      // A reaction floats up the right of the screen and fades.
-      const e = h('i', {}, fx.text)
-      e.style.setProperty('--x', `${Math.random() * 18}vw`)
-      // The HUD is zoomed, so the layer lives on the page itself to float over the right of the screen.
-      if (!float.isConnected) document.body.append(float)
-      float.append(e)
-      if (!root.isConnected) float.remove()
-      setTimeout(() => e.remove(), 3200)
+      if (fx.k === 'emoji' && fx.text) emoji.show(fx.text)
     },
   }
 }

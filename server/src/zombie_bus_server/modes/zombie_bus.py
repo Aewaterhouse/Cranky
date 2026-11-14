@@ -353,6 +353,8 @@ class ZombieBus(CrewGame):
     def on_act(self, room: Room, r: Rider, k: str, v: object) -> None:
         if k == "road" and self.ev == "servo" and v in C.LEGS:
             self.road_votes[r.id] = str(v)
+        elif k == "emoji" and v in C.BUS_EMOJI:  # the horn and reactions, fallen riders' heckles too
+            self.emit("emoji", str(v), r.id)
 
     def pick_leg(self, room: Room) -> None:
         """Counts the road votes (a tie is a coin toss) and sets the next leg; a shortcut is a gamble now."""

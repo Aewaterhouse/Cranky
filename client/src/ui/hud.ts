@@ -13,6 +13,7 @@ import type { Frame, SprintResult, Tier } from '../types'
 import { TIER_NAME, TIERS } from '../types'
 import { h } from './dom'
 import { choiceSheet } from './choiceSheet'
+import { emojiFloat } from './emojiFloat'
 import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
 import { eventOf, FX_DEFAULT, setEvents } from './hudKit'
@@ -49,6 +50,12 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   let mask: string | undefined
   const shop = makeShop((i) => o.onBuy?.(i))
   const sheet = choiceSheet((k, v) => o.onAct?.(k, v))
+  // The bus: quick reactions and the horn, for riders and anyone who has fallen off to heckle with.
+  const emoji = emojiFloat(
+    ['📯', '😂', '🔥', '💀', '👏', '🧟'],
+    (e) => o.onAct?.('emoji', e),
+    () => root,
+  )
   const stats = o.rec ? makeStats(o.rec) : null
   const toast = hudToast()
   const sprint = h('div', { class: 'glass nchip sprint' }, 'SPRINT · all out · ERG off')
@@ -141,7 +148,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         { class: `hud-left${mad || o.panel ? ' mad' : ''}` },
         o.panel ? '' : (mad?.root ?? bus.root),
       ),
-      h('div', { class: 'hud-right' }, sp.feed),
+      h('div', { class: 'hud-right' }, sp.feed, o.panel || !o.onAct ? '' : emoji.tray),
       ...(o.panel ? [sheet.root] : [shop.root, sheet.root]),
       sp.flash,
       sp.layer,
@@ -267,7 +274,10 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
         if (CARD_FX.has(fx.k)) continue
         o.panel?.fx?.(fx, sp)
-        if (fx.k === 'emoji') continue
+        if (fx.k === 'emoji') {
+          if (!o.panel && fx.text) emoji.show(fx.text)
+          continue
+        }
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
         const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
         if (fx.k === 'fell')

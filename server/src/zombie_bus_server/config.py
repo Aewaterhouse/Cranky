@@ -258,6 +258,7 @@ LEGS = {
     },
 }
 SHORTCUT_LUCK = 0.5
+BUS_EMOJI = ["📯", "😂", "🔥", "💀", "👏", "🧟"]  # the bus HUD's reaction tray, horn first
 SHORTCUT_GAP = 30
 AUTO_PLATING_UNDER = (
     70  # a stop where nobody buys: the servo bolts on plating under this armour, else repellent

@@ -1,0 +1,39 @@
+/* Reactions floating up the right of the screen: the Watch Party and the bus. */
+.emoji-float {
+  position: fixed;
+  right: 6vw;
+  bottom: 12vh;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.emoji-float i {
+  position: absolute;
+  right: var(--x);
+  bottom: 0;
+  font-size: 2.6rem;
+  font-style: normal;
+  animation: emoji-up 3.2s ease-out forwards;
+}
+@keyframes emoji-up {
+  from {
+    transform: translateY(0) scale(0.6);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-60vh) scale(1.3);
+    opacity: 0;
+  }
+}
+
+.emoji-tray {
+  margin-top: 10px;
+  display: flex;
+  gap: 4px;
+  pointer-events: auto;
+}
+.emoji-tray button {
+  padding: 2px 6px;
+  font-size: 1.2rem;
+}
