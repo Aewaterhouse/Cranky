@@ -68,7 +68,10 @@ class LastStanding(CrewGame):
                 if r.id in self.out:
                     continue
                 self.reached[r.id] = b["pct"]
-                off = r.st != "riding" or r.p < 1 or (r.s is not None and r.s < G.LAST_OUT_BAND)
+                if r.bot:  # a bot goes at its own breaking point, not on a wobble of its compliance model
+                    off = b["pct"] / 100 > self.limit.get(r.id, 9)
+                else:
+                    off = r.st != "riding" or r.p < 1 or (r.s is not None and r.s < G.LAST_OUT_BAND)
                 self.low[r.id] = self.low.get(r.id, 0.0) + dt if off else 0.0
                 if self.low[r.id] >= G.LAST_OUT_S:
                     self.out.append(r.id)

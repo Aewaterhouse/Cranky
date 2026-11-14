@@ -124,7 +124,7 @@ export const GAMES: Record<Game, GameInfo> = {
     name: 'Last Rider Standing',
     how: [
       'A ramp test for everyone: the target climbs every minute.',
-      'Fall off your step for 10 seconds and you are out.',
+      'Fall off your step for 12 seconds and you are out.',
       'The last one still holding wins. Everyone gets a victory lap.',
     ],
     tag: 'Elimination ramp test',

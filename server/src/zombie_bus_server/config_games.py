@@ -294,7 +294,7 @@ GAME_MUTATORS = {
 # LAST_GRACE_S while ERG ramps. Bots break somewhere in LAST_BOT_LIMIT (share of FTP).
 LAST_FROM, LAST_TO, LAST_STEP, LAST_HOLDS = 60, 150, 6, 4
 LAST_WARM_S, LAST_COOL_S = 300, 240
-LAST_OUT_S, LAST_OUT_BAND, LAST_GRACE_S = 10, 0.8, 8
+LAST_OUT_S, LAST_OUT_BAND, LAST_GRACE_S = 12, 0.7, 15
 LAST_BOT_LIMIT = (1.0, 1.4)
 
 # Pub Quiz: the first question QUIZ_FIRST_S in, then one every QUIZ_EVERY_S, each open QUIZ_OPEN_S, none in
