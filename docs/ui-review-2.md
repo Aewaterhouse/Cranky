@@ -35,7 +35,7 @@ say where you are, and free-ride places that don't look like where they are.
 
 **Races**
 7. [ ] (live place and gap done: "P3 of 6 · 4 s to Kat" under the speed panel; sprint points still badges) Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).
-8. [ ] (every rider now finishes, and bots ride with form on the day; bot kit still samey) Let the last rider finish instead of a DNF when the winner crosses; vary bot times and kit (games 6, 7).
+8. [x] (every rider now finishes; bots ride with form on the day and dress from the whole Garage) Let the last rider finish instead of a DNF when the winner crosses; vary bot times and kit (games 6, 7).
 
 **Games**
 9. [ ] (Kidney Stone Express names names now: the hump, spikes, smoothest hands; other games and the MVP line still to do) Live, named credit and blame ("Kat bounced the patient"), and an MVP line for everyone in results (games 13, 18).

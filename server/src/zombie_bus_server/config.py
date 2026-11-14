@@ -242,9 +242,35 @@ NAME_MAX = 20
 # Bots: NPC riders that fill empty seats. Seeded per bot from the room code and bot id.
 BOT_NAMES = ["Dazza", "Shazza", "Bluey", "Robbo", "Kev"]
 BOT_FTP = (200, 260)
+# Bots dress from the whole Garage, so a podium of bots looks like a crew, not a team kit.
 BOT_LOOKS = {
-    "hat": ["hat-cap", "hat-cone", "hat-viking"],
-    "outfit": ["outfit-hivis", "outfit-purple", "outfit-black"],
+    "hat": [
+        "hat-cap",
+        "hat-cone",
+        "hat-viking",
+        "hat-crown",
+        "hat-akubra",
+        "hat-corks",
+        "hat-witches",
+        "hat-propeller",
+        "hat-chef",
+        "hat-shark",
+        "hat-traffic",
+        "hat-snag",
+        "hat-ibis",
+    ],
+    "outfit": [
+        "outfit-hivis",
+        "outfit-purple",
+        "outfit-black",
+        "outfit-gold",
+        "outfit-maroon",
+        "outfit-skyblue",
+        "outfit-greengold",
+        "outfit-polka",
+        "outfit-zombie",
+    ],
+    "bike": ["bike-pink", "bike-matte", "bike-chrome", "bike-trainer"],
 }
 BOT_COMP = (0.85, 1.0)  # compliance wanders slowly inside this band
 BOT_COMP_WALK = 0.01  # std dev of the random walk per tick
