@@ -13,6 +13,8 @@ export interface Badge {
   earned: boolean
   /** ISO date earned, when known. */
   date?: string
+  /** For a badge you work towards: how far along you are and what it takes. */
+  progress?: [number, number]
 }
 
 const byDate = (rides: RideRecord[]) => [...rides].sort((a, b) => a.date.localeCompare(b.date))
@@ -52,7 +54,16 @@ export function badges(p: Profile): Badge[] {
   const first = byDate(p.rides)[0]?.date
   const streak = weekStreak(p.rides)
   const big = byDate(p.rides).find((r) => r.kj >= 1000)
-  const def: [string, string, string, string, Badge['rank'], boolean, string | undefined][] = [
+  const def: [
+    string,
+    string,
+    string,
+    string,
+    Badge['rank'],
+    boolean,
+    string | undefined,
+    [number, number]?,
+  ][] = [
     ['first', 'Fair Dinkum Start', 'Finish your first ride', '1', 'bronze', n >= 1, first],
     [
       'rides10',
@@ -62,8 +73,18 @@ export function badges(p: Profile): Badge[] {
       'bronze',
       n >= 10,
       totalDate(p, () => 1, 10),
+      [n, 10],
     ],
-    ['rides50', 'Battler', 'Finish 50 rides', '50', 'silver', n >= 50, totalDate(p, () => 1, 50)],
+    [
+      'rides50',
+      'Battler',
+      'Finish 50 rides',
+      '50',
+      'silver',
+      n >= 50,
+      totalDate(p, () => 1, 50),
+      [n, 50],
+    ],
     [
       'rides100',
       'True Blue Ton',
@@ -72,6 +93,7 @@ export function badges(p: Profile): Badge[] {
       'gold',
       n >= 100,
       totalDate(p, () => 1, 100),
+      [n, 100],
     ],
     [
       'kj5k',
@@ -81,6 +103,7 @@ export function badges(p: Profile): Badge[] {
       'bronze',
       p.stats.kj >= 5000,
       totalDate(p, (r) => r.kj, 5000),
+      [p.stats.kj, 5000],
     ],
     [
       'kj25k',
@@ -90,6 +113,7 @@ export function badges(p: Profile): Badge[] {
       'silver',
       p.stats.kj >= 25000,
       totalDate(p, (r) => r.kj, 25000),
+      [p.stats.kj, 25000],
     ],
     [
       'kj100k',
@@ -99,6 +123,7 @@ export function badges(p: Profile): Badge[] {
       'gold',
       p.stats.kj >= 100000,
       totalDate(p, (r) => r.kj, 100000),
+      [p.stats.kj, 100000],
     ],
     [
       'w300',
@@ -108,6 +133,7 @@ export function badges(p: Profile): Badge[] {
       'bronze',
       (p.allTime[60]?.w ?? 0) >= 300,
       firstOver(p, 60, 300),
+      [p.allTime[60]?.w ?? 0, 300],
     ],
     [
       'w400',
@@ -117,6 +143,7 @@ export function badges(p: Profile): Badge[] {
       'silver',
       (p.allTime[60]?.w ?? 0) >= 400,
       firstOver(p, 60, 400),
+      [p.allTime[60]?.w ?? 0, 400],
     ],
     [
       'w500',
@@ -126,6 +153,7 @@ export function badges(p: Profile): Badge[] {
       'gold',
       (p.allTime[60]?.w ?? 0) >= 500,
       firstOver(p, 60, 500),
+      [p.allTime[60]?.w ?? 0, 500],
     ],
     [
       'streak4',
@@ -135,6 +163,7 @@ export function badges(p: Profile): Badge[] {
       'silver',
       streak.best >= 4,
       streak.reached,
+      [streak.best, 4],
     ],
     ['bigday', 'Full Tucker', 'Burn 1,000 kJ in a single ride', '1k', 'silver', !!big, big?.date],
     [
@@ -148,9 +177,9 @@ export function badges(p: Profile): Badge[] {
     ],
     ...passportBadges(p, ROUTE_INDEX),
   ]
-  return def.map(([id, name, desc, mark, rank, now, date]) => {
+  return def.map(([id, name, desc, mark, rank, now, date, progress]) => {
     const kept = p.badges?.[id]
-    return { id, name, desc, mark, rank, earned: now || !!kept, date: kept ?? date }
+    return { id, name, desc, mark, rank, earned: now || !!kept, date: kept ?? date, progress }
   })
 }
 

@@ -1,6 +1,8 @@
 import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
+import { badges } from '../core/badges'
+import { badgeCard, headline } from './resultsTop'
 import { bankScrap, soloScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
@@ -52,21 +54,6 @@ const tile = (label: string, value: string, sub = '', cls = '') =>
   )
 
 /** Applies the ride to the profile, saves it and shows the summary screen. */
-const ORD = ['th', 'st', 'nd', 'rd']
-const ordinal = (n: number) => `${n}${n % 100 > 10 && n % 100 < 14 ? 'th' : (ORD[n % 10] ?? 'th')}`
-/** The results headline says how it went: your place in a race, a limp home, a flooded town. */
-function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
-  if (road?.game && road.game !== 'ride') {
-    const at = road.riders.findIndex((r) => r.id === me)
-    return at === 0 ? 'You won!' : at > 0 ? `${ordinal(at + 1)} place` : 'Race done'
-  }
-  if (!group) return 'Ride done'
-  if (group.flooded) return 'The town flooded'
-  if (group.mode === undefined || group.mode === 'bus')
-    return group.armour <= 0 ? 'Limped home!' : 'Made it!'
-  return 'Made it!'
-}
-
 export function finishRide(
   profile: Profile,
   s: RideSummary,
@@ -81,6 +68,13 @@ export function finishRide(
   const before = profile.allTime
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
+  // Badges this ride unlocked, for a moment of their own at the top of the results.
+  const had = new Set(
+    badges(profile)
+      .filter((b) => b.earned)
+      .map((b) => b.id),
+  )
+  const unlocked = p === profile ? [] : badges(p).filter((b) => b.earned && !had.has(b.id))
   const banked =
     s.record.secs < 30 ? 0 : group ? bankScrap(group.scrap, myAwards) : soloScrap(s.record.secs)
   if (banked) p = { ...p, scrap: p.scrap + banked }
@@ -174,6 +168,7 @@ export function finishRide(
         h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
       // What you earned leads, then the game's story, then the training numbers.
+      ...unlocked.map(badgeCard),
       banked
         ? h(
             'div',

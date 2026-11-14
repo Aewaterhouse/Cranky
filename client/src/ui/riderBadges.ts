@@ -30,6 +30,21 @@ export function badgeGrid(p: Profile, title = 'Badges', only: (b: Badge) => bool
             {},
             h('b', {}, b.name),
             h('small', {}, b.earned ? (b.date ? `Earned ${day(b.date)}` : 'Earned') : b.desc),
+            // How far along a locked badge is, so there is always a next thing within reach.
+            !b.earned && b.progress
+              ? h(
+                  'span',
+                  { class: 'badge-prog' },
+                  h('i', {
+                    style: `width:${Math.min(100, (b.progress[0] / b.progress[1]) * 100)}%`,
+                  }),
+                  h(
+                    'small',
+                    {},
+                    `${Math.round(b.progress[0]).toLocaleString()} / ${b.progress[1].toLocaleString()}`,
+                  ),
+                )
+              : '',
           ),
         ),
       ),

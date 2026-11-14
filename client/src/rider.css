@@ -486,3 +486,21 @@ button.danger {
     grid-template-columns: 1fr;
   }
 }
+.badge-prog {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+.badge-prog i {
+  display: block;
+  height: 5px;
+  flex: 0 0 auto;
+  max-width: 60%;
+  border-radius: 3px;
+  background: var(--acc);
+}
+.badge-prog small {
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
