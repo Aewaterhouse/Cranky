@@ -5,23 +5,18 @@ from __future__ import annotations
 import copy
 import random
 import statistics
-from collections import Counter
 from datetime import date
 from typing import TYPE_CHECKING
 
 from .. import config as C
 from .. import config_games as G
-from ..plan import event_for, is_over
+from ..plan import is_over
+from .bus_crew import CrewPlay
+from .bus_servo import Servo
 from .common import CrewGame, award, compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
-
-
-T_SHORTCUT = {
-    True: "Shortcut paid off! Down a fire trail and out ahead of the horde.",
-    False: "Shortcut was a dead end. Reverse out, the horde is right there!",
-}
 
 
 def roll_weather(rng: random.Random) -> str:
@@ -37,7 +32,7 @@ def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
     return twists[week % len(twists)] if twists else None
 
 
-class ZombieBus(CrewGame):
+class ZombieBus(Servo, CrewPlay, CrewGame):
     """Bus state for one ride. `tick` runs at TICK_HZ; `on_sprint` applies sprint grades."""
 
     def __init__(self, level: str = "normal", mutator: dict | None = None) -> None:
@@ -363,165 +358,6 @@ class ZombieBus(CrewGame):
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
-
-    def role_tick(self, room: Room, active: list[Rider], ev: str, dt: float) -> None:
-        """Crew roles: each rider's ability fires by itself once they hold its cue, then cools down."""
-        for n, rid in enumerate(sorted(room.riders)):
-            self.roles.setdefault(rid, {"role": list(C.ROLES)[n % len(C.ROLES)], "held": 0.0, "ready": 0.0})
-        if ev in C.ROLE_QUIET:
-            return
-        cads = [r.cad for r in active]
-        mean = statistics.fmean(cads) if cads else 0.0
-        for r in active:
-            st = self.roles[r.id]
-            role = C.ROLES[st["role"]]
-            cue = {
-                "spin": r.cad >= role.get("rpm", 0),
-                "grind": 0 < r.cad <= role.get("rpm", 0),
-                "target": (r.s or 0) >= role.get("s", 1),
-                "steady": abs(r.cad - mean) <= role.get("rpm", 0) and r.cad > 0,
-            }[role["cue"]]
-            st["held"] = st["held"] + dt if cue and room.el >= st["ready"] else 0.0
-            if st["held"] < role["hold"]:
-                continue
-            st["held"], st["ready"] = 0.0, room.el + C.ROLE_CD
-            self.gap += role.get("gap", 0)
-            self.armour = min(100.0, self.armour + role.get("armour", 0))
-            self.scrap += role.get("scrap", 0)
-            self.emit("role", f"{r.name}, {role['name'].lower()}: {role['done']}", r.id)
-
-    def zed_pull(self, ev: str, active: list[Rider], comp: float) -> float:
-        """Metres a second the event's zombie type gains when the crew rides the way it hunts: runners chase a
-        low cadence, brutes a crew off target."""
-        z = C.ZED_TYPES.get(ev)
-        if not z or not active:
-            return 0.0
-        if z["kind"] == "runners":
-            weak = statistics.fmean(r.cad for r in active) < z["rpm"]
-        else:
-            weak = comp < z["comp"]
-        return z["pull"] if weak else 0.0
-
-    def pick_boss(self, room: Room) -> dict:
-        """The ride's last long effort before the cool-down is the boss; which boss is drawn for the room."""
-        blocks = room.plan["blocks"]
-        fights = [j for j in range(1, len(blocks) - 1) if event_for(blocks, j) in C.BOSS_EVENTS]
-        if not fights:
-            return {"i": -1, "over": True}
-        i = fights[-1]
-        kind = random.Random(f"{room.code}:boss").choice(sorted(C.BOSSES))
-        return {"i": i, "kind": kind, "need": blocks[i]["dur"] * C.BOSS_SHARE, "done": 0.0}
-
-    def end_boss(self) -> None:
-        """The boss block is over: beaten for scrap and armour, or it lands its blow."""
-        b, boss = self.boss, C.BOSSES[self.boss["kind"]]
-        b["over"] = True
-        if b["done"] >= b["need"]:
-            self.scrap += C.BOSS_SCRAP
-            self.armour = min(100.0, self.armour + C.BOSS_ARMOUR)
-            self.emit("bosswin", f"{boss['win']} +{C.BOSS_SCRAP} scrap")
-        else:
-            self.damage(C.BOSS_HIT, boss["lose"])
-
-    def turns(self, room: Room, active: list[Rider], ev: str) -> None:
-        """Rolling turns, a team move: each rider takes the front for FRONT_S; a clean turn gains metres."""
-        if len(active) < 2 or ev in C.FELL_FREE_EVENTS:
-            self.front = None
-            return
-        f = self.front
-        r = room.riders.get(f["id"]) if f else None
-        if f and r in active and room.el - f["t"] < C.FRONT_S:
-            if r.s is not None:
-                f["s"], f["n"] = f["s"] + r.s, f["n"] + 1
-            return
-        order = sorted(a.id for a in active)
-        nxt = order[(order.index(f["id"]) + 1) % len(order)] if f and f["id"] in order else order[0]
-        name = room.riders[nxt].name
-        if f and r in active and f["n"] and f["s"] / f["n"] >= C.FRONT_CLEAN:
-            self.gap += C.FRONT_GAP
-            self.emit(
-                "turn", f"{r.name} did a clean turn on the front (+{C.FRONT_GAP} m). {name}, you're up.", nxt
-            )
-        else:
-            self.emit("turn", f"{name}, take the front.", nxt)
-        self.front = {"id": nxt, "t": room.el, "s": 0.0, "n": 0}
-
-    def ask(self, room: Room, r: Rider) -> dict | None:
-        """At a servo stop: which way next. Everyone votes; the most votes wins as the stop closes."""
-        if self.ev != "servo" or r.bot:
-            return None
-        opts = [{"v": k, "label": v["name"], "icon": v["icon"], "sub": v["desc"]} for k, v in C.LEGS.items()]
-        return {
-            "k": "road",
-            "title": "🗺️ Which way next?",
-            "sub": "Most votes wins when the servo closes.",
-            "opts": opts,
-            "v": self.road_votes.get(r.id),
-        }
-
-    def on_act(self, room: Room, r: Rider, k: str, v: object) -> None:
-        if k == "road" and self.ev == "servo" and v in C.LEGS:
-            self.road_votes[r.id] = str(v)
-        elif k == "emoji" and v in C.BUS_EMOJI:  # the horn and reactions, fallen riders' heckles too
-            self.emit("emoji", str(v), r.id)
-
-    def pick_leg(self, room: Room) -> None:
-        """Counts the road votes (a tie is a coin toss) and sets the next leg; a shortcut is a gamble now."""
-        if not self.road_votes:
-            return
-        n = Counter(self.road_votes.values())
-        rng = random.Random(f"{room.code}:{round(room.el)}")
-        pick = rng.choice(sorted(k for k, c in n.items() if c == max(n.values())))
-        self.leg, self.road_votes = C.LEGS[pick], {}
-        if pick == "shortcut":
-            lucky = rng.random() < C.SHORTCUT_LUCK
-            self.gap += C.SHORTCUT_GAP if lucky else -C.SHORTCUT_GAP
-            self.emit("leg", T_SHORTCUT[lucky])
-        else:
-            self.emit("leg", f"The crew picked {self.leg['name']}. {self.leg['desc']}")
-
-    def auto_shop(self) -> None:
-        """Nobody bought at the stop: the tin buys what helps most, so nobody lets go of the bars."""
-        if self.shopped:
-            return
-        order = ["plating"] * (self.armour < C.AUTO_PLATING_UNDER) + [
-            "repellent",
-            "ram",
-            "nitro",
-            "sync",
-            "magnet",
-        ]
-        item = next((k for k in order if k in self.wares and self.scrap >= C.SHOP[k]), None)
-        if item:
-            self.buy(None, item)
-
-    def buy(self, r: Rider | None, item: str) -> None:
-        """Servo Stop shop: session-only upgrades paid from the bus scrap tin (no rider: the servo picked)."""
-        cost = C.SHOP[item]
-        if self.ev != "servo" or item not in self.wares or self.scrap < cost or self.mut.get("no_shop"):
-            return
-        self.scrap -= cost
-        self.shopped = True
-        name = r.name if r else "Nobody let go of the bars, so the servo"
-        if item == "plating":
-            self.armour = min(100.0, self.armour + C.PLATING_ARMOUR)
-            text = f"{name} bolted on armour plating (+{C.PLATING_ARMOUR})"
-        elif item == "repellent":
-            self.repel += 1
-            text = f"{name} bought horde repellent (one free fail)"
-        elif item == "nitro":
-            self.nitro = 1.0
-            text = f"{name} poured a can of nitro in the tank"
-        elif item == "ram":
-            self.ram = True
-            text = f"{name} welded on a ram: the next roadblock takes half as much again"
-        elif item == "magnet":
-            self.magnet = C.MAGNET_SCRAP
-            text = f"{name} hung a scrap magnet off the back: more scrap until the next stop"
-        else:
-            self.syncw += C.SYNC_WIDEN_RPM
-            text = f"{name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"
-        self.emit("buy", text, r.id if r else None)
 
     def on_sprint(self, r: Rider, blk: int, grade: str, combo: int) -> None:
         """Applies one rider's sprint grade to the current roadblock."""
