@@ -39,7 +39,7 @@ say where you are, and free-ride places that don't look like where they are.
 
 **Games**
 9. [ ] (Kidney Stone Express names names: the hump, spikes, smoothest hands; every rider gets an MVP line in the crew results; other games' live call-outs still to do) Live, named credit and blame ("Kat bounced the patient"), and an MVP line for everyone in results (games 13, 18).
-10. [ ] (power fallback done; the box name and the timer still to check) VO2 Madness falls back to power when there is no heart rate; the box name matches the timer (games 8, 9).
+10. [x] (power fallback done; the box and the timer both read the same next block on the server: most likely the screenshot caught the box mid-spin, when it flicks through names) VO2 Madness falls back to power when there is no heart rate; the box name matches the timer (games 8, 9).
 11. [x] A five-second "how this one works" splash as each game starts (games 17).
 12. [x] Labels on the Speed Dating meter and the Kidney Stone Comfort bar and ETA (games 10, 12).
 
