@@ -55,6 +55,17 @@ def describe(s: dict[str, Any], rider: str, link: str = "") -> tuple[str, str]:
             f"Crew: {names}",
             *awards,
         ]
+    elif g.get("mode") == "climate":
+        verdict = (g.get("verdicts") or {}).get(rider)
+        fate = "the town flooded" if g.get("flooded") else "the town survived"
+        title = f"🌊 Climate Lawsuit · {fate}" + (f" · {verdict}" if verdict else "")
+        lines = [
+            f"{me.get('company') or 'My company'}: {me.get('coins', 0)} coins · {me.get('emit', 0)} tonnes"
+            + (" · took the envelope" if me.get("bribed") else ""),
+            f"Town profit {g.get('score', 0)} · sea reached {g.get('stageName') or 'nothing'} · {power}",
+            f"Crew: {names}",
+            *awards,
+        ]
     elif g:
         gap = g.get("gap")
         fate = "survived" if (g.get("armour") or 0) > 0 else "caught"

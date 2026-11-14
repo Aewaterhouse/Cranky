@@ -146,7 +146,7 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - [x] C4 Client HUD: fuel picker, coins and the crew's ledger (profit shown, emissions hidden until the Trial),
       sea-level gauge, gust and surge prompts, seawall button, the secret bribe sheet, the jury vote.
 - [x] C5 Scene: the town, stations by fuel, rising water and flood stages, seawall with its sign, courtroom camera.
-- [ ] C6 Results, TV view, Strava and Discord text, announcer, bots (Baron, Greenie, Fence-sitter), the sash on avatars.
+- [x] C6 Results, TV view, Strava and Discord text, announcer, bots (Baron, Greenie, Fence-sitter), the sash on avatars.
 - [ ] C7 Headless four-rider test, e2e, manual notes, tuning pass.
 
 ## Phase 4: after all three

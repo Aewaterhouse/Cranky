@@ -43,6 +43,17 @@ def format_summary(plan_name: str, s: dict) -> str:
                 *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
             ]
         )
+    if s.get("mode") == "climate":
+        guilty = [r["name"] for r in s["riders"] if s["verdicts"].get(r["id"]) == "guilty"]
+        return "\n".join(
+            [
+                f"🌊 **Climate Lawsuit** · {'the town FLOODED' if s['flooded'] else 'the town survived'}"
+                f" · profit **{s['score']}**",
+                *(f"🏭 {r['company']} ({r['name']}): {r['coins']} coins, {r['emit']} t" for r in s["riders"]),
+                *([f"⚖️ Guilty: {', '.join(guilty)}"] if guilty else []),
+                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
+            ]
+        )
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",
