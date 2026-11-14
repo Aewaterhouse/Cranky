@@ -2,13 +2,12 @@ import '../../hud.css'
 import '../../tv.css'
 import '../../freeHud.css'
 import '../../road.css'
-import { riderRows } from '../../core/hud'
 import { ROUTE_INDEX, loadRoute } from '../../core/routeLibrary'
 import type { RoadLobby, RoadMsg } from '../../net/protocol'
 import { VIS } from '../../scene/params'
 import type { RouteWorld } from '../../scene/route/routeWorld'
 import { clock, h, kmStr, show } from '../../ui/dom'
-import { riderList } from '../../ui/riderList'
+import { roadCards } from '../../ui/roadCards'
 import { roadTvEnd, roadTvLobby } from '../../ui/roadResults'
 import { toast } from '../../ui/toast'
 import { WsClient } from '../../net/wsClient'
@@ -23,7 +22,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
   show(stage)
   const net = new WsClient<RoadMsg>(code)
   const link = new RoadLink('', () => {})
-  const list = riderList()
+  const list = roadCards('tv-cards')
   const head = h('div', { class: 'tv-head' })
   const slot = h('div', { class: 'tv-slot' })
   const status = h('span', { class: 'dim' })
@@ -67,7 +66,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
       'div',
       { class: 'hud tv tv-road' },
       head,
-      list.el,
+      list.root,
       slot,
       h(
         'div',
@@ -101,7 +100,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
     const lapM = lobby.laps > 1 ? lapDist : 0
     const shown = riders.map((r) => (lapM ? { ...r, d: r.d % lapM } : r))
     if (world) world.state = { me: on.id, riders: shown }
-    list.set(riderRows(riders, on.id), on.speed)
+    list.set(riders, '', on.speed, undefined, on.id)
     const count = link.countdown()
     head.replaceChildren(
       h('b', {}, routeName()),
@@ -142,14 +141,14 @@ export function roadSpectate(code: string, leaveTo: () => void) {
       void build(m)
       if (m.state === 'lobby') {
         link.clear()
-        list.set([], 0)
+        list.set([], '', 0)
         head.replaceChildren()
         slot.replaceChildren(roadTvLobby(m, routeName()))
       } else if (m.state === 'running') slot.replaceChildren()
     } else if (m.t === 'tick') link.tick(m)
     else if (m.t === 'end') {
       ended = true
-      list.set([], 0)
+      list.set([], '', 0)
       head.replaceChildren()
       slot.replaceChildren(roadTvEnd(m.summary, leave))
     } else if (m.t === 'error') {

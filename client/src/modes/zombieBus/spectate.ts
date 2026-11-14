@@ -12,7 +12,8 @@ import { makeBusPanel } from '../../ui/hudBus'
 import { makeHeader } from '../../ui/hudHeader'
 import { eventOf, FX_DEFAULT } from '../../ui/hudKit'
 import { makeSplash } from '../../ui/hudSplash'
-import { makeTvBoard } from '../../ui/hudTvBoard'
+import { makeRoster } from '../../ui/hudRoster'
+import { VIS } from '../../scene/params'
 import { tvEnd, tvLobby } from '../../ui/hudTvScreens'
 import { toast } from '../../ui/toast'
 import type { Grade } from '../../types'
@@ -36,19 +37,18 @@ const FX_SOUND: Record<string, () => void> = {
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 const GRADE_RE = /: (FAIL|HIT|GREAT|MEGA|LEGEND)\b/
 
-/** TV / second-screen view of a bus: big scene, crew board and bus status. Sends only `watch`. */
+/** TV / second-screen view of a bus: big scene, crew cards and bus status. Sends only `watch`. */
 export function spectate(code: string, leaveTo: () => void) {
   const stage = h('div', { class: 'stage' })
   show(stage)
   const world = new World(stage)
   const sp = makeSplash()
   const bus = makeBusPanel()
-  const board = makeTvBoard()
+  const board = makeRoster('crew tv-cards')
   let l: Lobby | null = null
   let header = makeHeader(undefined, 'hard')
   let planId = ''
   let total = 0
-  const grades = new Map<string, Grade[]>()
   const ui = h('div', { class: 'tv-ui' })
   const slot = h('div', { class: 'tv-slot' })
   const net = new WsClient(code)
@@ -85,6 +85,9 @@ export function spectate(code: string, leaveTo: () => void) {
   const fit = () => {
     const z = Math.min(CFG.tv.maxZoom, Math.max(CFG.tv.minZoom, innerHeight / CFG.tv.designH))
     ui.style.cssText = `transform:scale(${z});width:${innerWidth / z}px;height:${innerHeight / z}px`
+    // The crew cards start under the rear-view mirror, in the HUD's design pixels.
+    const mirror = VIS.mirror ? (VIS.mirrorY * innerHeight + (VIS.mirrorW * innerWidth) / 3) / z : 0
+    ui.style.setProperty('--mirror-b', `${Math.round(mirror)}px`)
     root.classList.toggle('narrow', innerWidth / innerHeight < 1.5)
   }
   const onKey = (e: KeyboardEvent) => {
@@ -160,7 +163,6 @@ export function spectate(code: string, leaveTo: () => void) {
       const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
       const grade = fx.k === 'sprint' ? (GRADE_RE.exec(text)?.[1] as Grade | undefined) : undefined
       if (grade && fx.id) {
-        grades.set(fx.id, [...(grades.get(fx.id) ?? []), grade])
         SFX[grade]()
         if (CFG.tv.bigSplashGrades.includes(grade))
           sp.splash(`sp-grade sp-${grade}`, `${who.toUpperCase()} ${grade}!`, '', 2600, 3)
@@ -199,7 +201,7 @@ export function spectate(code: string, leaveTo: () => void) {
       })),
     }
     bus.update(b, m.riders)
-    board.update(m.riders, grades)
+    board.update(m, '')
   }
 
   net.onStatus = (up) => (status.textContent = up ? '' : 'reconnecting…')
@@ -214,7 +216,6 @@ export function spectate(code: string, leaveTo: () => void) {
       l = m
       setPlan(m)
       if (m.state === 'lobby') {
-        grades.clear()
         lastI = -2
         screen(tvLobby(m))
         world.state = {

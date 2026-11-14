@@ -10,6 +10,7 @@ import { profileChart } from './freeRideChart'
 import { diffSlider } from './freeRideFlat'
 import type { FreeLayout, FreeParts } from './freeRideView'
 import { riderList } from './riderList'
+import { roadCards } from './roadCards'
 import { strengthPct, strengthSlider } from './gearTile'
 import { hudMenu, hudStat as stat, hudVal as val } from './hudParts'
 import { powerPanel } from './hudPower'
@@ -78,6 +79,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   )
   gearChip.hidden = true
   const list = riderList()
+  const crew = roadCards()
   const group = h('div', { class: 'glass gchip' })
   group.hidden = true
 
@@ -130,7 +132,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         h('div', { class: 'totals' }, ...(laps ? [lap] : []), dist, el, up),
       ),
     ),
-    h('div', { class: 'hud-tr' }, h('div', { class: 'minimap' }, mapBox), list.el),
+    h('div', { class: 'hud-tr' }, h('div', { class: 'minimap' }, mapBox), list.el, crew.root),
     h(
       'div',
       { class: 'hud-bot' },
@@ -215,7 +217,23 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       gearChip.hidden = !s.gears
       gear.v.textContent = String(s.gear)
       shiftPct.textContent = strengthPct()
-      list.set(riderRows(s.riders, s.me), s.speed)
+      // A group ride shows the crew as cards; a solo ride keeps the list of ghosts nearby.
+      crew.root.hidden = !s.group
+      if (s.group) {
+        const mine = s.riders.find((r) => r.id === s.me)
+        const kj = (s.avgPower * s.el) / 1000
+        const stats = {
+          ftp: s.ftp,
+          kg: mine?.kg ?? null,
+          avg: s.avgPower,
+          np: s.np,
+          on: null,
+          kj,
+          falls: 0,
+        }
+        crew.set(s.riders, s.me, s.speed, stats)
+      }
+      list.set(s.group ? [] : riderRows(s.riders, s.me), s.speed)
       const g = s.group
       const pull = g ? Math.round((g.band - 1) * 100) : 0
       const saving = g && g.draftW >= CFG.road.showW

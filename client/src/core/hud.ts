@@ -39,6 +39,13 @@ export interface ListRider {
   wkg?: number
   /** A best effort ridden again, not a rider. */
   ghost?: boolean
+  /** Group rides, for the crew cards: watts and cadence now, heart rate, FTP and the weight the rider set. */
+  power?: number
+  cadence?: number
+  hr?: number | null
+  ftp?: number
+  kg?: number | null
+  st?: 'riding' | 'stopped' | 'away' | 'finished'
 }
 export interface RiderRow {
   id: string

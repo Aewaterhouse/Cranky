@@ -16,6 +16,9 @@ export const ordinal = (n: number) => ORD[n] ?? `${n}th`
 export interface LinkRider extends RoadRider {
   wkg: number
   st: RoadRiderTick['st']
+  hr: number | null
+  ftp?: number
+  kg?: number | null
 }
 
 /**
@@ -140,6 +143,9 @@ export class RoadLink {
           cheer: r.st === 'finished',
           wkg: r.w / (i?.kg || CFG.freeRide.defaultKg),
           st: r.st,
+          hr: r.hr,
+          ftp: i?.ftp,
+          kg: i?.weightKg,
         }
       })
   }

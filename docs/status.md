@@ -33,6 +33,7 @@
 
 ## In progress
 - `docs/ride-notes-plan.md` worked through on 2026-11-14. Three items stay open: gear strength and falling-off tuning are waiting on the owner (`docs/questions.md`), and the shift-strength slider needs an iPad check. Trainer and iPad checks are in `docs/owner-checks.md`.
+- Crew cards, 2026-11-14: the crew panel on the bus, Madness, both TV views and group free rides is a narrow column of rider cards that open (tap, or D for all) to every number now and this ride; the server sends each rider's ride so far (average, NP, time on target, kJ, falls, weight) once a second. Seen in headless rides with bots only; iPad checks in `docs/owner-checks.md`.
 - Player camera, 2026-11-14 (client only): drag or one finger to orbit and wheel or pinch to zoom on the 3D view, auto-return after 8 s, double click or tap to snap back; C or 🎥 cycles Chase, High, Rear and Side (remembered per device); air strike and supply drop cinematics with a letterbox and title, plus a gunship title (skip with C or a tap, Settings > Cinematics); free-ride photo mode from the pause screen with "Use as postcard"; all in both TV views and the dev pages. Judged from headless stills only: touch on an iPad is untested (checks in `docs/owner-checks.md`).
 
 ## Next

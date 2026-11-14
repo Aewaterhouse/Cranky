@@ -232,7 +232,17 @@ export function runFreeRide(
       ftp: profile.ftp,
       weightKg: kg,
       etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
-      riders: [{ ...me, wkg: live.avg / kg }, ...others],
+      riders: [
+        {
+          ...me,
+          wkg: live.avg / kg,
+          power: live.avg,
+          hr: live.hr ?? null,
+          ftp: profile.ftp,
+          kg: profile.weightKg || null,
+        },
+        ...others,
+      ],
       me: me.id,
       lap,
       ...seg,

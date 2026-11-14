@@ -143,3 +143,14 @@
   white-space: normal;
   color: var(--warn);
 }
+.ccol[hidden] {
+  display: none;
+}
+/* Free ride: the cards follow the rider list's show and hide (R), under the minimap */
+.fhud .ccol.road {
+  display: none;
+  flex: 0 1 auto;
+}
+.hud-riders .fhud .ccol.road:not([hidden]) {
+  display: flex;
+}

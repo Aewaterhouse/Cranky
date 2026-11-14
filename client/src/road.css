@@ -47,31 +47,17 @@
 }
 
 /* TV: who is where, top right, and who the camera is on */
-.tv-road .rlist {
+.tv-road .ccol {
+  --u: 15px;
   position: absolute;
   top: 5.5rem;
   right: 1.5rem;
-  display: block;
-  min-width: 17rem;
-  padding: 0.7rem 1rem;
-  font-size: 1.25rem;
+  width: 300px;
+  max-height: calc(100% - 11rem);
+  font-size: 1.5rem;
   color: #fff;
   background: rgba(10, 16, 20, 0.6);
   border-radius: 0.8rem;
-}
-.tv-road .rrow {
-  display: grid;
-  grid-template-columns: 1fr 3.2rem 5rem;
-  gap: 0.6rem;
-  padding: 0.15rem 0;
-}
-.tv-road .rrow.me {
-  color: #f2b705;
-  font-weight: 800;
-}
-.tv-road .rrow .rw,
-.tv-road .rrow .rg {
-  text-align: right;
 }
 .tv-road .tv-head {
   position: absolute;

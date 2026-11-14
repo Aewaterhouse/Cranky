@@ -9,6 +9,9 @@ export interface CardNumbers {
   hrp?: number | null
   erg?: boolean
   stats?: RideStats
+  /** FTP and the weight the rider set (null: none), when the mode knows them without ride stats. */
+  ftp?: number
+  kg?: number | null
   /** The rider's share of the crew's work so far (0..1). */
   rideShare?: number
 }
@@ -25,11 +28,13 @@ const wkg = (w: number | undefined, kg: number | null | undefined) =>
  */
 export function cardLines(r: CardNumbers, me: boolean) {
   const s = r.stats
+  const ftp = r.ftp ?? s?.ftp
+  const kg = r.kg !== undefined ? r.kg : s?.kg
   const now: [string, string][] = [
     ['Watts', `${Math.round(r.w)}`],
     ['Target', r.tgt ? `${r.tgt} · ${pct(r.w / r.tgt)}` : DASH],
-    ['W/kg', wkg(r.w, s?.kg)],
-    ['FTP', s?.ftp ? pct(r.w / s.ftp) : DASH],
+    ['W/kg', wkg(r.w, kg)],
+    ['FTP', ftp ? pct(r.w / ftp) : DASH],
     ['Cadence', r.cad == null ? DASH : `${Math.round(r.cad)}`],
     ['HR', r.hr ? `${r.hr}${r.hrp ? ` · ${pct(r.hrp)}` : ''}` : DASH],
     ['Mode', r.erg == null ? DASH : r.erg ? 'ERG' : 'Gears'],
@@ -37,13 +42,13 @@ export function cardLines(r: CardNumbers, me: boolean) {
   const ride: [string, string][] = [
     ['Avg', s ? `${Math.round(s.avg)} W` : DASH],
     ['NP', s ? `${Math.round(s.np)} W` : DASH],
-    ['Avg W/kg', wkg(s?.avg, s?.kg)],
+    ['Avg W/kg', wkg(s?.avg, kg)],
     ['On target', pct(s?.on)],
     ['kJ', s ? `${Math.round(s.kj)}` : DASH],
     ['Falls', s ? `${s.falls}` : DASH],
     ['Share', pct(r.rideShare)],
   ]
-  return { now, ride, hint: me && !!s && !s.kg }
+  return { now, ride, hint: me && kg === null }
 }
 
 /** Each rider's share of all the work the crew has done this ride, from their kJ (0 for everyone at the start). */

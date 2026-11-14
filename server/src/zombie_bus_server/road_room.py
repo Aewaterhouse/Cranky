@@ -13,6 +13,7 @@ from . import config as C
 from . import road_bots
 from .modes.road import RoadSim
 from .protocol import Bots, ClientMsg, Data, End, Join, RoadSetup, Start, Watch
+from .ride_stats import profile_kg
 from .road_route import load_lap
 from .session import Rider, Room
 
@@ -41,6 +42,10 @@ class RoadRoom(Room):
         profile = self.store.get_profile(rid) if self.store else None
         return float((profile or {}).get("weightKg") or C.ROAD_DEFAULT_KG)
 
+    def weight_of(self, rid: str) -> float | None:
+        """The weight a rider set (a bot's from its card), or None: no W/kg on the crew cards."""
+        return road_bots.BOTS[rid][2] if rid in road_bots.BOTS else profile_kg(self.store, rid)
+
     def lobby_msg(self) -> dict:
         lap = load_lap(self.route)
         return {
@@ -61,6 +66,7 @@ class RoadRoom(Room):
                     "name": r.name,
                     "ftp": r.ftp,
                     "kg": self.kg_of(r.id),
+                    "weightKg": self.weight_of(r.id),
                     "connected": r.connected,
                     "look": r.look,
                     "bot": r.bot,

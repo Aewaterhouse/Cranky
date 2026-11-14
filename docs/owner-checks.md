@@ -140,3 +140,10 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] The 🎥 button cycles Chase, High, Rear and Side, and the choice is still there next ride.
 - [ ] An air strike or supply drop shot can be skipped with a tap, and the power panel stays readable through it.
 - [ ] Free ride photo mode: pause, 📷 Photo mode, two-finger drag pans, pinch zooms, "Use as postcard", then Done; the postcard at the end is that frame and the ride carries on.
+
+## Crew cards on an iPad
+- [ ] Tap a crew card: it opens with Now and This ride; tap it again and it closes. The camera does not move when you tap or drag on the cards.
+- [ ] Open all (the button at the top of the column): the column scrolls with a finger when it runs past the bottom, and the scroll stays inside the column.
+- [ ] With every card open, nothing covers the power panel (top left), the clock (top centre) or the bus panel and plan strip (bottom).
+- [ ] Leave and rejoin a ride: the cards you had open are open again.
+- [ ] On a rider with no weight set, W/kg shows "–" and your own card says "Add your weight in Rider → Settings".

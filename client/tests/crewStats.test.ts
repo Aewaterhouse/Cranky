@@ -36,6 +36,15 @@ describe('crew card numbers', () => {
     expect(cardLines({ w: 200, stats: noKg }, false).hint).toBe(false)
   })
 
+  it('takes FTP and weight from the rider when there are no ride stats (group rides)', () => {
+    const r = cardLines({ w: 210, ftp: 300, kg: 70 }, false)
+    expect(get(r.now, 'W/kg')).toBe('3.0')
+    expect(get(r.now, 'FTP')).toBe('70%')
+    const mine = cardLines({ w: 210, ftp: 300, kg: null }, true)
+    expect(get(mine.now, 'W/kg')).toBe('–')
+    expect(mine.hint).toBe(true)
+  })
+
   it('shows dashes before the server has sent the ride so far', () => {
     const { now, ride, hint } = cardLines({ w: 120 }, true)
     expect(get(now, 'FTP')).toBe('–')

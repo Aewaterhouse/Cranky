@@ -181,14 +181,6 @@
     background-color: rgb(255 60 50 / 0.55);
   }
 }
-.tvb-hr {
-  margin-left: auto;
-  padding-left: 6px;
-  font-size: 0.78em;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 
 .bs-nitro {
   height: 8px;

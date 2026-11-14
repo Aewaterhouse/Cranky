@@ -155,6 +155,8 @@ export interface RoadLobbyRider {
   name: string
   ftp: number
   kg: number
+  /** The weight the rider set (null if none; `kg` falls back to a default for the physics). From 2026-11-14. */
+  weightKg?: number | null
   connected: boolean
   look: Look
   bot: boolean
