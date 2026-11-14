@@ -45,6 +45,8 @@ export interface Settings {
   camView: CamView
   /** Short letterboxed shots of air strikes and supply drops on the bus. */
   cinematics: boolean
+  /** Crew cards opened to show every number (rider ids), kept on this device. */
+  cardsOpen: string[]
 }
 
 const KEY = 'cranky.settings'
@@ -70,6 +72,7 @@ const DEFAULTS: Settings = {
   shiftStrength: CFG.gears.strength.start,
   camView: 'chase',
   cinematics: true,
+  cardsOpen: [],
 }
 
 export const settings: Settings = { ...DEFAULTS, ...read() }

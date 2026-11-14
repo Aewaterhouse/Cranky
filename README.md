@@ -91,6 +91,15 @@ Photo mode (free ride): pause, then 📷 Photo mode. The HUD goes, drag, zoom an
 
 With no camera input for 8 s the view eases back by itself. HUD panels, buttons, the map and sliders work as before; only drags that start on the 3D view move the camera.
 
+## Crew cards
+
+On the bus, in VO2 Madness, the TV view and group free rides, the crew is a column of cards down the right edge (`R` shows or hides it on the bus).
+
+| Input | Effect |
+| --- | --- |
+| Click or tap a card | open it for every number (now and this ride), again to close |
+| `D` or the button at the top | open or close every card (remembered on this device) |
+
 ## Zwift Click and virtual gears
 
 Free ride, solo Slope mode and the Zombie Bus with ERG off (pick Gears in the bus lobby, or `E` mid-ride) have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 150%; slider in Settings, in free ride and in Slope mode, `;` and `'` while riding; the gear tile and chip show it, and tapping the chip opens the slider). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T). On the bus the gears sit on a flat 2% road: Z X, the arrows or a Zwift Click shift, and the target still scores.

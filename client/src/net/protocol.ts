@@ -132,6 +132,20 @@ export interface Tick {
   fx: Fx[]
   /** Targets of riders still on the bus are multiplied by this while others have fallen off (1 when none). */
   load?: number
+  /** Each rider's ride so far, at most once a second (absent on the ticks in between, and from older servers). */
+  stats?: Record<string, RideStats>
+}
+/** A rider's ride so far, worked out on the server from the power it has received. */
+export interface RideStats {
+  ftp: number
+  /** Kilograms, or null when the rider has not set a weight. */
+  kg: number | null
+  /** Average and normalised watts, the share of scored time on target (null before any), kJ and falls. */
+  avg: number
+  np: number
+  on: number | null
+  kj: number
+  falls: number
 }
 
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */

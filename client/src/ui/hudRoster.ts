@@ -1,6 +1,7 @@
 import { CFG } from '../config'
 import { crewShares } from '../core/hud'
-import type { RiderTick } from '../net/protocol'
+import { rideShares } from '../core/crewStats'
+import type { RideStats, Tick } from '../net/protocol'
 import { crewCards, type CardRider } from './crewCards'
 
 /**
@@ -11,9 +12,16 @@ import { crewCards, type CardRider } from './crewCards'
 export function makeRoster(cls = 'crew') {
   const col = crewCards(cls)
   const fellAt = new Map<string, number>()
+  // The ride so far comes once a second; keep the last for the ticks in between.
+  let stats: Record<string, RideStats> = {}
+  let shares: Record<string, number> = {}
   return {
     root: col.root,
-    update(riders: Record<string, RiderTick>, meId: string, el: number) {
+    update({ riders, el, stats: st }: Pick<Tick, 'riders' | 'el' | 'stats'>, meId: string) {
+      if (st) {
+        stats = st
+        shares = rideShares(st)
+      }
       const { share, carrier } = crewShares(riders)
       const rows: CardRider[] = Object.entries(riders).map(([id, r]) => {
         if (r.st === 'fell' && !fellAt.has(id)) fellAt.set(id, el)
@@ -37,6 +45,10 @@ export function makeRoster(cls = 'crew') {
           erg: r.erg ?? true,
           share: share[id],
           carrier: id === carrier,
+          tgt: r.tgt,
+          cad: r.cad,
+          stats: stats[id],
+          rideShare: shares[id],
         }
       })
       col.update(rows, meId)

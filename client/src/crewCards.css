@@ -101,3 +101,45 @@
   text-align: right;
   text-shadow: 0 1px 2px #000;
 }
+.cc-all {
+  align-self: stretch;
+  padding: calc(0.2 * var(--u)) calc(0.5 * var(--u));
+  border: 0;
+  border-radius: calc(0.5 * var(--u));
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  font: 600 calc(1.1 * var(--u)) var(--ui);
+  cursor: pointer;
+}
+.cc-more {
+  display: none;
+  flex-direction: column;
+  gap: calc(0.15 * var(--u));
+  padding-top: calc(0.3 * var(--u));
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: calc(1.2 * var(--u));
+}
+.ccard.open .cc-more {
+  display: flex;
+}
+.cc-more h4 {
+  margin: calc(0.3 * var(--u)) 0 0;
+  font-size: 0.8em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+.cc-row {
+  display: flex;
+  justify-content: space-between;
+  gap: calc(0.5 * var(--u));
+}
+.cc-row span {
+  opacity: 0.75;
+}
+.cc-hint {
+  margin: calc(0.3 * var(--u)) 0 0;
+  font-size: 0.85em;
+  white-space: normal;
+  color: var(--warn);
+}
