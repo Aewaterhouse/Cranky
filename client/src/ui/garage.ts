@@ -65,14 +65,31 @@ export function garageTab(p: Profile, changed: () => void) {
         { class: 'meta' },
         on ? 'Equipped' : owned ? 'Owned' : h('span', {}, scrapIcon(), ` ${c.price}`),
       ),
-      h(
-        'button',
-        { class: owned ? 'ghost' : 'primary', disabled: !owned && short > 0, onclick: act },
-        owned ? (on ? 'Take off' : 'Equip') : short > 0 ? `Need ${short} more` : 'Buy',
-      ),
+      !owned && short > 0
+        ? h(
+            'div',
+            { class: 'need-bar', title: `${p.scrap} of ${c.price} scrap` },
+            h('i', { style: `width:${Math.round((p.scrap / c.price) * 100)}%` }),
+            h('span', {}, `${short} to go`),
+          )
+        : h(
+            'button',
+            { class: owned ? 'ghost' : 'primary', onclick: act },
+            owned ? (on ? 'Take off' : 'Equip') : 'Buy',
+          ),
     )
   }
   const slots = Object.keys(SLOT_NAMES) as Slot[]
+  // The dearest things you can buy right now, one per slot.
+  const treats = slots
+    .map(
+      (s) =>
+        COSMETICS.filter((c) => c.slot === s && c.price <= p.scrap && !p.owned.includes(c.id)).sort(
+          (a, b) => b.price - a.price,
+        )[0],
+    )
+    .filter((c) => c)
+    .slice(0, 4)
   return h(
     'div',
     { class: 'garage' },
@@ -91,9 +108,17 @@ export function garageTab(p: Profile, changed: () => void) {
         scrapIcon(),
         h('b', {}, String(p.scrap)),
         h('span', {}, 'scrap'),
-        h('small', {}, 'Earned on crew rides, plus a bonus per award'),
+        h('small', {}, 'Earned on every ride of 10 minutes or more, plus a bonus per award'),
       ),
     ),
+    treats.length
+      ? h(
+          'section',
+          { class: 'slot' },
+          h('h2', { class: 'label' }, 'Treat yourself', h('small', {}, 'You can afford these now')),
+          h('div', { class: 'shopgrid' }, ...treats.map(item)),
+        )
+      : '',
     ...slots.map((s) =>
       h(
         'section',
