@@ -39,7 +39,15 @@ export class Skyline {
   }
 
   /** `x, y, z` is the rider in world metres; the mesh sits there and its vertices hold heights relative to it. */
-  update(field: HeightField, x: number, y: number, z: number, env: Env, dt: number) {
+  update(
+    field: HeightField,
+    x: number,
+    y: number,
+    z: number,
+    env: Env,
+    dt: number,
+    wet: (x: number, z: number) => boolean,
+  ) {
     const mat = this.mesh.material as THREE.ShaderMaterial
     mat.uniforms.top.value.copy(env.hill).lerp(env.fog, 0.3)
     mat.uniforms.bot.value.copy(env.fog)
@@ -50,11 +58,15 @@ export class Skyline {
       for (let i = 0; i < N; i++) {
         const a = (i / N) * Math.PI * 2
         let top = -Infinity
+        let land = false
         for (const k of LOOK) {
-          const h = field.natural(x + Math.sin(a) * R.skyR * k, z - Math.cos(a) * R.skyR * k)
-          top = Math.max(top, (h - y) / k)
+          const px = x + Math.sin(a) * R.skyR * k
+          const pz = z - Math.cos(a) * R.skyR * k
+          top = Math.max(top, (field.natural(px, pz) - y) / k)
+          land ||= !wet(px, pz)
         }
-        this.want[i] = top + (noise2(i * 0.9, 3) - 0.3) * R.skyJag
+        // Out to sea the ring drops to the waterline so the horizon is flat.
+        this.want[i] = land ? top + (noise2(i * 0.9, 3) - 0.3) * R.skyJag : R.seaLevel - y - 1
       }
       this.want[N] = this.want[0]
     }

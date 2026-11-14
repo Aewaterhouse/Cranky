@@ -67,9 +67,12 @@ describe('land cover', () => {
     expect(new LandCover(terrain(0, () => 'g')).at(600, -600, 0)).toBe('w')
     expect(new LandCover().at(0, 0, 0.2)).toBe('w')
   })
-  it('guesses without a map: sand by the sea, bush below the treeline, rock well above it', () => {
+  it('guesses without a map: sand on the coast, bush below the treeline, rock well above it', () => {
     const c = new LandCover()
-    expect(c.at(0, 0, R.seaLevel + 1)).toBe('a')
+    expect(new LandCover(terrain(0)).coast).toBe(true)
+    expect(new LandCover(terrain(0)).at(600, -600, R.seaLevel + 1)).toBe('a')
+    expect(c.coast).toBe(false)
+    expect(c.at(0, 0, R.seaLevel + 1)).not.toBe('a')
     expect('bfg').toContain(c.at(0, 0, 400))
     expect(c.at(0, 0, R.treeline + R.alpineBand + 100)).toBe('r')
     expect(new LandCover(undefined, 'TAS').at(0, 0, R.treelineTas + R.alpineBand + 100)).toBe('r')

@@ -453,3 +453,8 @@ tr.me td {
     opacity: 0;
   }
 }
+.res-score small {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.8;
+}

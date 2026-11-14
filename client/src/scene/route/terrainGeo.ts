@@ -12,6 +12,7 @@ const rock = new THREE.Color()
 const snow = new THREE.Color()
 const gravel = new THREE.Color()
 const sea = new THREE.Color()
+const sand = new THREE.Color()
 const tint = new THREE.Color()
 const other = new THREE.Color()
 const mix = new THREE.Color()
@@ -44,8 +45,11 @@ function shade(cover: LandCover, x: number, y: number, z: number, up: number, ve
   paint(c, x, z, tint)
   // Two samples with different boundary noise: where they disagree the face is a half-way colour.
   if (c2 !== c) tint.lerp(paint(c2, x, z, other), 0.5)
+  // On the coast the sea sheet is the water; ground poking through it is beach.
+  if (cover.coast && c === 'w') tint.copy(sand)
   if (c !== 'w') {
     if (verge) tint.lerp(gravel, 0.2)
+    if (cover.coast) tint.lerp(sand, smooth(R.seaLevel + R.sandBand, R.seaLevel + R.sandBand * 0.4, y))
     tint.lerp(rock, smooth(R.rockSlope, R.rockSlope - 0.12, up))
     const line = y + (noise2(x / 120, z / 120 + 7) - 0.5) * 200
     tint.lerp(snow, smooth(R.snowLine, R.snowLine + 150, line) * smooth(0.45, 0.7, up))
@@ -83,7 +87,8 @@ function face(
   const wet = shade(cover, x, y, z, Math.abs(ny) / len, verge)
   if (ny < 0) [b, c] = [c, b]
   out.add(p, a, b, c, tint)
-  if (!wet) return
+  // On the coast the sea sheet covers anything below sea level.
+  if (!wet || (cover.coast && y < R.seaLevel + 0.3)) return
   ;[a, b, c].forEach((i, k) => {
     flat[k * 3] = p[i]
     flat[k * 3 + 1] = y + R.waterLift
@@ -122,6 +127,7 @@ export function buildTerrain(
   snow.set(R.snow)
   gravel.set(R.gravel)
   sea.set(R.sea)
+  sand.set(G.sand)
   const { p, end, cut, NI, NC, full } = pt
   const at = (j: number, c: number) => pt.at(j, c)
   /** True when the triangle a, b, c keeps `r` metres clear of every road (centre and edge midpoints). */

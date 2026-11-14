@@ -24,6 +24,7 @@ import { RoadPath, newPose } from './roadPath'
 import { pickMood } from './routeMoods'
 import { RoadRiders, type RoadRider } from './roadRiders'
 import { RouteCam } from './routeCam'
+import { Sea } from './sea'
 import { PlayerCam } from '../playerCam'
 import { CAM } from '../camVis'
 import { Skyline } from './skyline'
@@ -93,6 +94,7 @@ export class RouteWorld {
   }
   private frame = { at: new THREE.Vector3(), right: new THREE.Vector3(), back: new THREE.Vector3() }
   private rain = new Rain()
+  private sea: Sea
   private confetti = new Confetti()
   private seed: number
   private hour = 12
@@ -122,6 +124,7 @@ export class RouteWorld {
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))
     // Map features share the height grid's origin, so they are only usable alongside it.
     const cover = new LandCover(terrain, route.region)
+    this.sea = new Sea(cover.coast ? terrain : undefined)
     this.cover = jokeCover(route.id, cover)
     const features = new Features(terrain && route.features, this.field)
     const furniture = planFurniture(path)
@@ -160,6 +163,7 @@ export class RouteWorld {
       this.skyline.mesh,
       this.confetti.mesh,
     )
+    if (this.sea.mesh) this.root.add(this.sea.mesh)
     this.scene.add(this.root, this.sky.group, this.rain.lines, k, k.target, this.hemi, this.camera)
     addEventListener('resize', this.resize)
     let was: number = LEVELS.indexOf(startLevel())
@@ -251,7 +255,8 @@ export class RouteWorld {
     this.sky.update(env, this.t, this.camera.position)
     this.rain.update(mood === 'routeShower', this.camera.position, this.t, dt)
     this.confetti.update(dt)
-    this.skyline.update(this.field, me.x, me.y, me.z, env, dt)
+    this.skyline.update(this.field, me.x, me.y, me.z, env, dt, this.sea.wet)
+    this.sea.update(me.x, me.z, this.t)
     aimSun(this.key, env, me.x - ox, me.y - oy, me.z - oz)
   }
 
@@ -313,6 +318,7 @@ export class RouteWorld {
     this.life.dispose()
     this.rain.dispose()
     this.confetti.dispose()
+    this.sea.dispose()
     this.cam.dispose()
     this.renderer.dispose()
     this.renderer.domElement.remove()

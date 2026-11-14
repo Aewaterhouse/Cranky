@@ -92,6 +92,7 @@ function routeFolder(f: GUI, rebuild: () => void) {
   built.add(R, 'hillScale', 50, 800)
   built.add(R, 'snowLine', 0, 2500)
   built.add(R, 'seaLevel', -1, 5)
+  built.add(R, 'sandBand', 0, 10)
   built.add(R, 'rockSlope', 0.3, 1)
   for (const k of ['aheadPotato', 'aheadLow', 'aheadMedium', 'aheadHigh'] as const)
     built.add(R, k, 200, 2000, 50)
@@ -113,7 +114,7 @@ function routeFolder(f: GUI, rebuild: () => void) {
     'mainStreet',
   ] as const)
     built.addColor(R, k)
-  for (const k of ['ground', 'signs', 'place'] as const)
+  for (const k of ['ground', 'signs', 'place', 'ocean'] as const)
     addAll(built.addFolder(k).close(), R[k] as Record<string, unknown>)
   built.onChange(rebuild)
 }

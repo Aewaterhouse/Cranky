@@ -169,8 +169,8 @@ export const VIS = {
     gravel: '#a39272',
     snow: '#f3f6fa',
     sea: '#3d8fc4',
-    /** Ground below this height (m) is drawn as water. */
-    seaLevel: 0.5,
+    /** Ground below this height (m) is drawn as water (the height grid reads beaches and shallows as 0 to 1 m). */
+    seaLevel: 1.5,
     /** Ground colours by land cover; each drifts towards a neighbour with slow noise. */
     ground: {
       grass: '#7fb24e',
@@ -188,8 +188,19 @@ export const VIS = {
     treeline: 1500,
     treelineTas: 1200,
     alpineBand: 200,
-    /** Without a map, ground this far above sea level is sand. */
-    sandBand: 2,
+    /** On the coast, ground this far above sea level is sand. */
+    sandBand: 3,
+    /** The sea sheet on coastal routes: shallow and foam colours, foam band (m below the shore), lapping, swell. */
+    ocean: {
+      shallow: '#62c6c4',
+      foam: '#f4fbff',
+      foamBand: 0.8,
+      lap: 0.35,
+      swell: 0.08,
+      /** Sea cells are drawn this much deeper (m) per cell out from land; a route needs this many sea cells. */
+      depthPerCell: 3,
+      coastCells: 50,
+    },
     /** Land cover boundaries wander by this fraction of a grid cell, with noise of this wavelength (m). */
     coverJitter: 0.35,
     coverNoise: 28,

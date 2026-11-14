@@ -1,6 +1,7 @@
 import type { TerrainData } from '../../core/route'
 import { noise2 } from '../math'
 import { VIS } from '../params'
+import { seaCells } from './sea'
 
 const R = VIS.route
 /** g grass, f forest, b bush, s scrub, u built-up, p park, a sand, r rock, w water. */
@@ -13,6 +14,8 @@ export class LandCover {
   readonly treeline: number
   /** True when the pack came with a land cover grid; false when every answer is a guess. */
   readonly mapped: boolean
+  /** True when the height grid reaches the sea: sand along the shore and a sea sheet. */
+  readonly coast: boolean
   private grid?: Uint8Array
 
   constructor(
@@ -21,6 +24,7 @@ export class LandCover {
   ) {
     this.treeline = region === 'TAS' ? R.treelineTas : R.treeline
     this.mapped = !!t?.cover
+    this.coast = seaCells(t) >= R.ocean.coastCells
     if (!t?.cover) return
     const grid = (this.grid = new Uint8Array(t.cols * t.rows))
     t.runs.forEach((row, r) =>
@@ -53,9 +57,9 @@ export class LandCover {
     return this.guess(x, z, y)
   }
 
-  /** No map: sand by the sea, bush with patches of forest and clearings, heath then rock above the treeline. */
+  /** No map: sand on the coast, bush with patches of forest and clearings, heath then rock above the treeline. */
   guess(x: number, z: number, y: number): Cover {
-    if (y < R.seaLevel + R.sandBand) return 'a'
+    if (this.coast && y < R.seaLevel + R.sandBand) return 'a'
     const line = y + (noise2(x / 140 + 5, z / 140) - 0.5) * 160
     if (line > this.treeline + R.alpineBand) return 'r'
     if (line > this.treeline) return 's'

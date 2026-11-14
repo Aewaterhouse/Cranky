@@ -2,7 +2,7 @@ import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
 import { badges } from '../core/badges'
-import { badgeCard, headline } from './resultsTop'
+import { badgeCard, headline, scoreContext } from './resultsTop'
 import { bankScrap, soloScrap } from '../core/cosmetics'
 import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
@@ -187,7 +187,7 @@ export function finishRide(
           )
         : '',
       // The game's outcome is the story of a crew ride: it comes before the training numbers.
-      group ? groupSection(group, profile.id) : '',
+      group ? groupSection(group, profile.id, scoreContext(profile.id, group)) : '',
       race ? roadSection(road!, profile.id) : '',
       h(
         'div',

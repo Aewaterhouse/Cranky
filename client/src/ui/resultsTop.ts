@@ -18,6 +18,27 @@ export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
   return 'Made it!'
 }
 
+/**
+ * A crew score with something to compare it to: your best and your last for this game on this device, then
+ * remembers this one. Empty the first time.
+ */
+export function scoreContext(me: string, g: GroupSummary) {
+  const key = `cranky.scores.${me}.${g.mode ?? 'bus'}`
+  let was: { best: number; last: number } | null = null
+  try {
+    was = JSON.parse(localStorage.getItem(key) ?? 'null')
+  } catch {
+    /* none kept */
+  }
+  localStorage.setItem(
+    key,
+    JSON.stringify({ best: Math.max(was?.best ?? 0, g.score), last: g.score }),
+  )
+  if (!was) return 'Your first go. Beat it next time.'
+  if (g.score > was.best) return `New best! Up from ${was.best.toLocaleString()}.`
+  return `Your best ${was.best.toLocaleString()} · last time ${was.last.toLocaleString()}`
+}
+
 /** A badge the ride just unlocked: its own moment at the top of the results. */
 export const badgeCard = (b: Badge) =>
   h(
