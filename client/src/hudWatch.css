@@ -1,0 +1,40 @@
+/* Watch party: the video behind everything, and the panel with the queue and the remote. */
+.video-stage {
+  position: absolute;
+  inset: 0;
+  background: #000;
+}
+.video-stage iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.wp-now {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  line-height: 1.25;
+}
+.wp-remote,
+.wp-add {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+  pointer-events: auto;
+}
+.wp-remote[hidden] {
+  display: none;
+}
+.wp-remote button {
+  flex: 1;
+  padding: 4px 2px;
+  font-size: 0.75rem;
+}
+.wp-in {
+  flex: 1;
+  min-width: 0;
+}
+.wp-note {
+  display: block;
+  margin-top: 4px;
+  opacity: 0.75;
+}

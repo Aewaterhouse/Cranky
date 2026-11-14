@@ -6,7 +6,7 @@ import type { Grade, Plan, Tier } from '../types'
 
 export type TrainerMode = 'erg' | 'gears' | 'choose'
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
-export type Game = 'bus' | 'madness' | 'ambo' | 'date' | 'climate'
+export type Game = 'bus' | 'madness' | 'ambo' | 'date' | 'climate' | 'watch'
 /** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
 export interface MadState {
   pts: Record<string, number>
@@ -153,6 +153,17 @@ export interface AmboState {
   reviews: { patient: string; icon: string; stars: number; text: string }[]
   score: number
   siren: string | null
+}
+/** Watch party state (`tick.game` when the game is `watch`): the room's video is `pos` seconds in at ride time `at`. */
+export interface WatchState {
+  g: 'watch'
+  vid: string | null
+  title: string | null
+  playing: boolean
+  pos: number
+  at: number
+  /** Videos waiting their turn, with who added them. */
+  queue: { vid: string; title: string | null; by: string }[]
 }
 /** Climate Lawsuit state (`tick.game` when the game is `climate`). */
 export interface ClimateState {

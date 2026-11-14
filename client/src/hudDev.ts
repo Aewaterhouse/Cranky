@@ -19,7 +19,7 @@ import { makeHud } from './ui/hud'
 
 /**
  * Dev page: a crew game's HUD over its scene, fed made-up ticks (no server). Params: `game=ambo|date`
- * (date states: `date|card|chap|wedding|divorce|cool`) `|climate` (states: `decade|gust|event|trial`),
+ * `watch` (a YouTube video, `v=<id>`), (date states: `date|card|chap|wedding|divorce|cool`) `|climate` (states: `decade|gust|event|trial`),
  * `state=run|event|siren|me|brake|ramp|reverse|base|cool`, `ask=1` (a question sheet), `fx=delivered|fellout|walked|review`.
  */
 const q = new URLSearchParams(location.search)
@@ -28,7 +28,7 @@ const state = q.get('state') ?? 'run'
 const ui = GAME_UI[game]
 const stage = h('div', { class: 'stage' })
 document.getElementById('app')!.append(stage)
-const world = ui?.world?.(stage) ?? new World(stage)
+const world = ui?.world?.(stage, (t) => hud.toast(t)) ?? new World(stage)
 const plan: Plan = {
   id: 'dev',
   name: 'Dev',
@@ -56,7 +56,10 @@ const hud = makeHud(
       slider: h('div', {}),
     },
     game,
-    panel: ui?.panel((k, v) => hud.toast(`act ${k} = ${v}`)),
+    panel: ui?.panel(
+      (k, v) => hud.toast(`act ${k} = ${v}`),
+      () => true,
+    ),
     events: ui?.events,
     onAct: (k, v) => hud.toast(`act ${k} = ${v}`),
   },
@@ -276,7 +279,21 @@ setInterval(() => {
     bus,
     fx,
     game:
-      game === 'date' ? { ...dating(t) } : game === 'climate' ? { ...climate(t) } : { ...ambo(t) },
+      game === 'watch'
+        ? {
+            g: 'watch',
+            vid: q.get('v') ?? 'aqz-KE-bpKQ',
+            title: 'Big Buck Bunny',
+            playing: true,
+            pos: 0,
+            at: el0,
+            queue: [{ vid: 'x', title: 'Tour Down Under, stage 3 highlights', by: 'Mo' }],
+          }
+        : game === 'date'
+          ? { ...dating(t) }
+          : game === 'climate'
+            ? { ...climate(t) }
+            : { ...ambo(t) },
   }
   const f = frameAt(plan.blocks, m.el, 'hard', 250)
   const me = m.riders.a

@@ -70,4 +70,15 @@ export const GAMES: Record<Game, GameInfo> = {
     fixed: true,
     soon: true,
   },
+  watch: {
+    icon: '📺',
+    name: 'Watch Party',
+    blurb:
+      'Ride the same workout while you watch the same YouTube video, in sync. The driver picks the workout and holds the remote; anyone can queue a video. No Premium needed.',
+    start: 'Start the show',
+    countdown: 'THE SHOW STARTS IN',
+    score: 'Crew score',
+    plan: true,
+    soon: true,
+  },
 }
