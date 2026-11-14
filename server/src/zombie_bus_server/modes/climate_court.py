@@ -63,7 +63,8 @@ class Court:
         return bool(r and r.look.get("sash"))
 
     def court_band(self, room: Room, r: Rider, kind: str):
-        if kind == "trial" and self.target and r.id in self.defendants and self.in_dock(room):
+        # In the dock the jury rides the same effort as the defendant: how much of it they hold sets the bar.
+        if kind == "trial" and self.target and self.in_dock(room):
             t = self.target / 100
             return min(C.TARGET_CAP, t - G.CLIM_DOCK_HALF), min(C.TARGET_CAP, t + G.CLIM_DOCK_HALF)
         service = room.el < self.cool_t + G.CLIM_SERVICE["secs"] * self.scale(room)
@@ -81,15 +82,23 @@ class Court:
             pick = max((v for v, n in tally_.items() if n == best), key=int, default="100")
             self.target = int(pick)
             self.emit("say", T.TARGET.format(t=self.target))
+            if len(room.riders) > len(self.defendants):
+                self.emit("say", T.JURY)
         if self.in_dock(room):
             self.dock_s += dt
             t, live = (self.target or 100) / 100, {r.id: r for r in act}
-            for rid in self.defendants:
-                r = live.get(rid)
-                if r and abs(r.w / r.ftp - t) <= G.CLIM_DOCK_HALF + 0.01:
-                    self.held_s[rid] = self.held_s.get(rid, 0.0) + dt
+            for rid, r in live.items():
+                on = abs(r.w / r.ftp - t) <= G.CLIM_DOCK_HALF + 0.01
+                self.held_s[rid] = self.held_s.get(rid, 0.0) + dt * on
         elif self.target is not None and self.dock_s and not self.verdicts:
             self.decide(room)
+
+    def bar(self) -> float:
+        """The share of the dock a defendant must hold: what the jury held, between the floor and 80%."""
+        jury = [self.held(rid) for rid in self.held_s if rid not in self.defendants]
+        if not jury:
+            return G.CLIM_ACQUIT
+        return min(G.CLIM_ACQUIT, max(G.CLIM_ACQUIT_MIN, sum(jury) / len(jury)))
 
     def held(self, rid: str) -> float:
         return self.held_s.get(rid, 0.0) / self.dock_s if self.dock_s else 0.0
@@ -100,7 +109,7 @@ class Court:
             return
         for rid in self.defendants:
             name = room.riders[rid].name if rid in room.riders else "?"
-            free = self.held(rid) >= G.CLIM_ACQUIT
+            free = self.held(rid) >= self.bar()
             self.verdicts[rid] = "acquitted" if free else "guilty"
             if free:
                 self.sash(room, rid, False)

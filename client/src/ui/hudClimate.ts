@@ -125,7 +125,7 @@ export function makeClimatePanel(act: (k: string, v: string) => void): GamePanel
               {},
               v
                 ? `${name(id)}: ${v === 'guilty' ? '🔨 GUILTY' : '🎉 acquitted on a technicality'}`
-                : `⚖️ ${name(id)} is in the dock${t.target ? `: hold ${t.target}% (${Math.round(t.held * 100)}% held)` : '. The jury is voting.'}`,
+                : `⚖️ ${name(id)} is in the dock${t.target ? `: hold ${t.target}%, ${Math.round(t.held * 100)}% held against the jury's ${Math.round((t.bar ?? 0.8) * 100)}%` : '. The jury is voting.'}`,
             )
           }),
         )

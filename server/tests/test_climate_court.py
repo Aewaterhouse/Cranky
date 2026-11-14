@@ -9,6 +9,7 @@ from test_bots import FakeWS, join
 
 from zombie_bus_server import config_games as G
 from zombie_bus_server.avatars import clean_look, wear_sash
+from zombie_bus_server.modes import climate_text as T
 from zombie_bus_server.protocol import ClientMsg
 from zombie_bus_server.session import Room
 from zombie_bus_server.store import Store
@@ -58,13 +59,30 @@ def test_nobody_voting_means_100():
     assert town.view()["trial"]["target"] == 100
 
 
-def test_the_defendant_rides_the_target_in_the_dock_and_everyone_else_spins_easy():
+def test_the_defendant_and_the_jury_ride_the_target_in_the_dock():
     town = Town()
     to_trial(town)
     town.ride(VOTE + 5)
     r3 = town.game.band(town, town.riders["r3"], 5, 70)
     assert r3 == pytest.approx((1 - G.CLIM_DOCK_HALF, 1 + G.CLIM_DOCK_HALF))
-    assert town.game.band(town, town.riders["r0"], 5, 70) == G.CLIM_EASY
+    assert town.game.band(town, town.riders["r0"], 5, 70) == r3
+
+
+def test_a_lazy_jury_lowers_the_bar_and_lets_the_defendant_off():
+    town = Town()
+    to_trial(town)
+    said = town.ride(VOTE + 1)
+    assert any(f["text"] == T.JURY for f in said)
+    start = town.el
+
+    def power(r, b, el):
+        if r.id == "r3":
+            return 1.0 if (el - start) / DOCK < 0.6 else 0.6
+        return 0.5  # the jury never holds it
+
+    town.ride(DOCK + 2, power)
+    v = town.view()["trial"]
+    assert v["bar"] == G.CLIM_ACQUIT_MIN and v["verdicts"] == {"r3": "acquitted"}
 
 
 @pytest.mark.parametrize("held, verdict", [(0.85, "acquitted"), (0.7, "guilty")])

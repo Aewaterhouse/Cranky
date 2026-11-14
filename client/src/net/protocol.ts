@@ -194,6 +194,8 @@ export interface ClimateState {
     /** The effort the jury chose (% FTP) once voting closes, and how much of it has been held so far. */
     target: number | null
     held: number
+    /** The share the defendant must hold: what the jury has held, between 50% and 80%. */
+    bar?: number
     verdicts: Record<string, 'acquitted' | 'guilty'>
   } | null
   /** Revealed at the Trial: emissions, bribes taken and seawalls bought. */

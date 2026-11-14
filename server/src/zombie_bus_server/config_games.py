@@ -226,6 +226,7 @@ CLIM_DOCK_S = 180  # then the defendants ride the chosen effort this long
 CLIM_TARGETS = ("90", "100", "105")  # the jury's options, % FTP
 CLIM_DOCK_HALF = 0.04  # the defendant's band is the target ± this share of FTP
 CLIM_ACQUIT = 0.8  # share of the dock held for an acquittal on a technicality
+CLIM_ACQUIT_MIN = 0.5  # ...or what the jury held, if less, but never under this: a lazy jury lets them off
 CLIM_SERVICE = {"band": (0.97, 1.03), "secs": 120}  # community service at sentencing
 CLIM_SASH_DAYS = 30
 CLIM_BOTS = ("baron", "greenie", "fence")  # by the bot's place in BOT_NAMES

@@ -46,6 +46,7 @@ class ClimateView:
                 "target": self.target,
                 "held": held.get(self.defendants[0], 0.0) if self.defendants else 0.0,
                 "heldBy": held,
+                "bar": round(self.bar(), 2),
                 "verdicts": self.verdicts,
             }
         return {
