@@ -4,8 +4,8 @@ import { canvasTex, noise2, smooth, rand } from './util'
 
 export const ROAD_HALF = 8
 const CELL = 6
-const ROWS = 102
-const Z0 = 114 // far enough behind the bus for the High camera view
+const ROWS = 125
+const Z0 = 252 // far enough behind the bus for the High and Rear camera views
 const XS = [
   -260, -190, -140, -100, -72, -52, -38, -29, -22, -17, -13.5, -11, -9, -8, 0, 8, 9, 11, 13.5, 17,
   22, 29, 38, 52, 72, 100, 140, 190, 260,

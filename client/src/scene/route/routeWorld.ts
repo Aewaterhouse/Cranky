@@ -81,13 +81,14 @@ export class RouteWorld {
   private mood = new MoodBlend()
   /** The sky right now (a key of the route moods), for the wind and the sounds of the place. */
   moodName = 'route'
-  private sky = new Sky(true)
+  sky = new Sky(true)
   private skyline = new Skyline()
   private rig = new RouteCam()
   /** The player's view, orbit and zoom on top of the chase camera. */
   cam!: PlayerCam
   private limits = {
     near: CAM.nearRider,
+    far: CAM.farRider,
     ground: (x: number, z: number) => this.field.ground(x + this.ox, z + this.oz) - this.oy,
   }
   private frame = { at: new THREE.Vector3(), right: new THREE.Vector3(), back: new THREE.Vector3() }

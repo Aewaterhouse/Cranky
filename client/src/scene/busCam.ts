@@ -1,11 +1,11 @@
 import * as THREE from 'three'
 import { CamRig } from './camRig'
+import type { OrbitLimits } from './camOrbit'
 import { CAM } from './camVis'
 import { Cinema } from './cinema'
 import { PlayerCam } from './playerCam'
 import type { Strikes } from './strikes'
 
-const LIMITS = { near: CAM.nearBus, ground: () => 0, bus: true }
 /** The bus sits at the origin facing -z. */
 const FRAME = {
   at: new THREE.Vector3(),
@@ -20,10 +20,13 @@ const FRAME = {
 export class BusCam {
   rig = new CamRig()
   cine: Cinema
-  private pc: PlayerCam
+  pc: PlayerCam
   private ship = false
+  private lim: OrbitLimits
 
-  constructor(host: HTMLElement, canvas: HTMLElement) {
+  /** `ground(x, z)` is the height of the land under a point near the bus. */
+  constructor(host: HTMLElement, canvas: HTMLElement, ground: OrbitLimits['ground']) {
+    this.lim = { near: CAM.nearBus, far: CAM.farBus, ground, bus: true }
     this.cine = new Cinema(host)
     this.pc = new PlayerCam(canvas, this.cine.skip)
   }
@@ -42,7 +45,7 @@ export class BusCam {
     hz: number | null,
   ) {
     this.rig.update(cam, t, dt, o)
-    this.pc.apply(cam, realDt, FRAME, this.rig.look, LIMITS, CAM.bus, 2)
+    this.pc.apply(cam, realDt, FRAME, this.rig.look, this.lim, CAM.bus, 2)
     strikes.view(cam)
     if (gunship && !this.ship) this.cine.start('gunship')
     this.ship = gunship

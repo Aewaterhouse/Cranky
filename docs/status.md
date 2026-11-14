@@ -45,6 +45,7 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Free-ride camera: on Mount Coot-tha, the High view zoomed out or orbited shows slivers (under 1.3%) of blank background at the terrain's edge beyond the hill. `/route-dev.html?route=mount-coot-tha&d=2000&camcheck=1` shows them.
 - `scripts/e2e.sh` on macOS leaves its uvicorn running after it passes (the trap kills `uv run`'s shell, not the server); kill whatever holds the port afterwards.
 - Imported GPX routes and My workouts live only in the browser's storage on one device; clearing it loses them (ride history, profiles and efforts are on the server).
 - Zombie Bus non-ERG mode and the fallen-rider load on everyone else's targets were added on 2026-11-14 without tests or a ride (owner asked for speed). Check both on the next bus ride.

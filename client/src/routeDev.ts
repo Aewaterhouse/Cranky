@@ -4,6 +4,8 @@ import { ROUTE_INDEX, loadRoute } from './core/routeLibrary'
 import { addFixture } from './routeDevFixture'
 import { debugPanel } from './scene/debug'
 import { VIS } from './scene/params'
+import { CAM } from './scene/camVis'
+import { runCamCheck } from './scene/camCheck'
 import { nextThing, watchPerf } from './scene/route/worldDev'
 import { perfOverlay } from './ui/perfOverlay'
 import './perf.css'
@@ -80,6 +82,7 @@ async function start() {
   }))
   world.state = { me: 'r0', riders }
   Object.assign(window, { world, st, jump, VIS })
+  if (q.has('camcheck')) setTimeout(() => runCamCheck(world.cam, CAM.route, world, 1800), 6000)
 
   let last = performance.now()
   setInterval(() => {

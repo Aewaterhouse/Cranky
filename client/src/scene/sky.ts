@@ -97,7 +97,8 @@ function skyline() {
 /** Sky dome, sun or moon, stars, hazy ridges and a ruined city skyline. */
 export class Sky {
   group = new THREE.Group()
-  private dome: THREE.Mesh
+  /** The dome alone, so the camera check can hide it and see what lies past the world. */
+  dome: THREE.Mesh
   private u = {
     top: { value: new THREE.Color() },
     hor: { value: new THREE.Color() },

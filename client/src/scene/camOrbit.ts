@@ -7,9 +7,13 @@ const v = new THREE.Vector3()
 const r = new THREE.Vector3()
 const u = new THREE.Vector3()
 
-/** Where the orbit may put the camera: no nearer than `near`, never under `ground`, and (on the bus) not inside it. */
+/**
+ * Where the orbit may put the camera: no nearer than `near`, no further than `far` metres (or the view's own
+ * distance, if that is further), never under `ground`, and (on the bus) not inside it.
+ */
 export interface OrbitLimits {
   near: number
+  far?: number
   ground: (x: number, z: number) => number
   bus?: boolean
 }
@@ -98,7 +102,8 @@ export class CamOrbit {
     const elev = Math.atan2(v.y, flat) / RAD
     const az = Math.atan2(v.x, v.z) + this.yaw * RAD
     const el = Math.min(CAM.pitchMax, Math.max(CAM.pitchMin, elev + this.pitch)) * RAD
-    const dist = Math.max(lim.near, v.length() * this.zoom)
+    const own = v.length()
+    const dist = Math.min(Math.max(lim.far ?? Infinity, own), Math.max(lim.near, own * this.zoom))
     cam.position.set(
       p.x + Math.sin(az) * Math.cos(el) * dist,
       p.y + Math.sin(el) * dist,

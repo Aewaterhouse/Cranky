@@ -5,7 +5,7 @@ import { BusCam } from './busCam'
 import { Crew } from './crew'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
-import { Ground } from './ground'
+import { Ground, ROAD_HALF, groundH } from './ground'
 import { Billboards, Servo } from './landmarks'
 import { Mirror } from './mirror'
 import { MoodBlend } from './moods'
@@ -69,7 +69,7 @@ export class World {
     roadblock: null,
   }
   private mood = new MoodBlend()
-  private sky = new Sky()
+  sky = new Sky()
   private ground = new Ground()
   private props = new Props(0)
   private boards = new Billboards(0)
@@ -145,7 +145,10 @@ export class World {
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
     this.mirror = new Mirror(this.host)
-    this.cam = new BusCam(this.host, this.renderer.domElement)
+    // The land under the camera, so no view or orbit goes inside a hill (the road is flat at 0).
+    const land = (x: number, z: number) =>
+      Math.abs(x) < ROAD_HALF + 0.5 ? 0 : Math.max(0, groundH(x, z - this.dist)) + 1.5
+    this.cam = new BusCam(this.host, this.renderer.domElement, land)
     addEventListener('resize', this.resize)
     this.quality = new Quality(this.renderer, () => this.resize())
     this.resize()

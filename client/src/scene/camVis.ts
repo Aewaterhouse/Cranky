@@ -14,6 +14,12 @@ export const CAM = {
   zoomMax: 3,
   nearBus: 9,
   nearRider: 2.2,
+  /**
+   * The furthest zooming out may take the camera, in metres; past this the world runs out or the fog takes the
+   * picture. A view whose own seat is further keeps its own distance.
+   */
+  farBus: 70,
+  farRider: 45,
   /** The camera stays this high above the ground, and above the bus roof when it would be inside the bus. */
   groundClear: 0.8,
   busHalf: [1.6, 3.6, 6.2] as [number, number, number],

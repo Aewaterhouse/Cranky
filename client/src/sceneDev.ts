@@ -1,5 +1,7 @@
 import { World, debugPanel, type FxKind, type SceneRider } from './scene/world'
 import { VIS } from './scene/params'
+import { CAM } from './scene/camVis'
+import { runCamCheck } from './scene/camCheck'
 
 /**
  * Scene dev harness. Open /scene-dev.html with optional params:
@@ -96,6 +98,7 @@ function apply() {
 apply()
 
 const fire = (k: FxKind) => world.fx(k)
+if (q.has('camcheck')) setTimeout(() => runCamCheck(world.cam.pc, CAM.bus, world), 1500)
 if (q.has('fx')) setTimeout(() => fire(q.get('fx') as FxKind), num('fxAt', 1500) ?? 1500)
 if (q.has('debug')) void debugPanel()
 const help = document.getElementById('help')!
