@@ -75,7 +75,7 @@ export function makeAmboPanel(): GamePanel {
       set(
         eta,
         onRoad && g.eta != null && g.eta < 3600
-          ? `ETA ${clock(g.eta)}${Math.abs(ahead) >= 5 ? ` · ${Math.abs(ahead)} s ${ahead > 0 ? 'ahead' : 'behind'}` : ''}`
+          ? `ETA ${clock(g.eta)}${Math.abs(ahead) >= 5 ? ` · ${Math.abs(ahead)} s ${ahead > 0 ? 'ahead of' : 'behind'} schedule` : ' · on schedule'}`
           : '',
       )
       const e = g.event

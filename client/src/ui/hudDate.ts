@@ -33,6 +33,7 @@ export function makeDatePanel(act: (k: string, v: string) => void): GamePanel {
   const me = h('i', { class: 'dt-me' }, '▼')
   const them = h('i', { class: 'dt-them' }, '▲')
   const track = h('div', { class: 'dt-track' }, h('i', { class: 'dt-band' }), me, them)
+  const legend = h('small', { class: 'dt-legend' })
   const chemN = h('b', { class: 'bs-n' })
   const chem = h('i', {})
   const card = h('div', { class: 'am-event' })
@@ -44,6 +45,7 @@ export function makeDatePanel(act: (k: string, v: string) => void): GamePanel {
     {},
     h('div', { class: 'am-patient' }, said, h('div', {}, who, prof)),
     track,
+    legend,
     h('div', { class: 'bs-head' }, h('label', {}, 'CHEMISTRY'), chemN),
     h('div', { class: 'bs-bar dt-chem' }, chem),
   )
@@ -81,7 +83,8 @@ export function makeDatePanel(act: (k: string, v: string) => void): GamePanel {
         me.style.left = left(inBandPos(m.riders[meId]))
         them.style.left = left(inBandPos(m.riders[other]))
         const c = Math.round(pair[2] * 100)
-        set(chemN, `${c}% · ${Math.round(pair[3])} pts`)
+        set(chemN, `${c}% now · ${Math.round(pair[3])} pts this date`)
+        set(legend, `▼ you · ▲ ${name(other)} · green: the date's band`)
         chem.style.width = `${c}%`
       } else if (chap) {
         set(who, 'You are the Chaperone')
