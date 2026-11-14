@@ -7,7 +7,7 @@ import { runCamCheck } from './scene/camCheck'
  * Scene dev harness. Open /scene-dev.html with optional params:
  *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  armour=0..100 (or none)
  *   speed=m/s  roadblock=0..1  paint=paint-rust  bullbar=1  spikes=1  riders=1..6  debug=1  hud=0
- *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  mad=1 (VO2 Madness pack)  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
+ *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  mad=1 (VO2 Madness pack)  ambo=1 siren=1 (ambulance)  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
  * Keys: 1-6 mood, [ ] gap, - = armour, , . speed, r roadblock (hold to approach), h hit, j shake,
  *       k slowmo, m smash, d supply drop, a air strike, u gunship, b bull bar, n spikes, p paint cycle, g toggle debug panel,
  *       c camera view (a, d and u also play the cinematics).
@@ -93,6 +93,7 @@ function apply() {
     mad: q.has('mad')
       ? { pts: { a: 320, b: 140, c: 20, d: 260, f: 90 }, crown: 'a', lead: 'a', work: true }
       : null,
+    ambo: q.has('ambo') ? { siren: q.get('siren') === '1' } : null,
   }
 }
 apply()

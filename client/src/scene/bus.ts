@@ -15,6 +15,7 @@ import {
   spikesGeo,
   trimGeo,
 } from './busParts'
+import { makeAmbo } from './ambulance'
 import { VIS } from './params'
 import { Mesher, VC, box, canvasTex, clamp, cyl } from './util'
 
@@ -160,13 +161,20 @@ export function makeBus() {
   beam.scale.set(0.5, 0.4, 1)
   g.add(beam)
 
+  const ambo = makeAmbo(shell)
   let lookKey = ''
   let baseCol = new THREE.Color(VIS.busColour)
-  const setLook = (look: Look = {}) => {
-    const key = `${look.paint}|${look.bullbar}|${look.spikes}`
+  /** `amb` dresses the bus as an ambulance: white, striped, light bar, none of the driver's cosmetics. */
+  const setLook = (look: Look = {}, amb = false) => {
+    const key = amb ? `ambo|${VIS.amboColour}` : `${look.paint}|${look.bullbar}|${look.spikes}`
     if (key === lookKey) return
     lookKey = key
-    baseCol = new THREE.Color(cosmetic(look.paint)?.colour ?? VIS.busColour)
+    if (amb) look = {}
+    ambo.group.visible = amb
+    decal.visible = !amb
+    baseCol = new THREE.Color(
+      amb ? VIS.amboColour : (cosmetic(look.paint)?.colour ?? VIS.busColour),
+    )
     bullbar.visible = look.bullbar === 'bullbar'
     plough.visible = look.bullbar === 'bullbar-plough'
     spikes.visible = look.spikes === 'spikes'
@@ -185,7 +193,9 @@ export function makeBus() {
     hit: number
     pitch: number
     dz: number
+    siren?: number
   }) => {
+    ambo.update(p.t, p.siren ?? 0)
     const { t, speed } = p
     const sp = clamp(speed / 12)
     const kick = p.hit

@@ -49,6 +49,8 @@ export interface SceneState {
   gunship?: boolean
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
   mad?: MadScene | null
+  /** Kidney Stone Express: the bus is an ambulance; `siren` flashes the light bar. */
+  ambo?: { siren: boolean } | null
 }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
@@ -237,7 +239,7 @@ export class World {
     this.brake += ((acc < -0.6 ? 1 : 0) - this.brake) * clamp(dt * 8)
     this.hit = Math.max(0, this.hit - dt * 2.2)
     this.flash = Math.max(0, this.flash - dt * 2)
-    this.bus.setLook(s.busLook ?? {})
+    this.bus.setLook(s.busLook ?? {}, !!s.ambo)
     this.bus.update({
       t: this.t,
       speed: v,
@@ -247,6 +249,7 @@ export class World {
       hit: this.hit,
       pitch: this.pitch,
       dz,
+      siren: s.ambo?.siren ? 1 : 0,
     })
     this.bus.group.visible = !s.mad
     this.pack.group.visible = !!s.mad

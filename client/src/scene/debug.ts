@@ -26,6 +26,7 @@ export async function debugPanel(onRoute?: () => void) {
   air.add(VIS, 'speedLines', 0, 2)
   gui.add(VIS, 'gapScale', 0.1, 2)
   gui.addColor(VIS, 'busColour')
+  gui.addColor(VIS, 'amboColour')
   const tr = gui.addFolder('Trainer').close()
   tr.addColor(VIS, 'trainerColour').onChange((c: string) => TRAINER_MAT.color.set(c))
   tr.add(VIS, 'trainerSize', 0.5, 2)
