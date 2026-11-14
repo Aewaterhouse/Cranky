@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { TIER_NAME } from '../types'
 import { liveStreak, type Profile } from '../core/curve'
 import { stickBadges } from '../core/badges'
@@ -43,10 +44,20 @@ function overview(p: Profile) {
       'section',
       { class: 'panel stats' },
       stat(s.rides, 'rides'),
-      stat(Math.round(s.secs / 360) / 10, 'hours'),
+      s.secs < 3600
+        ? stat(Math.round(s.secs / 60), 'minutes')
+        : stat(Math.round(s.secs / 360) / 10, 'hours'),
       stat(s.kj.toLocaleString('en-AU'), 'kJ'),
       stat(liveStreak(p), 'week streak'),
     ),
+    // A kJ of work at the pedals is about a kilocalorie burned: in pies and Tim Tams.
+    s.kj > 0
+      ? h(
+          'p',
+          { class: 'dim fun-stats' },
+          `That is about ${Math.round(s.kj / CFG.funStats.pieKj).toLocaleString('en-AU')} meat pies, or ${Math.round(s.kj / CFG.funStats.timTamKj).toLocaleString('en-AU')} Tim Tams, burned off.`,
+        )
+      : '',
     h(
       'div',
       { class: 'cols' },

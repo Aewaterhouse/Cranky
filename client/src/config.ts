@@ -66,6 +66,8 @@ export const CFG = {
   trends: { ctlDays: 42, atlDays: 7, fitnessDays: 90, weeks: 12, heatWeeks: 26 },
   /** Weekly streak: a freeze forgives one missed week; one is earned every `freezeEvery` weeks, up to `freezeMax`. */
   streak: { freezeEvery: 4, freezeMax: 2 },
+  /** Rider Overview: kJ per meat pie and per Tim Tam (a kJ at the pedals is about a kcal burned). */
+  funStats: { pieKj: 420, timTamKj: 95 },
   /** Training plans: a ride this share of a session's length on its day counts it done, whatever was ridden. */
   trainingPlan: { doneFrac: 0.8 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],
