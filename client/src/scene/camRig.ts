@@ -28,6 +28,8 @@ export class CamRig {
       pack?: boolean
       /** Where the horde front is (z behind the bus), for the dread shot. */
       horde?: number | null
+      /** A boss is on, this tall (m): the camera looks back at it. */
+      boss?: number
     },
   ) {
     this.near += ((o.pack ? 1 : 0) - this.near) * clamp(dt * 2)
@@ -58,11 +60,17 @@ export class CamRig {
     )
     // The horde nearly on us: swing round to look back past the bus at it, so the tension is on screen.
     const D = VIS.dread
-    const want2 = o.gap === null || o.horde == null || o.pack ? 0 : 1 - smooth(D.near, D.far, o.gap)
+    const near = o.gap === null || o.horde == null || o.pack ? 0 : 1 - smooth(D.near, D.far, o.gap)
+    const want2 = Math.max(near, o.boss && o.horde != null ? VIS.boss.dread : 0)
     this.dread += (want2 - this.dread) * clamp(dt * 1.2)
     if (this.dread > 0.001 && o.horde != null) {
-      cam.position.lerp(this.tmp.set(D.x, D.y, D.z), this.dread)
-      this.look.lerp(this.tmp.set(0, D.aimY, o.horde * D.aimBack), this.dread)
+      const b = o.boss ?? 0
+      cam.position.lerp(
+        this.tmp.set(D.x + b * 0.3, D.y + b * VIS.boss.camY, D.z - b * VIS.boss.camAhead),
+        this.dread,
+      )
+      const aimY = D.aimY + (o.boss ?? 0) * VIS.boss.aimY
+      this.look.lerp(this.tmp.set(0, aimY, o.horde * D.aimBack), this.dread)
     }
     cam.lookAt(this.look)
     cam.rotateZ(nx * sh * 0.012 + Math.sin(t * 0.3) * 0.012 * sway)

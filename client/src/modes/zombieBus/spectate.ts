@@ -209,6 +209,8 @@ export function spectate(code: string, leaveTo: () => void) {
       mad: b.mad,
       armour: b.armour,
       weather: b.weather,
+      boss: b.boss,
+      zed: b.zed,
       mood: (m.i < 0 || m.ev === 'warmup' || m.ev === 'cooldown' ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],

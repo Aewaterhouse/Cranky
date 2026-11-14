@@ -17,7 +17,8 @@ import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
 import { VIS, type Mood } from './params'
 import { Props } from './props'
-import { Horde } from './horde'
+import { Horde, zedKind } from './horde'
+import { Bosses, bossKind } from './bosses'
 import { Roadblock } from './roadblock'
 import { Sky } from './sky'
 import { Strikes } from './strikes'
@@ -63,6 +64,10 @@ export interface SceneState {
   duck?: boolean
   /** A crew game's own state, for a game that brings its own scene (Climate Lawsuit's town). */
   game?: Record<string, unknown> | null
+  /** A boss fight behind the bus, as the server names it, and its health, 1 to 0. */
+  boss?: { name: string; left: number } | null
+  /** The server's zombie-type tip (runners on long hauls, brutes on ramp-ups), or null. */
+  zed?: string | null
   /** Kidney Stone Express: the bus is an ambulance; `siren` flashes the light bar. */
   ambo?: { siren: boolean; dist?: number | null; fell?: boolean } | null
 }
@@ -98,6 +103,7 @@ export class World {
   private bus = makeBus()
   private ambo = makeAmboProps()
   private horde = new Horde()
+  private bosses = new Bosses()
   private block = new Roadblock()
   private strikes = new Strikes()
   private pack = new Pack()
@@ -155,6 +161,7 @@ export class World {
       this.bus.group,
       this.ambo.group,
       this.horde.group,
+      this.bosses.group,
       this.block.group,
       this.block.debris,
       this.strikes.group,
@@ -297,7 +304,7 @@ export class World {
       const target = hordeZFor(g)
       this.hordeZ += (target - this.hordeZ) * clamp(dt * 2)
       this.horde.group.position.z = this.hordeZ
-      this.horde.update(this.t, dt, g)
+      this.horde.update(this.t, dt, g, zedKind(s.zed))
       hordeDust(this.smoke, this.horde.dust, this.hordeZ, env.fog)
     }
 
@@ -308,10 +315,24 @@ export class World {
     else
       this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
     const hz = g === null ? null : this.hordeZ
+    const boss =
+      s.mad || g === null || !s.boss ? null : { kind: bossKind(s.boss.name), left: s.boss.left }
+    if (this.bosses.update(boss, this.hordeZ, this.t, dt, this.smoke, this.sparks))
+      this.cam.rig.shake = Math.max(this.cam.rig.shake, VIS.boss.stomp)
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
       this.cam.rig.shake = Math.max(this.cam.rig.shake, 1.6)
     const climb = (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8))
-    const o = { speed: v, gap: g, hit: this.hit, slow: sm < 1, pack: !!s.mad, climb, horde: hz }
+    const tall = boss ? { roadtrain: 6, giant: VIS.boss.giantH, bridge: 10 }[boss.kind] : 0
+    const o = {
+      speed: v,
+      gap: g,
+      hit: this.hit,
+      slow: sm < 1,
+      pack: !!s.mad,
+      climb,
+      horde: hz,
+      boss: tall,
+    }
     this.cam.update(this.camera, this.t, dt, o, dt / sm, this.strikes, !!s.gunship, hz)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)

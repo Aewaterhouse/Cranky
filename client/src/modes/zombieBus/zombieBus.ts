@@ -265,6 +265,8 @@ export function startBusRide(
       mad: b.mad,
       armour: b.armour,
       weather: b.weather,
+      boss: b.boss,
+      zed: b.zed,
       mood: (calm ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
