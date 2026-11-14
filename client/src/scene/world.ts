@@ -274,7 +274,7 @@ export class World {
       pack: !!s.mad,
       climb: (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8)),
     })
-    this.pc.apply(this.camera, this.busPivot, this.rig.look, BUS_LIMITS)
+    this.pc.apply(this.camera, dt / sm, this.busPivot, this.rig.look, BUS_LIMITS)
     this.strikes.view(this.camera)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)

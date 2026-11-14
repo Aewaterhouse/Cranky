@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { CAM } from './camVis'
 
 const RAD = Math.PI / 180
+const smooth = (k: number) => k * k * (3 - 2 * k)
 const v = new THREE.Vector3()
 const r = new THREE.Vector3()
 const u = new THREE.Vector3()
@@ -15,7 +16,7 @@ export interface OrbitLimits {
 
 /**
  * The player's own turn of the camera on top of whatever the game is showing: a yaw and pitch round the subject,
- * a zoom, and (in photo mode) a pan.
+ * a zoom, and (in photo mode) a pan. With no input for `CAM.returnS` it eases back to nothing, unless `free`.
  */
 export class CamOrbit {
   yaw = 0
@@ -25,8 +26,10 @@ export class CamOrbit {
   panY = 0
   /** Seconds since the last camera input. */
   idle = Infinity
-  /** Photo mode: panning allowed. */
+  /** Photo mode: no auto-return, and panning allowed. */
   free = false
+  private from: number[] | null = null
+  private back = 0
 
   get active() {
     return (
@@ -35,6 +38,7 @@ export class CamOrbit {
   }
   private touch() {
     this.idle = 0
+    this.from = null
   }
   /** A drag of `dx, dy` pixels: right turns the camera round to the left, down lifts it. */
   drag(dx: number, dy: number) {
@@ -58,7 +62,27 @@ export class CamOrbit {
   snap() {
     this.yaw = this.pitch = this.panX = this.panY = 0
     this.zoom = 1
+    this.from = null
   }
+  /** Counts idle time and, after `CAM.returnS`, eases the offsets back to nothing over `CAM.returnEaseS`. */
+  tick(dt: number) {
+    this.idle += dt
+    if (this.free || this.idle < CAM.returnS || !this.active) return
+    if (!this.from) {
+      this.from = [this.yaw, this.pitch, this.zoom, this.panX, this.panY]
+      this.back = 0
+    }
+    this.back = Math.min(1, this.back + dt / CAM.returnEaseS)
+    const k = 1 - smooth(this.back)
+    const [y, p, z, x, h] = this.from
+    if (this.back >= 1) return this.snap()
+    this.yaw = y * k
+    this.pitch = p * k
+    this.zoom = 1 + (z - 1) * k
+    this.panX = x * k
+    this.panY = h * k
+  }
+
   /**
    * Turns the camera (placed by the game, aiming at `look`) round `pivot` by the offsets, inside the limits.
    * Does nothing while there are no offsets, so the game's camera is untouched.

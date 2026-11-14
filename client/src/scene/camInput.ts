@@ -3,10 +3,12 @@ import { CAM } from './camVis'
 
 /**
  * Camera input on the 3D canvas only, so HUD panels, buttons, the map and sliders above it keep their own
- * pointers: one-finger or mouse drag orbits, the wheel or a pinch zooms, and two fingers pan in photo mode. `tap` runs first on every press; returning true eats it (skipping a cinematic).
+ * pointers: one-finger or mouse drag orbits, the wheel or a pinch zooms, two fingers pan in photo mode, and a
+ * double click or tap snaps back. `tap` runs first on every press; returning true eats it (skipping a cinematic).
  */
 export function bindCamInput(el: HTMLElement, orbit: CamOrbit, tap: () => boolean) {
   const pts = new Map<number, { x: number; y: number }>()
+  let lastUp = 0
   let moved = 0
   el.style.touchAction = 'none'
   const mid = () => {
@@ -39,7 +41,14 @@ export function bindCamInput(el: HTMLElement, orbit: CamOrbit, tap: () => boolea
     if (after.d > 0) orbit.zoomBy(before.d / after.d)
     orbit.pan(-(after.x - before.x) * 0.02, (after.y - before.y) * 0.02)
   }
-  const up = (e: PointerEvent) => void pts.delete(e.pointerId)
+  const up = (e: PointerEvent) => {
+    if (!pts.delete(e.pointerId) || pts.size) return
+    const now = performance.now()
+    if (moved <= 6 && now - lastUp < CAM.doubleMs) {
+      orbit.snap()
+      lastUp = 0
+    } else lastUp = moved <= 6 ? now : 0
+  }
   const wheel = (e: WheelEvent) => {
     e.preventDefault()
     orbit.zoomBy(Math.exp(Math.sign(e.deltaY) * CAM.wheelStep))

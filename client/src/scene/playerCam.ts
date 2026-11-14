@@ -4,7 +4,7 @@ import { CamOrbit, type OrbitLimits } from './camOrbit'
 
 /**
  * The player's say over a world's camera, laid on top of the game's own camera each frame: orbit and zoom from
- * the canvas. The bus world and the free-ride world each own one.
+ * the canvas, easing back after a while with no input. The bus world and the free-ride world each own one.
  */
 export class PlayerCam {
   orbit = new CamOrbit()
@@ -15,7 +15,14 @@ export class PlayerCam {
   }
 
   /** Call after the game has placed the camera; `pivot` is the subject, `look` where the game aims. */
-  apply(cam: THREE.PerspectiveCamera, pivot: THREE.Vector3, look: THREE.Vector3, lim: OrbitLimits) {
+  apply(
+    cam: THREE.PerspectiveCamera,
+    dt: number,
+    pivot: THREE.Vector3,
+    look: THREE.Vector3,
+    lim: OrbitLimits,
+  ) {
+    this.orbit.tick(dt)
     this.orbit.apply(cam, pivot, look, lim)
   }
 

@@ -234,7 +234,7 @@ export class RouteWorld {
     if (!shot) {
       this.rig.update(this.camera, this.field, this.riders, dt, this.t, ox, oy, oz)
       this.pivot.copy(this.rig.subject).y += 1.1
-      this.cam.apply(this.camera, this.pivot, this.rig.look, {
+      this.cam.apply(this.camera, dt, this.pivot, this.rig.look, {
         near: CAM.nearRider,
         ground: (x, z) => this.field.ground(x + ox, z + oz) - oy,
       })
