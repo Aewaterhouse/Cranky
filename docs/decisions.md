@@ -794,3 +794,6 @@ Phase B2 item 3: the solo workout player and the Zombie Bus ride now read like t
 
 ## Photo mode (2026-11-14)
 - Free ride only, from the Paused screen (solo rides; a group ride never pauses, so it has none). "📷 Photo mode" hides the HUD and the pause screen and frees the camera: drag to turn, wheel or pinch to zoom, arrows or two fingers to pan (1.5 m a press), no auto-return. While it is up it takes every key (capture listener), so the arrows pan instead of reaching the simulated trainer. "Use as postcard" keeps the frame; it beats the lookout and finish stills for the ride's postcard. Done, Esc or Enter puts the camera back and resumes the ride.
+
+## TV views (2026-11-14)
+- Both TV views take C for the camera views, and drag, wheel and pinch on the picture (they use the same worlds as the rides). The bus TV view now passes the gunship flag on to the scene, so the TV shows the gunship's seat and its title like the riders' screens; air strike and supply drop shots already came with the world's effects. The road TV has no streaks, so no cinematics; its flyover and summit shots are unchanged.

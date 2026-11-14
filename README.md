@@ -78,7 +78,7 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 
 ## Camera
 
-In the Zombie Bus, VO2 Madness, free ride and the TV view, the 3D camera is yours to move:
+In the Zombie Bus, VO2 Madness, free ride and both TV views (bus and group ride), the 3D camera is yours to move:
 
 | Input | Effect |
 | --- | --- |

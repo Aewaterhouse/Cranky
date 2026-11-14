@@ -88,6 +88,7 @@ export function spectate(code: string, leaveTo: () => void) {
     root.classList.toggle('narrow', innerWidth / innerHeight < 1.5)
   }
   const onKey = (e: KeyboardEvent) => {
+    if (e.key.toLowerCase() === 'c' && !e.repeat) world.cycleView()
     if (e.key.toLowerCase() !== 'f') return
     if (document.fullscreenElement) void document.exitFullscreen()
     else void document.documentElement.requestFullscreen().catch(() => {})
@@ -184,6 +185,7 @@ export function spectate(code: string, leaveTo: () => void) {
       mood: (m.i < 0 || m.ev === 'warmup' || m.ev === 'cooldown' ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
+      gunship: b.gunship,
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         name: r.name,

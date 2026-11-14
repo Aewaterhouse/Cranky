@@ -49,7 +49,8 @@ export function roadSpectate(code: string, leaveTo: () => void) {
     if (k === 'f') {
       if (document.fullscreenElement) void document.exitFullscreen()
       else void document.documentElement.requestFullscreen().catch(() => {})
-    } else if (k === 'l') pick = ''
+    } else if (k === 'c' && !e.repeat) world?.cycleView()
+    else if (k === 'l') pick = ''
     else if (k === 'arrowleft' || k === 'arrowright') {
       const ids = link
         .others()

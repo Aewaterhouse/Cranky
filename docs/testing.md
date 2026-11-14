@@ -193,7 +193,7 @@ Two people, two browsers (or two tabs logged in as different riders), simulated 
 - Stop pedalling: you coast to a stop, the group rides away, a toast says who dropped you. With Keep together on, start again and the chip shows "Tow +N%" while you come back. The trainer resistance should not change with the tow (real trainer needed).
 - Guest refreshes the browser mid-ride: the Ride tab offers "Rejoin ride CODE"; after rejoining they are where the server left them, not back at the start.
 - A third rider joins after the start: they appear a few metres behind the last rider and the others get a "joined" toast. Their result says "joined late".
-- TV: on a third screen open `/?watch=CODE` (any login). It follows the leader; arrow keys change rider, L returns to the leader, F is fullscreen.
+- TV: on a third screen open `/?watch=CODE` (any login). It follows the leader; arrow keys change rider, L returns to the leader, F is fullscreen, C cycles the camera view; drag and wheel move the camera.
 - Finish: each rider gets "Finished: 2nd" and waits; when the last human is home (or the host ends the ride) everyone gets the results with the crew table: place, time, average power, W/kg and watts saved drafting. "Back to the lobby" returns to the room for another go.
 - Race: in the lobby pick Race. Keep together turns off. Same ride, nobody is towed.
 - Look for: a rider jumping backwards or forwards (the correction should be invisible), riders drawn on top of each other, the chip flickering on and off, a rider list that disagrees with what you see, your own speed feeling laggy against the pedals.
