@@ -17,6 +17,18 @@ export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
   if (group.flooded) return 'The town flooded'
   if (group.mode === undefined || group.mode === 'bus')
     return group.armour <= 0 ? 'Limped home!' : 'Made it!'
+  // The ranked games list their riders best first.
+  const at = group.riders.findIndex((r) => r.id === me)
+  const place =
+    at === 0 ? 'You won!' : at > 0 ? `${ordinal(at + 1)} of ${group.riders.length}` : 'Done'
+  if (group.mode === 'last') return at === 0 ? 'Last one standing!' : place
+  if (group.mode === 'quiz' || group.mode === 'hunt') return place
+  if (group.mode === 'ttt' && group.teams) {
+    const mine = group.riders[at]?.team
+    const won = group.teams.names[group.teams.winner]
+    return mine === won ? 'Your team won!' : `Team ${won} won`
+  }
+  if (group.mode === 'galley') return group.armour <= 0 ? 'Taken by pirates' : 'Made port!'
   return 'Made it!'
 }
 
