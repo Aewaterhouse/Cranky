@@ -5,6 +5,7 @@ from __future__ import annotations
 import copy
 import random
 import statistics
+from collections import Counter
 from datetime import date
 from typing import TYPE_CHECKING
 
@@ -15,6 +16,12 @@ from .common import CrewGame, award, compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
+
+
+T_SHORTCUT = {
+    True: "Shortcut paid off! Down a fire trail and out ahead of the horde.",
+    False: "Shortcut was a dead end. Reverse out, the horde is right there!",
+}
 
 
 def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
@@ -52,6 +59,8 @@ class ZombieBus(CrewGame):
         self.fx: list[dict] = []
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
+        self.road_votes: dict[str, str] = {}  # the next leg, voted at the servo
+        self.leg: dict = {}  # the leg the crew picked: damage and scrap multipliers until the next stop
         self.repel = 0
         self.syncw = 0
         self.streak = 0.0
@@ -84,6 +93,7 @@ class ZombieBus(CrewGame):
         b = room.plan["blocks"][i]
         if self.ev == "servo" and ev != "servo":
             self.auto_shop()
+            self.pick_leg(room)
         self.ev = ev
         if i != self.last_i:
             self.block_change(room, i, b, ev)
@@ -105,7 +115,7 @@ class ZombieBus(CrewGame):
         self.gap += C.NITRO_GAP * dt if boost else 0
         self.speed *= C.LIMP_MULT if self.armour <= 0 else 1
         self.dist += self.speed * dt
-        self.scrap += self.speed * dt * C.SCRAP_PER_M * self.mut.get("scrap", 1)
+        self.scrap += self.speed * dt * C.SCRAP_PER_M * self.mut.get("scrap", 1) * self.leg.get("scrap", 1)
         neutral = C.NEUTRAL[ev]
         if ev == "longhaul":
             neutral += min(C.LONGHAUL_CREEP_MAX, C.LONGHAUL_CREEP * bel / 60)
@@ -220,6 +230,8 @@ class ZombieBus(CrewGame):
             self.emit("roadblock", "ROADBLOCK! Sprint to smash it!")
         elif ev == "servo":
             self.shopped = False
+            rng = random.Random(f"{room.code}:{i}")
+            self.road_votes = {r.id: rng.choice(list(C.LEGS)) for r in room.riders.values() if r.bot}
             self.emit("servo", f"Servo stop! {int(self.scrap)} scrap in the tin. Shop's open.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
@@ -234,7 +246,9 @@ class ZombieBus(CrewGame):
             self.emit("repel", "Horde repellent! Zombies sprayed off, no damage.")
             return
         self.armour = max(
-            0.0, self.armour - n * C.DIFFICULTY[self.level]["damage"] * self.mut.get("damage", 1)
+            0.0,
+            self.armour
+            - n * C.DIFFICULTY[self.level]["damage"] * self.mut.get("damage", 1) * self.leg.get("damage", 1),
         )
         self.emit("hit", text if self.armour > 0 else "Armour gone! Limping on...")
 
@@ -308,6 +322,38 @@ class ZombieBus(CrewGame):
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
+
+    def ask(self, room: Room, r: Rider) -> dict | None:
+        """At a servo stop: which way next. Everyone votes; the most votes wins as the stop closes."""
+        if self.ev != "servo" or r.bot:
+            return None
+        opts = [{"v": k, "label": v["name"], "icon": v["icon"], "sub": v["desc"]} for k, v in C.LEGS.items()]
+        return {
+            "k": "road",
+            "title": "🗺️ Which way next?",
+            "sub": "Most votes wins when the servo closes.",
+            "opts": opts,
+            "v": self.road_votes.get(r.id),
+        }
+
+    def on_act(self, room: Room, r: Rider, k: str, v: object) -> None:
+        if k == "road" and self.ev == "servo" and v in C.LEGS:
+            self.road_votes[r.id] = str(v)
+
+    def pick_leg(self, room: Room) -> None:
+        """Counts the road votes (a tie is a coin toss) and sets the next leg; a shortcut is a gamble now."""
+        if not self.road_votes:
+            return
+        n = Counter(self.road_votes.values())
+        rng = random.Random(f"{room.code}:{round(room.el)}")
+        pick = rng.choice(sorted(k for k, c in n.items() if c == max(n.values())))
+        self.leg, self.road_votes = C.LEGS[pick], {}
+        if pick == "shortcut":
+            lucky = rng.random() < C.SHORTCUT_LUCK
+            self.gap += C.SHORTCUT_GAP if lucky else -C.SHORTCUT_GAP
+            self.emit("leg", T_SHORTCUT[lucky])
+        else:
+            self.emit("leg", f"The crew picked {self.leg['name']}. {self.leg['desc']}")
 
     def auto_shop(self) -> None:
         """Nobody bought at the stop: the tin buys what helps most, so nobody lets go of the bars."""

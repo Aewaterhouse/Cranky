@@ -231,6 +231,31 @@ COMBO_STEP = 0.25
 
 # Servo Stop session shop (costs in bus scrap)
 SHOP = {"plating": 40, "repellent": 60, "sync": 50}
+# Route vote at each servo stop: the crew picks the next leg; damage and scrap scale until the next stop. The
+# shortcut is a coin flip worth SHORTCUT_GAP metres either way.
+LEGS = {
+    "brutal": {
+        "name": "Short and brutal",
+        "icon": "⛰️",
+        "desc": "Double scrap, but hits hurt half as much again.",
+        "damage": 1.5,
+        "scrap": 2.0,
+    },
+    "easy": {
+        "name": "Long and easy",
+        "icon": "🛣️",
+        "desc": "Hits hurt half as much, half the scrap.",
+        "damage": 0.5,
+        "scrap": 0.5,
+    },
+    "shortcut": {
+        "name": "Risky shortcut",
+        "icon": "🎲",
+        "desc": "Coin flip: away from the horde, or into it.",
+    },
+}
+SHORTCUT_LUCK = 0.5
+SHORTCUT_GAP = 30
 AUTO_PLATING_UNDER = (
     70  # a stop where nobody buys: the servo bolts on plating under this armour, else repellent
 )

@@ -4,6 +4,8 @@ from zombie_bus_server.session import Rider
 
 
 class FakeRoom:
+    code = "TEST"
+
     def __init__(self, blocks, n=4):
         self.plan = {"blocks": blocks}
         self.el = 0.0
@@ -311,3 +313,33 @@ def test_a_servo_stop_where_nobody_buys_picks_for_the_crew():
     assert not [
         f for f in fx if f["k"] == "buy" and f["id"] is None
     ], "someone shopped, so the servo keeps out of it"
+
+
+def test_the_crew_votes_the_next_leg_at_the_servo():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, i=0)
+    run(room, bus, 1, ev="servo")
+    q = bus.ask(room, room.riders["r0"])
+    assert q["k"] == "road" and [o["v"] for o in q["opts"]] == list(C.LEGS)
+    for rid in ("r0", "r1", "r2"):
+        bus.on_act(room, room.riders[rid], "road", "brutal")
+    bus.on_act(room, room.riders["r3"], "road", "nowhere")
+    assert bus.ask(room, room.riders["r0"])["v"] == "brutal" and "r3" not in bus.road_votes
+    fx = run(room, bus, 1, ev="longhaul")
+    assert bus.leg == C.LEGS["brutal"] and any(f["k"] == "leg" for f in fx)
+    assert bus.ask(room, room.riders["r0"]) is None
+    armour = bus.armour
+    bus.damage(10, "ouch")
+    assert armour - bus.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 1.5
+
+
+def test_the_shortcut_moves_the_horde_one_way_or_the_other():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, i=0)
+    run(room, bus, 1, ev="servo")
+    bus.on_act(room, room.riders["r0"], "road", "shortcut")
+    gap = bus.gap
+    run(room, bus, 0.5, ev="longhaul")
+    assert abs(abs(bus.gap - gap) - C.SHORTCUT_GAP) < 3
