@@ -144,7 +144,7 @@ export class RouteWorld {
     const paint = planPaint(route, names)
     this.landmarks = planLandmarks(route.id, terrain, this.field, cover, features)
     this.odd = new Oddities(route.id, this.field, cover, features)
-    this.lifePlan = new LifePlan(route.id, this.field, cover, features)
+    this.lifePlan = new LifePlan(route.id, this.field, cover, features, route.region, new Date())
     this.replan = () => {
       const { sign, chalk, paint: lines } = this.things
       const p = planRoadLife(

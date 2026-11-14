@@ -119,3 +119,23 @@ describe('an animal crossing the road', () => {
     expect(L.crossLate).toBeLessThan(L.cross)
   })
 })
+
+describe('local colour', () => {
+  const bush = funWorld(20, 100, () => 'b')
+  const count = (p: LifePlan, kind: string) => all(p, 20).filter((h) => h.kind === kind).length
+  const at = (region: string, when?: Date) =>
+    new LifePlan('a', bush.field, bush.cover, bush.features, region, when)
+  it('puts wombats in Tasmania and none in Queensland', () => {
+    expect(count(at('TAS'), 'wombat')).toBeGreaterThan(count(at('VIC'), 'wombat'))
+    expect(count(at('QLD'), 'wombat')).toBe(0)
+  })
+  it('brings roos out at dusk and magpies in spring', () => {
+    const noon = new Date(2026, 5, 1, 12)
+    expect(count(at('VIC', new Date(2026, 5, 1, 18)), 'roos')).toBeGreaterThan(
+      count(at('VIC', noon), 'roos'),
+    )
+    expect(count(at('VIC', new Date(2026, 9, 1, 12)), 'magpie')).toBeGreaterThan(
+      count(at('VIC', noon), 'magpie'),
+    )
+  })
+})

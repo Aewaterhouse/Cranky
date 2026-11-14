@@ -43,6 +43,9 @@ export class LifePlan {
   private cover: Pick<LandCover, 'at'>
   private seed: number
   private alpine: boolean
+  /** Weight multipliers for this place and time (regionW, dusk roos), and the chance of a magpie per chunk. */
+  private boost: Partial<Record<LifeKind, number>> = {}
+  private magpies: number
   /** Extra oncoming vehicles the director wants, by route metres (director.ts). */
   traffic: number[] = []
 
@@ -51,12 +54,22 @@ export class LifePlan {
     private field: HeightField,
     cover: LandCover,
     private features: Features,
+    region = '',
+    /** The time of the ride, for dusk roos and spring magpies; left out, neither. */
+    when?: Date,
   ) {
     this.seed = seedOf(id) ^ 0x11fe
     this.cover = jokeCover(id, cover)
     let top = -Infinity
     for (const y of field.path.y) top = Math.max(top, y)
     this.alpine = top >= L.coachAbove
+    for (const [kind, by] of Object.entries(L.regionW))
+      this.boost[kind as LifeKind] = by[region] ?? 1
+    const h = when?.getHours() ?? 12
+    if (h >= L.duskHours[0] && h < L.duskHours[1])
+      this.boost.roos = (this.boost.roos ?? 1) * L.duskRoos
+    const spring = !!when && L.springMonths.includes(when.getMonth())
+    this.magpies = L.magpieChance * (spring ? L.springMagpies : 1)
   }
 
   chunk(k: number): Herd[] {
@@ -108,7 +121,7 @@ export class LifePlan {
         const c = cover.at(x0, z0, y0)
         const coast = [L.coastProbe / 2, L.coastProbe].some((o) => 'aw'.includes(here(o)))
         const kinds = MOBS.filter((q) => allowed(L.kinds[q], c, y0 > R.snowLine, coast, false))
-        const kind = weighted(kinds, (q) => L.kinds[q].w, uk)
+        const kind = weighted(kinds, (q) => L.kinds[q].w * (this.boost[q] ?? 1), uk)
         if (!kind) continue
         const def = L.kinds[kind]
         const o = edge + def.near + uo * (def.far - def.near)
@@ -130,7 +143,7 @@ export class LifePlan {
     if (mid > L.endClear && mid < path.length - L.endClear) {
       const { x, y, z } = path.poseAt(mid, pose)
       const [um, ut, uk] = [rand(), rand(), rand()]
-      if (um < L.magpieChance && L.kinds.magpie.on.includes(cover.at(x, z, y)) && y < R.snowLine)
+      if (um < this.magpies && L.kinds.magpie.on.includes(cover.at(x, z, y)) && y < R.snowLine)
         add('magpie', mid, 1, x, z)
       else if (ut < L.trafficChance)
         add(

@@ -5,6 +5,20 @@ export const LIFE = {
   /** Chance a 200 m chunk has a mob or flock, a magpie, or something coming the other way. */
   chance: 0.5,
   magpieChance: 0.07,
+  /**
+   * Local colour: mob weights by state (left out: 1), so wombats crowd Tasmania and lyrebirds its forests;
+   * roos come out `duskRoos` times as often between `duskHours`; magpies swoop `springMagpies` times as often
+   * in spring (months counted from 0).
+   */
+  regionW: {
+    wombat: { TAS: 5, VIC: 1.5, QLD: 0 },
+    lyrebird: { TAS: 4, VIC: 2, NSW: 2, QLD: 0.3, SA: 0 },
+    roos: { TAS: 0.6 },
+  } as Record<string, Record<string, number>>,
+  duskRoos: 3,
+  duskHours: [17, 20],
+  springMagpies: 3,
+  springMonths: [8, 9, 10],
   trafficChance: 0.12,
   tries: 4,
   endClear: 100,
