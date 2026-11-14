@@ -119,6 +119,28 @@ export interface BusState {
   gunship: boolean
   mad?: MadState | null
 }
+/** Kidney Stone Express state (`tick.game` when the game is `ambo`). */
+export interface AmboState {
+  g: 'ambo'
+  phase: 'base' | 'run' | 'ramp' | 'reverse' | 'cool'
+  run: number
+  runs: number
+  patient: { id: string; name: string; icon: string; line: string } | null
+  comfort: number
+  /** Metres left and metres in this run; seconds left at the prescribed pace and at the current speed. */
+  dist: number
+  total: number
+  speed: number
+  par: number
+  eta: number
+  event: { k: string; name: string; text: string; left: number; who?: string | null } | null
+  brake: boolean
+  perk: 'spike' | 'green' | null
+  sweet: number
+  reviews: { patient: string; icon: string; stars: number; text: string }[]
+  score: number
+  siren: string | null
+}
 export interface Fx {
   k: string
   text?: string | null

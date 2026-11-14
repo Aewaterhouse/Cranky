@@ -24,7 +24,9 @@ const MAD_EVENTS: Record<string, EventStyle> = {
   servo: { name: 'Recover', icon: '🎁', col: '#44bba4' },
 }
 let skin = EVENTS
-export const madEvents = (on: boolean) => (skin = on ? { ...EVENTS, ...MAD_EVENTS } : EVENTS)
+/** Skins the block events for a game: its own names over the bus's. `true` is VO2 Madness. */
+export const setEvents = (extra?: Record<string, EventStyle> | boolean) =>
+  (skin = extra ? { ...EVENTS, ...(extra === true ? MAD_EVENTS : extra) } : EVENTS)
 export const eventOf = (ev: string) => skin[ev] ?? skin.longhaul
 
 export const FX_ICON: Record<string, string> = {

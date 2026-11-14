@@ -8,14 +8,13 @@ import { CFG } from '../config'
 import { busAim } from '../core/aim'
 import { hudCues } from './hudCues'
 import type { Live } from '../modes/rideController'
-import type { RideRecorder } from '../core/ride'
-import type { ShopItem, Tick } from '../net/protocol'
-import type { Frame, Plan, SprintResult, Tier } from '../types'
+import type { Tick } from '../net/protocol'
+import type { Frame, SprintResult, Tier } from '../types'
 import { TIERS } from '../types'
 import { h } from './dom'
 import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
-import { eventOf, FX_DEFAULT, madEvents } from './hudKit'
+import { eventOf, FX_DEFAULT, setEvents } from './hudKit'
 import { makeMadPanel } from './hudMad'
 import { GAMES } from '../modes/crew/games'
 import { hudMenu, hudToast, hudUnit } from './hudParts'
@@ -25,29 +24,10 @@ import { makeShop } from './hudShop'
 import { makeSplash } from './hudSplash'
 import { VIS } from '../scene/params'
 import { makeStats } from './hudStats'
+import type { HudOpts } from './hudOpts'
 
-export interface HudOpts {
-  plan?: Plan
-  tier?: Tier
-  rec?: RideRecorder
-  meId?: string
-  weightKg?: number
-  /** What the End button says: the host ends the ride for everyone, anyone else leaves the bus. */
-  quitLabel?: () => string
-  onBuy?: (item: ShopItem) => void
-  /** ERG switch: `erg` is the state to show; `slope(d)` steps the gradient when ERG is off and returns it. */
-  /** ERG on or off; off, the rider shifts virtual gears (`tile` and `slider` are the gear tile and strength). */
-  erg?: {
-    on: () => boolean
-    toggle: () => void
-    shift: (d: number) => number
-    strength: (d: number) => void
-    tile: HTMLElement
-    slider: HTMLElement
-  }
-  /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
-  mad?: string[]
-}
+export type { GamePanel, HudOpts } from './hudOpts'
+
 /** Events whose title card replaces a feed line. */
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 const KEYS: Record<string, string> = { h: 'clean', s: 'stats', tab: 'stats', r: 'riders' }
@@ -60,7 +40,7 @@ const KEYS: Record<string, string> = { h: 'clean', s: 'stats', tab: 'stats', r: 
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {
   const sp = makeSplash()
   const power = powerPanel(true)
-  madEvents(!!o.mad)
+  setEvents(o.events ?? !!o.mad)
   const header = makeHeader(o.mad ? undefined : o.plan, o.tier ?? 'hard')
   header.root.classList.add('glass', 'speed')
   const bus = makeBusPanel()
@@ -151,9 +131,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     h(
       'div',
       { class: 'hud' },
-      h('div', { class: `hud-left${mad ? ' mad' : ''}` }, mad?.root ?? bus.root),
+      h('div', { class: `hud-left${mad ? ' mad' : ''}` }, o.panel?.root ?? mad?.root ?? bus.root),
       h('div', { class: 'hud-right' }, sp.feed),
-      shop.root,
+      ...(o.panel ? [] : [shop.root]),
       sp.flash,
       sp.layer,
     ),
@@ -165,7 +145,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     if (z !== gz) root.style.setProperty('--gz', String((gz = z)))
     // The crew cards start under the rear-view mirror (the bus only; Madness has no mirror).
     const mb = `calc(${VIS.mirrorY * 100}vh + ${(VIS.mirrorW * 100) / 3}vw)`
-    root.style.setProperty('--mirror-b', VIS.mirror && !mad ? mb : '0px')
+    root.style.setProperty('--mirror-b', VIS.mirror && !mad && !o.panel ? mb : '0px')
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
@@ -252,7 +232,13 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       root.classList.add('pre')
       fit()
       setPower(null, live)
-      sp.splash('sp-count sp-pre', `${n}`, GAMES[o.mad ? 'madness' : 'bus'].countdown, 1100, 0)
+      sp.splash(
+        'sp-count sp-pre',
+        `${n}`,
+        GAMES[o.game ?? (o.mad ? 'madness' : 'bus')].countdown,
+        1100,
+        0,
+      )
     },
     /** Everything that comes from the server tick: bus, roster, shop, fx. */
     tick(m: Tick) {
@@ -261,6 +247,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       bus.update(m.bus, m.riders)
       const ms = m.bus.mad
       if (ms) mad?.update(ms, m.riders, meId)
+      o.panel?.update(m, meId)
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m, meId)
       cues.tick(m)
@@ -269,6 +256,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         if (fx.id !== meId || fx.k === 'fell')
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
         if (CARD_FX.has(fx.k)) continue
+        o.panel?.fx?.(fx, sp)
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
         const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
         if (fx.k === 'fell')

@@ -1,0 +1,84 @@
+/* HUD: Kidney Stone Express panel. */
+.am {
+  min-width: 290px;
+  max-width: 330px;
+}
+.am-patient {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 6px 0 2px;
+}
+.am-face {
+  font-size: 2rem;
+}
+.am-line {
+  font-size: 0.78rem;
+  font-style: italic;
+  opacity: 0.85;
+  line-height: 1.25;
+}
+.am-road {
+  position: relative;
+  height: 26px;
+  margin-top: 10px;
+  border-bottom: 3px dashed rgb(255 255 255 / 0.35);
+}
+.am-road[hidden],
+.am-event[hidden],
+.am-patient[hidden] {
+  display: none;
+}
+.am-van,
+.am-hosp {
+  position: absolute;
+  bottom: 0;
+  font-style: normal;
+  font-size: 1.2rem;
+  transition: left 0.6s linear;
+}
+.am-van {
+  transform: scaleX(-1);
+}
+.am-hosp {
+  right: 0;
+}
+.am-nums {
+  font-size: 0.78rem;
+  opacity: 0.9;
+}
+.am-event {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.1);
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+.am-event b {
+  display: flex;
+  justify-content: space-between;
+  font: 0.95rem/1.1 var(--display);
+}
+.am-event[data-s='on'] {
+  background: linear-gradient(90deg, #ffd23f, #ff7a1a);
+  color: #1a1420;
+}
+.am-event[data-s='me'],
+.am-event[data-s='brake'] {
+  background: linear-gradient(90deg, #ff3b2a, #ff7a1a);
+  color: #fff;
+  animation: bs-pulse 0.4s infinite alternate;
+}
+.am-perk,
+.am-review {
+  margin-top: 8px;
+  font-size: 0.76rem;
+  line-height: 1.25;
+}
+.am-perk {
+  color: var(--ok);
+}

@@ -16,6 +16,7 @@ import { mood as moodAudio, SFX, stopAudio } from '../../ui/audio'
 import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
 import type { Frame, Trainer } from '../../types'
+import { GAME_UI } from '../crew/gameUi'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
 import { camButton, camKey } from '../../ui/camButton'
@@ -58,6 +59,7 @@ export function startBusRide(
   const world = new World(stage)
   if (location.search.includes('debug')) debugPanel()
   let l = lobby0
+  const ui = GAME_UI[l.game ?? 'bus']
   const plan = l.plan
   const total = planTotal(plan.blocks)
   const key = busKey(profile.id, l.code)
@@ -116,6 +118,9 @@ export function startBusRide(
       weightKg: profile.weightKg,
       quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
       onBuy: (item) => net.send({ t: 'buy', item }),
+      game: l.game,
+      panel: ui?.panel(),
+      events: ui?.events,
       mad:
         l.game === 'madness'
           ? [...new Set(plan.blocks.filter((x) => x.work).map((x) => x.label ?? ''))]
@@ -233,6 +238,7 @@ export function startBusRide(
       roadblock: b.rb,
       busLook: lk[l.host],
       gunship: b.gunship,
+      ...ui?.scene(m),
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         name: r.name,
