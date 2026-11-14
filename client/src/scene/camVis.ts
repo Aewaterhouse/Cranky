@@ -57,6 +57,9 @@ export const CAM = {
   blastSeat: [16, 16, -30] as [number, number, number],
   /** Supply drop: a low seat at the roadside ahead of the bus. */
   dropSeat: [7, 1.3, -24] as [number, number, number],
+  /** How far from the bus towards the crate the drop shot aims (0 the bus, 1 the crate), and its highest aim. */
+  dropAimToCrate: 0.4,
+  dropAimMaxY: 5,
 }
 export type CamView = 'chase' | 'high' | 'rear' | 'side'
 export const CAM_VIEWS: CamView[] = ['chase', 'high', 'rear', 'side']

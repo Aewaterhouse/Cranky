@@ -71,12 +71,20 @@ export class Cinema {
     aim.set(0, 2, hz + 4).lerp(this.look, 1 - k)
   }
 
-  /** Low at the roadside ahead of the bus, watching the crate down and the bus through it. */
+  /**
+   * Low at the roadside ahead of the bus, watching the crate down onto it. The aim sits between the bus and the crate
+   * (never higher than `CAM.dropAimMaxY`), so the bus stays in frame while the crate is still high in the sky.
+   */
   private drop(crate: THREE.Vector3 | null) {
     const [x, y, z] = CAM.dropSeat
     eye.set(x, y, z)
-    if (crate) this.look.copy(crate)
-    else this.look.lerp(aim.set(0, 1.5, -5), 0.1)
+    const bus = aim.set(0, 1.5, -5)
+    if (crate)
+      this.look
+        .copy(crate)
+        .lerp(bus, 1 - CAM.dropAimToCrate)
+        .setY(Math.min(CAM.dropAimMaxY, this.look.y))
+    else this.look.lerp(bus, 0.1)
     aim.copy(this.look)
   }
 
