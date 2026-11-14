@@ -133,7 +133,11 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     h(
       'div',
       { class: 'hud' },
-      h('div', { class: `hud-left${mad ? ' mad' : ''}` }, o.panel?.root ?? mad?.root ?? bus.root),
+      h(
+        'div',
+        { class: `hud-left${mad || o.panel ? ' mad' : ''}` },
+        o.panel?.root ?? mad?.root ?? bus.root,
+      ),
       h('div', { class: 'hud-right' }, sp.feed),
       ...(o.panel ? [sheet.root] : [shop.root]),
       sp.flash,

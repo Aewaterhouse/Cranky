@@ -1,7 +1,10 @@
 /* HUD: Kidney Stone Express panel. */
 .am {
-  min-width: 290px;
-  max-width: 330px;
+  width: 310px;
+  padding: 10px 14px 12px;
+}
+.am > * + .bs-head {
+  margin-top: 10px;
 }
 .am-patient {
   display: flex;

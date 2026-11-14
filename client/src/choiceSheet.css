@@ -1,11 +1,11 @@
 /* A crew game's question to the rider: cards, fuels, votes. */
 .choice {
   position: absolute;
-  left: 50%;
-  bottom: 16%;
+  left: 58%;
+  bottom: 62px;
   transform: translateX(-50%);
   z-index: 6;
-  max-width: min(92vw, 760px);
+  max-width: min(80vw, 620px);
   padding: 10px 12px 12px;
   pointer-events: auto;
 }

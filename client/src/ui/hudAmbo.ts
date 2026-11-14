@@ -38,7 +38,7 @@ export function makeAmboPanel(): GamePanel {
   const patient = h('div', { class: 'am-patient' }, face, h('div', {}, name, line))
   const root = h(
     'section',
-    { class: 'hud-glass bs am' },
+    { class: 'hud-glass am' },
     h('div', { class: 'bs-head' }, h('label', {}, 'KIDNEY STONE EXPRESS'), run),
     patient,
     h('div', { class: 'bs-head' }, h('label', {}, 'COMFORT'), comfortN),

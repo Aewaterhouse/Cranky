@@ -65,7 +65,7 @@ export function makeAmbo(shell: THREE.Object3D) {
       red.color.set('#ff2a20').multiplyScalar(lit(ph))
       blue.color.set('#2a6cff').multiplyScalar(lit(!ph))
       glow.color.copy(tmp.set(ph ? '#ff2a20' : '#2a6cff'))
-      glow.intensity = siren * 220
+      glow.intensity = siren * 110
     },
   }
 }

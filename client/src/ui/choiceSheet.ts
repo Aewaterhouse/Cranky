@@ -7,7 +7,7 @@ import { h } from './dom'
  * question in the rider's tick; a tap or the number keys 1 to 9 answer it with an `act` of the same key.
  */
 export function choiceSheet(onPick: (k: string, v: string) => void) {
-  const root = h('div', { class: 'choice glass', hidden: true })
+  const root = h('div', { class: 'choice hud-glass', hidden: true })
   let ask: Ask | null = null
   let key = ''
   const pick = (v: string) => ask && !ask.opts.find((o) => o.v === v)?.off && onPick(ask.k, v)
