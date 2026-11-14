@@ -4,6 +4,7 @@ import { h } from './dom'
 import { GRADE_COLOUR, set } from './hudKit'
 import { hudStat } from './hudParts'
 import { ZONE_COLOURS } from './planGraph'
+import { GRADE_WORD } from '../types'
 
 const mean = (a: number[]) => (a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0)
 
@@ -72,7 +73,7 @@ export function makeStats(rec: RideRecorder) {
       sprints.replaceChildren(
         ...(rec.sprints.length
           ? rec.sprints.map((r) => {
-              const c = h('span', { class: 'st-chip' }, `${r.grade} ${r.avg} W`)
+              const c = h('span', { class: 'st-chip' }, `${GRADE_WORD[r.grade]} ${r.avg} W`)
               c.style.setProperty('--g', GRADE_COLOUR[r.grade])
               return c
             })

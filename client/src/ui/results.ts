@@ -14,6 +14,7 @@ import { weeklyRewards } from '../core/weekly'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
+import { GRADE_WORD } from '../types'
 import { groupSection, postcard } from './resultsGroup'
 import { stravaCardButton } from './strava'
 import { blocksCard } from './resultsBlocks'
@@ -168,6 +169,9 @@ export function finishRide(
         h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
       // What you earned leads, then the game's story, then the training numbers.
+      s.record.secs < 30
+        ? h('div', { class: 'card' }, 'Under 30 s, so this one is not saved to your History.')
+        : '',
       ...unlocked.map(badgeCard),
       banked
         ? h(
@@ -274,7 +278,7 @@ export function finishRide(
                     'div',
                     { class: `res-spr grade-${x.grade}` },
                     h('small', {}, `#${i + 1}`),
-                    h('b', {}, x.grade),
+                    h('b', {}, GRADE_WORD[x.grade]),
                     h('span', {}, `${x.avg} W`),
                     h('small', {}, pctStr(x.pct)),
                   ),

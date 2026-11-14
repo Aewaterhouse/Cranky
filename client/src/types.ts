@@ -85,6 +85,14 @@ export interface Trainer {
 }
 
 export type Grade = 'FAIL' | 'HIT' | 'GREAT' | 'MEGA' | 'LEGEND'
+/** Kinder words for a grade in tables: FAIL is for the live call and the joke awards. */
+export const GRADE_WORD: Record<Grade, string> = {
+  FAIL: 'Missed',
+  HIT: 'Hit',
+  GREAT: 'Great',
+  MEGA: 'Mega',
+  LEGEND: 'LEGEND',
+}
 export interface SprintResult {
   blk: number
   dur: number

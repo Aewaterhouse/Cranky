@@ -50,8 +50,8 @@ say where you are, and free-ride places that don't look like where they are.
 16. [x] (roadside detail, the farm kit and a road-life director that fills any 42 s gap with chalk, a sign or traffic) Close-up roadside detail for speed; a farm kit for open country; something every 30 to 45 s (worlds 5, 6, 7).
 
 **Bugs found along the way**
-17. [ ] ("1 rides" fixed; the missing History ride and the blank postcard need a reproduction: the reviewer did not
-    say which screen) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
+17. [ ] ("1 rides" fixed; the missing History ride was almost surely under 30 s, which is never saved: results now
+    says so; sprint tables say Missed, not FAIL; the postcard still wants a picture) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
     overflows on iPad (rider 20).
 
 The rest of each report follows after these.
