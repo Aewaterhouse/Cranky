@@ -78,6 +78,9 @@ class RoadEvents:
                         self.emit("fine", f"{r.name} cops a speeding fine in the roadworks.", r.id)
         elif c["k"] == "hump" and el >= c["t"] + c["dur"] / 2:
             c["low"] |= bool(act) and all(r.p / r.ftp < G.AMBO_HUMP_MAX for r in act)
+            heavy = max(act, key=lambda r: r.p / r.ftp, default=None)  # who to blame if it goes wrong
+            if heavy and heavy.p / heavy.ftp >= G.AMBO_HUMP_MAX:
+                c["heavy"] = heavy.id
         elif c["k"] == "siren":
             who = room.riders.get(c["who"])
             if who:
@@ -112,7 +115,16 @@ class RoadEvents:
             return self.emit("perk", "Free spike used on the speed hump. Nobody felt a thing.")
         self.comfort -= G.AMBO_HUMP_COMFORT * PATIENTS[self.pid]["strict"]
         self.hurt_at = room.el
-        self.emit("say", "BANG. The patient left the stretcher for a moment there.")
+        who = room.riders.get(c.get("heavy") or "")
+        self.emit(
+            "say",
+            (
+                f"BANG. {who.name} kept the power on over the hump and the patient left the stretcher."
+                if who
+                else "BANG. The patient left the stretcher for a moment there."
+            ),
+            who.id if who else None,
+        )
 
     def end_siren(self, room: Room, c: dict, k: float) -> None:
         who = room.riders.get(c["who"])

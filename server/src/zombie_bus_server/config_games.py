@@ -237,3 +237,5 @@ WATCH_EMOJI = ("😂", "🔥", "😱", "👏", "🥵", "💀")  # reactions anyo
 SCRAP_PER_PATIENT = 20
 SCRAP_WEDDING = 50
 SCRAP_TOWN_SAVED = 100
+AMBO_NAG_S = 60  # a rider is told about a spike at most once a minute
+AMBO_CREDIT_COMFORT = 60  # a run delivered at this Comfort or more credits its smoothest rider

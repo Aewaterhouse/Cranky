@@ -57,6 +57,7 @@ class Ambulance(RoadEvents, AmboView, CrewGame):
         self.rough: dict[str, list[float]] = {}  # [sum of jerk, samples] in steady riding
         self.spikes: dict[str, int] = {}
         self.spiking: dict[str, bool] = {}
+        self.nagged: dict[str, float] = {}  # when each rider was last told about a spike
         self.fines: dict[str, int] = {}
         self.run, self.pid, self.open, self.gone, self.fell = 0, None, False, False, False
         self.comfort, self.total, self.left, self.brake_m, self.run_end = 100.0, 0.0, 0.0, 0.0, 0.0
@@ -225,7 +226,12 @@ class Ambulance(RoadEvents, AmboView, CrewGame):
             tot = self.rough.setdefault(r.id, [0.0, 0])
             tot[0], tot[1] = tot[0] + jerk, tot[1] + 1
             spiking = jerk > G.AMBO_SPIKE
-            self.spikes[r.id] = self.spikes.get(r.id, 0) + (spiking and not self.spiking.get(r.id, False))
+            fresh = spiking and not self.spiking.get(r.id, False)
+            self.spikes[r.id] = self.spikes.get(r.id, 0) + fresh
+            # A spike gets a word with whoever did it, kindly and not too often.
+            if fresh and el >= self.nagged.get(r.id, -1e9) + G.AMBO_NAG_S * k:
+                self.nagged[r.id] = el
+                self.emit("say", T.nag(r.name, p.get("name", "the patient")), r.id)
             self.spiking[r.id] = spiking
             out = max(0.0, band[0] - pct, pct - band[1])
             cost += G.AMBO_ROUGH_RATE * max(0.0, jerk - p["tol"])
@@ -287,6 +293,13 @@ class Ambulance(RoadEvents, AmboView, CrewGame):
         self.emit("review", f"{'★' * entry['stars']}{'☆' * (5 - entry['stars'])} {entry['text']}")
         if not walked:
             self.emit("delivered", f"{p['name']} delivered. Comfort {round(self.comfort)}%.")
+            # Credit where it is due: the smoothest pair of hands on a comfortable run.
+            smooth = min(self.rough.items(), key=lambda kv: kv[1][0] / max(1, kv[1][1]), default=None)
+            who = room.riders.get(smooth[0]) if smooth and self.comfort >= G.AMBO_CREDIT_COMFORT else None
+            if who:
+                self.emit(
+                    "say", f"Smoothest hands on that run: {who.name}. The patient wants their number.", who.id
+                )
 
     def sweet_talk(self, room: Room, act: list[Rider], i: int, secs: float) -> None:
         """In the queue, the whole crew spinning easy earns a perk for the next run."""

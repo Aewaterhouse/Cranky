@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import random
+
 # What each patient says when the ride is smooth, and when it is not.
 CALM = {
     "hook": [
@@ -134,3 +136,16 @@ def review(pid: str, stars: int, walked: bool, fell: bool, late: bool) -> str:
     if fell:
         return FELL
     return REVIEWS[pid]["low" if stars <= 2 else "mid" if stars == 3 else "high"] + (LATE if late else "")
+
+
+NAGS = [
+    "{name}, easy on the pedals: {patient} felt that one.",
+    "{name}! {patient} just bit through the blanket.",
+    "That spike was {name}. {patient} has opinions.",
+    "{name}, smooth it out, mate. {patient} is filming you now.",
+]
+
+
+def nag(name: str, patient: str) -> str:
+    """A kind word with the rider who spiked."""
+    return random.choice(NAGS).format(name=name, patient=patient)

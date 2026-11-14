@@ -192,3 +192,15 @@ def test_bot_characters_smooth_twitchy_and_lead_foot():
     game.cur = {"k": "roadworks"}
     assert game.bot(None, lead, 100.0, 100.0, rng) == 200 * G.AMBO_LEADFOOT_X > 200 * G.AMBO_FINE_OVER
     assert game.bot(None, NS(name="Alex", ftp=200), 100.0, 100.0, rng) == 100.0
+
+
+def test_the_hump_names_who_kept_the_power_on():
+    s, g = on_road("kidney", "hump")
+    s.ride(2)
+
+    def r2_hot(r, band, el):
+        return 0.9 if r.id == "r2" and band == G.AMBO_HUMP else mid(band)
+
+    fx = s.ride(8, r2_hot)
+    bang = [f for f in fx if f["k"] == "say" and "BANG" in (f["text"] or "")]
+    assert bang and s.riders["r2"].name in bang[0]["text"] and bang[0]["id"] == "r2"
