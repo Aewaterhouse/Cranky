@@ -1,3 +1,4 @@
+import { COSMETICS } from '../core/cosmetics'
 import { setBack } from './back'
 import { ladderTab } from './ladder'
 import { settingsTab } from './settings'
@@ -86,7 +87,15 @@ export function showHome(p: Profile, act: HomeActions) {
         'nav',
         { class: 'tabs' },
         ...Object.entries(TABS).map(([k, v]) =>
-          h('a', { href: `#${k}`, class: k === tab ? 'on' : '' }, v),
+          h(
+            'a',
+            { href: `#${k}`, class: k === tab ? 'on' : '' },
+            v,
+            // A dot on the Garage when there is something new you can afford.
+            k === 'garage' && COSMETICS.some((c) => c.price <= p.scrap && !p.owned.includes(c.id))
+              ? h('i', { class: 'tab-dot', title: 'You can afford something' })
+              : '',
+          ),
         ),
       ),
       h('div', { class: 'right' }, trainerPill(), riderChip(p, act, admin)),

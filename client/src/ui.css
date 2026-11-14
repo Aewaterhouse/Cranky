@@ -553,3 +553,12 @@ a.button.primary {
 .welcome-points li + li {
   margin-top: 8px;
 }
+.tab-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-left: 5px;
+  vertical-align: super;
+  border-radius: 50%;
+  background: var(--acc);
+}
