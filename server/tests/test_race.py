@@ -149,3 +149,47 @@ def test_four_riders_points_race_with_bots():
     s = room.summary
     assert s["game"] == "points" and s["award"]["kind"] == "points"
     assert sum(r["pts"] for r in s["riders"]) >= 11 * 2 + 20  # the fourth may still be out at the end
+
+
+def test_the_crit_prime_is_one_lap_around_halfway():
+    for laps in (1, 2, 5, 10, 20):
+        primes = {racers("crit", laps, seed=s).rules.prime for s in range(200)}
+        lo, hi = round(laps * 0.4), round(laps * 0.6)
+        assert primes <= set(range(max(1, min(lo, laps - 1)), max(1, min(hi, laps - 1)) + 1))
+        assert laps < 2 or primes.isdisjoint({laps})  # never the finish when there is a choice
+    assert len({racers("crit", 20, seed=s).rules.prime for s in range(200)}) > 2  # it moves about
+
+
+def test_crit_rings_the_prime_and_crowns_its_winner():
+    sim = spread(racers("crit", 6, seed=3))
+    prime = sim.rules.prime
+    fx = race_out(sim)
+    bells = [(f["text"], f["id"]) for f in fx if f["k"] == "bell"]
+    first = next(r["id"] for r in sim.rules.results(sim))  # the strongest takes everything here
+    assert bells == [("PRIME NEXT LAP", None), ("PRIME!", first), ("LAST LAP", None)]
+    assert sim.rules.prime_by == first and sim.rules.state(sim)["prime"] == prime
+    rows = sim.rules.results(sim)
+    assert [r["prime"] for r in rows] == [True, False, False, False]
+    assert sim.rules.extra(sim, rows)["award"] == {"kind": "prime", "id": first}
+
+
+def test_a_weaker_rider_can_take_the_prime_and_still_lose():
+    sim = spread(racers("crit", 4, seed=1))
+    prime_at = sim.rules.prime * sim.road.lap.distance
+    sim.movers["r3"].d = prime_at - 1  # a breakaway just short of the prime line
+    while sim.rules.prime_by is None:
+        sim.step(DT)
+    sim.movers["r3"].p = 60  # then blows up
+    race_out(sim)
+    rows = sim.rules.results(sim)
+    assert sim.rules.prime_by == "r3" and rows[0]["id"] == "r0"
+    back = RoadSim.from_dict(sim.to_dict())
+    assert back.rules.prime_by == "r3" and back.rules.prime == sim.rules.prime
+
+
+def test_four_riders_crit_with_bots():
+    room = bot_room("crit", 8)
+    run_room(room)
+    s = room.summary
+    assert s["game"] == "crit" and s["award"]["kind"] == "prime" and len(s["podium"]) == 3
+    assert sum(r["prime"] for r in s["riders"]) == 1

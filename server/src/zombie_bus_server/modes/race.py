@@ -110,4 +110,50 @@ class Points(Race):
         return {**super().extra(sim, rows), "award": top and {"kind": "points", "id": top["id"]}}
 
 
-RULES.update(race=Race, points=Points)
+class Crit(Race):
+    """Many laps of a short loop and a sprint prime on one lap around halfway. The finish decides the race."""
+
+    name = "crit"
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.prime = 0  # the lap whose line is the prime, picked when the first rider is placed
+        self.prime_by: str | None = None
+
+    def place(self, sim: RoadSim, m: Mover) -> None:
+        super().place(sim, m)
+        if not self.prime:
+            laps = sim.road.laps
+            lo, hi = (round(laps * f) for f in C.CRIT_PRIME_AT)
+            hi = max(1, min(laps - 1, hi))
+            self.prime = sim.rng.randint(max(1, min(lo, hi)), hi)
+
+    def line(self, sim: RoadSim, m: Mover) -> float:
+        prime = self.prime * sim.road.lap.distance
+        return prime if self.prime_by is None and m.d < prime else sim.road.distance
+
+    def on_lap(self, sim: RoadSim, done: int) -> list[dict]:
+        bell = [{"k": "bell", "id": None, "text": "PRIME NEXT LAP"}] if done == self.prime - 1 else []
+        return super().on_lap(sim, done) + bell
+
+    def after(self, sim: RoadSim, dt: float) -> list[dict]:
+        fx = super().after(sim, dt)
+        line = self.prime * sim.road.lap.distance
+        over = [m for m in sim.movers.values() if m.d >= line - 1e-6]
+        if self.prime_by is None and over:
+            self.prime_by = min(over, key=lambda m: self.crossed(sim, m, line)).id
+            fx.append({"k": "bell", "id": self.prime_by, "text": "PRIME!"})
+        return fx
+
+    def state(self, sim: RoadSim) -> dict | None:
+        return {**super().state(sim), "prime": self.prime, "primeBy": self.prime_by}
+
+    def results(self, sim: RoadSim) -> list[dict]:
+        return [{**r, "prime": r["id"] == self.prime_by} for r in super().results(sim)]
+
+    def extra(self, sim: RoadSim, rows: list[dict]) -> dict:
+        award = self.prime_by and {"kind": "prime", "id": self.prime_by}
+        return {**super().extra(sim, rows), "award": award}
+
+
+RULES.update(race=Race, points=Points, crit=Crit)

@@ -214,7 +214,7 @@ the server), with bots, results and history like the other games.
 - [x] Normal race: everyone from the line, first across wins; a route and a number of laps picked by the host.
 - [x] Points race: laps with a sprint at the end of each (points for the top places, more on the last lap); most
       points wins, whoever crosses first.
-- [ ] Crit: a short loop, many laps, and a sprint prime rung at a random lap around halfway (a bell and a banner);
+- [x] Crit: a short loop, many laps, and a sprint prime rung at a random lap around halfway (a bell and a banner);
       the prime winner is the hero of the results whatever the finish.
 - [ ] A podium scene at the end: the top three on the steps in the 3D world (champagne, confetti, silly poses with
       the bonkers models), with the prime or points winner standing to the side on their own little box.

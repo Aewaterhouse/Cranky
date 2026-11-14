@@ -42,6 +42,11 @@ const GAMES: [RoadGame, string, string][] = [
     'Points',
     'A sprint every lap: 5, 3, 2 and 1 points, double on the last. Most points wins.',
   ],
+  [
+    'crit',
+    'Crit',
+    'Lap after lap of a short loop, and a prime on one lap around halfway. First home wins.',
+  ],
 ]
 
 /** Group-ride lobby, built once and patched in place: who is in, the route, and the host's choices. */
@@ -97,7 +102,16 @@ export function roadLobbyView(c: RoadLobbyCtx) {
   const gameSeg = seg<RoadGame>(
     GAMES.map(([id, name]): [RoadGame, string] => [id, name]),
     'ride',
-    (game) => send({ game }),
+    // A crit wants laps: a loop gets at least `critLaps`.
+    (game) =>
+      send(
+        game === 'crit' &&
+          l &&
+          l.laps < CFG.road.critLaps &&
+          ROUTE_INDEX.find((r) => r.id === l?.route)?.loop
+          ? { game, laps: CFG.road.critLaps }
+          : { game },
+      ),
     'diff',
   )
   const gameNote = h('span', { class: 'dim' })

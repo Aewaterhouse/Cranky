@@ -268,13 +268,16 @@ export interface RideStats {
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
 export type RoadStyle = 'social' | 'race'
 /** The road layer's rule sets (the server's `RULES`). */
-export type RoadGame = 'ride' | 'race' | 'points'
+export type RoadGame = 'ride' | 'race' | 'points' | 'crit'
 /** A race's tick `game`: the leader's lap and, in a points race, everyone's points. */
 export interface RaceState {
   kind: RoadGame
   lap: number
   laps: number
   pts?: Record<string, number>
+  /** Crit: the lap whose line is the prime, and who took it. */
+  prime?: number
+  primeBy?: string | null
 }
 export interface RoadLobbyRider {
   id: string
@@ -342,7 +345,7 @@ export interface RoadSummary {
   game?: RoadGame
   /** Races: the first three across the line, in order, and the points winner. */
   podium?: string[]
-  award?: { kind: 'points'; id: string } | null
+  award?: { kind: 'points' | 'prime'; id: string } | null
   riders: {
     id: string
     name: string
@@ -361,6 +364,8 @@ export interface RoadSummary {
     /** Points race: the rider's points and their place across the line. */
     pts?: number
     line?: number
+    /** Crit: this rider won the prime. */
+    prime?: boolean
   }[]
 }
 /** What a road room's socket sends. */

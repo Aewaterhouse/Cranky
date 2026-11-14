@@ -137,6 +137,15 @@ describe('group ride link', () => {
     expect(link.others()[0].tag).toBe('5 pts')
   })
 
+  it("a crit's prime winner gets a star on their card and the PRIME! banner", () => {
+    const { link } = make()
+    const m = tick(60, { me: at(500), kev: at(600) }, [{ k: 'bell', id: 'kev', text: 'PRIME!' }])
+    link.tick({ ...m, game: { kind: 'crit', lap: 4, laps: 8, prime: 4, primeBy: 'kev' } })
+    expect(link.banner()).toEqual(['PRIME!', 'Kev'])
+    expect(link.others()[0].tag).toBe('★ prime')
+    expect(link.tag('me')).toBeUndefined()
+  })
+
   it('says who joined, who finished and who caught whom', () => {
     const { link } = make()
     link.lobby(lobby(['me', 'kev', 'shaz']))

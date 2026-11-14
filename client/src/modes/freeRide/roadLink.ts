@@ -139,10 +139,10 @@ export class RoadLink {
     return [isFinite(count) ? String(Math.ceil(count)) : 'Get ready', 'The ride starts together']
   }
 
-  /** A race's tag for a rider's card: their points. */
+  /** A race's tag for a rider's card: their points, or the crit's prime. */
   tag(id: string) {
     const pts = this.race?.pts
-    return pts ? `${pts[id] ?? 0} pts` : undefined
+    return pts ? `${pts[id] ?? 0} pts` : this.race?.primeBy === id ? '★ prime' : undefined
   }
 
   /** Everyone else, carried on from the last tick at their speed. */

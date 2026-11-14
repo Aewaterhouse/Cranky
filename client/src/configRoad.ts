@@ -232,5 +232,7 @@ export const ROAD_CFG = {
     seats: 8,
     /** A race's bell banner (last lap, sprint, prime) stays up this long (s). */
     bannerS: 4,
+    /** Picking a crit on a loop sets at least this many laps. */
+    critLaps: 8,
   },
 }

@@ -6,7 +6,7 @@ import { UNIT } from './units'
 
 const km = (m: number) => UNIT.dist(m)
 const lapsText = (n: number) => (n > 1 ? ` · ${n} laps` : '')
-const GAME_NAME = { ride: 'social ride', race: 'race', points: 'points race' }
+const GAME_NAME = { ride: 'social ride', race: 'race', points: 'points race', crit: 'crit' }
 
 /** The crew table for a road ride: place, time (or how far they got), average power, W/kg and watts saved drafting. */
 export function roadTable(g: RoadSummary, myId = '', faces = false) {
@@ -21,7 +21,14 @@ export function roadTable(g: RoadSummary, myId = '', faces = false) {
         'tr',
         { class: r.id === myId ? 'me' : '' },
         h('td', {}, r.time == null ? '–' : ordinal(r.place)),
-        h('td', {}, faces ? avatar(r.name, 'sm') : '', r.name, r.bot ? ' 🤖' : ''),
+        h(
+          'td',
+          {},
+          faces ? avatar(r.name, 'sm') : '',
+          r.name,
+          r.bot ? ' 🤖' : '',
+          r.prime ? ' ★' : '',
+        ),
         pts ? h('td', {}, h('b', {}, String(r.pts ?? 0))) : '',
         h(
           'td',
@@ -56,6 +63,16 @@ export function podium(g: RoadSummary, myId = '') {
   return h('div', { class: 'podium' }, ...[top[1], top[0], top[2]].filter(Boolean).map(step))
 }
 
+/** The points or prime winner's own line, the hero of a crit whatever the finish. */
+function award(g: RoadSummary, myId: string) {
+  const r = g.award && g.riders.find((x) => x.id === g.award!.id)
+  if (!r) return ''
+  const who = r.id === myId ? 'You' : r.name
+  const what =
+    g.award!.kind === 'prime' ? `★ ${who} won the prime` : `🏅 ${who} won on points (${r.pts})`
+  return h('p', { class: 'race-award' }, what)
+}
+
 /** Group-ride extras for the results screen. */
 export function roadSection(g: RoadSummary, myId: string) {
   const mine = g.riders.find((r) => r.id === myId)
@@ -73,6 +90,7 @@ export function roadSection(g: RoadSummary, myId: string) {
         `${g.name}${lapsText(g.laps)} · ${km(g.distance)} · ${g.game && g.game !== 'ride' ? GAME_NAME[g.game] : g.style === 'race' ? 'race' : 'social ride'}${g.together ? ' · kept together' : ''}`,
       ),
       podium(g, myId),
+      award(g, myId),
       roadTable(g, myId),
     ),
   )
