@@ -12,7 +12,7 @@ import { makeQuizPanel } from '../../ui/hudQuiz'
 import { makeGalleyPanel } from '../../ui/hudGalley'
 import { makeHuntPanel } from '../../ui/hudHunt'
 import { videoStage } from '../../scene/videoStage'
-import type { EventStyle } from '../../ui/hudKit'
+import { WORKOUT_EVENTS, type EventStyle } from '../../ui/hudKit'
 
 /** What the ride and TV screens need from a crew game newer than VO2 Madness: its panel, names and scene. */
 export interface GameUi {
@@ -69,7 +69,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     world: (stage) => new TownWorld(stage),
   },
   watch: {
-    events: {},
+    events: WORKOUT_EVENTS,
     panel: makeWatchPanel,
     scene: (m) => ({ game: m.game, el: m.el }) as Partial<SceneState>,
     world: (stage, say, act) =>
@@ -90,7 +90,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     },
   },
   hunt: {
-    events: {},
+    events: WORKOUT_EVENTS,
     panel: makeHuntPanel,
     scene: () => ({
       gap: null,
@@ -100,7 +100,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     }),
   },
   galley: {
-    events: {},
+    events: WORKOUT_EVENTS,
     panel: makeGalleyPanel,
     scene: () => ({
       gap: null,
@@ -110,7 +110,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     }),
   },
   quiz: {
-    events: {},
+    events: WORKOUT_EVENTS,
     panel: makeQuizPanel,
     scene: () => ({
       gap: null,
@@ -120,7 +120,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     }),
   },
   ttt: {
-    events: {},
+    events: WORKOUT_EVENTS,
     panel: makeTttPanel,
     scene: () => ({
       gap: null,

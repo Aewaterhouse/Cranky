@@ -525,3 +525,7 @@ TITLES = {
     "Drummer's Pet": "🥁 Drummer's Pet",
     "Top Dog": "🦊 Top Dog",
 }
+
+# The workout each workout game starts on (the driver can change it): a chat for the quiz, steady cadence
+# for the galley, sweet spot for the hunt, threshold for the time trial.
+GAME_PLANS = {"quiz": "coffee-spin-45", "galley": "tempo-2x20", "hunt": "ss-2x15", "ttt": "thr-2x15"}

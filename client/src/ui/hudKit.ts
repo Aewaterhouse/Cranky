@@ -23,6 +23,14 @@ const MAD_EVENTS: Record<string, EventStyle> = {
   roadblock: { name: 'Sprint', icon: '💥', col: '#ffd23f' },
   servo: { name: 'Recover', icon: '🎁', col: '#44bba4' },
 }
+/** Plain workout names for the games that ride a workout without the bus: no servos or hordes. */
+export const WORKOUT_EVENTS: Record<string, EventStyle> = {
+  longhaul: { name: 'Steady', icon: '🚴', col: '#f2b705' },
+  rampup: { name: 'Climb', icon: '⛰️', col: '#8ecf6a' },
+  surge: { name: 'Over-unders', icon: '〰️', col: '#ff7a1a' },
+  roadblock: { name: 'Sprint', icon: '⚡', col: '#e040fb' },
+  servo: { name: 'Easy spin', icon: '😮‍💨', col: '#44bba4' },
+}
 let skin = EVENTS
 /** Skins the block events for a game: its own names over the bus's. `true` is VO2 Madness. */
 export const setEvents = (extra?: Record<string, EventStyle> | boolean) =>

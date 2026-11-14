@@ -106,6 +106,9 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         await room.lobby()
     elif isinstance(msg, Game) and room.state != "running":
         room.game, room.state = msg.game, "lobby"
+        # A workout game starts on a workout of its own, not the bus run the lobby opened with.
+        if msg.game in C.GAME_PLANS and room.plan_id.startswith("bus-"):
+            room.plan_id = C.GAME_PLANS[msg.game]
         room.deal()
         await room.lobby()
     elif isinstance(msg, TrainerMode) and room.state != "running":

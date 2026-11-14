@@ -40,3 +40,14 @@ def test_the_tick_carries_both_teams_scores():
 
     g = asyncio.run(main())["game"]
     assert g["g"] == "ttt" and g["teams"] == ["Maroons", "Blues"] and len(g["scores"]) == 2
+
+
+def test_a_workout_game_swaps_the_bus_run_for_its_own_workout():
+    async def main():
+        room, ws = await lobby_with(1, code="TTT3")
+        room.plan_id = "bus-crew-45"
+        await room.handle("h0", ws, {"t": "game", "game": "quiz"})
+        return room
+
+    room = asyncio.run(main())
+    assert room.plan_id == "coffee-spin-45" and room.plan["name"] == "Coffee Spin"
