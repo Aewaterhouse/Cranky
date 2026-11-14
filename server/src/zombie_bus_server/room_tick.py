@@ -65,6 +65,7 @@ def step(room: Room, dt: float) -> dict:
             "hr": r.hr,
             "hrp": None if r.hrp is None else round(r.hrp, 2),
             "erg": room.erg_of(r),
+            "ask": room.mode.ask(room, r) if i >= 0 else None,
         }
     tick = Tick(
         el=room.el,

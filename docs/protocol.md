@@ -123,6 +123,7 @@ position, through `ErgController.setGrade`.
 - Tick riders carry `band`: `[lo, hi]` watts when the game sets this rider's target itself (then `tgt` is the middle of it), `"sprint"` or `"free"` for no target at all (`tgt` null), or null when the target is the plan's. Neither edge is ever over 150% of the rider's FTP.
 - `tick.game` is the game's own state (null for Zombie Bus and VO2 Madness, which use `bus`).
 - Client `{t: 'act', k, v?}`: a rider's input to the game (an emoji, a card, a choice, a vote). `k` is up to 24 of `a-z0-9_`; `v` is a boolean, a number, a string of up to 64 characters or absent. Dropped outside a running ride and past 8 in 4 s per rider. What `k` means is the game's business.
+- Tick riders carry `ask`: the game's question to that rider right now, or null. `{k, title, sub?, opts: [{v, label, icon?, sub?, off?}], left?, v?}`: `left` is seconds to answer, `v` their answer so far, `off` an option they cannot pick. The rider answers with `{t: 'act', k, v}` using the question's `k` and an option's `v` (always a string).
 - A game can be marked never-ERG on the server. Its lobby then reports `trainers: 'gears'` and every rider's `erg` is false, whatever the host or the rider picked. Such a game deals its own plan of `free` blocks, so no client ever has a block target to send a trainer.
 
 ## ERG or gears (bus rooms)

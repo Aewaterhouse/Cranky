@@ -153,6 +153,7 @@ class RiderTick(BaseModel):
     hrp: float | None = None
     erg: bool = True
     band: tuple[int, int] | Literal["sprint", "free"] | None = None  # the game's own target for this rider
+    ask: dict | None = None  # the game's question to this rider; answered with an `act` of its `k`
 
 
 class Bus(BaseModel):

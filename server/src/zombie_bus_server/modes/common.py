@@ -101,6 +101,15 @@ class CrewGame:
     def on_act(self, room: Room, r: Rider, k: str, v: str | float | bool | None) -> None:
         """A rider's game input (`act`): an emoji, a card, a vote. Unknown kinds are ignored."""
 
+    def ask(self, room: Room, r: Rider) -> dict | None:
+        """The game's question to this rider right now, sent in their tick entry, or None.
+
+        Returns:
+            `{"k", "title", "sub"?, "opts": [{"v", "label", "icon"?, "sub"?, "off"?}], "left"?, "v"?}`. The
+            rider answers with an `act` of the same `k` whose `v` is one of the options' `v` (a string).
+        """
+        return None
+
 
 def tally(active: Iterable[Rider], dt: float) -> None:
     """Adds this tick's compliance to each rider who has a score."""

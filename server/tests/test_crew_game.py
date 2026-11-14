@@ -37,6 +37,10 @@ class Toy(CrewGame):
     def on_act(self, room, r, k, v):
         self.acts.append((r.id, k, v))
 
+    def ask(self, room, r):
+        opts = [{"v": "tea", "label": "Tea"}, {"v": "beer", "label": "Beer", "off": True}]
+        return {"k": "drink", "title": "Drink?", "opts": opts, "left": 9} if r.id == "h1" else None
+
 
 async def toy_room(monkeypatch, humans=2):
     monkeypatch.setitem(session.MODES, "toy", Toy)
@@ -107,6 +111,25 @@ def test_act_reaches_the_game_only_in_a_ride_and_is_rate_limited(monkeypatch):
     acts = room.mode.acts
     assert [a for a in acts if a[0] == "h1"] == [("h1", "vote", n) for n in range(C.ACT_LIMIT[0])]
     assert acts[-1] == ("h0", "card", None)
+
+
+def test_a_games_question_rides_in_that_riders_tick_only(monkeypatch):
+    async def main():
+        room, ws = await toy_room(monkeypatch)
+        room.start()
+        room.task.cancel()
+        room.el = -3.0
+        early = room.step(DT)  # still in the countdown
+        room.el = 1.0
+        t = room.step(DT)
+        await room.handle("h1", ws, {"t": "act", "k": t["riders"]["h1"]["ask"]["k"], "v": "tea"})
+        return room, early, t
+
+    room, early, t = asyncio.run(main())
+    assert early["riders"]["h1"]["ask"] is None
+    assert t["riders"]["h1"]["ask"]["opts"][1] == {"v": "beer", "label": "Beer", "off": True}
+    assert t["riders"]["h0"]["ask"] is None
+    assert room.mode.acts[-1] == ("h1", "drink", "tea")
 
 
 @pytest.mark.parametrize(
