@@ -265,6 +265,7 @@ export function startBusRide(
       ...ui?.scene(m),
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
+        me: id === profile.id,
         name: r.name,
         c: r.s,
         st: r.st,

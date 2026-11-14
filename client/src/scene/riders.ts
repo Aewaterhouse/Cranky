@@ -68,6 +68,7 @@ export function makeRider(colour: string, id: string, road = false) {
   const head = new THREE.Group()
   head.add(skull)
   person.add(bodyMesh, head)
+  let tagLift = 0
   const { tag, label, brand } = makeTag()
   person.add(tag)
 
@@ -280,11 +281,13 @@ export function makeRider(colour: string, id: string, road = false) {
     }
     tag.position.set(
       side * 0.9,
-      sy + d.headUp + SKULL * d.head + 0.33 + (0.35 * (TAG_H - 80)) / 80,
+      sy + d.headUp + SKULL * d.head + 0.33 + (0.35 * (TAG_H - 80)) / 80 + tagLift,
       -sf,
     )
     fig.write()
   }
   rebuild()
-  return { root, person, head, bike, label, setLook, setBody, fade, pose, heat, tag }
+  /** Raises the name tag (metres), so tags of riders further from the camera clear the ones in front. */
+  const liftTag = (m: number) => (tagLift = m)
+  return { root, person, head, bike, label, setLook, setBody, fade, pose, heat, tag, liftTag }
 }

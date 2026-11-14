@@ -159,6 +159,7 @@ export class Pack {
       r.root.position.set(x, 0, e.z)
       r.label(sr.name, sr.c, sr.st, sr.hr, sr.hrp)
       r.setLook(sr.look)
+      r.tag.visible = !sr.me
       r.heat(out ? null : sr.hrp, dt, smoke, speed)
       r.pose(out ? 'slump' : 'ride', t * (sr.cadence / 60) * Math.PI * 2 + e.seed, 0)
       r.fade(out ? 0.35 : 1)

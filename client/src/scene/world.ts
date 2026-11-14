@@ -25,6 +25,8 @@ export { debugPanel } from './debug'
 
 export interface SceneRider {
   id: string
+  /** This screen's own rider: no name tag (you know who you are). */
+  me?: boolean
   name: string
   c: number | null
   st: string

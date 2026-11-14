@@ -1,3 +1,4 @@
+import { VIS } from './params'
 import * as THREE from 'three'
 import { SLOTS, ROOF_Y } from './busParts'
 import { makeCable } from './cables'
@@ -66,6 +67,9 @@ export class Crew {
       r.label(sr.name, sr.c, sr.st, sr.hr, sr.hrp)
       r.heat(sr.st === 'spectator' ? null : sr.hrp, dt, steam, speed)
       r.setLook(sr.look)
+      // Your own tag goes; the others rise row by row away from the camera so none hides another.
+      r.tag.visible = !sr.me
+      r.liftTag(VIS.tagRowLift * (2 - Math.floor(e.slot / 2)))
       const fell = sr.st === 'fell'
       const ph = t * (sr.cadence / 60) * Math.PI * 2 + e.seed
       if (fell) {

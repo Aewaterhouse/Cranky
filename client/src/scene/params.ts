@@ -1,6 +1,6 @@
 import { CAM } from './camVis'
 import { FEEL } from './route/feelVis'
-import { FLY, ORBIT, PARTY } from './route/shotVis'
+import { FLY, ORBIT, PARTY, PODIUM } from './route/shotVis'
 import { PLACE } from './route/placeVis'
 import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
 
@@ -75,6 +75,8 @@ export const VIS = {
   vignette: 0.45,
   busColour: '#f2b705',
   amboColour: '#f4f1e8',
+  /** How much higher (m) each row of riders' name tags sits than the row behind it on the bus roof. */
+  tagRowLift: 0.45,
   /** The hospital comes into view this many metres out, drawn at this many scene metres per metre. */
   amboHospitalM: 400,
   amboHospitalScale: 0.4,
@@ -208,6 +210,7 @@ export const VIS = {
     fly: FLY,
     orbit: ORBIT,
     party: PARTY,
+    podium: PODIUM,
     mood: MOOD,
     signs: {
       post: '#8d949a',

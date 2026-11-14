@@ -64,7 +64,7 @@ end of the queue. Owner's own to-dos go first:*
 12. [ ] Phone crew HUD overlaps itself (riding 6); in-ride controls are tiny on touch (nav 10, riding 22).
 13. [ ] (the menu no longer covers the target card, and Escape or a tap outside closes it in every mode; contents still differ between modes) The ride menu covers the target card; its contents and keys differ between modes (riding 7, 8).
 14. [x] Watch Party panel washes out over bright video; its remote is always open and tiny (riding 10, 11).
-15. [ ] Rider name tags stack and hide your own (riding 12). Letterbox bars eat the HUD (riding 13).
+15. [ ] (your own tag is hidden and roof rows step up; heart-rate pills can still clip the tag behind on a full roof) Rider name tags stack and hide your own (riding 12). Letterbox bars eat the HUD (riding 13).
 16. [ ] The servo shop opens over a short interval; Climate Lawsuit's panel grows over the controls (riding 14, 15).
 17. [ ] (crew rides now show time to go on the bottom strip) Crew modes show no total time left (riding 17). Zone and W/kg describe power, not the target (riding 18).
 
