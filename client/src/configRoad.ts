@@ -62,6 +62,8 @@ export const ROAD_CFG = {
     phoneMaxH: 500,
     /** No ETA to the top below this speed (m/s). */
     etaMinMs: 1,
+    /** A callout held back by a more important one is dropped if it has waited this long. */
+    splashWaitMs: 5000,
   },
   freeRide: {
     defaultKg: 75,

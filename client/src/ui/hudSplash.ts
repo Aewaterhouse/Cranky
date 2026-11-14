@@ -1,6 +1,7 @@
 import type { SprintResult } from '../types'
 import { h } from './dom'
 import { FX_ICON } from './hudKit'
+import { CFG } from '../config'
 
 /** Centre splashes (one at a time, with priority) and the short stacked event feed. */
 export function makeSplash() {
@@ -9,10 +10,23 @@ export function makeSplash() {
   const flash = h('div', { class: 'hud-flash' })
   let cur = { prio: 0, until: 0 }
   let timer: ReturnType<typeof setTimeout>
+  // Callouts that arrive while a more important one is up wait their turn (briefly) instead of vanishing.
+  type Args = [string, string, string?, number?, number?, ...Node[]]
+  let waiting: { args: Args; at: number }[] = []
+  const next = () => {
+    const now = performance.now()
+    waiting = waiting.filter((w) => now - w.at < CFG.hud.splashWaitMs)
+    const w = waiting.sort((a, b) => (b.args[4] ?? 1) - (a.args[4] ?? 1)).shift()
+    if (w) splash(...w.args)
+  }
 
   function splash(cls: string, big: string, sub = '', ms = 2000, prio = 1, ...extra: Node[]) {
     const now = performance.now()
-    if (now < cur.until && prio < cur.prio) return
+    if (now < cur.until && prio < cur.prio) {
+      if (prio > 0 && waiting.length < 3)
+        waiting.push({ args: [cls, big, sub, ms, prio, ...extra], at: now })
+      return
+    }
     cur = { prio, until: now + ms }
     const sp = h('div', { class: `sp ${cls}` }, h('div', { class: 'sp-big' }, big))
     if (sub) sp.append(h('div', { class: 'sp-sub' }, sub))
@@ -20,7 +34,7 @@ export function makeSplash() {
     sp.append(...extra)
     layer.replaceChildren(sp)
     clearTimeout(timer)
-    timer = setTimeout(() => sp.remove(), ms)
+    timer = setTimeout(() => (sp.remove(), next()), ms)
   }
 
   const confetti = () =>
