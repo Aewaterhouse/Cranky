@@ -78,7 +78,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Workout builder | Drag-and-drop editor for your own sessions | L |
 | ✅ FTP tests | Ramp test and 20-minute test that set FTP automatically | S |
 | ✅ Bigger library | 50+ workouts, sorted by goal (endurance, sweet spot, threshold, VO2, sprint) and length | M |
-| Training plans | Multi-week plans with a calendar and "today's workout" | L |
+| ✅ Training plans | Multi-week plans with a calendar and "today's workout" | L |
 | ✅ Coach text cues | Timed on-screen messages inside workouts | S |
 | ✅ Resistance and slope modes | Ride without ERG at a fixed resistance or gradient | S |
 | ✅ Cadence targets | Optional cadence band per interval, scored like power | S |

@@ -10,6 +10,7 @@ import type { Plan } from '../types'
 import { avatar, fmt, h } from './dom'
 import { freeRideSetup } from './freeRideSetup'
 import { soloSetup } from './solo'
+import { planScreen, todayCard } from './planCalendar'
 import { needTrainer } from './trainer'
 
 export interface HomeActions {
@@ -189,11 +190,19 @@ export function rideTab(p: Profile, act: HomeActions) {
     else code.focus()
   }
   const joinCode = withCode((c) => needTrainer(() => act.join(c))())
+  const goWorkout = (id: string) => needTrainer(() => act.drill(planFor(id, 0)))()
+  const today = h('div')
+  const home = () => (
+    today.replaceChildren(todayCard(p, goWorkout, openPlan)),
+    wrap.replaceChildren(main)
+  )
+  const openPlan = () => wrap.replaceChildren(planScreen(p, goWorkout, home))
   const main = h(
     'div',
     { class: 'ride' },
     resumeCard(p, act),
     rejoin,
+    today,
     h(
       'section',
       { class: 'hero' },
@@ -250,6 +259,24 @@ export function rideTab(p: Profile, act: HomeActions) {
     ),
     h(
       'button',
+      { class: 'solo', onclick: openPlan },
+      h('span', { class: 'big-emoji' }, '📅'),
+      h(
+        'span',
+        {},
+        h('b', {}, 'Training plan'),
+        h(
+          'small',
+          {},
+          p.plan
+            ? 'Your calendar and what is next.'
+            : 'Pick a multi-week plan and the days you ride.',
+        ),
+      ),
+      h('span', { class: 'arrow' }, '→'),
+    ),
+    h(
+      'button',
       {
         class: 'solo',
         onclick: () =>
@@ -268,5 +295,6 @@ export function rideTab(p: Profile, act: HomeActions) {
     soon('🎮', 'More games', 'Handicap race, chaingang, last rider standing.'),
   )
   const wrap = h('div', {}, main)
+  home()
   return wrap
 }

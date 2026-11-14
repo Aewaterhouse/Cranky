@@ -1,0 +1,146 @@
+/* Training plans: the Ride tab's "Today's workout" card, the plan picker and the calendar */
+.today-plan:empty {
+  display: none;
+}
+.today-plan {
+  margin-bottom: 16px;
+}
+.today-plan .tp-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+.today-plan .tp-row > span:first-child {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.today-plan .tp-row b {
+  font: 1.15rem/1.3 var(--display);
+}
+.tp-done {
+  color: var(--tox);
+  font-weight: 700;
+}
+.plan-screen h1 {
+  margin: 12px 0;
+}
+.pl-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.pl-card {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  text-align: left;
+  background: var(--card);
+  border: 2px solid transparent;
+  border-radius: var(--r);
+}
+.pl-card.on {
+  border-color: var(--acc);
+}
+.pl-card > span:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pl-card b {
+  font: 1.05rem/1.3 var(--display);
+}
+.pl-days {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pl-days button {
+  min-width: 52px;
+}
+.pl-days button.on {
+  background: var(--acc);
+  color: var(--acc-ink);
+}
+.pl-start {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+}
+.pl-week {
+  margin-bottom: 10px;
+}
+.pl-week.now {
+  border: 1px solid var(--acc);
+}
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.pl-day {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 92px;
+  padding: 8px;
+  text-align: left;
+  font-size: 0.8rem;
+  background: var(--card2);
+  border: 1px solid transparent;
+  border-radius: 10px;
+}
+.pl-day.rest {
+  background: none;
+  border: 1px dashed var(--line);
+}
+.pl-day small {
+  color: var(--dim);
+}
+.pl-day b {
+  font-size: 0.9rem;
+  line-height: 1.2;
+}
+.pl-day em {
+  margin-top: auto;
+  font-style: normal;
+  font-weight: 700;
+}
+.pl-day.done {
+  border-color: var(--tox);
+}
+.pl-day.done em {
+  color: var(--tox);
+}
+.pl-day.missed {
+  opacity: 0.6;
+}
+.pl-day.missed em {
+  color: var(--bad);
+}
+.pl-day.is-today {
+  outline: 2px solid var(--acc);
+}
+.pl-day.today em {
+  color: var(--acc);
+}
+@media (max-width: 700px) {
+  .pl-grid {
+    grid-template-columns: 1fr;
+  }
+  .pl-day {
+    min-height: 0;
+  }
+  .pl-day.rest {
+    display: none;
+  }
+  .today-plan .tp-row {
+    flex-wrap: wrap;
+  }
+  .today-plan .tp-row > span:first-child {
+    flex-basis: 100%;
+  }
+}

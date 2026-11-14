@@ -348,3 +348,11 @@ Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
 - `/watch-dev.html` has two players on one clock with play, pause, +30 s and load.
 - Volume dip: in a watch party with sound on, the video goes quiet for the five seconds before each change of target (the 5, 4, 3, 2, 1 beeps) and comes back after. Not yet checked by ear.
 - Other sources: paste a Twitch channel link (twitch.tv/name) or a link to a video file (.mp4, .webm). Twitch shows the live stream with no syncing; a file plays in step like YouTube. Checked in headless Chromium with a Wikimedia WebM and Twitch's gcn channel.
+
+## Training plans (2026-11-14)
+
+- Ride tab → Training plan: four plan cards. Pick one, tap weekdays (fewer than the plan's rides a week keeps Start plan greyed out), pick a start date, Start plan. The calendar shows every plan week as seven days: sessions with name, minutes and TSS, the rest dashed.
+- Back on the Ride tab a "Today's workout" card sits at the top: Start opens that workout in the solo player; on a rest day it shows the next session and "Ride it now".
+- Ride a session (the simulated trainer is fine, or a 1 min ride of the same workout): after saving, the day shows ✓ Done in the calendar and the card says Done. A past session with no ride shows Missed. Any ride of 80% of the session's length also counts.
+- Log in on a second browser: the same plan and calendar. Restart from today moves week 1 to today; Leave plan asks first, then shows the picker again.
+
