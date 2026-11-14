@@ -23,6 +23,7 @@ import { scatter } from './scatter'
 import type { Signs } from './signs'
 import { buildStreets } from './streetGeo'
 import { buildTerrain } from './terrainGeo'
+import { buildVerge } from './vergeGeo'
 
 const R = VIS.route
 const P = R.place
@@ -134,6 +135,7 @@ export class Chunks {
     if (cf) for (const m of buildBuildings(cf.buildings, field, patches, cover, solid)) g.add(m)
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
+    buildVerge(field, patches, cover, d0, d1, level, solid)
     for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     for (const m of buildOddities(odds, field, patches, solid, signs)) g.add(m)
     const { funSigns, chalk } = this.place

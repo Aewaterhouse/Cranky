@@ -60,6 +60,26 @@ export const PLACE = {
   door: '#7a4a2e',
   awning: '#d9482f',
   servo: '#f2b705',
+  /** Close-up detail per metre of road (scaled by `density` per quality level): grass tufts out to `tuftOut` m past
+   * the verge, gravel specks, chevron boards round bends sharper than 1 / `chevronCurve` m, and painted tree shadows
+   * (only where there are no shadow maps). */
+  verge: {
+    density: { lowpower: 0, potato: 0.3, low: 0.6, medium: 1, high: 1.4 },
+    tufts: 1.4,
+    tuftOut: 5,
+    tuftH: 0.45,
+    tuft: '#8cc04a',
+    tuftDry: '#d8c470',
+    specks: 1.2,
+    speck: '#6f665a',
+    chevronCurve: 0.025,
+    chevronApart: 9,
+    chevronBg: '#f2c230',
+    chevronFg: '#1b1b1b',
+    shadowEvery: 9,
+    shadowChance: 0.35,
+    shadowDark: 0.72,
+  },
   furniture: {
     /** Gradient signs: a stretch averaging at least `gradeMin` over `gradeWindow` for `gradeLength`, signed `gradeAhead` early. */
     gradeMin: 0.06,
