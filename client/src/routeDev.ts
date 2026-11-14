@@ -18,10 +18,10 @@ import { rideSound } from './ui/rideSound'
  *   fixture=1 (made-up land cover, side streets, houses and landmarks, to try map features without real data)
  *   next=odd|sign|chalk|life (start just before the next oddity, funny sign, chalk or animal after d; kind=roos)  kind=couch (only that kind)  odd=couch (make every oddity a couch; odd=* cycles through every kind)  back=14 (metres before it)
  *   power=0 (coasting; left out, pedalling)  effort=1.5 (share of FTP)  cheer=1 (arms up)  calm=1 (calm camera)
- *   sound=1 (the ride sounds, after a click or key; c for a gear clunk)
+ *   sound=1 (the ride sounds, after a click or key; q for a gear clunk)
  *   mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower (default: by the clock, mist up high, showers)
  *   debug=1  hud=0  gfx=potato|low|medium|high  vis.route.camBack=12 (any numeric VIS tunable, dotted path)
- * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel
+ * Keys: , . speed   [ ] jump 500 m back or on   n next oddity   g debug panel   c camera view   q clunk
  */
 const q = new URLSearchParams(location.search)
 const num = (k: string, d: number) => (q.has(k) ? Number(q.get(k)) : d)
@@ -113,7 +113,7 @@ async function start() {
     Object.assign(window, { sound })
   }
   addEventListener('pointerdown', hear)
-  addEventListener('keydown', (e) => (hear(), e.key === 'c' && sound?.clunk()))
+  addEventListener('keydown', (e) => (hear(), e.key === 'q' && sound?.clunk()))
 
   const openPanel = () => void debugPanel(() => world.rebuild())
   if (q.has('debug')) openPanel()
@@ -129,6 +129,7 @@ async function start() {
     else if (e.key === ']') st.d = Math.min(route.distance, st.d + 500)
     else if (e.key === 'n') jump(q.get('next') ?? 'odd')
     else if (e.key === 'g') openPanel()
+    else if (e.key === 'c') world.cycleView()
   })
   let frames = 0
   const count = () => (frames++, requestAnimationFrame(count))
