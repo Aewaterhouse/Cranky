@@ -48,7 +48,7 @@ end of the queue. Owner's own to-dos go first:*
 4. [x] No scrap reward shown for the non-bus games (lobby 7).
 5. [x] Postcard downloads silently, no preview or share, always named `zombie-bus-…` (lobby 8).
 6. [ ] ("Ride again with this crew" done: the results button already went back to the same lobby, it now says so) No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
-7. [ ] The leaked group chat is a 40-line dump (lobby 5).
+7. [x] The leaked group chat is a 40-line dump (lobby 5).
 
 **The lobby**
 8. [ ] Long scroll, host decisions scattered, bus code and Start below the fold, top nav gone, Leave buried

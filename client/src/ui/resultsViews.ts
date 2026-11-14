@@ -51,6 +51,27 @@ export interface GroupSummary {
 export const tile = (label: string, value: string, cls = '') =>
   h('div', { class: `res-tile ${cls}` }, h('span', {}, label), h('b', {}, value))
 
+/**
+ * The leaked chat, readable: the game's own commentary (the lines that are not emoji traffic) and the last few
+ * messages, with the whole thing folded away under "Read the whole chat".
+ */
+function chatLines(chat: string[]) {
+  const line = (l: string) => h('p', { class: 'res-review' }, l)
+  const said = chat.filter((l) => !/^Date \d+ · .+ → .+: /.test(l))
+  const top = [...new Set([...said, ...chat.slice(-3)])].slice(-CHAT_TOP)
+  if (chat.length <= CHAT_TOP) return chat.map(line)
+  return [
+    ...top.map(line),
+    h(
+      'details',
+      {},
+      h('summary', {}, `Read the whole chat (${chat.length} messages)`),
+      ...chat.map(line),
+    ),
+  ]
+}
+const CHAT_TOP = 8
+
 const who = (g: GroupSummary, id: string) => g.riders.find((r) => r.id === id)?.name ?? '?'
 
 type Row = GroupSummary['riders'][number]
@@ -129,7 +150,7 @@ export const VIEWS: Record<
           ),
         ),
         g.chat?.length ? h('h2', {}, 'The leaked group chat') : '',
-        ...(g.chat ?? []).map((l) => h('p', { class: 'res-review' }, l)),
+        ...chatLines(g.chat ?? []),
       ),
   },
   climate: {
