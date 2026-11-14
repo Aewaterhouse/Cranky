@@ -140,8 +140,8 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
   are not the highest emitter. The sash expires after 30 days regardless.
 
 **Checklist**
-- [ ] C1 Server: `modes/climate.py`: decades, four fuels as per-rider targets, profit, emissions, switching costs. Tests.
-- [ ] C2 Server: sea level and stages, seawalls, demand events, the lobbyist. Tests, including the two tuning cases.
+- [x] C1 Server: `modes/climate.py`: decades, four fuels as per-rider targets, profit, emissions, switching costs. Tests.
+- [x] C2 Server: sea level and stages, seawalls, demand events, the lobbyist. Tests, including the two tuning cases.
 - [ ] C3 Server: Trial, jury vote, sentencing, win and lose, the sash saved on the profile. Tests.
 - [x] C4 Client HUD: fuel picker, coins and the crew's ledger (profit shown, emissions hidden until the Trial),
       sea-level gauge, gust and surge prompts, seawall button, the secret bribe sheet, the jury vote.

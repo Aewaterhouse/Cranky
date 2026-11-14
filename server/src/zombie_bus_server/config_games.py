@@ -180,3 +180,49 @@ DATE_CLING = 0.7  # how much of a clingy bot's power is copied from its date
 DATE_CHAOS = 0.12  # how far a chaotic bot wanders from its target
 DATE_BOT_EMOJI_PER_S = 0.03
 DATE_CHAT_MAX = 36  # lines of leaked chat
+
+# --- Climate Lawsuit ---------------------------------------------------------------------------------------
+CLIM_EIGHTIES_S = 480  # warm-up: everyone on coal
+CLIM_DECADE_S = 420
+CLIM_DECADES = ("1990s", "2000s", "2010s", "2020s")
+CLIM_TRIAL_S = 300
+CLIM_COOL_S = 240
+CLIM_CHOOSE_S = 30  # the fuel question opens this long before each decade
+CLIM_MIN_RIDERS = 4  # bots fill the town to this many companies
+CLIM_MS_AT_FTP = 10.0
+# Each fuel: its band (share of FTP), coins a second at FTP while earning, tonnes a second at FTP.
+CLIM_FUELS = {
+    "coal": {"band": (0.60, 1.00), "rate": 0.12, "emit": 1.0},
+    "gas": {"band": (0.70, 0.90), "rate": 0.096, "emit": 0.5},
+    "solar": {"band": (0.85, 0.90), "rate": 0.144, "emit": 0.1},
+    "wind": {"band": (0.55, 0.65), "rate": 0.0, "emit": 0.0},
+}
+CLIM_EARN_MIN = 0.3  # coal and gas earn over this share of FTP
+CLIM_SOLAR_SLACK = 0.01  # solar still earns this close outside its band
+CLIM_COST = {"gas": 20, "solar": 35, "wind": 45}  # coins to leave coal for this fuel in the 1990s
+CLIM_COST_FALL = (1.0, 0.8, 0.6, 0.45)  # price by decade: early adopters pay up front
+CLIM_GUST = {"every": 75, "secs": 15, "band": (1.05, 1.15), "pay": 14}  # wind: big payout per gust held
+CLIM_SURGE = {"every": 120, "secs": 20, "band": (1.00, 1.10), "pay": 8}  # gas: bonus per surge held
+CLIM_CUE_HELD = 0.97  # mean share of FTP over a gust or surge that counts as holding it
+CLIM_FLOOD_T = 1340  # tonnes per company that put the town under (level 1)
+CLIM_STAGES = (0.15, 0.40, 0.65, 1.0)  # sea level at which the beach, surf club, Main Street, everything go
+CLIM_STAGE_NAMES = ("", "Beach", "Surf club", "Main Street", "Everything")
+CLIM_WALL_STEP = 0.08  # a seawall knocks the sea back this much
+CLIM_WALL_COST = (30, 15)  # the first seawall's price and how much dearer each one after is
+CLIM_HEAT = {"band": (0.95, 1.05), "need": 0.9}  # heatwave: crew mean under `need` blacks out the town
+CLIM_KETTLE = {"band": (1.10, 1.20), "need": 1.05}  # State of Origin half time
+CLIM_BLACKOUT = 15  # coins every company loses in a blackout
+CLIM_MINER = {"x": 1.05, "pay": 1.25}  # bitcoin miner: targets and profits for the rest of the decade
+CLIM_BRIBE = 60  # the lobbyist's envelope
+CLIM_BRIBE_S = 45  # how long the envelope sits on the table
+CLIM_EVENT_S = {"say": 0, "heat": 120, "kettle": 30, "miner": 0, "lobby": 0}
+CLIM_EASY = (0.50, 0.62)  # jury, Trial voting and sentencing spectators
+CLIM_VOTE_S = 60  # the jury votes for this long at the start of the Trial
+CLIM_DOCK_S = 180  # then the defendants ride the chosen effort this long
+CLIM_TARGETS = ("90", "100", "105")  # the jury's options, % FTP
+CLIM_DOCK_HALF = 0.04  # the defendant's band is the target ± this share of FTP
+CLIM_ACQUIT = 0.8  # share of the dock held for an acquittal on a technicality
+CLIM_SERVICE = {"band": (0.97, 1.03), "secs": 120}  # community service at sentencing
+CLIM_SASH_DAYS = 30
+CLIM_BOTS = ("baron", "greenie", "fence")  # by the bot's place in BOT_NAMES
+CLIM_BOT_ASK_S = (3, 12)  # a bot answers a question after this many seconds

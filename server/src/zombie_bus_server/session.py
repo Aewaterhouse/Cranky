@@ -11,6 +11,7 @@ from fastapi import WebSocket
 from . import bots, discord, room_handle, room_tick
 from . import config as C
 from .modes.ambulance import Ambulance
+from .modes.climate import Climate
 from .modes.dating import Dating
 from .modes.vo2_madness import Vo2Madness
 from .modes.zombie_bus import ZombieBus, weekly_mutator
@@ -21,7 +22,7 @@ if TYPE_CHECKING:
     from .store import Store
 
 __all__ = ["MODES", "Rider", "Room"]
-MODES = {"bus": ZombieBus, "madness": Vo2Madness, "ambo": Ambulance, "date": Dating}
+MODES = {"bus": ZombieBus, "madness": Vo2Madness, "ambo": Ambulance, "date": Dating, "climate": Climate}
 
 
 class Room:

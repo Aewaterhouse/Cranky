@@ -17,6 +17,12 @@ class Join(BaseModel):
     tier: Tier
     look: dict[str, str] = Field(default_factory=dict)
 
+    @field_validator("look", mode="before")
+    @classmethod
+    def no_sash(cls, look: object) -> object:
+        """Only the server puts a sash on: one in the join message is dropped before it is checked."""
+        return {k: v for k, v in look.items() if k != "sash"} if isinstance(look, dict) else look
+
     @field_validator("look")
     @classmethod
     def checked_body(cls, look: dict[str, str]) -> dict[str, str]:
@@ -46,7 +52,7 @@ class Difficulty(BaseModel):
 
 class Game(BaseModel):
     t: Literal["game"]
-    game: Literal["bus", "madness", "ambo", "date"]
+    game: Literal["bus", "madness", "ambo", "date", "climate"]
 
 
 class RoadSetup(BaseModel):
