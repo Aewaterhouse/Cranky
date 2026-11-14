@@ -147,3 +147,16 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] With every card open, nothing covers the power panel (top left), the clock (top centre) or the bus panel and plan strip (bottom).
 - [ ] Leave and rejoin a ride: the cards you had open are open again.
 - [ ] On a rider with no weight set, W/kg shows "–" and your own card says "Add your weight in Rider → Settings".
+
+## Strava
+- [ ] On strava.com/settings/api, the app's Authorization Callback Domain is `www.cranky.life` (the host of `PUBLIC_URL`).
+- [ ] Connect from Safari on the iPad: Rider → Settings → Connect with Strava, approve, and you land back on Settings with "Strava connected" and your Strava name.
+- [ ] Connect from a laptop (another rider, or after Disconnect): the same.
+- [ ] In Bluefy, Settings carries the note about connecting from Safari or a laptop; after connecting in Safari, a ride finished in Bluefy still uploads.
+- [ ] Ride a short Zombie Bus (over 30 s): within a minute it is on Strava as a Virtual Ride titled "🧟 Zombie Bus · <plan> · survived with a … m gap" (or caught), with the score, crew, awards and your NP, time on target and share in the description.
+- [ ] The postcard link at the end of that description previews as the postcard picture (paste it into Messages or Discord) and opens the postcard page.
+- [ ] "Save postcard for Strava" on the results screen gives the picture to add to the activity in the Strava app.
+- [ ] History shows the ride tagged "Strava"; opening it gives View on Strava, which opens the activity.
+- [ ] Retry: revoke Cranky on strava.com (Settings → My Apps), then ride again: within a few minutes History shows the ride as "Strava: retry", with the reason in the ride. In Cranky, Disconnect and Connect with Strava again, open the ride and tap Retry: it uploads.
+- [ ] An older ride (from before connecting) shows Upload to Strava in History, and uploads.
+- [ ] Disconnect in Settings: Cranky disappears from strava.com → Settings → My Apps.

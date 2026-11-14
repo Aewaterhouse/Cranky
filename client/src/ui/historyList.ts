@@ -3,6 +3,7 @@ import type { Profile } from '../core/curve'
 import type { RideSummary } from '../core/ride'
 import { flushRides, queuedList } from '../core/rideQueue'
 import { downloadFit, downloadJson } from './rideExport'
+import { stravaRides, stravaTag, type StravaJob } from './strava'
 import { fmt, h, kmStr, pctStr } from './dom'
 import { routeTrace } from './routeTrace'
 import { dateStr, rideDetail } from './historyDetail'
@@ -25,7 +26,7 @@ export interface RideRow {
 }
 
 const num = (v: number | null, unit = '') => (v == null ? '–' : `${Math.round(v)}${unit}`)
-function list(rows: RideRow[], open: (n: number) => void) {
+function list(rows: RideRow[], open: (n: number) => void, strava?: Record<string, StravaJob>) {
   if (!rows.length) return h('p', { class: 'dim' }, 'No rides yet. Your first one lands here.')
   const cols = ['Date', 'Ride', 'Time', 'Avg W', 'NP', 'TSS', 'kJ', 'Compl.']
   return h(
@@ -50,6 +51,7 @@ function list(rows: RideRow[], open: (n: number) => void) {
               )
             : '',
           r.crew ? h('em', { class: 'crew-tag' }, 'Crew') : '',
+          stravaTag(strava?.[r.id]),
         ),
         h('span', {}, r.secs == null ? '–' : fmt(r.secs)),
         h('span', {}, num(r.avgPower)),
@@ -89,13 +91,13 @@ export function historyTab(p: Profile) {
     box.replaceChildren(h('h2', { class: 'label' }, 'Rides'), h('p', { class: 'dim' }, 'Loading…'))
     flushRides(p.id)
       .catch(() => {})
-      .then(() => api<RideRow[]>('/api/rides'))
+      .then(() => Promise.all([api<RideRow[]>('/api/rides'), stravaRides().catch(() => undefined)]))
       .then(
-        (rows) =>
+        ([rows, strava]) =>
           box.replaceChildren(
             h('h2', { class: 'label' }, `Rides (${rows.length})`),
             waiting(p.id),
-            list(rows, (n) => box.replaceChildren(rideDetail(p, n, showList))),
+            list(rows, (n) => box.replaceChildren(rideDetail(p, n, showList)), strava?.rides),
           ),
         () =>
           box.replaceChildren(

@@ -14,6 +14,7 @@ import { downloadFit, downloadJson } from './rideExport'
 import { ridePostcard, savePng } from './ridePostcard'
 import type { GroupSummary } from './results'
 import { busCard, postcard } from './resultsGroup'
+import { stravaRow } from './strava'
 import { segsFromSeries } from './soloSegs'
 import { modal, toast } from './toast'
 import { workoutChart } from './workoutChart'
@@ -243,6 +244,7 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
           h('button', { onclick: () => void savePostcard(p, s) }, 'Save postcard'),
           h('button', { class: 'ghost danger', onclick: del }, 'Delete'),
         ),
+        stravaRow(p, s, n),
       )
     },
     () => root.replaceChildren(head(), h('p', { class: 'dim' }, "Couldn't load that ride.")),

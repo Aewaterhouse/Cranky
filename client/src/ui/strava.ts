@@ -161,3 +161,72 @@ export function stravaCardButton(p: Profile, s: RideSummary, group?: GroupSummar
   )
   return b
 }
+
+/** My uploads by ride number, and whether I'm connected (History). */
+export const stravaRides = () =>
+  api<{ connected: boolean; rides: Record<string, StravaJob> }>('/api/strava/rides')
+
+const activityLink = (id: string) =>
+  h(
+    'a',
+    {
+      class: 'strava-link',
+      href: `https://www.strava.com/activities/${id}`,
+      target: '_blank',
+      rel: 'noopener',
+    },
+    'View on Strava',
+  )
+
+/** History list: a ride's Strava status in a word (the actions are in the ride itself). */
+export function stravaTag(j?: StravaJob) {
+  if (!j || j.status === 'none') return ''
+  const [cls, text] =
+    j.status === 'done'
+      ? ['done', 'Strava']
+      : j.status === 'failed'
+        ? ['failed', 'Strava: retry']
+        : ['busy', 'Uploading']
+  return h('em', { class: `strava-tag ${cls}` }, text)
+}
+
+/**
+ * One ride in History: on Strava with a link, uploading (checked again every few seconds), failed with Retry, or
+ * Upload for a ride from before connecting. Nothing when Strava isn't connected.
+ */
+export function stravaRow(p: Profile, s: RideSummary, n: number) {
+  const box = h('div', { class: 'strava-row' })
+  const send = () => {
+    box.replaceChildren(h('span', { class: 'dim' }, 'Sending to Strava…'))
+    sendToStrava(p, s, n).then(draw, (e: Error) => {
+      toast(e.message || "Couldn't send that to Strava", 'bad')
+      refresh()
+    })
+  }
+  const draw = (j?: StravaJob) => {
+    if (!j || j.status === 'none')
+      return box.replaceChildren(
+        s.record.secs >= CFG.stravaMinSecs && s.power?.length
+          ? h('button', { onclick: send }, 'Upload to Strava')
+          : '',
+      )
+    if (j.status === 'done')
+      return box.replaceChildren(
+        j.activity ? activityLink(j.activity) : h('span', { class: 'dim' }, 'On Strava'),
+      )
+    if (j.status === 'failed')
+      return box.replaceChildren(
+        h('span', { class: 'dim' }, `Strava upload failed${j.error ? `: ${j.error}` : ''}. `),
+        h('button', { onclick: send }, 'Retry'),
+      )
+    box.replaceChildren(h('span', { class: 'dim' }, 'Uploading to Strava…'))
+    setTimeout(() => box.isConnected && refresh(), CFG.stravaPollMs)
+  }
+  const refresh = () =>
+    stravaRides().then(
+      (r) => (r.connected ? draw(r.rides[n]) : box.replaceChildren()),
+      () => {},
+    )
+  refresh()
+  return box
+}

@@ -92,6 +92,11 @@ def router(strava: Strava, uploads: Uploads, user: Any) -> APIRouter:
         strava.disconnect(u["id"])
         return strava.status(u["id"])
 
+    @api.get("/api/strava/rides")
+    def rides(u: user) -> dict:
+        """The caller's own uploads by ride number, for History."""
+        return {"connected": strava.status(u["id"])["connected"], "rides": uploads.rides(u["id"])}
+
     @api.post("/api/strava/upload/{n}")
     def upload(n: int, body: Upload, u: user) -> dict:
         """Sends one of the caller's own saved rides (its .fit built on the device) to Strava."""

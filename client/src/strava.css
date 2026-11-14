@@ -20,3 +20,19 @@ a.strava-link {
   color: #fc4c02;
   font-weight: 700;
 }
+.strava-tag {
+  margin-left: 0.4rem;
+  font-size: 0.75em;
+  font-style: normal;
+  font-weight: 700;
+  color: var(--dim, #9c998f);
+}
+.strava-tag.done {
+  color: #fc4c02;
+}
+.strava-tag.failed {
+  color: #e5484d;
+}
+.strava-row {
+  margin-top: 0.6rem;
+}

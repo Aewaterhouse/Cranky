@@ -250,3 +250,19 @@ def test_postcard_page_is_public_only_once_uploaded_and_previews_as_the_picture(
     m = save(h, bus_ride("2026-11-14T15:00:00.000Z"))
     client.post(f"/api/strava/upload/{m}", json={"fit": FIT}, headers=h)
     assert U._get("luke", m)["card"] is None
+
+
+def test_history_sees_only_my_own_uploads(fake):
+    _, h = auth("luke", "Luke")
+    _, hs = auth("steve", "Steve")
+    connect(h)
+    n = save(h, bus_ride("2026-11-14T16:00:00.000Z"))
+    client.post(f"/api/strava/upload/{n}", json={"fit": FIT}, headers=h)
+    run("done", n)
+    mine = client.get("/api/strava/rides", headers=h).json()
+    assert mine == {
+        "connected": True,
+        "rides": {str(n): {"status": "done", "activity": "9001", "error": None}},
+    }
+    assert client.get("/api/strava/rides", headers=hs).json() == {"connected": False, "rides": {}}
+    assert client.get("/api/strava/rides").status_code == 401
