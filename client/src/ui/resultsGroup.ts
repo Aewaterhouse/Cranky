@@ -102,7 +102,25 @@ export async function busCard(g: GroupSummary, planName: string) {
   sky.addColorStop(1, '#e8a86b')
   x.fillStyle = sky
   x.fillRect(0, 0, 1200, 800)
-  if (g.postcard) {
+  if (!g.postcard) {
+    // No scene still (rebuilt in History, or the renderer would not give one): a cartoon road under the game's icon.
+    x.fillStyle = '#3d5a3a'
+    x.beginPath()
+    x.ellipse(300, 520, 520, 200, 0, Math.PI, 0)
+    x.ellipse(950, 520, 480, 160, 0, Math.PI, 0)
+    x.fill()
+    x.fillStyle = '#4a4f5a'
+    x.beginPath()
+    x.moveTo(560, 520)
+    x.lineTo(640, 520)
+    x.lineTo(900, 800)
+    x.lineTo(300, 800)
+    x.fill()
+    x.font = '200px system-ui'
+    x.textAlign = 'center'
+    x.fillText(GAMES[(g.mode ?? 'bus') as Game].icon, 600, 400)
+    x.textAlign = 'start'
+  } else {
     const img = new Image()
     img.src = g.postcard
     await img.decode().catch(() => {})
@@ -119,20 +137,17 @@ export async function busCard(g: GroupSummary, planName: string) {
   x.fillStyle = '#eee'
   x.font = '28px system-ui'
   x.fillText(
-    `${planName} · ${(g.distance / 1000).toFixed(1)} km · armour ${Math.round(g.armour)} · sync ${Math.round(g.syncPct)}% · ${g.scrap} scrap`,
+    `${planName} · ${(g.distance / 1000).toFixed(1)} km${(g.mode ?? 'bus') === 'bus' ? ` · armour ${Math.round(g.armour)}` : ''} · sync ${Math.round(g.syncPct)}% · ${g.scrap} scrap`,
     40,
     580,
   )
   x.fillText(`Crew: ${g.riders.map((r) => r.name).join(', ')}`, 40, 625)
   x.font = '24px system-ui'
-  g.awards
-    .slice(0, 5)
-    .forEach((a, i) =>
-      x.fillText(
-        `🏆 ${a.award}: ${a.name} (${a.why})`,
-        40 + (i % 2) * 580,
-        680 + Math.floor(i / 2) * 36,
-      ),
-    )
+  g.awards.slice(0, 6).forEach((a, i) => {
+    // Each award keeps to its own column, cut short with an ellipsis rather than running into the next.
+    let t = `🏆 ${a.award}: ${a.name} (${a.why})`
+    while (x.measureText(t).width > 550 && t.length > 4) t = t.slice(0, -2).trimEnd() + '…'
+    x.fillText(t, 40 + (i % 2) * 580, 680 + Math.floor(i / 2) * 36)
+  })
   return c
 }

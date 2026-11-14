@@ -51,7 +51,8 @@ say where you are, and free-ride places that don't look like where they are.
 
 **Bugs found along the way**
 17. [ ] ("1 rides" fixed; the missing History ride was almost surely under 30 s, which is never saved: results now
-    says so; sprint tables say Missed, not FAIL; the postcard still wants a picture) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
+    says so; sprint tables say Missed, not FAIL; a crew postcard with no scene still gets a cartoon road under the game icon,
+    awards no longer overlap and the preview fits the dialog; a 3D crew render on it is still to do) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
     overflows on iPad (rider 20).
 
 The rest of each report follows after these.

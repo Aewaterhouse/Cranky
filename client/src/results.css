@@ -394,7 +394,7 @@ tr.me td {
 }
 .postcard-preview {
   display: block;
-  max-width: min(80vw, 720px);
+  max-width: min(100%, 720px);
   max-height: 60vh;
   margin: 0 auto 12px;
   border-radius: 10px;
