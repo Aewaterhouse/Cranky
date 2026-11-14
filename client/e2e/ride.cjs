@@ -1,5 +1,5 @@
-// End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride and a Kidney Stone
-// Express shift with bots.
+// End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride, a Kidney Stone
+// Express shift and a Speed Dating night, the last two with bots.
 // Run with scripts/e2e.sh, which starts a sped-up server on E2E_URL.
 const { chromium } = require('playwright')
 
@@ -72,6 +72,21 @@ async function shift(page) {
     if (!new RegExp(want, 'i').test(text)) throw new Error(`shift results missing "${want}"`)
 }
 
+// Speed Dating with three bots: six dates, the wedding and the divorce.
+async function night(page) {
+  await page.click('text=Start a new bus')
+  await useSim(page)
+  await page.waitForSelector('.code-letters')
+  await page.click('.game-card:has-text("Speed Dating")')
+  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
+  await page.click('text=Open the bar')
+  await page.waitForSelector('.dt', { timeout: 20000 })
+  await page.waitForSelector('text=Made it!', { timeout: 300000 })
+  const text = await page.innerText('body')
+  for (const want of ['Chemistry', 'Couples', 'The leaked group chat', 'Best Match'])
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`dating results missing "${want}"`)
+}
+
 ;(async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
   try {
@@ -83,6 +98,8 @@ async function shift(page) {
     console.log('crew ride: ok')
     await shift(await rider(browser, 'Kat'))
     console.log('Kidney Stone Express: ok')
+    await night(await rider(browser, 'Jack'))
+    console.log('Speed Dating: ok')
     if (errors.length) throw new Error(`page errors:\n${errors.join('\n')}`)
     console.log('e2e passed')
   } catch (e) {
