@@ -104,7 +104,7 @@ export function todayCard(p: Profile, go: Go, open: () => void) {
 
 function sessionCell(s: Session | undefined, date: string, st: SessionState | 'rest', go: Go) {
   const kids = [h('small', {}, dayLabel(date))]
-  if (!s) return h('div', { class: 'pl-day rest' }, ...kids, h('span', { class: 'dim' }, 'Rest'))
+  if (!s) return h('div', { class: 'pl-day rest', title: 'Rest day' }, ...kids, h('span', {}, '–'))
   const i = workoutInfo(s.workout)
   return h(
     'button',
@@ -130,6 +130,13 @@ function calendar(p: Profile, go: Go, redraw: () => void) {
     const nowWeek = Math.floor(
       (Date.parse(`${today}T12:00`) - Date.parse(`${pick.start}T12:00`)) / 864e5 / 7,
     )
+    // "2/3 ✓" per week: sessions done of those planned.
+    const tally = (w: number) => {
+      const days = new Set(Array.from({ length: 7 }, (_, d) => addDays(pick.start, w * 7 + d)))
+      const mine = a.sessions.filter((x) => days.has(x.date))
+      const done = mine.filter((x) => state.get(x.date) === 'done').length
+      return `${done}/${mine.length}${done === mine.length && mine.length ? ' ✓' : ''}`
+    }
     const week = (w: number) =>
       Array.from({ length: 7 }, (_, d) => {
         const date = addDays(pick.start, w * 7 + d)
@@ -157,6 +164,7 @@ function calendar(p: Profile, go: Go, redraw: () => void) {
             'h2',
             { class: 'label' },
             w === nowWeek ? `Week ${w + 1} · this week` : `Week ${w + 1}`,
+            h('span', { class: 'pl-tally' }, tally(w)),
           ),
           h('div', { class: 'pl-grid' }, ...week(w)),
         ),

@@ -95,7 +95,13 @@
 }
 .pl-day.rest {
   background: none;
-  border: 1px dashed var(--line);
+  opacity: 0.45;
+  align-items: center;
+  justify-content: center;
+}
+.pl-tally {
+  float: right;
+  color: var(--tox);
 }
 .pl-day small {
   color: var(--dim);
