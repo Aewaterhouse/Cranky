@@ -58,6 +58,7 @@
 - After a reboot the server is not running until someone starts `scripts/run.sh`.
 
 ## Known issues
+- Only `scripts/run.sh` should rebuild `client/dist` while the live server runs: anything else that rebuilds it breaks open pages (free ride went 2D). Tests use `ZB_CLIENT_DIST` and a scratch build.
 - Free-ride camera: on Mount Coot-tha, the High view zoomed out or orbited shows slivers (under 1.3%) of blank background at the terrain's edge beyond the hill. `/route-dev.html?route=mount-coot-tha&d=2000&camcheck=1` shows them.
 - `scripts/e2e.sh` on macOS leaves its uvicorn running after it passes (the trap kills `uv run`'s shell, not the server); kill whatever holds the port afterwards.
 - Imported GPX routes and My workouts live only in the browser's storage on one device; clearing it loses them (ride history, profiles and efforts are on the server).

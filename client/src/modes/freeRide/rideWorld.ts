@@ -74,7 +74,13 @@ export function rideWorld(
         world.shot = new sp.FlyShot(st.from, st.to, CFG.intro.secs, () => intro?.fly(st.what))
         world.onShotEnd = endIntro
       })
-      .catch(() => (view.flat(), cardOnly()))
+      .catch((e) => {
+        // Say why the ride is flat instead of leaving the rider to guess.
+        console.error('3D world failed to load', e)
+        view.toast('The 3D view could not load. Refresh to try again.')
+        view.flat()
+        cardOnly()
+      })
   else cardOnly()
 
   function cycleView() {

@@ -5,7 +5,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 CONTENT = ROOT / "content"
-CLIENT_DIST = ROOT / "client" / "dist"
+# The built client. Test runs point this elsewhere (ZB_CLIENT_DIST) so they never rebuild under a live server.
+CLIENT_DIST = Path(os.environ.get("ZB_CLIENT_DIST", ROOT / "client" / "dist"))
 DB_PATH = Path(os.environ.get("ZB_DB", ROOT / "server" / "zombie_bus.db"))
 
 TICK_HZ = 2

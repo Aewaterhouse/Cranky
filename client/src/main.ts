@@ -84,5 +84,14 @@ applySettings()
 diagOverlay()
 me().then(enter, () => showLogin(enter))
 
+// A newer build went live while this page was open, so a part loaded later (the 3D world) has gone: load the new
+// build rather than carry on without it. Once a minute at most, so a real outage cannot loop.
+addEventListener('vite:preloadError', (e) => {
+  const last = Number(sessionStorage.getItem('cranky.reloadAt') ?? 0)
+  if (Date.now() - last < 60000) return
+  sessionStorage.setItem('cranky.reloadAt', String(Date.now()))
+  e.preventDefault()
+  location.reload()
+})
 if (import.meta.env.PROD && 'serviceWorker' in navigator)
   navigator.serviceWorker.register('/sw.js').catch(() => {})
