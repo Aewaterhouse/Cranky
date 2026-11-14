@@ -7,6 +7,8 @@ import random
 from typing import TYPE_CHECKING
 
 from .. import config as C
+from .common import award as give
+from .common import compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
@@ -101,11 +103,7 @@ class Vo2Madness:
             extra = f" Twist: {twist[0]}. {twist[1]}" if twist else ""
             self.emit("box", f"{nxt['label']}!{extra}")
         comp = [r.s if r.s is not None else 1.0 for r in active]
-        for r in active:
-            if r.s is not None:
-                r.comp_sum += r.s
-                r.comp_n += 1
-                r.band_s += dt if r.s >= 0.999 else 0
+        tally(active, dt)
         self.speed = C.MAD_SPEED[0] + (C.MAD_SPEED[1] - C.MAD_SPEED[0]) * (
             sum(comp) / len(comp) if comp else 0
         )
@@ -221,13 +219,10 @@ class Vo2Madness:
 
     def summary(self, room: Room) -> dict:
         rs = list(room.riders.values())
-        comp = {r.id: r.comp_sum / r.comp_n if r.comp_n else 0.0 for r in rs}
-        awards = []
+        comp, awards = compliance(rs), []
 
         def award(name: str, score: dict, why) -> None:
-            best = max(rs, key=lambda r: score.get(r.id, 0), default=None)
-            if best and score.get(best.id, 0) > 0:
-                awards.append({"award": name, "id": best.id, "name": best.name, "why": why(score[best.id])})
+            give(awards, rs, name, lambda r: score.get(r.id, 0), lambda r: why(score[r.id]))
 
         award("Maddest", self.pts, lambda v: f"{int(v)} effort points")
         award("Red Liner", self.red, lambda v: f"{int(v)} s over {C.MAD_ZONES[-1]:.0%} of max")
@@ -242,17 +237,9 @@ class Vo2Madness:
             "difficulty": "normal",
             "syncPct": 0,
             "riders": [
-                {
-                    "id": r.id,
-                    "name": r.name,
-                    "compliance": round(comp[r.id], 3),
-                    "inBandSecs": round(r.band_s),
-                    "sprints": r.sprints,
-                    "falls": 0,
-                    "bot": r.bot,
-                    "points": int(self.pts.get(r.id, 0)),
-                    "redSecs": int(self.red.get(r.id, 0)),
-                }
+                rider_row(
+                    r, comp, falls=0, points=int(self.pts.get(r.id, 0)), redSecs=int(self.red.get(r.id, 0))
+                )
                 for r in sorted(rs, key=lambda r: -self.pts.get(r.id, 0))
             ],
             "awards": awards,

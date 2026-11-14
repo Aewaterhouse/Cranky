@@ -31,7 +31,7 @@ Work top to bottom, one checklist item per commit. Every invented rule or number
 
 Five games through `game === 'madness'` switches will not hold, and four files in the path are already over 300 lines.
 
-- [ ] Server: pull the shared pieces of the two modes into `modes/common.py` (compliance tally, `award`, rider result
+- [x] Server: pull the shared pieces of the two modes into `modes/common.py` (compliance tally, `award`, rider result
       rows) and split `session.py` (room vs. message handling) so it is back under 300 lines.
 - [ ] Server: per-rider target band from the mode in the tick; `act` message and `mode.on_act`; force non-ERG per game;
       ERG tests (no target written, 150% cap).

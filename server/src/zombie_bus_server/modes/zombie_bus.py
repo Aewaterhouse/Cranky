@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from .. import config as C
 from ..plan import is_over
+from .common import award, compliance, rider_row, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
@@ -85,11 +86,7 @@ class ZombieBus:
         self.fell_off(room, active, dt)
         active = [r for r in active if r.st == "riding"]
         comp = statistics.fmean([r.s if r.s is not None else 1.0 for r in active]) if active else 0.0
-        for r in active:
-            if r.s is not None:
-                r.comp_sum += r.s
-                r.comp_n += 1
-                r.band_s += dt if r.s >= 0.999 else 0
+        tally(active, dt)
         self.hauling(room, active, dt)
         self.cadence_sync(active, dt)
 
@@ -383,23 +380,19 @@ class ZombieBus:
 
     def summary(self, room: Room) -> dict:
         rs = list(room.riders.values())
-        comp = {r.id: r.comp_sum / r.comp_n if r.comp_n else 0.0 for r in rs}
-        awards = []
+        comp, awards = compliance(rs), []
 
-        def award(name: str, key, why, need=lambda v: v > 0) -> None:
-            best = max(rs, key=key, default=None)
-            if best and need(key(best)):
-                awards.append({"award": name, "id": best.id, "name": best.name, "why": why(best)})
-
-        award("Iron Lungs", lambda r: comp[r.id], lambda r: f"{comp[r.id]:.0%} compliance")
-        award("Fell Off King", lambda r: r.falls, lambda r: f"fell off {r.falls}x")
-        award("Roadblock MVP", lambda r: r.rb_dmg, lambda r: f"{int(r.rb_dmg)} roadblock damage")
+        award(awards, rs, "Iron Lungs", lambda r: comp[r.id], lambda r: f"{comp[r.id]:.0%} compliance")
+        award(awards, rs, "Fell Off King", lambda r: r.falls, lambda r: f"fell off {r.falls}x")
+        award(awards, rs, "Roadblock MVP", lambda r: r.rb_dmg, lambda r: f"{int(r.rb_dmg)} roadblock damage")
         award(
+            awards,
+            rs,
             "Sync Master",
             lambda r: r.sync_hits / r.sync_n if r.sync_n else 0,
             lambda r: f"{r.sync_hits / r.sync_n:.0%} in sync",
         )
-        award("PR Hunter", lambda r: r.mega, lambda r: f"{r.mega} MEGA+ sprints")
+        award(awards, rs, "PR Hunter", lambda r: r.mega, lambda r: f"{r.mega} MEGA+ sprints")
         score = round(
             (self.dist / 10 * (0.5 + self.armour / 200) + self.scrap) * C.DIFFICULTY[self.level]["score"]
         )
@@ -411,18 +404,6 @@ class ZombieBus:
             "score": score,
             "difficulty": self.level,
             "syncPct": round(100 * self.sync_ticks / self.ticks) if self.ticks else 0,
-            "riders": [
-                {
-                    "id": r.id,
-                    "name": r.name,
-                    "compliance": round(comp[r.id], 3),
-                    "inBandSecs": round(r.band_s),
-                    "sprints": r.sprints,
-                    "falls": r.falls,
-                    "kj": round(r.rs_joules / 1000, 1),
-                    "bot": r.bot,
-                }
-                for r in rs
-            ],
+            "riders": [rider_row(r, comp, kj=round(r.rs_joules / 1000, 1)) for r in rs],
             "awards": awards,
         }
