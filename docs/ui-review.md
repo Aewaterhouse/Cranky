@@ -50,7 +50,7 @@ end of the queue. Owner's own to-dos go first:*
 3. [ ] (phone) Phone award cards lose the winner's name (fixed: a top-bar rule hid it); the crew table breaks on phones (lobby 3, 4).
 4. [x] No scrap reward shown for the non-bus games (lobby 7).
 5. [x] Postcard downloads silently, no preview or share, always named `zombie-bus-…` (lobby 8).
-6. [ ] ("Ride again with this crew" done: the results button already went back to the same lobby, it now says so) No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
+6. [x] (History rows now name the game and its score) ("Ride again with this crew" done: the results button already went back to the same lobby, it now says so) No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
 7. [x] The leaked group chat is a 40-line dump (lobby 5).
 
 **The lobby**
@@ -58,7 +58,7 @@ end of the queue. Owner's own to-dos go first:*
    (nav 3, 4; lobby 10, 11, 16).
 9. [ ] (run picker, effort and trainer rows now hidden for scripted games) Run picker and effort rows shown for games that ignore them; game cards are walls of small text (lobby 12, 13).
 10. [x] Joining by code asks for a trainer before checking the code (nav 5).
-11. [ ] (leaving a lobby now frees the seat and hands over the driver's seat; no ready state yet) Guests have no ready state; a host who leaves leaves a ghost seat (lobby 15, 27).
+11. [x] (guests tap I'm ready; the driver's Start counts them) (leaving a lobby now frees the seat and hands over the driver's seat; no ready state yet) Guests have no ready state; a host who leaves leaves a ghost seat (lobby 15, 27).
 
 **Riding**
 12. [ ] Phone crew HUD overlaps itself (riding 6); in-ride controls are tiny on touch (nav 10, riding 22).
@@ -71,7 +71,7 @@ end of the queue. Owner's own to-dos go first:*
 **Rider and Garage**
 18. [ ] (try-on for hats, outfits and bikes, sticky shelf chips, a deal of the week, Treat yourself and progress bars done; paint thumbnails still without the bike) Garage: no try-on preview, paint thumbnails without the bike, a 3,300 px wall without tabs (rider 3, 4, 8).
 19. [ ] Phone Settings wider than the screen; clipped "OPTIONAL" placeholders in the display font (rider 9, 10).
-20. [ ] (crew line colours fixed) Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
+20. [x] (crew line colours fixed; Overview's recent rides lead to History) (crew line colours fixed) Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
 
 **Navigation and words**
 21. [ ] (the account menu now says App settings and no longer repeats the Rider tab) Settings in two places, leaderboards in three; jargon (Ladder, Rider, scrap, tier, CTL/ATL/TSB) (nav 7, 8, 9;
