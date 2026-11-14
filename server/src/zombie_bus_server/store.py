@@ -38,7 +38,25 @@ class Store:
             CREATE TABLE IF NOT EXISTS tokens (token TEXT PRIMARY KEY, id TEXT);
             CREATE TABLE IF NOT EXISTS rooms (code TEXT PRIMARY KEY, json TEXT, saved_at REAL);
             CREATE TABLE IF NOT EXISTS results (n INTEGER PRIMARY KEY, date TEXT, plan TEXT, json TEXT);
+            CREATE TABLE IF NOT EXISTS sashes (id TEXT PRIMARY KEY, until REAL);
             """)
+
+    def sash_until(self, rid: str) -> float | None:
+        """When this rider's Climate Lawsuit GUILTY sash comes off (epoch seconds), or None if they have none.
+
+        Kept apart from the profile, which the rider writes, so nobody can put one on or take one off.
+        """
+        with self.lock:
+            row = self.db.execute("SELECT until FROM sashes WHERE id = ?", (rid,)).fetchone()
+        return row[0] if row and row[0] > time.time() else None
+
+    def set_sash(self, rid: str, until: float | None) -> None:
+        """Puts the sash on until `until` (epoch seconds), or takes it off with None."""
+        with self.lock, self.db:
+            if until is None:
+                self.db.execute("DELETE FROM sashes WHERE id = ?", (rid,))
+            else:
+                self.db.execute("INSERT OR REPLACE INTO sashes VALUES (?, ?)", (rid, until))
 
     def get_profile(self, rid: str) -> dict | None:
         with self.lock:

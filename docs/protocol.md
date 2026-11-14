@@ -135,6 +135,15 @@ position, through `ErgController.setGrade`.
 - `PUT /api/rides/files/<name>` (logged in; body is the file, a .fit, .json or .png up to 8 MB) returns `{"url": "/api/rides/files/<key>/<name>"}`.
 - `GET /api/rides/files/<key>/<name>` (no login) serves it as an attachment for 10 minutes; `?inline=1` serves it inline.
 
+## Climate Lawsuit (`game: 'climate'`)
+- A bus room, never on ERG. The plan is free blocks with `kind` (`eighties`, `decade`, `trial`, `cool`); decades also carry `decade` ("1990s") and `n` (1 to 4). `tick.ev` is the kind.
+- `tick.game`: `{g: 'climate', phase, decade (on a decade, else null), n, level (0..1), stage (0..4), stageName ('' | 'Beach' | 'Surf club' | 'Main Street' | 'Everything'), walls, wallCost, cos: {id: {name, fuel, coins, on}}, event: {k: 'heat' | 'kettle' | 'miner', name, text, left} | null, cue: {id: {k: 'gust' | 'surge', left}}, trial, ledger, flooded}`.
+- `trial` (null before the Trial): `{defendants, target (% FTP, null while the jury votes), held (the first defendant's share of the dock held so far), heldBy: {id: share}, verdicts: {id: 'acquitted' | 'guilty'}}`. `ledger` (null before the Trial): `{id: {emit (tonnes), bribed, walls}}`.
+- Questions (`ask`, answered with `act` of the same `k`): `fuel` (`coal` | `gas` | `solar` | `wind`, in the last 30 s before each decade), `bribe` (`yes` | `no`, the lobbyist's envelope to one company), `appeal` (`yes` | `no`, to a sashed rider while the jury votes), `verdict_target` (`90` | `100` | `105`, to everyone but the defendants while the jury votes). Plus `act` `wall` (any value): build a seawall.
+- fx: `stage` (a new flood stage), `flood`, `blackout`, `wall` (id: who built it), `verdict` (id: the defendant), `say`.
+- Summary: `mode: 'climate'`, `score` (all companies' coins, 0 if flooded), `distance`, `flooded`, `level`, `stageName`, `walls`, `verdicts`, `awards`, rider rows with `company`, `coins`, `emit`, `bribed`, `walls`, `fuel`, `verdict`.
+- The GUILTY sash: the server adds `look.sash: true` to a rider's look on join (bus and road rooms) while they wear one; a `sash` in a join message or a saved profile is dropped. It is stored apart from the profile (`sashes` table) for 30 days from a guilty verdict in a flooded town, and comes off on an acquittal.
+
 ## Kidney Stone Express (`game: 'ambo'`)
 - A bus room, never on ERG. The plan is free blocks with `kind` (`base`, `run`, `ramp`, `cool`) and, on runs, `patient` (`hook`, `kidney`, `magpie`, `bin`, `trainer`). `tick.ev` is the phase: `base`, `run`, `ramp`, `reverse` or `cool` (a crew that arrives early is already in `ramp` while the run block finishes).
 - `tick.game`: `{g: 'ambo', phase, run, runs, patient: {id, name, icon, line} | null, comfort (0..100), dist (metres left), total, speed (km/h), par (seconds left in the run block), eta (seconds at this speed, or null when stopped), event, brake, perk: null | 'spike' | 'green', sweet (0..1), queue (seconds left in the hospital queue), reviews, score, siren}`. `patient` is null once they are delivered or have walked.

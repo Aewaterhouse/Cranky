@@ -30,9 +30,21 @@ def clean_body(s: object) -> str | None:
 
 
 def clean_look(look: dict) -> dict:
-    """The look with its `body` kept (clamped) if it is a body and dropped if not. Item ids pass through."""
+    """The look with its `body` kept (clamped) if it is a body and dropped if not. Item ids pass through.
+
+    A `sash` is never the rider's to set: it is always dropped here and added back by `wear_sash`.
+    """
+    look = {k: v for k, v in look.items() if k != "sash"}
     if "body" not in look:
         return look
     body = clean_body(look["body"])
     rest = {k: v for k, v in look.items() if k != "body"}
     return {**rest, "body": body} if body else rest
+
+
+def wear_sash(store: object, rid: str, look: dict) -> dict:
+    """The look with Climate Lawsuit's GUILTY sash on if the store says this rider is still wearing one."""
+    look = clean_look(look)
+    lookup = getattr(store, "sash_until", None)  # test stand-ins for the store may not have one
+    until = lookup(rid) if lookup else None
+    return {**look, "sash": True} if until else look

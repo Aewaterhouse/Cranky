@@ -10,6 +10,7 @@ from fastapi import WebSocket
 
 from . import bots
 from . import config as C
+from .avatars import wear_sash
 from .plan import load_plans
 from .protocol import (
     Act,
@@ -46,7 +47,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
     r = room.riders.get(rid)
     if isinstance(msg, Join):
         if r:
-            r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
+            r.name, r.ftp, r.look = msg.name, msg.ftp, wear_sash(room.store, rid, msg.look)
             if room.state != "running":
                 r.tier = msg.tier
         elif len(room.humans()) >= C.MAX_RIDERS:
@@ -55,7 +56,8 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         else:
             if len(room.riders) >= C.MAX_RIDERS:  # a bot gives up its seat
                 bots.set_bots(room, len(room.riders) - len(room.humans()) - 1)
-            r = room.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
+            look = wear_sash(room.store, rid, msg.look)
+            r = room.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=look)
         r.kg = profile_kg(room.store, rid)
         r.ws, r.connected, r.last_data = ws, True, time.monotonic()
         if room.paused:
