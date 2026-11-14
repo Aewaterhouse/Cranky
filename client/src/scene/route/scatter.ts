@@ -1,4 +1,4 @@
-import { noise2 } from '../math'
+import { noise2, smooth } from '../math'
 import { VIS } from '../params'
 import type { Features } from './features'
 import type { Cover, LandCover } from './landCover'
@@ -17,10 +17,12 @@ export const KINDS = [
   'boulder',
   'tor',
   'snow',
+  'stag',
+  'grasstree',
 ] as const
 export type Kind = (typeof KINDS)[number]
 /** The kinds that are trees: they keep further from the road, cast shadows and stop at the treeline. */
-export const TREES: readonly Kind[] = ['gum', 'scribbly', 'snowgum', 'teatree', 'tor']
+export const TREES: readonly Kind[] = ['gum', 'scribbly', 'snowgum', 'teatree', 'tor', 'stag']
 
 /** One plant: where, which, how big, which way round and a 0..1 number for its tint. */
 export interface Spot extends P3 {
@@ -68,12 +70,20 @@ function under(cover: LandCover, c: Cover, p: P3, rand: () => number): Kind {
   const r = rand()
   if (p.y > cover.alpine + P.snowAbove && rand() < P.snowShare) return 'snow'
   if (p.y > cover.treeline) return r < 0.3 ? 'boulder' : r < 0.7 ? 'tussock' : 'shrub'
+  if ((c === 'b' || c === 's') && p.y < P.grassTreeMax && rand() < P.grassTrees) return 'grasstree'
   if (c === 'f')
     return p.y < P.fernMax && noise2(p.x / 200 + 2, p.z / 200) > 0.45 && r < 0.75 ? 'fern' : 'shrub'
   if (c === 'r') return r < 0.6 ? 'boulder' : 'tussock'
   if (c === 'g' || c === 'a') return 'tussock'
   if (c === 'p' || c === 'u') return 'shrub'
   return r < 0.55 ? 'shrub' : 'tussock'
+}
+
+/** How much of a stand of trees covers (x, z): 0 in a clearing, 1 in the thick of it, ragged at the edges. */
+function stand(x: number, z: number) {
+  const S = P.stands
+  const n = noise2(x / S.scale + 5, z / S.scale - 2) * 0.8 + noise2(x / 17, z / 17 + 4) * 0.2
+  return smooth(S.clearing, S.full, n)
 }
 
 /**
@@ -107,8 +117,12 @@ export function scatter(
         if (!pt.point(j0, j1, c, rand(), v, p)) continue
         const cv = cover.at(p.x, p.z, p.y)
         const dens = isTree ? P.trees[cv] / MAX_TREES : P.under[cv] / MAX_UNDER
-        if (rand() >= dens || (cv === 'g' && cover.vine(p.x, p.z, p.y))) continue
-        const kind = isTree ? tree(cover, cv, p, rand) : under(cover, cv, p, rand)
+        if (cv === 'g' && cover.vine(p.x, p.z, p.y)) continue
+        let kind: Kind | undefined
+        if (!isTree) kind = rand() < dens ? under(cover, cv, p, rand) : undefined
+        else if (rand() < dens * stand(p.x, p.z) * P.stands.boost) kind = tree(cover, cv, p, rand)
+        else if (rand() < dens * P.stands.stags && p.y < cover.alpine && !'up'.includes(cv))
+          kind = 'stag'
         if (!kind) continue
         if (isTree) {
           // Not on the lip where this ground meets another stretch of road.

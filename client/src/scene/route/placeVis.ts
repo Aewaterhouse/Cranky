@@ -33,6 +33,15 @@ export const PLACE = {
   coastProbe: 45,
   /** Tree ferns only below this height. */
   fernMax: 1100,
+  /**
+   * Trees grow in stands with clearings between: a noise `scale` m across sets each spot's share, none below
+   * `clearing`, full from `full`, and stands are `boost` times as thick as the land cover's average. A tree that does
+   * not grow in a clearing is a dead stag `stags` of the time (scaled by how wooded the cover is).
+   */
+  stands: { scale: 120, clearing: 0.42, full: 0.58, boost: 2, stags: 0.15 },
+  /** Grass trees: this share of small plants in bush and scrub below `grassTreeMax` m. */
+  grassTrees: 0.22,
+  grassTreeMax: 1000,
   plant: {
     gumTrunk: '#d8d0bd',
     gumLeaf: '#6f9150',
@@ -54,6 +63,10 @@ export const PLACE = {
     shrub2: '#93a86e',
     tussock: '#c9bb6a',
     boulder: '#8d8a84',
+    stag: '#c9c3b8',
+    grassTrunk: '#2e2a24',
+    grassSkirt: '#8ea24c',
+    grassSpike: '#6b5634',
   },
   /** Houses and shops: roof pitch as a share of depth, the tallest roof, and colour schemes picked per building. */
   roofPitch: 0.32,

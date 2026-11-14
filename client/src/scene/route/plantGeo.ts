@@ -133,6 +133,38 @@ const snow = () =>
     .add(ico(1), C.oldSnow, [1.9, 0.1, 0.6], [0, 1.1, 0], [1.4, 0.1, 1])
     .build()
 
+/** A dead gum: a bleached leaning trunk and bare branches reaching up, no leaves at all. */
+function stag() {
+  const m = new Mesher(0.1)
+  m.add(cyl(0.18, 0.34, 8, 5), C.stag, [0.25, 4, 0], [0, 0, -0.06])
+  for (const [x, y, z, rx, rz, l] of [
+    [1.2, 7.4, 0.2, 0.1, -0.8, 3.4],
+    [-0.8, 6.3, -0.3, -0.3, 0.7, 2.8],
+    [0.4, 9.2, 0.5, 0.5, -0.2, 2.6],
+    [-0.3, 8.6, -0.6, -0.6, 0.45, 2],
+  ])
+    m.add(cyl(0.05, 0.12, l, 3), C.stag, [x, y, z], [rx, 0, rz])
+  return m.build()
+}
+
+/** Grass tree: a short black trunk under a fountain of thin green leaves and one tall brown flower spike. */
+function grasstree() {
+  const m = new Mesher(0.14)
+  m.add(cyl(0.24, 0.3, 1.5, 5), C.grassTrunk, [0, 0.75, 0])
+  for (let i = 0; i < 12; i++) {
+    const a = (i / 12) * Math.PI * 2
+    const up = i % 2 ? 0.5 : 0.95
+    m.add(
+      cone(0.09, 1.7, 3),
+      C.grassSkirt,
+      [Math.sin(a) * 0.5, 1.8 - up * 0.25, Math.cos(a) * 0.5],
+      [Math.cos(a) * up, 0, -Math.sin(a) * up],
+    )
+  }
+  m.add(cyl(0.05, 0.07, 2.4, 4), C.grassSpike, [0, 3.1, 0], [0.08, 0, 0.05])
+  return m.build()
+}
+
 const MAKE: Record<Kind, () => THREE.BufferGeometry> = {
   gum,
   scribbly,
@@ -144,6 +176,8 @@ const MAKE: Record<Kind, () => THREE.BufferGeometry> = {
   boulder,
   tor,
   snow,
+  stag,
+  grasstree,
 }
 let geos: Partial<Record<Kind, THREE.BufferGeometry>> = {}
 
