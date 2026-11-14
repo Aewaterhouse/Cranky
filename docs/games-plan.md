@@ -35,7 +35,7 @@ Five games through `game === 'madness'` switches will not hold, and four files i
       rows) and split `session.py` (room vs. message handling) so it is back under 300 lines.
 - [x] Server: per-rider target band from the mode in the tick; `act` message and `mode.on_act`; force non-ERG per game;
       ERG tests (no target written, 150% cap).
-- [ ] Server: script runner (`modes/script.py`): segments, seeded event scheduling, the 90 s gap test, time-scale.
+- [x] Server: script runner (`modes/script.py`): segments, seeded event scheduling, the 90 s gap test, time-scale.
 - [ ] Server: power-shape stats per rider (`ride_stats.py`): smoothness (spread of 3 s power around the rider's own
       30 s mean, as % FTP), spike count, time punished. Feeds Comfort, dating reports and awards.
 - [ ] Client: a game registry (`modes/crew/games.ts`): per game its name, blurb, HUD panel, scene set-up, event styles,
