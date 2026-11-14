@@ -9,6 +9,7 @@ import { makeWatchPanel } from '../../ui/hudWatch'
 import { LAST_EVENTS, makeLastPanel } from '../../ui/hudLast'
 import { makeTttPanel } from '../../ui/hudTtt'
 import { makeQuizPanel } from '../../ui/hudQuiz'
+import { makeGalleyPanel } from '../../ui/hudGalley'
 import { videoStage } from '../../scene/videoStage'
 import type { EventStyle } from '../../ui/hudKit'
 
@@ -86,6 +87,16 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
         mad: { pts: {}, crown: winner, lead: null, work: true },
       }
     },
+  },
+  galley: {
+    events: {},
+    panel: makeGalleyPanel,
+    scene: () => ({
+      gap: null,
+      armour: null,
+      roadblock: null,
+      mad: { pts: {}, crown: null, lead: null, work: true },
+    }),
   },
   quiz: {
     events: {},

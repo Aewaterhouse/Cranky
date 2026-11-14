@@ -167,4 +167,20 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Top score',
     plan: true,
   },
+  galley: {
+    icon: '🛶',
+    name: 'Galley Ship',
+    how: [
+      'The drum sets a cadence. Pedal at it, within 4 rpm.',
+      'The more of the crew in time, the faster the ship.',
+      'Fall out of time and the pirates board. The beat changes every 2 minutes.',
+    ],
+    tag: 'Row in time',
+    blurb:
+      'Row the galley over the driver’s workout: match the drum’s cadence to outrun the pirates. ERG holds your power; your legs keep the time.',
+    start: 'Cast off',
+    countdown: 'CASTING OFF IN',
+    score: 'Voyage score',
+    plan: true,
+  },
 }

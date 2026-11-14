@@ -22,6 +22,8 @@ export interface GroupSummary {
     reached?: number
     /** Team Time Trial: the rider's team. */
     team?: string
+    /** Galley Ship: seconds rowed on the beat. */
+    beat?: number
     /** Kidney Stone Express: power spread (% FTP), spikes and fines. */
     spread?: number
     spikes?: number
@@ -108,6 +110,11 @@ export const VIEWS: Record<
     ],
     col: 'Falls',
     cell: (r) => String(r.falls),
+  },
+  galley: {
+    tiles: (g) => [tile('Hull', String(Math.round(g.armour)))],
+    col: 'On the beat',
+    cell: (r) => `${r.beat ?? 0} s`,
   },
   quiz: {
     tiles: () => [],

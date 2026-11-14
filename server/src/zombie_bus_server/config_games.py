@@ -278,3 +278,11 @@ LAST_BOT_LIMIT = (1.0, 1.4)
 # QUIZ_ON_TARGET) when tapped, QUIZ_FAST more for the quickest.
 QUIZ_FIRST_S, QUIZ_EVERY_S, QUIZ_OPEN_S, QUIZ_LAST_S = 60, 90, 25, 60
 QUIZ_PTS, QUIZ_ON_PTS, QUIZ_FAST, QUIZ_ON_TARGET = 10, 5, 3, 0.9
+
+# Galley Ship: the drum's cadence changes every GALLEY_BEAT_S through GALLEY_BEATS; a rider within GALLEY_TOL
+# rpm is on the beat. Ship speed runs from GALLEY_V[0] (nobody) to GALLEY_V[1] (everyone, smoothed over
+# GALLEY_SMOOTH_S); the pirates hold GALLEY_PIRATES m/s. Caught: GALLEY_HIT hull, then GALLEY_KNOCK m back.
+GALLEY_BEATS = [85, 95, 80, 100, 90]
+GALLEY_BEAT_S, GALLEY_TOL, GALLEY_SMOOTH_S = 120, 4, 4
+GALLEY_V, GALLEY_PIRATES = (6.0, 10.0), 8.5
+GALLEY_GAP, GALLEY_GAP_MAX, GALLEY_HIT, GALLEY_KNOCK = 40, 120, 15, 25

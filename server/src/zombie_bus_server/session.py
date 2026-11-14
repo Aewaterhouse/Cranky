@@ -14,6 +14,7 @@ from . import config as C
 from .modes.ambulance import Ambulance
 from .modes.climate import Climate
 from .modes.dating import Dating
+from .modes.galley import Galley
 from .modes.last_standing import LastStanding
 from .modes.pub_quiz import PubQuiz
 from .modes.ttt import TeamTrial
@@ -37,6 +38,7 @@ MODES = {
     "last": LastStanding,
     "ttt": TeamTrial,
     "quiz": PubQuiz,
+    "galley": Galley,
 }
 
 
