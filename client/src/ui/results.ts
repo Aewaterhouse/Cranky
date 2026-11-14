@@ -254,41 +254,47 @@ export function finishRide(
         ),
       ),
       ftpBox,
-      h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
-      moreNumbers(s.power, s.hr, s.cadence, s.ftp),
+      // A crew ride's story is the game: its training numbers fold away. A solo workout shows them open.
       h(
-        'div',
-        { class: 'res-two' },
+        'details',
+        { class: 'res-more', open: !group && !road },
+        h('summary', {}, 'Training details'),
+        h('div', { class: 'card' }, h('h2', {}, 'Power vs target'), chartBox),
+        moreNumbers(s.power, s.hr, s.cadence, s.ftp),
         h(
           'div',
-          { class: 'card' },
-          h('h2', {}, 'Time in zone'),
-          ...s.zones.map((z, i) => zoneRow(z, i)),
-        ),
-        s.sprints.length
-          ? h(
-              'div',
-              { class: 'card' },
-              h('h2', {}, 'Sprints'),
-              h(
+          { class: 'res-two' },
+          h(
+            'div',
+            { class: 'card' },
+            h('h2', {}, 'Time in zone'),
+            ...s.zones.map((z, i) => zoneRow(z, i)),
+          ),
+          s.sprints.length
+            ? h(
                 'div',
-                { class: 'res-sprints' },
-                ...s.sprints.map((x, i) =>
-                  h(
-                    'div',
-                    { class: `res-spr grade-${x.grade}` },
-                    h('small', {}, `#${i + 1}`),
-                    h('b', {}, GRADE_WORD[x.grade]),
-                    h('span', {}, `${x.avg} W`),
-                    h('small', {}, pctStr(x.pct)),
+                { class: 'card' },
+                h('h2', {}, 'Sprints'),
+                h(
+                  'div',
+                  { class: 'res-sprints' },
+                  ...s.sprints.map((x, i) =>
+                    h(
+                      'div',
+                      { class: `res-spr grade-${x.grade}` },
+                      h('small', {}, `#${i + 1}`),
+                      h('b', {}, GRADE_WORD[x.grade]),
+                      h('span', {}, `${x.avg} W`),
+                      h('small', {}, pctStr(x.pct)),
+                    ),
                   ),
                 ),
-              ),
-              h('p', { class: 'dim' }, 'Percent is of your 90-day best for that length.'),
-            )
-          : '',
+                h('p', { class: 'dim' }, 'Percent is of your 90-day best for that length.'),
+              )
+            : '',
+        ),
+        blocksCard(s),
       ),
-      blocksCard(s),
       h(
         'div',
         { class: 'row res-actions' },

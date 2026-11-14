@@ -464,3 +464,16 @@ tr.me td {
   font-weight: 400;
   opacity: 0.75;
 }
+/* A crew ride's training numbers, folded under the game's story. */
+.res-more > summary {
+  cursor: pointer;
+  padding: 12px 0;
+  font-weight: 700;
+  color: var(--dim, #aab);
+}
+.res-more > summary::after {
+  content: ' ▸';
+}
+.res-more[open] > summary::after {
+  content: ' ▾';
+}

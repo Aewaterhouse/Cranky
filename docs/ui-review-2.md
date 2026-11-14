@@ -54,7 +54,8 @@ say where you are, and free-ride places that don't look like where they are.
     says so; sprint tables say Missed, not FAIL; a crew postcard with no scene still gets a cartoon road under the game icon,
     awards no longer overlap and the preview fits the dialog; a 3D crew render on it is still to do; also done from
     the same list: armour 0 reads "Wrecked, but home", first bests share one timeline row, and This week (route of the
-    week, weekly climb) sits on home) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
+    week, weekly climb) sits on home; crew results fold the training numbers under Training details; the lobby shows only
+    the game that is on; the servo picks for a crew that does not shop; the podium shows everyone) A second solo ride missing from History; "1 rides"; the postcard is a blank gradient and
     overflows on iPad (rider 20).
 
 The rest of each report follows after these.
