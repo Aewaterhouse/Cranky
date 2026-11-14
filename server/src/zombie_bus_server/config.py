@@ -233,6 +233,11 @@ WEATHER = {
     "dust": {"weight": 12, "name": "Dust storm"},
     "night": {"weight": 13, "name": "Night run", "scrap": 1.25},
 }
+# Zombie types by event: each gains `pull` m/s on the bus while the crew rides the way it hunts.
+ZED_TYPES = {
+    "longhaul": {"kind": "runners", "rpm": 85, "pull": 0.6, "tip": "🏃 RUNNERS: keep your cadence over 85"},
+    "rampup": {"kind": "brutes", "comp": 0.9, "pull": 0.8, "tip": "💪 BRUTES: hold your target, don't fade"},
+}
 # Boss fight: the last long effort before the cool-down. The crew wears it down by riding on target: beaten
 # once BOSS_SHARE of the block's seconds have been ridden at full compliance (the crew's mean).
 BOSS_EVENTS = ("longhaul", "surge", "rampup")

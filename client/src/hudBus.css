@@ -217,3 +217,12 @@
 .bs-bar.boss > i {
   background: #d8342a;
 }
+.bs-zed-tip {
+  margin: 4px 0 2px;
+  font-size: 0.78em;
+  font-weight: 700;
+  color: #ffb347;
+}
+.bs-zed-tip:empty {
+  display: none;
+}

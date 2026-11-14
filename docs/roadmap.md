@@ -107,7 +107,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | --- | --- | --- |
 | ✅ Route vote and map | At each Servo Stop the crew votes on a branching map: short and brutal, long and easy, risky shortcut. Built as a vote card (no drawn map yet): most votes wins as the stop closes, bots vote too | M |
 | ✅ Pick-one upgrades | Roguelike choice of three random upgrades at each stop instead of a fixed shop. Six in the pool (plating, repellent, sync, nitro, ram, magnet); buy as many of the three as the tin allows | M |
-| Zombie types | Runners punish slow cadence, brutes need sustained power, spitters need a sprint; each maps to a workout demand | L |
+| Zombie types | Runners punish slow cadence, brutes need sustained power, spitters need a sprint; each maps to a workout demand. Built: long hauls bring runners (cadence under 85 rpm lets them gain), ramp-ups bring brutes (under 90% on target), named on the HUD; roadblock sprints are the spitters. Still to do: the types in the 3D horde | L |
 | Boss fights | A final event per ride: a giant, a chasing road train, a collapsing bridge. Built: the last long effort before the cool-down is a boss with a health bar the crew empties by riding on target (75% of the block); a win pays 60 scrap and 15 armour, a loss is a 30 armour hit. Still to do: the bosses in the 3D scene | L |
 | ✅ Ramp-up hill | The planned ramp event: the bus climbs out of a valley | S |
 | Crew roles | Driver, gunner, mechanic, lookout: small abilities on a cooldown, fired by a cadence or power cue | L |

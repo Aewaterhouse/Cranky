@@ -133,6 +133,8 @@ export interface BusState {
   weather?: 'clear' | 'rain' | 'dust' | 'night'
   /** The boss fight while it is on: its name and the share of its health left. */
   boss?: { name: string; left: number } | null
+  /** The zombie type this event brings and what beats it ("🏃 RUNNERS: keep your cadence over 85"). */
+  zed?: string | null
   repel: number
   syncw: number
   nitro: number

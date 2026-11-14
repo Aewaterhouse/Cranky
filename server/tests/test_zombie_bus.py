@@ -457,3 +457,18 @@ def test_the_last_long_effort_is_a_boss_and_riding_on_target_beats_it():
 def test_a_boss_the_crew_cannot_hold_lands_a_big_hit():
     bus, fx, armour, scrap = boss_ride(0.5)
     assert not any(f["k"] == "bosswin" for f in fx) and bus.armour < armour
+
+
+def test_runners_chase_a_slow_cadence_and_brutes_a_crew_off_target():
+    fast, slow = (FakeRoom(STEADY), ZombieBus()), (FakeRoom(STEADY), ZombieBus())
+    set_all(fast[0], 1.0, cad=95)
+    set_all(slow[0], 1.0, cad=70)
+    for room, bus in (fast, slow):
+        run(room, bus, 20)
+    assert slow[1].gap < fast[1].gap - 10
+    assert fast[1].state(fast[0], 1, 0)["zed"].startswith("🏃 RUNNERS")
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 0.8)
+    assert bus.zed_pull("rampup", list(room.riders.values()), 0.8) == C.ZED_TYPES["rampup"]["pull"]
+    assert bus.zed_pull("rampup", list(room.riders.values()), 0.95) == 0
+    assert bus.zed_pull("servo", list(room.riders.values()), 0.1) == 0

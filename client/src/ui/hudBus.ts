@@ -29,6 +29,7 @@ export function makeBusPanel() {
   const zombie = h('span', { class: 'bs-zed' }, '🧟')
   const busIco = h('span', { class: 'bs-bus' }, '🚌')
   const gapTrack = h('div', { class: 'bs-gap' }, zombie, busIco)
+  const zed = h('div', { class: 'bs-zed-tip' })
   const armour = h('div', { class: 'bs-bar' }, armourFill)
   // The boss fight: its name and a health bar that empties as the crew rides on target.
   const bossName = h('label', {})
@@ -57,6 +58,7 @@ export function makeBusPanel() {
     armour,
     h('div', { class: 'bs-head' }, h('label', {}, 'HORDE GAP'), gapN),
     gapTrack,
+    zed,
     h(
       'div',
       { class: 'bs-stats' },
@@ -94,6 +96,7 @@ export function makeBusPanel() {
         pulse(armour, 'hit')
       }
       lastArmour = b.armour
+      set(zed, b.zed ?? '')
       boss.hidden = !b.boss
       if (b.boss) {
         set(bossName, b.boss.name)

@@ -149,6 +149,7 @@ class ZombieBus(CrewGame):
             k = C.GAP_K_AWAY if comp > neutral else C.GAP_K
             creep = C.DIFFICULTY[self.level]["creep"]
             self.gap += (k * (comp - neutral) - creep + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
+        self.gap -= self.zed_pull(ev, active, comp) * dt
         self.gap = min(C.GAP_MAX, self.gap)
         if self.gap <= 0:
             self.gap = 0
@@ -361,6 +362,18 @@ class ZombieBus(CrewGame):
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
 
+    def zed_pull(self, ev: str, active: list[Rider], comp: float) -> float:
+        """Metres a second the event's zombie type gains when the crew rides the way it hunts: runners chase a
+        low cadence, brutes a crew off target."""
+        z = C.ZED_TYPES.get(ev)
+        if not z or not active:
+            return 0.0
+        if z["kind"] == "runners":
+            weak = statistics.fmean(r.cad for r in active) < z["rpm"]
+        else:
+            weak = comp < z["comp"]
+        return z["pull"] if weak else 0.0
+
     def pick_boss(self, room: Room) -> dict:
         """The ride's last long effort before the cool-down is the boss; which boss is drawn for the room."""
         blocks = room.plan["blocks"]
@@ -543,6 +556,7 @@ class ZombieBus(CrewGame):
             "shop": self.ev == "servo" and not self.mut.get("no_shop"),
             "wares": self.wares,
             "weather": self.weather,
+            "zed": C.ZED_TYPES[self.ev]["tip"] if self.ev in C.ZED_TYPES else None,
             "boss": (
                 {
                     "name": C.BOSSES[self.boss["kind"]]["name"],
