@@ -273,6 +273,11 @@ GAME_MUTATORS = {
         {"id": "slow", "name": "Slow Night", "desc": "40 seconds to answer.", "open": 40},
         {"id": "normal", "name": "Trivia Night", "desc": "25 seconds to answer.", "open": 25},
     ],
+    "climate": [
+        {"id": "tides", "name": "King Tides", "desc": "The sea comes up a quarter faster.", "sea": 1.25},
+        {"id": "grants", "name": "Green Grants", "desc": "Leaving coal costs half.", "cost": 0.5},
+        {"id": "normal", "name": "An Ordinary Year", "desc": "No help, no extra trouble.", "sea": 1.0},
+    ],
 }
 
 # Last Rider Standing: steps of LAST_STEP % FTP a minute from LAST_FROM to the 150% cap, LAST_HOLDS more

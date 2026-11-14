@@ -132,3 +132,12 @@ def test_an_envelope_left_on_the_table_goes_away():
     who = town.game.offer["who"]
     town.ride(G.CLIM_BRIBE_S + 1)
     assert town.ask(who) is None and not town.game.bribed
+
+
+def test_this_weeks_twist_can_raise_the_sea_or_cut_switching_costs():
+    from zombie_bus_server.modes.climate import Climate
+
+    town = Climate()
+    base = town.switch_cost("coal", "solar", 1)
+    town.mut = next(m for m in G.GAME_MUTATORS["climate"] if m["id"] == "grants")
+    assert town.switch_cost("coal", "solar", 1) == round(base * 0.5)

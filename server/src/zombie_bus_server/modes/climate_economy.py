@@ -116,7 +116,7 @@ class Economy:
 
     def sea(self, room: Room) -> None:
         """Raises the water; a new stage gets a splash and the last one floods the town for good."""
-        self.level = level_of(self.emit_t, self.walls)
+        self.level = level_of(self.emit_t, self.walls) * self.mut.get("sea", 1.0)
         self.stage = stage_of(self.level)
         if self.stage > self.top:
             self.top = self.stage
@@ -125,7 +125,7 @@ class Economy:
                 self.flooded = True
 
     def switch_cost(self, old: str, new: str, n: int) -> int:
-        return fuel_cost(old, new, n)
+        return round(fuel_cost(old, new, n) * self.mut.get("cost", 1.0))
 
     def wall_cost(self) -> int:
         first, more = G.CLIM_WALL_COST
