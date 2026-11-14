@@ -51,8 +51,11 @@ class LastStanding(CrewGame):
         return "free" if r.id in self.out or self.winner or last else None
 
     def bot(self, room: Room, r: Rider, w: float, tgt: float | None, rng: random.Random) -> float:
-        # Past its breaking point a bot fades and drops out like anyone else.
-        return w * 0.6 if tgt and tgt > r.ftp * self.limit.get(r.id, 9) else w
+        # Past its breaking point a bot fades and drops out like anyone else, its compliance with its watts.
+        if tgt and tgt > r.ftp * self.limit.get(r.id, 9):
+            r.s = 0.6
+            return w * 0.6
+        return w
 
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
         riding = [r for r in room.riders.values() if r.st == "riding"]

@@ -1,5 +1,7 @@
 """Last Rider Standing without sockets: the ramp, who goes out when, the winner and the cap."""
 
+import asyncio
+
 from zombie_bus_server import config as C
 from zombie_bus_server import config_games as G
 from zombie_bus_server.modes.last_standing import LastStanding
@@ -74,3 +76,28 @@ def test_a_room_deals_and_runs_last_rider_standing():
     room, tick = asyncio.run(main())
     assert room.plan["id"] == "last-standing" and tick["game"]["g"] == "last"
     assert room.summary["mode"] == "last" and len(room.summary["riders"]) == 3
+
+
+def test_bots_past_their_breaking_point_go_out_and_a_steady_human_wins():
+    import time
+
+    from test_bots import lobby_with
+
+    async def main():
+        room, ws = await lobby_with(1, code="LRS2")
+        await room.handle("h0", ws, {"t": "game", "game": "last"})
+        await room.handle("h0", ws, {"t": "bots", "n": 3})
+        room.start()
+        room.task.cancel()
+        h, total = room.riders["h0"], sum(b["dur"] for b in room.plan["blocks"])
+        while room.el < total:
+            room.el += DT
+            tick = room.step(DT)
+            h.p = h.w = tick["riders"]["h0"].get("tgt") or h.ftp * 0.5
+            h.cad, h.last_data = 90, time.monotonic()
+        await room.finish()
+        return room
+
+    room = asyncio.run(main())
+    assert room.mode.winner == "h0" and len(room.mode.out) == 3
+    assert room.summary["awards"][0]["award"] == "Last One Standing"
