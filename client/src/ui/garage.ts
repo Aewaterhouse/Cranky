@@ -16,7 +16,7 @@ import { h } from './dom'
 import { portrait, shopPreview } from './shopPreview'
 import { modal, toast } from './toast'
 
-const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲' }
+const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲', horn: '📯' }
 const WHERE: Record<Slot, string> = {
   paint: 'On the bus when you drive',
   bullbar: 'On the bus when you drive',
@@ -24,6 +24,7 @@ const WHERE: Record<Slot, string> = {
   hat: 'On your rider',
   outfit: 'On your rider',
   bike: 'Your bike, on the bus and out on the road',
+  horn: 'Your 📯 on the bus: everyone hears it',
 }
 
 export const scrapIcon = () => h('span', { class: 'scrap-ico', 'aria-hidden': 'true' }, '⚙')
@@ -62,9 +63,11 @@ export function garageTab(p: Profile, changed: () => void) {
       { class: 'sw', style: c.colour ? `--sw:${c.colour}` : '' },
       c.colour ? '' : (ICON[c.slot] ?? '★'),
     )
-    shopPreview(c, { id: p.id, body: p.look.body }, (src) =>
-      sw.replaceChildren(h('img', { src, alt: '' })),
-    )
+    // A horn has nothing to show on the rider: it keeps its 📯.
+    if (c.slot !== 'horn')
+      shopPreview(c, { id: p.id, body: p.look.body }, (src) =>
+        sw.replaceChildren(h('img', { src, alt: '' })),
+      )
     // Rider items: tap the picture to see it on you, with everything else you wear.
     if (c.slot === 'hat' || c.slot === 'outfit' || c.slot === 'bike') {
       sw.title = 'Try it on'

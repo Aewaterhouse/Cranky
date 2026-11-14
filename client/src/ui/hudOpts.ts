@@ -15,6 +15,8 @@ export interface HudOpts {
   onBuy?: (item: ShopItem) => void
   /** A rider's input to a crew game: an answer to its question, an emoji, a card. */
   onAct?: (k: string, v: string) => void
+  /** The Garage horn a rider has on, for their 📯. */
+  hornOf?: (id: string) => string | undefined
   /** ERG switch: `erg` is the state to show; `slope(d)` steps the gradient when ERG is off and returns it. */
   /** ERG on or off; off, the rider shifts virtual gears (`tile` and `slider` are the gear tile and strength). */
   erg?: {

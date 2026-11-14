@@ -277,7 +277,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         o.panel?.fx?.(fx, sp)
         if (fx.k === 'emoji') {
           if (!o.panel && fx.text) emoji.show(fx.text)
-          if (!o.panel && fx.text === '📯') SFX.horn()
+          if (!o.panel && fx.text === '📯') SFX.horn(fx.id ? o.hornOf?.(fx.id) : undefined)
           continue
         }
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''

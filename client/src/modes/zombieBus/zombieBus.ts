@@ -128,6 +128,7 @@ export function startBusRide(
       quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
       onBuy: (item) => net.send({ t: 'buy', item }),
       onAct: (k, v) => net.send({ t: 'act', k, v }),
+      hornOf: (id) => lk[id]?.horn,
       game: l.game,
       panel: ui?.panel((k, v) => net.send({ t: 'act', k, v }), isHost),
       events: ui?.events,

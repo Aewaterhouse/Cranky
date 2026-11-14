@@ -41,5 +41,9 @@
  {"id": "bike-pink", "slot": "bike", "name": "Fairy Floss", "price": 120, "colour": "#ff8fc8", "rarity": "rare"},
  {"id": "bike-matte", "slot": "bike", "name": "Murdered Out", "price": 150, "colour": "#1c1c1e", "rarity": "rare"},
  {"id": "bike-chrome", "slot": "bike", "name": "Chrome Dome", "price": 240, "colour": "#c9ced6", "rarity": "rare"},
- {"id": "bike-trainer", "slot": "bike", "name": "Indoor Escapee", "price": 520, "rarity": "legendary"}
+ {"id": "bike-trainer", "slot": "bike", "name": "Indoor Escapee", "price": 520, "rarity": "legendary"},
+ {"id": "horn-cow", "slot": "horn", "name": "Cow Moo", "price": 70, "rarity": "common"},
+ {"id": "horn-didge", "slot": "horn", "name": "Didgeridoo", "price": 120, "rarity": "rare"},
+ {"id": "horn-cucaracha", "slot": "horn", "name": "La Cucaracha", "price": 150, "rarity": "rare"},
+ {"id": "horn-roadtrain", "slot": "horn", "name": "Road Train Air Horn", "price": 320, "rarity": "epic"}
 ]

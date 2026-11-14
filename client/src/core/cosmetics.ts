@@ -3,7 +3,7 @@ import { CFG } from '../config'
 import type { Profile } from './curve'
 import { weekOf } from './weekly'
 
-export type Slot = 'paint' | 'bullbar' | 'spikes' | 'hat' | 'outfit' | 'bike'
+export type Slot = 'paint' | 'bullbar' | 'spikes' | 'hat' | 'outfit' | 'bike' | 'horn'
 export interface Cosmetic {
   id: string
   slot: Slot
@@ -28,6 +28,7 @@ export const SLOT_NAMES: Record<Slot, string> = {
   hat: 'Hat',
   outfit: 'Outfit',
   bike: 'Bike',
+  horn: 'Horn',
 }
 /** The bike skin that brings your indoor trainer out on the road with you. */
 export const TRAINER_SKIN = 'bike-trainer'

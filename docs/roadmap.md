@@ -163,7 +163,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | ✅ Graphics presets | Low / medium / high, auto-picked from measured frame rate | S |
 | Proper icons | SVG icon set in place of emoji so every device looks the same | S |
 | ✅ Rider avatars | Body, face and bike customisation beyond hats and kit. Done by the body creator (Rider → Body, 24 options) and the Garage bikes | M |
-| More cosmetics | Done: 20 more items (6 paints, zombie plough, pirate flags, roof esky and surfboard, 6 hats, 5 kits). Still to do: paint patterns, decals, horns, exhaust flames, rider celebrations | M |
+| More cosmetics | Done: 20 more items (6 paints, zombie plough, pirate flags, roof esky and surfboard, 6 hats, 5 kits). Horns done: a Horn shelf in the Garage (Cow Moo, Didgeridoo, La Cucaracha, Road Train Air Horn) that your 📯 plays for everyone on the bus. Still to do: paint patterns, decals, exhaust flames, rider celebrations | M |
 | ✅ Installable app | Add-to-home-screen with offline solo mode | S |
 | Logo and domain | Done: a chainring-and-crank logo, favicon and app icon. Still to do, **needs the owner:** pick and register a domain; a share image for link previews | S |
 
