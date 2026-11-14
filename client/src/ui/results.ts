@@ -12,6 +12,7 @@ import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { groupSection, postcard } from './resultsGroup'
+import { stravaCardButton } from './strava'
 import { blocksCard } from './resultsBlocks'
 import { downloadFit, downloadJson } from './rideExport'
 import { ridePostcard, savePng } from './ridePostcard'
@@ -294,6 +295,7 @@ export function finishRide(
               'Save postcard',
             )
           : '',
+        stravaCardButton(p, s, group, still),
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),
     ),

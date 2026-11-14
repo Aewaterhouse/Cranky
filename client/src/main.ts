@@ -12,6 +12,7 @@ import './builder.css'
 import './touch.css'
 import { logout, me, type Me } from './core/api'
 import type { Profile } from './core/curve'
+import type { RideSummary } from './core/ride'
 import { flushEfforts } from './core/efforts'
 import { flushRides, onRideSaved } from './core/rideQueue'
 import { loadProfile, syncProfile } from './core/profile'
@@ -58,7 +59,7 @@ async function enter(u: Me) {
   const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
   if (watch?.length === 4) return spectate(watch, () => home())
   if (stravaReturn()) openRiderSettings()
-  onRideSaved(autoStrava)
+  onRideSaved<RideSummary>((s, n) => autoStrava(profile, s, n))
   home()
   // Anything ridden while the server was out of reach goes up now, and again whenever the network returns.
   const sync = () => (void flushEfforts(u.id), void flushRides(u.id))

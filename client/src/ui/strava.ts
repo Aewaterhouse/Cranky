@@ -1,7 +1,13 @@
 import { CFG } from '../config'
 import { api } from '../core/api'
+import type { Profile } from '../core/curve'
 import type { RideSummary } from '../core/ride'
+import { postcardCanvas } from './historyDetail'
+import type { GroupSummary } from './results'
 import { fitBytes } from './rideExport'
+import { busCard } from './resultsGroup'
+import { ridePostcard, savePng } from './ridePostcard'
+import { settings } from '../core/settings'
 import { h } from './dom'
 import { toast } from './toast'
 import '../strava.css'
@@ -104,16 +110,54 @@ const base64 = (b: Uint8Array) => {
   return btoa(s)
 }
 
-/** Sends one of my saved rides (number `n` on the server) to Strava: the .fit is built here, as for a download. */
-export const sendToStrava = async (s: RideSummary, n: number) =>
-  api<StravaJob>(`/api/strava/upload/${n}`, {
+const pngOf = async (c: HTMLCanvasElement) => {
+  const b = await new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/png'))
+  return b ? base64(new Uint8Array(await b.arrayBuffer())) : undefined
+}
+
+/**
+ * Sends one of my saved rides (number `n` on the server) to Strava: the .fit built here as for a download, and the
+ * postcard rebuilt as History rebuilds it, for the ride's public postcard page.
+ */
+export async function sendToStrava(
+  p: Profile,
+  s: RideSummary & { group?: GroupSummary },
+  n: number,
+) {
+  const png = await postcardCanvas(p, s)
+    .then(pngOf)
+    .catch(() => undefined)
+  return api<StravaJob>(`/api/strava/upload/${n}`, {
     method: 'POST',
-    body: JSON.stringify({ fit: base64(await fitBytes(s)) }),
+    body: JSON.stringify({ fit: base64(await fitBytes(s)), png }),
   })
+}
 
 /** After the server saves a ride: up to Strava by itself when the rider is connected with auto-upload on. */
-export async function autoStrava(s: RideSummary, n: number) {
+export async function autoStrava(p: Profile, s: RideSummary, n: number) {
   if (s.record.secs < CFG.stravaMinSecs || !s.power?.length) return
   const st = await stravaStatus().catch(() => null)
-  if (st?.connected && st.auto) await sendToStrava(s, n).catch(() => {})
+  if (st?.connected && st.auto) await sendToStrava(p, s, n).catch(() => {})
+}
+
+/**
+ * Results screen, once connected: the postcard saved through the download link, so iOS's share sheet can add it
+ * to the Strava activity by hand (Strava's API can't attach photos).
+ */
+export function stravaCardButton(p: Profile, s: RideSummary, group?: GroupSummary, still?: string) {
+  const card = () =>
+    group
+      ? busCard(group, s.planName)
+      : ridePostcard(s, p.weightKg || CFG.freeRide.defaultKg, still, settings.units)
+  const name = `cranky-strava-${new Date(s.record.date).toLocaleDateString('en-CA')}`
+  const b = h(
+    'button',
+    { hidden: true, onclick: async () => savePng(await card(), name) },
+    'Save postcard for Strava',
+  )
+  stravaStatus().then(
+    (st) => (b.hidden = !st.connected),
+    () => {},
+  )
+  return b
 }

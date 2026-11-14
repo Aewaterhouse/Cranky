@@ -192,6 +192,8 @@ def test_titles_and_descriptions_by_mode():
     caught = bus_ride("x")
     caught["group"]["armour"] = 0
     assert "caught" in describe(caught, "luke")[0]
+    caught["group"]["riders"][0]["inBandSecs"] = 4000  # longer than the ride (a sped-up server)
+    assert "(100%)" in describe(caught, "luke")[1]
     mad = bus_ride("x")
     mad["group"].update(mode="madness")
     mad["group"]["riders"][0].update(points=812, redSecs=95)
@@ -221,3 +223,30 @@ def test_titles_and_descriptions_by_mode():
     }
     title, about = describe(solo, "luke")
     assert title == "💪 Sweet Spot 3x10 · Cranky workout" and "1:01:40" in about and "93% on plan" in about
+
+
+def test_postcard_page_is_public_only_once_uploaded_and_previews_as_the_picture(fake):
+    _, h = auth("luke", "Luke")
+    connect(h)
+    n = save(h, bus_ride("2026-11-14T14:00:00.000Z"))
+    png = base64.b64encode(b"\x89PNGcard").decode()
+    client.post(f"/api/strava/upload/{n}", json={"fit": FIT, "png": png}, headers=h)
+    card = U._get("luke", n)["card"]
+    assert len(card) >= 20
+    assert client.get(f"/p/{card}").status_code == 404  # not on Strava yet
+    run("done", n)
+    up = next(c for c in fake.calls if c[1] == "/api/v3/uploads")
+    assert f"Postcard: {config.PUBLIC_URL}/p/{card}".encode() in up[2]
+    page = client.get(f"/p/{card}")  # no login
+    assert page.status_code == 200 and "text/html" in page.headers["content-type"]
+    assert f'<meta property="og:image" content="{config.PUBLIC_URL}/p/{card}.png">' in page.text
+    assert "Zombie Bus" in page.text
+    img = client.get(f"/p/{card}.png")
+    assert img.content == b"\x89PNGcard" and img.headers["content-type"] == "image/png"
+    assert client.get("/p/not-a-card").status_code == 404
+    assert client.get("/p/not-a-card.png").status_code == 404
+    # A re-send keeps the same page; a ride sent without a postcard gets none.
+    assert U.card_for("luke", n) == card
+    m = save(h, bus_ride("2026-11-14T15:00:00.000Z"))
+    client.post(f"/api/strava/upload/{m}", json={"fit": FIT}, headers=h)
+    assert U._get("luke", m)["card"] is None

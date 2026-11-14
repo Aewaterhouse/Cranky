@@ -2,12 +2,13 @@
 
 import base64
 import binascii
+import html
 from typing import Any
 from urllib.parse import urlencode
 
 import httpx
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import RedirectResponse
+from fastapi import APIRouter, HTTPException, Response
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import BaseModel
 
 from . import config
@@ -22,6 +23,30 @@ class Auto(BaseModel):
 
 class Upload(BaseModel):
     fit: str  # base64
+    png: str | None = None  # the postcard, base64
+
+
+def unpack(b64: str, what: str) -> bytes:
+    """A base64 file from the app, or a 4xx."""
+    try:
+        data = base64.b64decode(b64, validate=True)
+    except binascii.Error:
+        raise HTTPException(422, f"That {what} didn't come through") from None
+    if not data or len(data) > config.FILE_MAX_BYTES:
+        raise HTTPException(413, f"That {what} is empty or too big")
+    return data
+
+
+PAGE = """<!doctype html><html lang="en-AU"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1"><title>{title}</title>
+<meta property="og:type" content="website"><meta property="og:site_name" content="Cranky">
+<meta property="og:title" content="{title}"><meta property="og:description" content="Ridden on Cranky">
+<meta property="og:image" content="{img}"><meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="800"><meta name="twitter:card" content="summary_large_image">
+<style>body{{margin:0;background:#15161a;color:#f3f0e6;font:16px system-ui;text-align:center}}
+img{{display:block;width:100%;max-width:1200px;margin:0 auto}}a{{color:#f2b705}}p{{padding:12px 16px}}</style>
+</head><body><img src="{card}.png" alt="{title}">
+<p>{title} · Ridden on <a href="/">Cranky</a></p></body></html>"""
 
 
 def back(**q: str) -> RedirectResponse:
@@ -77,13 +102,26 @@ def router(strava: Strava, uploads: Uploads, user: Any) -> APIRouter:
             raise HTTPException(409, "Connect Strava first")
         if (ride.get("record") or {}).get("secs", 0) < config.STRAVA_MIN_SECS:
             raise HTTPException(422, "That ride is too short for Strava")
-        try:
-            fit = base64.b64decode(body.fit, validate=True)
-        except binascii.Error:
-            raise HTTPException(422, "That .fit didn't come through") from None
-        if not fit or len(fit) > config.FILE_MAX_BYTES:
-            raise HTTPException(413, "That .fit is empty or too big")
-        name, about = describe(ride, u["id"])
-        return uploads.queue(u["id"], n, name, about, fit)
+        fit = unpack(body.fit, ".fit")
+        png = unpack(body.png, "postcard") if body.png else None
+        card = uploads.card_for(u["id"], n) if png else None
+        name, about = describe(ride, u["id"], f"{config.PUBLIC_URL}/p/{card}" if card else "")
+        return uploads.queue(u["id"], n, name, about, fit, card, png)
+
+    @api.get("/p/{card}.png")
+    def card_png(card: str) -> Response:
+        """A postcard picture: public, the unguessable id is the only key."""
+        got = uploads.card(card)
+        if not got:
+            raise HTTPException(404)
+        return Response(got[1], media_type="image/png", headers={"cache-control": "public, max-age=86400"})
+
+    @api.get("/p/{card}", response_class=HTMLResponse)
+    def card_page(card: str) -> str:
+        """A ride's postcard page, with og:image so a link to it previews as the picture."""
+        got = uploads.card(card)
+        if not got:
+            raise HTTPException(404, "No postcard here")
+        return PAGE.format(title=html.escape(got[0]), img=f"{config.PUBLIC_URL}/p/{card}.png", card=card)
 
     return api

@@ -6,6 +6,7 @@ next window without using up a try.
 """
 
 import re
+import secrets
 import time
 
 import httpx
@@ -29,8 +30,8 @@ class Uploads:
             self.db.execute(
                 """CREATE TABLE IF NOT EXISTS strava_uploads (rider TEXT, ride INTEGER, status TEXT,
                 upload TEXT, activity TEXT, error TEXT, tries INTEGER DEFAULT 0, polls INTEGER DEFAULT 0,
-                next REAL DEFAULT 0,
-                name TEXT, about TEXT, fit BLOB, at REAL, PRIMARY KEY (rider, ride))"""
+                next REAL DEFAULT 0, name TEXT, about TEXT, fit BLOB, at REAL, card TEXT UNIQUE, png BLOB,
+                PRIMARY KEY (rider, ride))"""
             )
 
     def _get(self, rider: str, ride: int) -> dict | None:
@@ -53,8 +54,29 @@ class Uploads:
             return {"status": "none"}
         return {"status": job["status"], "activity": job["activity"], "error": job["error"]}
 
+    def card_for(self, rider: str, ride: int) -> str:
+        """The ride's postcard page id: the one it has, or a new unguessable one."""
+        job = self._get(rider, ride)
+        return job["card"] if job and job["card"] else secrets.token_urlsafe(16)
+
+    def card(self, card: str) -> tuple[str, bytes] | None:
+        """(title, PNG) for a postcard page, only once its ride is up on Strava."""
+        with self.lock:
+            row = self.db.execute(
+                "SELECT name, png FROM strava_uploads WHERE card = ? AND status = 'done'", (card,)
+            ).fetchone()
+        return (row[0], row[1]) if row and row[1] else None
+
     def queue(
-        self, rider: str, ride: int, name: str, about: str, fit: bytes, now: float | None = None
+        self,
+        rider: str,
+        ride: int,
+        name: str,
+        about: str,
+        fit: bytes,
+        card: str | None = None,
+        png: bytes | None = None,
+        now: float | None = None,
     ) -> dict:
         """Starts an upload. A ride already up or on its way is left alone: a re-send never duplicates."""
         now = time.time() if now is None else now
@@ -64,9 +86,9 @@ class Uploads:
         with self.lock, self.db:
             self.db.execute(
                 """INSERT OR REPLACE INTO strava_uploads
-                   (rider, ride, status, tries, next, name, about, fit, at)
-                   VALUES (?, ?, 'queued', 0, ?, ?, ?, ?, ?)""",
-                (rider, ride, now, name, about, fit, now),
+                   (rider, ride, status, tries, next, name, about, fit, at, card, png)
+                   VALUES (?, ?, 'queued', 0, ?, ?, ?, ?, ?, ?, ?)""",
+                (rider, ride, now, name, about, fit, now, card, png),
             )
         log(f"{rider} ride {ride} queued")
         return self.view(self._get(rider, ride))

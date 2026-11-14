@@ -87,7 +87,15 @@ export function groupSection(g: GroupSummary, myId: string) {
 }
 
 /** Composes the end-of-ride scene snapshot with the crew's numbers and downloads a PNG for the group chat. */
-export async function postcard(g: GroupSummary, planName: string, date = new Date().toISOString()) {
+/** Saves the bus postcard as a PNG. */
+export const postcard = async (
+  g: GroupSummary,
+  planName: string,
+  date = new Date().toISOString(),
+) => savePng(await busCard(g, planName), `zombie-bus-${new Date(date).toLocaleDateString('en-CA')}`)
+
+/** The bus postcard: the scene still (when there is one), the score, the crew and the awards. */
+export async function busCard(g: GroupSummary, planName: string) {
   const c = document.createElement('canvas')
   c.width = 1200
   c.height = 800
@@ -130,5 +138,5 @@ export async function postcard(g: GroupSummary, planName: string, date = new Dat
         680 + Math.floor(i / 2) * 36,
       ),
     )
-  return savePng(c, `zombie-bus-${new Date(date).toLocaleDateString('en-CA')}`)
+  return c
 }

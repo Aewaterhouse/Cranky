@@ -48,7 +48,7 @@ def describe(s: dict[str, Any], rider: str, link: str = "") -> tuple[str, str]:
                 x
                 for x in (
                     f"NP {s.get('np', 0)} W",
-                    f"on target {clock(on)} ({on / secs:.0%})" if on is not None and secs else "",
+                    f"on target {clock(on)} ({min(1, on / secs):.0%})" if on is not None and secs else "",
                     f"{share:.0%} of the crew's work" if share is not None else "",
                 )
                 if x
