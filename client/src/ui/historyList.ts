@@ -3,7 +3,7 @@ import type { Profile } from '../core/curve'
 import type { RideSummary } from '../core/ride'
 import { flushRides, queuedList } from '../core/rideQueue'
 import { downloadFit, downloadJson } from './rideExport'
-import { stravaRides, stravaTag, type StravaJob } from './strava'
+import { stravaMark, stravaRides, stravaTag, type StravaJob } from './strava'
 import { fmt, h, kmStr, pctStr } from './dom'
 import { routeTrace } from './routeTrace'
 import { dateStr, rideDetail } from './historyDetail'
@@ -98,6 +98,7 @@ export function historyTab(p: Profile) {
             h('h2', { class: 'label' }, `Rides (${rows.length})`),
             waiting(p.id),
             list(rows, (n) => box.replaceChildren(rideDetail(p, n, showList)), strava?.rides),
+            strava?.connected ? stravaMark() : '',
           ),
         () =>
           box.replaceChildren(

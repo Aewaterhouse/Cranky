@@ -22,7 +22,20 @@ export interface StravaStatus {
 /** The rider's Strava connection (never a token), fetched fresh each time. */
 export const stravaStatus = () => api<StravaStatus>('/api/strava')
 
-/** Connect with Strava, styled after Strava's brand guidelines (their orange, white text, their words). */
+/** Strava's own artwork, unchanged (their API brand guidelines; see public/assets/CREDITS.md). */
+const ART = '/assets/strava'
+
+/** "Compatible with Strava", wherever Strava is named or its data shows. */
+export const stravaMark = () =>
+  h('img', {
+    class: 'strava-mark',
+    src: `${ART}/api_logo_cptblWith_strava_horiz_white.svg`,
+    alt: 'Compatible with Strava',
+    width: 437,
+    height: 37,
+  })
+
+/** Strava's Connect with Strava button at its own 48 px height. */
 const connectButton = () =>
   h(
     'button',
@@ -34,7 +47,12 @@ const connectButton = () =>
           (e: Error) => toast(e.message, 'bad'),
         ),
     },
-    'Connect with Strava',
+    h('img', {
+      src: `${ART}/btn_strava_connect_with_orange.svg`,
+      alt: 'Connect with Strava',
+      width: 237,
+      height: 48,
+    }),
   )
 
 /** Rider → Settings: connect once, then every finished ride goes up to Strava by itself. */
@@ -60,6 +78,7 @@ export function stravaPanel() {
               'On an iPad in Bluefy, Strava may open its own app and not come back here. If it does, connect once from Safari or a laptop: the connection is kept on the server, so uploads then work from any browser.',
             )
           : '',
+        stravaMark(),
       )
     const auto = h('input', {
       type: 'checkbox',
@@ -79,6 +98,7 @@ export function stravaPanel() {
       h('p', {}, 'Connected as ', h('b', {}, s.name ?? 'your Strava account')),
       h('label', { class: 'strava-auto' }, auto, ' Upload rides automatically'),
       h('button', { class: 'ghost', onclick: off }, 'Disconnect'),
+      stravaMark(),
     )
   }
   stravaStatus().then(draw, () =>
@@ -151,9 +171,10 @@ export function stravaCardButton(p: Profile, s: RideSummary, group?: GroupSummar
       : ridePostcard(s, p.weightKg || CFG.freeRide.defaultKg, still, settings.units)
   const name = `cranky-strava-${new Date(s.record.date).toLocaleDateString('en-CA')}`
   const b = h(
-    'button',
-    { hidden: true, onclick: async () => savePng(await card(), name) },
-    'Save postcard for Strava',
+    'span',
+    { class: 'strava-save', hidden: true },
+    h('button', { onclick: async () => savePng(await card(), name) }, 'Save postcard for Strava'),
+    stravaMark(),
   )
   stravaStatus().then(
     (st) => (b.hidden = !st.connected),
@@ -195,7 +216,8 @@ export function stravaTag(j?: StravaJob) {
  * Upload for a ride from before connecting. Nothing when Strava isn't connected.
  */
 export function stravaRow(p: Profile, s: RideSummary, n: number) {
-  const box = h('div', { class: 'strava-row' })
+  const row = h('div', { class: 'strava-row' })
+  const box = h('span')
   const send = () => {
     box.replaceChildren(h('span', { class: 'dim' }, 'Sending to Strava…'))
     sendToStrava(p, s, n).then(draw, (e: Error) => {
@@ -224,9 +246,12 @@ export function stravaRow(p: Profile, s: RideSummary, n: number) {
   }
   const refresh = () =>
     stravaRides().then(
-      (r) => (r.connected ? draw(r.rides[n]) : box.replaceChildren()),
+      (r) =>
+        r.connected
+          ? (draw(r.rides[n]), row.replaceChildren(box, stravaMark()))
+          : row.replaceChildren(),
       () => {},
     )
   refresh()
-  return box
+  return row
 }
