@@ -1,6 +1,7 @@
 import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import { ROUTE_INDEX, type RouteSummary } from '../core/routeLibrary'
+import { dailyChallenge, dayOf } from '../core/daily'
 import { featuredRoute, weekState } from '../core/weekly'
 import { h } from './dom'
 import { scrapIcon } from './garage'
@@ -27,7 +28,7 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
   return h(
     'section',
     { class: 'panel week' },
-    h('h2', { class: 'label' }, 'This week'),
+    h('h2', { class: 'label' }, 'Today and this week'),
     h(
       'div',
       { class: 'wk-cols' },
@@ -59,6 +60,20 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
             ),
           )
         : '',
+      h(
+        'div',
+        { class: 'wk-item' },
+        h('span', { class: 'dim' }, "Today's challenge"),
+        h('b', {}, dailyChallenge().text),
+        h(
+          'span',
+          { class: 'wk-foot' },
+          p.dailyPaid === dayOf()
+            ? 'Done. A new one tomorrow.'
+            : 'Any ride counts. A new one every day.',
+          reward(CFG.daily.scrap, p.dailyPaid === dayOf()),
+        ),
+      ),
       h(
         'div',
         { class: 'wk-item' },

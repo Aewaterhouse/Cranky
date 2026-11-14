@@ -117,7 +117,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Weather and night | Rain, dust storms, night driving with headlights; visibility as a mechanic | M |
 | Campaign | A multi-ride journey across a map with a persistent bus, damage carried over and unlocks | L |
 | ✅ Difficulty and mutators | Easy to nightmare, picked by the host, plus a mutator that changes every week (Hungry Horde, Closed Servos, Scrap Rush, Loose Bolts, Tailwind) on everything above easy | S |
-| Daily and weekly challenges | Rotating goals with scrap rewards | M |
+| ✅ Daily and weekly challenges | Rotating goals with scrap rewards. Built: a daily challenge (six goals, the same for everyone, 25 scrap once a day) beside the weekly route and climb on home and free ride | M |
 | ✅ Trophies and bus history | LEGEND sprints bolt a permanent trophy on the bus; a plaque lists past runs. Built: every LEGEND sprint ever ridden on the bus is a gold cup on the roof rails (up to 14); the past runs are the Ladder's Top bus runs | S |
 | ✅ Horn, emotes and heckles | Quick reactions; spectators and fallen riders can cheer or heckle. Built: a tray of six (📯 horn first) on the bus HUD; fallen riders can use it; they float up everyone's screen. The TV view only watches | S |
 | Highlights and replay | Auto-clip the best moments (MEGA sprint, last-second escape) for the results page | L |

@@ -35,6 +35,8 @@ export interface Profile {
   /** Free ride: what has been ridden on each route, and the last few weeks' climbing and weekly rewards. */
   passport?: Record<string, Stamp>
   weeks?: Record<number, WeekLog>
+  /** The day number whose daily challenge was last paid. */
+  dailyPaid?: number
   /** The training plan the rider is on, if any. */
   plan?: PlanPick
   /** Every FTP change, oldest first. */

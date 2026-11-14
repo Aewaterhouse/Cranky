@@ -11,6 +11,7 @@ import { postRide } from '../core/rideQueue'
 import { ROUTE_INDEX } from '../core/routeLibrary'
 import { settings } from '../core/settings'
 import { weeklyRewards } from '../core/weekly'
+import { dailyReward } from '../core/daily'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
 import { ZONE_COLOURS } from './planGraph'
@@ -82,6 +83,9 @@ export function finishRide(
   // A free ride goes in the passport and may pay this week's rewards (each once a week).
   const week = weeklyRewards(stampRide(p, s), s, ROUTE_INDEX)
   p = week.p
+  const today = s.record.secs >= 30 ? dailyReward(p, { ...s, crew: !!group }) : { p, won: null }
+  p = today.p
+  if (today.won) week.won.push(today.won)
   saveProfile(p)
   // The crew's result rides along (without the scene still) so History can rebuild the bus postcard.
   const crew = group && { ...group, postcard: undefined }
