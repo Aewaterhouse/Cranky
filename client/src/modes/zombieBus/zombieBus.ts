@@ -50,6 +50,13 @@ const FX_SOUND: Record<string, () => void> = {
 }
 
 /** Zombie Bus ride view driven by server ticks. */
+/** Team Time Trial: everyone rides in their team's State of Origin kit, whatever they own. */
+const TEAM_KIT = ['outfit-maroon', 'outfit-skyblue']
+const teamKit = (m: Tick, id: string) => {
+  const g = m.game as { g?: string; team?: Record<string, number> } | null
+  return g?.g === 'ttt' && g.team?.[id] != null ? { outfit: TEAM_KIT[g.team[id]] } : undefined
+}
+
 export function startBusRide(
   lobby0: Lobby,
   profile: Profile,
@@ -281,7 +288,7 @@ export function startBusRide(
         c: r.s,
         st: r.st,
         cadence: r.cad,
-        look: lk[id],
+        look: teamKit(m, id) ?? lk[id],
         hr: r.hr,
         hrp: r.hrp,
         effort: r.tgt ? r.w / r.tgt : r.w > 0 ? 1 : 0,

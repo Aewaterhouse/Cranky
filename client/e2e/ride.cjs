@@ -178,7 +178,7 @@ async function workoutGame(page, name, start, panel, wants) {
     await workoutGame(await rider(browser, 'Ali'), 'Pub Quiz', 'Open the pub', 'PUB QUIZ', ['Points', 'Quizmaster|Knows Nothing'])
     await workoutGame(await rider(browser, 'Luke'), 'Galley Ship', 'Cast off', 'ROW AT', ['On the beat', 'Hull'])
     await workoutGame(await rider(browser, 'Jack'), 'The Hunt', 'Release the fox', 'THE HUNT', ['Points'])
-    await workoutGame(await rider(browser, 'Angus'), 'Team Time Trial', 'Start the trial', 'TEAM TIME TRIAL', ['Team Red|Team Blue'])
+    await workoutGame(await rider(browser, 'Angus'), 'Team Time Trial', 'Start the trial', 'TEAM TIME TRIAL', ['Team Maroons|Team Blues'])
     console.log('Pub Quiz, Galley Ship, The Hunt, Team Time Trial: ok')
     const racer = await rider(browser, 'Kat')
     await race(racer, 'Race', 1, ['Nundah', 'race'])

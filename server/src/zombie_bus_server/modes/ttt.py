@@ -11,7 +11,7 @@ from .common import CrewGame, award, compliance, crew_scrap, rider_row, tally
 if TYPE_CHECKING:
     from ..session import Room
 
-TEAMS = ("Red", "Blue")
+TEAMS = ("Maroons", "Blues")  # State of Origin; the client dresses them in maroon and sky blue
 
 
 class TeamTrial(CrewGame):

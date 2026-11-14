@@ -39,4 +39,4 @@ def test_the_tick_carries_both_teams_scores():
         return room.step(0.25)
 
     g = asyncio.run(main())["game"]
-    assert g["g"] == "ttt" and g["teams"] == ["Red", "Blue"] and len(g["scores"]) == 2
+    assert g["g"] == "ttt" and g["teams"] == ["Maroons", "Blues"] and len(g["scores"]) == 2

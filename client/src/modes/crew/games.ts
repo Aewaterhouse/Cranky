@@ -139,11 +139,11 @@ export const GAMES: Record<Game, GameInfo> = {
     icon: '⏱',
     name: 'Team Time Trial',
     how: [
-      'Two teams, Red and Blue, on the same workout.',
+      'Two teams, Maroons and Blues, on the same workout.',
       'Your team scores by staying on target, all of you.',
       'The team more on target at the end wins.',
     ],
-    tag: 'Red against Blue',
+    tag: 'Maroons against Blues',
     blurb:
       'The crew splits into two teams for the same workout. Every rider counts: the team that holds its targets better wins.',
     start: 'Start the trial',
