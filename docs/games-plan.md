@@ -136,6 +136,8 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - Sentencing: a guilty defendant rides 2 min at 100% in the cooldown; the rest get emoji.
 - Town survives: everyone wins, ranked by profit, top earner gets the Greenwashing Award. Town floods: everyone
   loses, and a guilty defendant's avatar wears a "GUILTY" sash in every game until they are acquitted in a later Trial.
+- A branded rider may appeal at the Trial of any later Climate Lawsuit and stand as a second defendant, even if they
+  are not the highest emitter. The sash expires after 30 days regardless.
 
 **Checklist**
 - [ ] C1 Server: `modes/climate.py`: decades, four fuels as per-rider targets, profit, emissions, switching costs. Tests.
@@ -154,10 +156,8 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - [ ] Owner checks added to `docs/owner-checks.md`; `docs/protocol.md`, `docs/map.md`, `docs/status.md` kept current
       throughout.
 
-## Open questions for the owner (the plan proceeds on the assumption in brackets)
+## Owner's answers (2026-11-14)
 
-1. Bots as dates and as jurors: fine? (Yes; bots fill to four.)
-2. See your date's power as a bar without a number, or not at all? (Bar, no number.)
-3. Climate: is there one winner when the town survives? (Yes, by profit, which is what makes coal tempting.)
-4. The "GUILTY" sash showing in every game, not only Climate Lawsuit? (Every game.)
-5. Is being early ever bad in the ambulance? (No; only arriving hot through the braking zone.)
+The assumptions above stand: bots as dates and jurors, a date's power as a bar with no number, one winner by profit
+when the town survives, real suburbs with joke hospitals and companies, early is never bad in the ambulance. The sash
+shows in every game, with the appeal and the 30-day expiry.
