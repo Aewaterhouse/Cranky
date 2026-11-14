@@ -22,7 +22,7 @@ export function planTags(p: Plan): { t: string; c?: string }[] {
   const np = (work.reduce((s, b) => s + mid(b)! ** 4 * b.dur, 0) / wsum) ** 0.25
   const score = np + (bl.filter((b) => b.type === 'sprint').length >= 5 ? 0.1 : 0)
   const level = score < 0.7 ? 'Easy' : score < 0.85 ? 'Moderate' : score < 0.95 ? 'Hard' : 'Brutal'
-  const tags: { t: string; c?: string }[] = [{ t: level, c: zoneColour(score + 0.05) }]
+  const tags: { t: string; c?: string }[] = [{ t: `${level} workout`, c: zoneColour(score + 0.05) }]
   const rb = bl.filter((b) => b.type === 'sprint').length
   if (rb) tags.push({ t: `${rb} roadblock${rb > 1 ? 's' : ''}` })
   const has = (lo: number, hi: number, dur: number) =>
