@@ -172,7 +172,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Item | What | Size |
 | --- | --- | --- |
 | Scheduled rides | Put a ride in the calendar; everyone gets a link and a reminder | M |
-| Crew feed | Who rode what, new PRs, kudos | M |
+| ✅ Crew feed | Who rode what, new PRs, kudos. Built: the crew's last eight rides on home (the game or workout, how long, how long ago) with a 👏 kudos each, once and never your own. PRs in the feed still to do | M |
 | Achievements | Long-term badges shown on the profile and the bus | M |
 | Proper accounts | Real passwords and invite links if it ever leaves the friend group | M |
 | ✅ Backups | A dated copy of the database at server start and every 24 h, newest 14 kept, in `server/backups/` (`ZB_BACKUPS` to move it) | S |

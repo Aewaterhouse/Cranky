@@ -97,3 +97,26 @@ class CrewStore:
         with self.lock, self.db:
             self.db.execute("INSERT OR REPLACE INTO campaign VALUES (1, ?)", (json.dumps(c),))
         return text
+
+    def feed(self, me: str, n: int = 15) -> list[dict]:
+        """The crew's latest rides, newest first: who, what, how long, a crew game's score, and the kudos."""
+        with self.lock:
+            rows = self.db.execute(
+                """SELECT r.n, r.rider, COALESCE(u.name, r.rider), r.date, json_extract(r.json, '$.planName'),
+                          json_extract(r.json, '$.record.secs'), json_extract(r.json, '$.group.mode'),
+                          json_extract(r.json, '$.group.score'), json_extract(r.json, '$.route.id'),
+                          (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n),
+                          (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n AND k.giver = ?)
+                   FROM rides r LEFT JOIN users u ON u.id = r.rider ORDER BY r.date DESC, r.n DESC LIMIT ?""",
+                (me, n),
+            ).fetchall()
+        keys = ("n", "rider", "name", "date", "plan", "secs", "game", "score", "route", "kudos", "mine")
+        return [{**dict(zip(keys, r, strict=True)), "mine": bool(r[10])} for r in rows]
+
+    def give_kudos(self, me: str, ride: int) -> bool:
+        """A kudos from `me` on someone else's ride, once each. False if it is their own or already given."""
+        with self.lock, self.db:
+            row = self.db.execute("SELECT rider FROM rides WHERE n = ?", (ride,)).fetchone()
+            if not row or row[0] == me:
+                return False
+            return self.db.execute("INSERT OR IGNORE INTO kudos VALUES (?, ?)", (ride, me)).rowcount == 1

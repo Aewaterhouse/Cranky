@@ -201,6 +201,18 @@ def get_ladder(u: User, season: str | None = None) -> dict:
     return ladder.build(season, store.results(*ladder.bounds(season)))
 
 
+@app.get("/api/feed")
+def crew_feed(u: User) -> list[dict]:
+    """The crew's latest rides with their kudos."""
+    return store.feed(u["id"])
+
+
+@app.post("/api/kudos/{n}")
+def kudos(n: int, u: User) -> dict:
+    """Gives a kudos on a mate's ride (once each, never your own)."""
+    return {"given": store.give_kudos(u["id"], n)}
+
+
 @app.get("/api/rides")
 def list_rides(u: User) -> list[dict]:
     """The caller's rides as list rows, newest first."""

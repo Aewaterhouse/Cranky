@@ -105,3 +105,27 @@ def test_efforts_table_is_added_to_an_existing_database_without_touching_it(tmp_
     for _ in range(2):  # opening twice is harmless
         Efforts(store)
     assert store.users() == [{"id": "old", "name": "Old"}] and len(store.rides("old")) == 1
+
+
+def test_the_crew_feed_lists_rides_and_takes_kudos_once():
+    _, ali = auth("ali", "Ali")
+    _, kat = auth("kat", "Kat")
+    ride = {
+        "record": {"date": "2026-11-15T07:00:00Z", "secs": 1800},
+        "planName": "Morning spin",
+        "group": {"mode": "quiz", "score": 42},
+    }
+    client.post("/api/rides", json={"summary": ride}, headers=ali)
+    top = client.get("/api/feed", headers=kat).json()[0]
+    assert (top["name"], top["plan"], top["game"], top["score"], top["kudos"]) == (
+        "Ali",
+        "Morning spin",
+        "quiz",
+        42,
+        0,
+    )
+    assert client.post(f"/api/kudos/{top['n']}", headers=kat).json() == {"given": True}
+    assert client.post(f"/api/kudos/{top['n']}", headers=kat).json() == {"given": False}
+    assert client.post(f"/api/kudos/{top['n']}", headers=ali).json() == {"given": False}  # not your own
+    again = client.get("/api/feed", headers=kat).json()[0]
+    assert again["kudos"] == 1 and again["mine"]

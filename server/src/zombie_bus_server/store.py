@@ -42,6 +42,7 @@ class Store(CrewStore):
             CREATE TABLE IF NOT EXISTS sashes (id TEXT PRIMARY KEY, until REAL);
             CREATE TABLE IF NOT EXISTS bests (game TEXT PRIMARY KEY, score REAL, date TEXT);
             CREATE TABLE IF NOT EXISTS titles (title TEXT PRIMARY KEY, holder TEXT, name TEXT);
+            CREATE TABLE IF NOT EXISTS kudos (ride INTEGER, giver TEXT, PRIMARY KEY (ride, giver));
             CREATE TABLE IF NOT EXISTS campaign (id INTEGER PRIMARY KEY CHECK (id = 1), json TEXT);
             """)
 
