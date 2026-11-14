@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en-AU">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cranky watch dev</title>
+    <style>
+      body { margin: 0; background: #111; color: #eee; font: 14px system-ui, sans-serif; }
+      #bar { display: flex; gap: 8px; padding: 8px; align-items: center; }
+      #players { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 8px; }
+      #players > div { aspect-ratio: 16 / 9; background: #000; }
+      input { width: 340px; }
+    </style>
+  </head>
+  <body>
+    <div id="bar"></div>
+    <div id="players"><div id="a"></div><div id="b"></div></div>
+    <pre id="log"></pre>
+    <script type="module" src="/src/watchDev.ts"></script>
+  </body>
+</html>
