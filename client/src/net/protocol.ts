@@ -298,7 +298,7 @@ export interface RideStats {
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
 export type RoadStyle = 'social' | 'race'
 /** The road layer's rule sets (the server's `RULES`). */
-export type RoadGame = 'ride' | 'race' | 'points' | 'crit' | 'handicap'
+export type RoadGame = 'ride' | 'race' | 'points' | 'crit' | 'handicap' | 'chaingang'
 /** A race's tick `game`: the leader's lap and, in a points race, everyone's points. */
 export interface RaceState {
   kind: RoadGame
@@ -376,6 +376,8 @@ export interface RoadSummary {
   /** Races: the first three across the line, in order, and the points winner. */
   podium?: string[]
   award?: { kind: 'points' | 'prime'; id: string } | null
+  /** A chaingang: the crew's time (the last rider home) and its turns on the front. */
+  team?: { time: number | null; smooth: number; turns: number }
   riders: {
     id: string
     name: string

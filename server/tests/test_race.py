@@ -228,3 +228,20 @@ def test_a_handicap_race_is_won_by_the_share_of_ftp_not_the_watts():
 
     asyncio.run(go())
     assert room.summary["riders"][0]["id"] == "small"
+
+
+def test_a_chaingang_calls_each_rider_to_the_front_and_scores_smooth_turns():
+    sim = racers("chaingang", 2)
+    sim.drafting = "off"
+    fx = []
+    while sim.rules.turns < 3:
+        # whoever is called rides hard, so they come through to the front
+        for m in sim.movers.values():
+            m.p = 450 if m.id == sim.rules.called else 200
+        fx += sim.step(DT)
+    calls = [f["id"] for f in fx if f["k"] == "bell" and f["text"] == "TO THE FRONT"]
+    assert calls[:4] == ["r0", "r1", "r2", "r3"]
+    assert sim.rules.turns == 3 and sim.rules.smooth >= 1
+    race_out(sim)
+    extra = sim.rules.extra(sim, sim.rules.results(sim))
+    assert extra["team"]["time"] == max(r["time"] for r in sim.rules.results(sim))

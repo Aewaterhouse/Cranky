@@ -145,7 +145,7 @@ Notes: YouTube's embedded player supports synced control and is the safe startin
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ Handicap race | Everyone races a route, speed scaled by FTP so it is always close. Built as a race kind in the group-ride lobby: everyone rides at 3.5 W/kg FTP for their weight, so the share of FTP decides it | M |
-| Chaingang | Take turns on the front; smooth rotations keep the speed up | M |
+| ✅ Chaingang | Take turns on the front; smooth rotations keep the speed up. Built as a road game: every 30 s the next rider is called to the front (a banner with their name), a turn is smooth if they lead when it ends, and the crew is timed to the last one home | M |
 | ✅ Last rider standing | A shared ramp test as an elimination game. Built as a crew game: one-minute steps from 60% to the 150% cap, out after 10 s off your step, last one standing wins, victory lap for all | S |
 | Team time trial | Two crews, same workout, compliance decides | M |
 | Galley Ship, Pub Quiz, Asymmetric Hunt | The remaining ideas from the original plan | L each |

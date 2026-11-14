@@ -166,4 +166,39 @@ class Handicap(Race):
     name = "handicap"
 
 
-RULES.update(race=Race, points=Points, crit=Crit, handicap=Handicap)
+class Chaingang(Rules):
+    """A team ride in turns: every CHAIN_TURN_S the next rider is called to the front, and a turn is smooth if
+    they are leading when it ends. The crew's time is the last rider home."""
+
+    name = "chaingang"
+    race = True  # no keep-together: the rotation has to be ridden
+
+    def __init__(self) -> None:
+        self.turn = 0
+        self.called: str | None = None
+        self.smooth = self.turns = 0
+
+    def after(self, sim: RoadSim, dt: float) -> list[dict]:
+        n = int(sim.el // C.CHAIN_TURN_S) + 1 if sim.el > 0 else 0
+        live = sorted(m.id for m in sim.movers.values() if m.fin is None and m.here)
+        if n == self.turn or not live:
+            return []
+        fx = []
+        if self.called in sim.movers and sim.movers[self.called].fin is None:
+            front = max((sim.movers[i] for i in live), key=lambda m: m.d)
+            ok = front.id == self.called
+            self.turns, self.smooth = self.turns + 1, self.smooth + ok
+            fx.append({"k": "turn", "id": self.called, "text": "Smooth turn" if ok else "Missed the turn"})
+        self.called = live[(live.index(self.called) + 1) % len(live)] if self.called in live else live[0]
+        self.turn = n
+        return [*fx, {"k": "bell", "id": self.called, "text": "TO THE FRONT"}]
+
+    def state(self, sim: RoadSim) -> dict | None:
+        return {"kind": self.name, "front": self.called, "smooth": self.smooth, "turns": self.turns}
+
+    def extra(self, sim: RoadSim, rows: list[dict]) -> dict:
+        times = [r["time"] for r in rows if r["time"] is not None]
+        return {"team": {"time": max(times, default=None), "smooth": self.smooth, "turns": self.turns}}
+
+
+RULES.update(race=Race, points=Points, crit=Crit, handicap=Handicap, chaingang=Chaingang)

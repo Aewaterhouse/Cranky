@@ -1,12 +1,19 @@
 import { ordinal } from '../modes/freeRide/roadLink'
 import type { RoadLobby, RoadSummary } from '../net/protocol'
 import '../moment.css'
-import { avatar, clock, h } from './dom'
+import { avatar, clock, fmt, h } from './dom'
 import { UNIT } from './units'
 
 const km = (m: number) => UNIT.dist(m)
 const lapsText = (n: number) => (n > 1 ? ` · ${n} laps` : '')
-const GAME_NAME = { ride: 'social ride', race: 'race', points: 'points race', crit: 'crit', handicap: 'handicap race' }
+const GAME_NAME = {
+  ride: 'social ride',
+  race: 'race',
+  points: 'points race',
+  crit: 'crit',
+  handicap: 'handicap race',
+  chaingang: 'chaingang',
+}
 
 /** The crew table for a road ride: place, time (or how far they got), average power, W/kg and watts saved drafting. */
 export function roadTable(g: RoadSummary, myId = '', faces = false) {
@@ -91,6 +98,13 @@ export function roadSection(g: RoadSummary, myId: string) {
       ),
       podium(g, myId),
       award(g, myId),
+      g.team
+        ? h(
+            'p',
+            { class: 'race-award' },
+            `⛓ Crew time ${g.team.time == null ? '–' : fmt(g.team.time)} · ${g.team.smooth} of ${g.team.turns} turns smooth`,
+          )
+        : '',
       roadTable(g, myId),
     ),
   )

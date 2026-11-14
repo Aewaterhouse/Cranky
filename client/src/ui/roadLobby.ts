@@ -48,6 +48,11 @@ const GAMES: [RoadGame, string, string][] = [
     'Lap after lap of a short loop, and a prime on one lap around halfway. First home wins.',
   ],
   [
+    'chaingang',
+    'Chaingang',
+    'A team ride in turns: every 30 s the next rider is called to the front. Smooth turns, and the crew is timed to the last one home.',
+  ],
+  [
     'handicap',
     'Handicap',
     'Everyone rides as if they had the same FTP for their weight, so it comes down to who goes deepest. First home wins.',

@@ -16,7 +16,14 @@ const R = CFG.road
 const ORD = ['', '1st', '2nd', '3rd']
 export const ordinal = (n: number) => ORD[n] ?? `${n}th`
 
-const TITLES = { ride: 'RIDE', race: 'RACE', points: 'POINTS RACE', crit: 'CRIT', handicap: 'HANDICAP' }
+const TITLES = {
+  ride: 'RIDE',
+  race: 'RACE',
+  points: 'POINTS RACE',
+  crit: 'CRIT',
+  handicap: 'HANDICAP',
+  chaingang: 'CHAINGANG',
+}
 
 /**
  * Who stands where at the end of a race: the first three across the line, the points or prime winner on the
@@ -108,6 +115,8 @@ export class RoadLink {
       } else if (fx.k === 'points' && fx.id) {
         this.notes.push(`${fx.id === this.me ? 'You' : name} ${fx.text} points`)
         this.flash = ['SPRINT POINTS', this.table(), this.got + R.bannerS]
+      } else if (fx.k === 'turn' && fx.id) {
+        this.notes.push(`${fx.id === this.me ? 'You' : name}: ${fx.text}`)
       } else if (fx.k === 'bell') {
         this.flash = [fx.text ?? '', fx.id ? name : '', this.got + R.bannerS]
         this.onBell(fx.text ?? '')
