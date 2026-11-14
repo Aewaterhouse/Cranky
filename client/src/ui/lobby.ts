@@ -5,9 +5,10 @@ import { GAMES } from '../modes/crew/games'
 import { FIRST_VIDEO, videoSource } from '../core/watchSync'
 import { campaignRow } from './campaignRow'
 import { gameCard } from './gameCard'
+import { seat } from './lobbySeat'
 import { TIER_NAME, TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
-import { avatar, h, seg } from './dom'
+import { h, seg } from './dom'
 import { planGraph } from './planGraph'
 import { mainWatts, minsLabel, planPicker, tagEls } from './planPicker'
 import { toast } from './toast'
@@ -148,44 +149,6 @@ export function lobbyView(c: LobbyCtx) {
   let link = ''
   let runKey = ''
 
-  const seat = (r?: Lobby['riders'][number], host?: string) =>
-    r
-      ? h(
-          'div',
-          { class: `seat${r.connected ? '' : ' away'}${r.id === c.profile().id ? ' me' : ''}` },
-          h('i', {
-            class: `dot${r.connected ? ' on' : ''}`,
-            title: r.connected ? 'Connected' : 'Away',
-          }),
-          avatar(r.name, 'lg'),
-          h(
-            'b',
-            {},
-            r.name,
-            r.ready && r.id !== host
-              ? h('span', { class: 'ready-tick', title: 'Ready' }, ' ✓')
-              : '',
-          ),
-          ...(r.titles ?? []).map((t) => h('small', { class: 'seat-title' }, t)),
-          h('span', { class: `tier-badge ${r.tier}` }, TIER_NAME[r.tier]),
-          h('small', {}, `${r.ftp} W`),
-          r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
-          r.bot
-            ? ''
-            : h(
-                'span',
-                { class: 'erg-badge', title: r.erg === false ? 'ERG off, on gears' : 'ERG on' },
-                r.erg === false ? '⚙ Gears' : 'ERG',
-              ),
-          r.id === host ? h('span', { class: 'driver' }, 'Driver') : '',
-        )
-      : h(
-          'div',
-          { class: 'seat vacant' },
-          h('span', { class: 'ghost-ava' }, '?'),
-          h('small', {}, 'waiting…'),
-        )
-
   const update = (l: Lobby) => {
     const me = c.profile()
     const isHost = l.host === me.id
@@ -239,7 +202,9 @@ export function lobbyView(c: LobbyCtx) {
     diffWhat.textContent = DIFF_WHAT[l.difficulty]
     botLess.disabled = bots === 0
     botMore.disabled = l.riders.length >= SEATS
-    seats.replaceChildren(...Array.from({ length: SEATS }, (_, i) => seat(l.riders[i], l.host)))
+    seats.replaceChildren(
+      ...Array.from({ length: SEATS }, (_, i) => seat(me.id, l.riders[i], l.host)),
+    )
     link = `${location.origin}/?join=${l.code}`
     if (code.dataset.code !== l.code) {
       code.dataset.code = l.code
