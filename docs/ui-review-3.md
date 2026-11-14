@@ -24,7 +24,7 @@ There's a lot of good stuff here. The Zombie Bus HUD is rich, the route vote is 
 - 18, 19, 20: no empty Sprints column, no "about 0 pies", quick time chips for planning a ride.
 - Bugs 1, 2, 3, 4, 5, 9 fixed (bike thumbnails show the bike; the deal is not repeated in Treat yourself).
 
-Since then: 11 done (your role, the zombie tip and the boss bar have their own row in the bus strip, which also fixes the strip's layout); the iPad overlaps eased (a narrower bus strip, the question card right of the feed), not yet seen on an iPad. Still open: 12 (the boss in the chase camera when the gap is wide), the sticky lobby header covering the game card.
+Since then: 11 done (your role, the zombie tip and the boss bar have their own row in the bus strip, which also fixes the strip's layout); the iPad overlaps eased (a narrower bus strip, the question card right of the feed), not yet seen on an iPad. The lobby bar keeps to one row at iPad width, so it no longer covers the game card. Still open: 12 (the boss in the chase camera when the gap is wide).
 
 ## Ideas, ranked
 

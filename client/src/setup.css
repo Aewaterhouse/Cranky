@@ -857,3 +857,29 @@ details.ftp-card > summary {
 .month-wrap {
   margin: 0 0 12px;
 }
+/* iPad width: keep the lobby bar to one row, so it never covers the game card under it. */
+@media (max-width: 1300px) {
+  .lobby-bar {
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
+  .lobby-bar h1 {
+    font-size: 1.3rem;
+    min-width: 0;
+  }
+  .lb-code {
+    gap: 6px;
+  }
+  .lobby-bar .code-letters span {
+    width: 30px;
+    height: 36px;
+    font-size: 1.2rem;
+  }
+  .lobby-bar .start-slot .mega-go {
+    padding: 10px 16px;
+    font-size: 1rem;
+  }
+  .lobby-bar .copy {
+    padding: 8px 10px;
+  }
+}
