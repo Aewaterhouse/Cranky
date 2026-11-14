@@ -106,6 +106,7 @@ async function connectBt() {
   try {
     const t = new FtmsTrainer()
     await t.connect()
+    localStorage.setItem(LAST, 'ble')
     set(t)
     return true
   } catch (e) {
@@ -120,7 +121,11 @@ async function connectBt() {
   }
 }
 
+/** Remembers the simulator, so a reload brings it back instead of asking again. */
+const LAST = 'cranky.trainer'
+
 export function useSim(ftp: number) {
+  localStorage.setItem(LAST, 'sim')
   if (!sim) {
     sim = new SimTrainer()
     sim.start(4)
@@ -255,3 +260,8 @@ export function openTrainer(then?: () => void) {
 
 /** Wraps a "start riding" action so it asks for a trainer first. */
 export const needTrainer = (fn: () => void) => () => (trainer ? fn() : openTrainer(fn))
+
+/** On load: put the simulator back if that was the last choice (a Bluetooth trainer needs a tap to pair again). */
+export function restoreTrainer(ftp: number) {
+  if (localStorage.getItem(LAST) === 'sim' && !currentTrainer()) useSim(ftp)
+}

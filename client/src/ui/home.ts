@@ -232,7 +232,7 @@ export function rideTab(p: Profile, act: HomeActions) {
           open(soloSetup(p, act, home)),
         ),
         mode(
-          '📅',
+          '📈',
           'Training plan',
           p.plan ? 'Your calendar and what is next' : 'A few weeks, your riding days',
           openPlan,

@@ -27,7 +27,7 @@ import { crew } from './modes/zombieBus/crew'
 import { spectate } from './modes/zombieBus/spectate'
 import { showLogin } from './ui/login'
 import { showHome } from './ui/shell'
-import { currentTrainer } from './ui/trainer'
+import { currentTrainer, restoreTrainer } from './ui/trainer'
 import { openRiderSettings } from './ui/rider'
 import { autoStrava, stravaReturn } from './ui/strava'
 
@@ -72,6 +72,7 @@ async function enter(u: Me) {
   addEventListener('online', sync)
   const p = await syncProfile(profile)
   if (p !== profile) home(p)
+  restoreTrainer(profile.ftp)
   maybeWelcome(profile, () => home())
 }
 

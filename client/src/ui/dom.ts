@@ -35,15 +35,29 @@ export const kmStr = (m: number) => (m / 1000).toFixed(m < 10000 ? 2 : 1)
 export const pctStr = (c: number | null | undefined) =>
   c == null ? '–' : `${Math.round(c * 100)}%`
 
-const HUES = ['#f2b705', '#7fd13b', '#3bb2d1', '#e85d9c', '#ff7a3d', '#a78bfa']
+const HUES = [
+  '#f2b705',
+  '#7fd13b',
+  '#3bb2d1',
+  '#e85d9c',
+  '#ff7a3d',
+  '#a78bfa',
+  '#f25f5c',
+  '#94a3b8',
+]
+/** Two letters for a name: first and last of a single word (Alex AX, Ali AI), or the first of two words. */
+export const initials = (name: string) => {
+  const w = name.trim().split(/\s+/)
+  return (w.length > 1 ? w[0][0] + w[1][0] : w[0][0] + (w[0].at(-1) ?? '')).toUpperCase()
+}
 /** Initials on a per-rider colour, stable across screens. */
 export function avatar(name: string, size = '') {
-  // Multiplier picked so the six crew names land on six different colours.
-  const n = [...name.toLowerCase()].reduce((a, c) => (a * 113 + c.charCodeAt(0)) % 9973, 7)
+  // Multiplier picked so the seven seeded riders land on seven different colours.
+  const n = [...name.toLowerCase()].reduce((a, c) => (a * 44 + c.charCodeAt(0)) % 9973, 7)
   return h(
     'span',
     { class: `ava ${size}`, style: `--c:${HUES[n % HUES.length]}`, 'aria-hidden': 'true' },
-    name.slice(0, 2).toUpperCase(),
+    initials(name),
   )
 }
 
