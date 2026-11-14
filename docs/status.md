@@ -34,7 +34,7 @@
 ## In progress
 - **Three new crew games** (`docs/games-plan.md`, the current priority), started 2026-11-14. All non-ERG, scripted sessions with their own targets, built on a shared kit (per-rider target bands, `act` input, `ask` questions, seeded events with a 90 s quiet limit, a per-game HUD panel, scene and results view).
   - Kidney Stone Express (`ambo`): done end to end. A sped-up shift with bots runs from lobby to results in `scripts/e2e.sh`. Never ridden by a person; Comfort tolerances against real trainer noise are guesses.
-  - Speed Dating (`date`): HUD, scene (couples, hearts, wedding tandem, divorce rope) and results built against made-up ticks on `/hud-dev.html?game=date`; server rules in progress. Shows as "Coming soon" in the lobby.
+  - Speed Dating (`date`): playable. A sped-up night with three bots runs from The Bar through six dates, the Proposal, Wedding and Divorce to the results (screenshots in `docs/screenshots/games/`). Not yet in `scripts/e2e.sh`; never ridden by a person.
   - Climate Lawsuit (`climate`): the town scene, HUD and results built the same way on `/hud-dev.html?game=climate`; the GUILTY ribbon draws on name tags; no server rules yet. "Coming soon" in the lobby.
 - Zwift Click v2: the driver pairs a v2 puck and reads its buttons (from the public bikecontrol source), never run on hardware; the reference's keep-awake logic is not public, so presses may stop after a while. Check in `docs/owner-checks.md`.
 - Zombie Bus: Lunch Break Quickie, a 15 min plan, and a 15 min length chip.

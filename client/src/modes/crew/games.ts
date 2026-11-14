@@ -57,7 +57,6 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Chemistry',
     plan: false,
     fixed: true,
-    soon: true,
   },
   climate: {
     icon: '🌊',

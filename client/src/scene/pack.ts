@@ -126,7 +126,8 @@ export class Pack {
     const top = Math.max(0, ...pts)
     const low = Math.min(top, ...pts)
     this.crown.visible = this.medal.visible = this.eyes.visible = false
-    const spot = mad.pairs ? this.dates(mad, t, dt, sparks) : null
+    // No couples yet (The Bar, the cooldown): the pack rides as a pack.
+    const spot = mad.pairs?.length ? this.dates(mad, t, dt, sparks) : null
     if (!spot) this.hearts.forEach((s) => (s.visible = false))
     riders.forEach((sr, i) => {
       let e = this.map.get(sr.id)
@@ -145,11 +146,14 @@ export class Pack {
       const at = spot?.get(sr.id)
       const want = at
         ? at[1]
-        : out || spot
+        : out
           ? VIS.packBack + 5
-          : VIS.packBack + (VIS.packFront - VIS.packBack) * k
+          : spot
+            ? VIS.packBack + 2
+            : VIS.packBack + (VIS.packFront - VIS.packBack) * k
       e.z += (want - e.z) * clamp(dt * 0.8)
-      const lane = spot ? 0 : (i - (riders.length - 1) / 2) * VIS.packLane
+      // Riders without a date (the Chaperone, wedding guests) ride their own lanes behind the couples.
+      const lane = at ? 0 : (i - (riders.length - 1) / 2) * VIS.packLane
       const wantX = (at ? at[0] : lane) + Math.sin(t * 0.6 + e.seed) * (at ? 0.08 : 0.25)
       const x = spot ? r.root.position.x + (wantX - r.root.position.x) * clamp(dt * 1.5) : wantX
       r.root.position.set(x, 0, e.z)
@@ -163,7 +167,7 @@ export class Pack {
         s.scale.setScalar(size * (1 + Math.sin(t * 6) * 0.08))
         s.position.set(x, y + Math.sin(t * 3) * 0.12, e.z - 0.3)
       }
-      if (spot && !at && !out) mark(this.eyes, 3.6, 1.1)
+      if (spot && !at && !out && mad.work) mark(this.eyes, 3.6, 1.1)
       if (sr.id === mad.lead) mark(this.medal, 0.5, 0.8)
       if (sr.id !== mad.crown) return
       mark(this.crown, 3.9, 1.4)

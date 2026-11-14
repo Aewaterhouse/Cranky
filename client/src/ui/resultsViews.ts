@@ -34,7 +34,8 @@ export interface GroupSummary {
   }[]
   /** Speed Dating: couples by points, who married, who won the Divorce, and the leaked chat. */
   couples?: { a: string; b: string; pts: number }[]
-  married?: [string, string] | null
+  /** Names, as the server sends them. */
+  married?: { a: string; b: string } | null
   divorced?: { winner: string; loser: string } | null
   chat?: string[]
   /** Climate Lawsuit: whether the town flooded, how far the sea got and the Trial's verdicts. */
@@ -109,8 +110,8 @@ export const VIEWS: Record<
   },
   date: {
     tiles: (g) => [
-      tile('Married', g.married ? g.married.map((id) => who(g, id)).join(' + ') : 'Nobody'),
-      tile('Kept the house', g.divorced ? who(g, g.divorced.winner) : 'No divorce'),
+      tile('Married', g.married ? `${g.married.a} + ${g.married.b}` : 'Nobody'),
+      tile('Kept the house', g.divorced ? g.divorced.winner : 'No divorce'),
     ],
     col: 'Match · best date · red flags',
     cell: (r) =>
