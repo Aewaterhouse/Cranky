@@ -1,0 +1,70 @@
+{
+ "id": "bus-lunch-quickie",
+ "name": "Lunch Break Quickie",
+ "goal": "bus",
+ "desc": "Fifteen minutes, door to door. Two roadblocks, one horde surge and back at your desk before anyone notices.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 150,
+   "pct": [
+    50,
+    75
+   ],
+   "label": "Warm-up"
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 92,
+   "label": "Long haul"
+  },
+  {
+   "type": "sprint",
+   "dur": 10,
+   "label": "Roadblock"
+  },
+  {
+   "type": "steady",
+   "dur": 80,
+   "pct": 50,
+   "label": "Servo stop"
+  },
+  {
+   "type": "over-under",
+   "dur": 180,
+   "pct": [
+    90,
+    108
+   ],
+   "step": 45,
+   "label": "Horde surge"
+  },
+  {
+   "type": "sprint",
+   "dur": 10,
+   "label": "Roadblock"
+  },
+  {
+   "type": "steady",
+   "dur": 60,
+   "pct": 50,
+   "label": "Servo stop"
+  },
+  {
+   "type": "steady",
+   "dur": 120,
+   "pct": 95,
+   "label": "Long haul"
+  },
+  {
+   "type": "ramp",
+   "dur": 110,
+   "pct": [
+    60,
+    45
+   ],
+   "label": "Cool-down"
+  }
+ ]
+}

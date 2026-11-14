@@ -34,7 +34,7 @@ interface Room {
   riders: string[]
 }
 
-export const DURATIONS = [0, 30, 45, 60, 75, 90]
+export const DURATIONS = [0, 15, 30, 45, 60, 75, 90]
 const POLL_MS = 3000
 
 export function planFor(id: string, minutes: number): Plan {
