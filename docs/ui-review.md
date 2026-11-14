@@ -34,8 +34,8 @@ re-run the review after a big round.
 ## Open, most important first
 
 **Results and history: the story is the product**
-1. [ ] A ride's History page drops the game story: Trial, couples, reviews, awards, crew (lobby 1, blocker).
-2. [ ] Results open with eight generic training tiles; the game outcome is 1.5 screens down on a phone (lobby 2).
+1. [x] A ride's History page drops the game story: Trial, couples, reviews, awards, crew (lobby 1, blocker).
+2. [x] Results open with eight generic training tiles; the game outcome is 1.5 screens down on a phone (lobby 2).
 3. [ ] Phone award cards lose the winner's name; the crew table breaks on phones (lobby 3, 4).
 4. [ ] No scrap reward shown for the non-bus games (lobby 7).
 5. [ ] Postcard downloads silently, no preview or share, always named `zombie-bus-…` (lobby 8).

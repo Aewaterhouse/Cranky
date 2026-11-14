@@ -14,7 +14,7 @@ import { ZONE_COLOURS } from './planGraph'
 import { downloadFit, downloadJson } from './rideExport'
 import { ridePostcard, savePng } from './ridePostcard'
 import type { GroupSummary } from './results'
-import { busCard, postcard } from './resultsGroup'
+import { busCard, groupSection, postcard } from './resultsGroup'
 import { stravaRow } from './strava'
 import { segsFromSeries } from './soloSegs'
 import { modal, toast } from './toast'
@@ -231,8 +231,11 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
           ),
         )
       }
+      // A crew ride's story (the game's result, awards and crew) leads, as on the results screen.
+      const g = (s as RideSummary & { group?: GroupSummary }).group
       root.replaceChildren(
         head(s),
+        g ? groupSection(g, p.id) : '',
         ...body(s),
         h(
           'div',

@@ -151,6 +151,8 @@ export function finishRide(
         h('h1', {}, group ? 'Made it!' : 'Ride done'),
         h('p', {}, h('b', {}, s.planName), ` · ${when}`),
       ),
+      // The game's outcome is the story of a crew ride: it comes before the training numbers.
+      group ? groupSection(group, profile.id) : '',
       h(
         'div',
         { class: 'res-tiles' },
@@ -198,7 +200,6 @@ export function finishRide(
             ),
           )
         : '',
-      group ? groupSection(group, profile.id) : '',
       road ? roadSection(road, profile.id) : '',
       segmentSection(s.segments),
       ...week.won.map((w) =>
