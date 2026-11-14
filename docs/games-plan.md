@@ -220,6 +220,16 @@ the server), with bots, results and history like the other games.
       the bonkers models), with the prime or points winner standing to the side on their own little box.
 - [ ] Each race in the e2e test with bots; owner checks for a real group race.
 
+## Phase 8: Second review round (owner, 2026-11-14; once the races and the current polish are done)
+
+A fresh set of independent reviewers, none of whom saw the first round or the code, each given only the running site.
+They judge the whole thing (the site, every game mode, the 3D scenes) and answer one question: what would make it a
+funner, better, cleaner, more intuitive experience? Same set-up as Phase 6 (headless Chromium, desktop and iPad sizes;
+phones are an edge case), one or two reviewers at a time, areas split as: first impressions and navigation; the crew
+games and races; free ride and the 3D worlds; the rider, Garage and results. Each report ranks its ideas by how much
+fun or clarity they would add for the effort, names a game or app that does it well, and is honest about what is
+already good. The reports are merged into `docs/ui-review-2.md` and become the next work queue.
+
 ## Always open: 3D worlds (owner, 2026-11-14)
 
 - [ ] More work on the 3D environments, free ride first, then the game scenes (bus road, the town, the dating road):
