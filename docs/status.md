@@ -41,7 +41,6 @@
 - Zwift Click v2: the driver pairs a v2 puck and reads its buttons (from the public bikecontrol source), never run on hardware; the reference's keep-awake logic is not public, so presses may stop after a while. Check in `docs/owner-checks.md`.
 - Zombie Bus: Lunch Break Quickie, a 15 min plan, and a 15 min length chip.
 - Extra ride metrics: a More numbers card (variability, efficiency, HR drift, W′ low point, cadence bands) on results and history for rides of 10 min or more. W′ is a flat 20 kJ for everyone.
-- Training plans: being built (bundled plans and matching landed; calendar and today's workout to come).
 - UI review by independent agents (`docs/games-plan.md` Phase 6): the first reviewer is on the riding screens.
 - `docs/ride-notes-plan.md` worked through on 2026-11-14. Three items stay open: gear strength and falling-off tuning are waiting on the owner (`docs/questions.md`), and the shift-strength slider needs an iPad check. Trainer and iPad checks are in `docs/owner-checks.md`.
 - Rider bodies, 2026-11-14: a free character creator (Rider → Body) and a rebuilt rider model: 24 options from normal to ridiculous, presets and Randomise, saved in the look, synced through the profile and the join message, validated on the server, shown on the bus, in Madness, free and group rides, the TV views and the Garage pictures. A rider is 10 draw calls where it was 26. Seen in headless rides and on `/avatars-dev.html` only; iPad checks in `docs/owner-checks.md`; design in `docs/avatars.md`; screenshots in `docs/screenshots/avatars/`.
