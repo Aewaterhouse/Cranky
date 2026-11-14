@@ -47,7 +47,7 @@ end of the queue. Owner's own to-dos go first:*
 3. [ ] (phone) Phone award cards lose the winner's name (fixed: a top-bar rule hid it); the crew table breaks on phones (lobby 3, 4).
 4. [x] No scrap reward shown for the non-bus games (lobby 7).
 5. [x] Postcard downloads silently, no preview or share, always named `zombie-bus-…` (lobby 8).
-6. [ ] No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
+6. [ ] ("Ride again with this crew" done: the results button already went back to the same lobby, it now says so) No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
 7. [ ] The leaked group chat is a 40-line dump (lobby 5).
 
 **The lobby**

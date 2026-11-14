@@ -118,7 +118,7 @@ export async function crew(
             if (lobby) renderLobby(lobby)
           },
           { ...m.summary, postcard },
-          'Back to the bus',
+          '↻ Ride again with this crew',
         ),
       )
     } else if (m.t === 'error') {
