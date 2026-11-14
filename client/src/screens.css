@@ -707,3 +707,6 @@ kbd {
   padding: 8px 0;
   background: var(--bg);
 }
+.game-shelves .shelf-name {
+  margin: 14px 0 6px;
+}
