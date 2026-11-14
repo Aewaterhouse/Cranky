@@ -285,3 +285,9 @@
 .bus-ride .bs-extra .bs-boss {
   flex: 1 1 100%;
 }
+/* iPad width: a narrower strip so its left edge clears the Stats and camera buttons. */
+@media (max-width: 1300px) {
+  .bus-ride .hud-left {
+    width: min(790px, 54vw);
+  }
+}
