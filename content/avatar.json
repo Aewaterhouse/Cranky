@@ -1,0 +1,550 @@
+{
+ "version": 1,
+ "fields": [
+  {
+   "key": "height",
+   "tab": "Body",
+   "label": "Height",
+   "type": "slider",
+   "max": 100,
+   "def": 50,
+   "lo": "Short",
+   "hi": "Tall"
+  },
+  {
+   "key": "build",
+   "tab": "Body",
+   "label": "Build",
+   "type": "slider",
+   "max": 100,
+   "def": 45,
+   "lo": "Skinny",
+   "hi": "Stocky"
+  },
+  {
+   "key": "belly",
+   "tab": "Body",
+   "label": "Belly",
+   "type": "slider",
+   "max": 100,
+   "def": 10,
+   "lo": "Flat",
+   "hi": "Keg"
+  },
+  {
+   "key": "shoulders",
+   "tab": "Body",
+   "label": "Shoulders",
+   "type": "slider",
+   "max": 100,
+   "def": 50,
+   "lo": "Narrow",
+   "hi": "Wide"
+  },
+  {
+   "key": "arms",
+   "tab": "Body",
+   "label": "Arm length",
+   "type": "slider",
+   "max": 100,
+   "def": 50,
+   "lo": "T-rex",
+   "hi": "Orangutan"
+  },
+  {
+   "key": "legs",
+   "tab": "Body",
+   "label": "Leg length",
+   "type": "slider",
+   "max": 100,
+   "def": 50,
+   "lo": "Stumpy",
+   "hi": "Stilts"
+  },
+  {
+   "key": "calves",
+   "tab": "Body",
+   "label": "Calves",
+   "type": "slider",
+   "max": 100,
+   "def": 25,
+   "lo": "Twigs",
+   "hi": "Huge"
+  },
+  {
+   "key": "head",
+   "tab": "Body",
+   "label": "Head size",
+   "type": "slider",
+   "max": 100,
+   "def": 15,
+   "lo": "Small",
+   "hi": "Bobblehead"
+  },
+  {
+   "key": "neck",
+   "tab": "Body",
+   "label": "Neck",
+   "type": "slider",
+   "max": 100,
+   "def": 20,
+   "lo": "None",
+   "hi": "Giraffe"
+  },
+  {
+   "key": "skin",
+   "tab": "Skin",
+   "label": "Skin",
+   "type": "colour",
+   "max": 15,
+   "def": 0,
+   "opts": [
+    "Porcelain",
+    "Fair",
+    "Light",
+    "Sand",
+    "Honey",
+    "Olive",
+    "Tan",
+    "Bronze",
+    "Brown",
+    "Deep brown",
+    "Ebony",
+    "Freckled pink",
+    "Zombie green",
+    "Sunburnt lobster",
+    "Smurf blue",
+    "Chrome"
+   ],
+   "colours": [
+    "#f6dccb",
+    "#f3d2b8",
+    "#f0c8a0",
+    "#e0b088",
+    "#d9a577",
+    "#c69063",
+    "#b07a50",
+    "#996341",
+    "#7a4e32",
+    "#5e3a25",
+    "#44291b",
+    "#eebfae",
+    "#8fb86a",
+    "#e8563c",
+    "#4a8fe0",
+    "#c5ced8"
+   ],
+   "normal": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+   ]
+  },
+  {
+   "key": "tan",
+   "tab": "Skin",
+   "label": "Cyclist's tan line",
+   "type": "toggle",
+   "max": 1,
+   "def": 0
+  },
+  {
+   "key": "hair",
+   "tab": "Hair",
+   "label": "Hair",
+   "type": "pick",
+   "max": 13,
+   "def": 2,
+   "opts": [
+    "Bald",
+    "Buzz",
+    "Short",
+    "Mullet",
+    "Mohawk",
+    "Afro",
+    "Man bun",
+    "Ponytail",
+    "Rat tail",
+    "Curtains",
+    "Comb-over",
+    "Spikes",
+    "Big perm",
+    "Bowl cut"
+   ],
+   "normal": [
+    1,
+    2,
+    2,
+    2,
+    7,
+    9,
+    13,
+    0
+   ]
+  },
+  {
+   "key": "hairColour",
+   "tab": "Hair",
+   "label": "Hair colour",
+   "type": "colour",
+   "max": 15,
+   "def": 2,
+   "opts": [
+    "Black",
+    "Dark brown",
+    "Brown",
+    "Light brown",
+    "Dirty blond",
+    "Blond",
+    "Ginger",
+    "Grey",
+    "White",
+    "Hot pink",
+    "Electric blue",
+    "Slime green",
+    "Purple",
+    "Traffic orange",
+    "Bleach yellow",
+    "Fire red"
+   ],
+   "colours": [
+    "#1c1a19",
+    "#3b2a20",
+    "#6a4630",
+    "#94683f",
+    "#b8935a",
+    "#e2c377",
+    "#c2562a",
+    "#9a9a9a",
+    "#eeeeea",
+    "#ff4fa3",
+    "#2f7bff",
+    "#63d43a",
+    "#8a48d6",
+    "#ff7a1a",
+    "#f7e653",
+    "#e02222"
+   ],
+   "normal": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ]
+  },
+  {
+   "key": "beard",
+   "tab": "Hair",
+   "label": "Facial hair",
+   "type": "pick",
+   "max": 6,
+   "def": 0,
+   "opts": [
+    "None",
+    "Moustache",
+    "Handlebar",
+    "Horseshoe",
+    "Beard",
+    "Goatee",
+    "Mutton chops"
+   ],
+   "normal": [
+    0,
+    0,
+    0,
+    0,
+    1,
+    4
+   ]
+  },
+  {
+   "key": "eyeShape",
+   "tab": "Face",
+   "label": "Eye shape",
+   "type": "pick",
+   "max": 4,
+   "def": 0,
+   "opts": [
+    "Round",
+    "Wide",
+    "Sleepy",
+    "Narrow",
+    "Tall"
+   ],
+   "normal": [
+    0,
+    0,
+    1,
+    4
+   ]
+  },
+  {
+   "key": "eyeSize",
+   "tab": "Face",
+   "label": "Eye size",
+   "type": "slider",
+   "max": 100,
+   "def": 40,
+   "lo": "Beady",
+   "hi": "Huge"
+  },
+  {
+   "key": "eyeColour",
+   "tab": "Face",
+   "label": "Eye colour",
+   "type": "colour",
+   "max": 7,
+   "def": 0,
+   "opts": [
+    "Brown",
+    "Hazel",
+    "Blue",
+    "Green",
+    "Grey",
+    "Black",
+    "Red",
+    "Violet"
+   ],
+   "colours": [
+    "#5a3a22",
+    "#8a6a35",
+    "#3f7fd0",
+    "#3f9a55",
+    "#7d8a94",
+    "#1a1a1a",
+    "#d82020",
+    "#8a4fd0"
+   ],
+   "normal": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ]
+  },
+  {
+   "key": "eyeGap",
+   "tab": "Face",
+   "label": "Eye spacing",
+   "type": "slider",
+   "max": 100,
+   "def": 45,
+   "lo": "Close",
+   "hi": "Wide"
+  },
+  {
+   "key": "googly",
+   "tab": "Face",
+   "label": "Googly eyes",
+   "type": "toggle",
+   "max": 1,
+   "def": 0
+  },
+  {
+   "key": "brows",
+   "tab": "Face",
+   "label": "Eyebrows",
+   "type": "pick",
+   "max": 6,
+   "def": 2,
+   "opts": [
+    "None",
+    "Thin",
+    "Thick",
+    "Bushy",
+    "Unibrow",
+    "Angry",
+    "Worried"
+   ],
+   "normal": [
+    1,
+    2,
+    2
+   ]
+  },
+  {
+   "key": "noseSize",
+   "tab": "Face",
+   "label": "Nose size",
+   "type": "slider",
+   "max": 100,
+   "def": 35,
+   "lo": "Button",
+   "hi": "Honker"
+  },
+  {
+   "key": "noseShape",
+   "tab": "Face",
+   "label": "Nose shape",
+   "type": "pick",
+   "max": 4,
+   "def": 0,
+   "opts": [
+    "Button",
+    "Pointy",
+    "Wide",
+    "Hook",
+    "Clown"
+   ],
+   "normal": [
+    0,
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "key": "ears",
+   "tab": "Face",
+   "label": "Ear size",
+   "type": "slider",
+   "max": 100,
+   "def": 30,
+   "lo": "Tiny",
+   "hi": "Jug"
+  },
+  {
+   "key": "mouth",
+   "tab": "Face",
+   "label": "Mouth",
+   "type": "pick",
+   "max": 6,
+   "def": 1,
+   "opts": [
+    "Neutral",
+    "Smile",
+    "Grin",
+    "Gap teeth",
+    "Buck teeth",
+    "Frown",
+    "Open"
+   ],
+   "normal": [
+    0,
+    1,
+    1,
+    2
+   ]
+  }
+ ],
+ "presets": [
+  {
+   "name": "Weekend warrior",
+   "body": {
+    "build": 60,
+    "belly": 45,
+    "calves": 30,
+    "hair": 2,
+    "beard": 4,
+    "tan": 1,
+    "mouth": 1
+   }
+  },
+  {
+   "name": "Sprinter",
+   "body": {
+    "build": 85,
+    "shoulders": 80,
+    "calves": 100,
+    "legs": 40,
+    "hair": 1,
+    "brows": 5,
+    "mouth": 2,
+    "neck": 5
+   }
+  },
+  {
+   "name": "Climber",
+   "body": {
+    "build": 5,
+    "belly": 0,
+    "height": 35,
+    "calves": 10,
+    "arms": 60,
+    "hair": 9,
+    "noseShape": 1,
+    "eyeSize": 55
+   }
+  },
+  {
+   "name": "Bobblehead",
+   "body": {
+    "head": 100,
+    "neck": 45,
+    "build": 20,
+    "eyeSize": 80,
+    "googly": 1,
+    "mouth": 2,
+    "hair": 11,
+    "hairColour": 14
+   }
+  },
+  {
+   "name": "The Dazza",
+   "body": {
+    "hair": 3,
+    "hairColour": 4,
+    "beard": 2,
+    "tan": 1,
+    "belly": 60,
+    "skin": 13,
+    "mouth": 3,
+    "brows": 3
+   }
+  },
+  {
+   "name": "Zombie",
+   "body": {
+    "skin": 12,
+    "hair": 10,
+    "hairColour": 7,
+    "eyeShape": 2,
+    "eyeColour": 6,
+    "mouth": 6,
+    "brows": 6,
+    "build": 15,
+    "arms": 85
+   }
+  },
+  {
+   "name": "Nan",
+   "body": {
+    "height": 15,
+    "hair": 12,
+    "hairColour": 12,
+    "build": 55,
+    "belly": 35,
+    "eyeShape": 1,
+    "mouth": 1,
+    "noseSize": 55,
+    "ears": 60
+   }
+  },
+  {
+   "name": "Chrome dome",
+   "body": {
+    "skin": 15,
+    "hair": 0,
+    "beard": 0,
+    "eyeColour": 6,
+    "brows": 5,
+    "build": 75,
+    "shoulders": 90,
+    "noseShape": 1
+   }
+  }
+ ]
+}

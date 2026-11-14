@@ -2,21 +2,29 @@ import * as THREE from 'three'
 import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
 import { TRAINER_SKIN } from '../core/cosmetics'
+import { bodyColour, defaultBody, type Body } from '../core/body'
+import { SLOT } from './figure'
 import { makeHat } from './hats'
+import { buildBody, dimsOf, type Dims } from './riderBody'
+import { buildHead } from './riderHead'
+import type { Headwear } from './riderHair'
 import { VIS } from './params'
 import type { Particles } from './particles'
 import { makeTag, TAG_H } from './riderTag'
 import { FEEL } from './route/feelVis'
 import type { RoadPose } from './route/riderPose'
-import { box, clamp, ico, lerp, rand, smooth, span } from './util'
+import { clamp, lerp, rand, smooth, span } from './util'
 
-const SKINS = ['#f0c8a0', '#d9a577', '#b07a50', '#7a4e32', '#f3d2b8', '#e0b088']
 const SHORTS = '#23252c'
 const HOT = new THREE.Color('#ff2a1a')
 const STEAM = new THREE.Color('#f4f6f8')
-const THIGH = 0.46
-const SHIN = 0.46
-const ARM = 0.32
+const WHITE = new THREE.Color('#ffffff')
+const TANNED = new THREE.Color('#8a4a20')
+/** How much darker the sun-side skin and how much paler the covered skin is with a cyclist's tan. */
+const TAN = { dark: 0.38, pale: 0.3 }
+const HEADWEAR = { up: 0.035, tilt: 0.15 }
+const TORSO = 0.6
+const SKULL = 0.23
 const P = FEEL.rider
 
 /** Two-bone IK in the (forward, up) plane; the joint bends counter-clockwise (knees and elbows forward/up). */
@@ -47,70 +55,79 @@ export type RiderMode = 'ride' | 'run' | 'slump'
  * A rider figure on a bike (on a trainer unless `road`) with a canvas name tag. Local origin is the surface
  * under the bike.
  */
-export function makeRider(colour: string, seed: number, road = false) {
+export function makeRider(colour: string, id: string, road = false) {
   const root = new THREE.Group()
   const bike = makeBike(colour, road)
   const person = new THREE.Group()
   root.add(bike.group, person)
-  const mats = {
-    jersey: new THREE.MeshLambertMaterial({ color: colour, flatShading: true }),
-    skin: new THREE.MeshLambertMaterial({ color: SKINS[seed % SKINS.length], flatShading: true }),
-    shorts: new THREE.MeshLambertMaterial({ color: SHORTS, flatShading: true }),
-    shoe: new THREE.MeshLambertMaterial({ color: '#f2f2f2', flatShading: true }),
-  }
-  const mesh = (geo: THREE.BufferGeometry, m: THREE.Material, shadow = false) => {
-    const o = new THREE.Mesh(geo, m)
-    o.castShadow = shadow
-    person.add(o)
-    return o
-  }
-  const limb = (m: THREE.Material, t = 0.13, shadow = false) => mesh(box(t, t, 1), m, shadow)
-  const thigh = [limb(mats.shorts, 0.17, true), limb(mats.shorts, 0.17, true)]
-  const shin = [limb(mats.skin, 0.12), limb(mats.skin, 0.12)]
-  const upper = [limb(mats.jersey, 0.13), limb(mats.jersey, 0.13)]
-  const fore = [limb(mats.skin, 0.1), limb(mats.skin, 0.1)]
-  const shoes = [mesh(box(0.11, 0.09, 0.26), mats.shoe), mesh(box(0.11, 0.09, 0.26), mats.shoe)]
-  const torso = mesh(
-    new THREE.CylinderGeometry(0.26, 0.2, 0.62, 6).translate(0, 0.31, 0).scale(1, 1, 0.7),
-    mats.jersey,
-    true,
-  )
-  for (const s of [-1, 1]) {
-    const b = new THREE.Mesh(ico(VIS.bust, 1), mats.jersey)
-    b.position.set(s * 0.13, 0.4, -0.2)
-    torso.add(b)
-  }
-  const hips = mesh(box(0.34, 0.2, 0.26), mats.shorts)
+  // The whole figure is two meshes sharing one material: the body (re-posed every frame) and the head.
+  const mat = new THREE.MeshLambertMaterial({ vertexColors: true, flatShading: true })
+  const bodyMesh = new THREE.Mesh(new THREE.BufferGeometry(), mat)
+  const skull = new THREE.Mesh(new THREE.BufferGeometry(), mat)
+  bodyMesh.castShadow = skull.castShadow = true
   const head = new THREE.Group()
-  const skull = new THREE.Mesh(ico(0.23, 1), mats.skin)
-  skull.castShadow = true
   head.add(skull)
-  const eyeM = new THREE.MeshBasicMaterial({ color: '#1a1a1a' })
-  for (const s of [-1, 1]) {
-    const e = new THREE.Mesh(box(0.05, 0.06, 0.03), eyeM)
-    e.position.set(s * 0.09, 0.03, -0.225)
-    head.add(e)
-  }
-  const nose = new THREE.Mesh(box(0.05, 0.06, 0.06), mats.skin)
-  nose.position.set(0, -0.03, -0.255)
-  head.add(nose)
-  person.add(head)
-
+  person.add(bodyMesh, head)
   const { tag, label } = makeTag()
   person.add(tag)
 
-  const skin0 = mats.skin.color.clone()
+  let body: Body = defaultBody(id)
+  let d: Dims = dimsOf(body)
+  let fig = buildBody(body)
+  let face = buildHead(body, 'helmet')
+  let wear: Headwear = 'helmet'
+  let jersey = colour
   let hot = 0
+  let painted = -1
+  const pal = Array.from({ length: 10 }, () => new THREE.Color())
+  /** Works the palette out (skin, tan, heat, outfit) and recolours both meshes. */
+  const paint = () => {
+    const skin = pal[SLOT.skin].set(bodyColour(body, 'skin'))
+    pal[SLOT.pale].copy(skin)
+    if (body.tan) {
+      skin.lerp(TANNED, TAN.dark)
+      pal[SLOT.pale].lerp(WHITE, TAN.pale)
+    }
+    skin.lerp(HOT, hot * 0.8)
+    pal[SLOT.pale].lerp(HOT, hot * 0.8)
+    pal[SLOT.jersey].set(jersey)
+    pal[SLOT.shorts].set(SHORTS)
+    pal[SLOT.shoe].set('#f2f2f2')
+    pal[SLOT.hair].set(bodyColour(body, 'hairColour'))
+    pal[SLOT.white].set('#f6f6f2')
+    pal[SLOT.dark].set('#1a1a1a')
+    pal[SLOT.iris].set(bodyColour(body, 'eyeColour'))
+    pal[SLOT.red].set('#e3262a')
+    fig.paint(pal)
+    face.paint(pal)
+    painted = hot
+  }
+  /** Builds the figure for the body and what is on the head. */
+  const rebuild = (headOnly = false) => {
+    if (!headOnly) {
+      fig.geo.dispose()
+      fig = buildBody(body)
+      d = dimsOf(body)
+    }
+    face.geo.dispose()
+    face = buildHead(body, wear)
+    bodyMesh.geometry = fig.geo
+    skull.geometry = face.geo
+    head.scale.setScalar(d.head)
+    root.scale.setScalar(d.height)
+    paint()
+  }
+
   const hp = new THREE.Vector3()
   /** Reddens the skin as effort climbs, and puffs steam off the head when the rider is cranking. */
   const heat = (hrp: number | null | undefined, dt: number, steam?: Particles, speed = 0) => {
     const e = hrp ?? 0
     hot += (smooth(VIS.heatFrom, 1, e) - hot) * clamp(dt * 2)
-    mats.skin.color.copy(skin0).lerp(HOT, hot * 0.8)
+    if (Math.abs(hot - painted) > 0.01) paint()
     const k = clamp((e - VIS.steamFrom) / (1 - VIS.steamFrom))
     if (!steam || e < VIS.steamFrom || Math.random() > dt * (10 + k * 22)) return
     head.getWorldPosition(hp)
-    hp.y += 0.3
+    hp.y += 0.3 * d.head * d.height
     steam.emit({
       p: hp,
       v: { x: rand(-0.4, 0.4), y: rand(1.4, 2.8), z: rand(0, 1) + speed * 0.15 },
@@ -129,26 +146,40 @@ export function makeRider(colour: string, seed: number, road = false) {
     new THREE.SphereGeometry(0.255, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2),
     new THREE.MeshLambertMaterial({ color: colour, flatShading: true }),
   )
-  head.add(helmet)
+  // Helmets and hats sit a little up and tipped back, clear of the eyebrows.
+  const wearOn = new THREE.Group()
+  wearOn.position.y = HEADWEAR.up
+  wearOn.rotation.x = HEADWEAR.tilt
+  wearOn.add(helmet)
+  head.add(wearOn)
+  let bare = false
   const setLook = (look: Look = {}) => {
     const key = `${look.hat}|${look.outfit}|${look.bike}`
     if (key === hatKey) return
     hatKey = key
-    mats.jersey.color.set(cosmetic(look.outfit)?.colour ?? colour)
+    jersey = cosmetic(look.outfit)?.colour ?? colour
     bike.skin(cosmetic(look.bike)?.colour, look.bike === TRAINER_SKIN)
-    if (hat) head.remove(hat)
+    if (hat) wearOn.remove(hat)
     hat = makeHat(look.hat)
-    if (hat) head.add(hat)
-    helmet.visible = !hat
+    if (hat) wearOn.add(hat)
+    dress()
+  }
+  /** Hat, helmet or (in the creator) neither, and the hair that goes with it. */
+  const dress = () => {
+    helmet.visible = !hat && !bare
+    wear = hat ? 'hat' : bare ? 'none' : 'helmet'
+    rebuild(true)
+  }
+  /** Gives the rider this body. `noHelmet` (the creator) shows the hair when no hat is worn. */
+  const setBody = (b: Body, noHelmet = bare) => {
+    body = b
+    bare = noHelmet
+    rebuild()
+    dress()
   }
 
   const fade = (o: number) => {
-    for (const m of [
-      ...Object.values(mats),
-      eyeM,
-      helmet.material as THREE.Material,
-      bike.frameMat,
-    ]) {
+    for (const m of [mat, helmet.material as THREE.Material, bike.frameMat]) {
       m.transparent = o < 1
       m.opacity = o
     }
@@ -170,7 +201,8 @@ export function makeRider(colour: string, seed: number, road = false) {
     // Where a point at height `y` on the rocking bike has moved sideways to.
     const sway = (y: number) => -Math.sin(rock) * y
     const hipF = run ? 0 : -0.3 + P.standF * st
-    const hipY = run ? 1.0 : slump ? 0.98 : 1.05 + P.standUp * st
+    const part = fig.parts
+    const hipY = run ? 2 * d.leg + 0.08 : slump ? 0.98 : 1.05 + P.standUp * st
     const sat = lerp(lerp(P.lean, P.tuckLean, tk), P.cheerLean, ch)
     const lean = run ? 0.3 : slump ? 1.15 : sat
     const bob = run
@@ -178,14 +210,16 @@ export function makeRider(colour: string, seed: number, road = false) {
       : Math.sin(phase * 2) * (0.012 + P.standBob * st)
     const hy = hipY + bob
     const hx = sway(hy) * 0.5
-    const sf = hipF + Math.sin(lean) * 0.6
-    const sy = hy + Math.cos(lean) * 0.6
+    const sf = hipF + Math.sin(lean) * TORSO
+    const sy = hy + Math.cos(lean) * TORSO
     pt(v, hx, hipF, hy)
-    hips.position.copy(v)
+    const torso = part.torso.o
+    part.hips.o.position.copy(v)
     torso.position.copy(v)
     torso.rotation.x = -lean
     torso.rotation.z = run ? 0 : Math.sin(phase) * 0.06 - rock * 0.5
-    head.position.set(hx, sy + 0.34 - (slump ? 0.1 : 0), -sf - (slump ? 0.15 : 0.1))
+    head.position.set(hx, sy + d.headUp - (slump ? 0.1 : 0), -sf - (slump ? 0.15 : 0.1))
+    span(part.neck.o, pt(v, hx, sf, sy - 0.04), head.position)
     head.rotation.x = slump ? -0.7 : run ? 0 : 0.05 + 0.4 * tk
     bike.spin(slump ? 0.5 : phase)
     for (const i of [0, 1]) {
@@ -194,7 +228,7 @@ export function makeRider(colour: string, seed: number, road = false) {
       let ff: number, fy: number
       if (run) {
         ff = hipF + Math.sin(ph) * 0.45
-        fy = hy - 0.96 + Math.max(0, Math.cos(ph)) * 0.32
+        fy = 0.04 + Math.max(0, Math.cos(ph)) * 0.32
       } else {
         ff = BB.f + Math.cos(ph) * CRANK
         fy = BB.y + Math.sin(ph) * CRANK + 0.07
@@ -203,17 +237,17 @@ export function makeRider(colour: string, seed: number, road = false) {
         ff = BB.f + Math.cos(i * Math.PI) * CRANK
         fy = BB.y + Math.sin(i * Math.PI) * CRANK + 0.07
       }
-      const px = s * 0.12
+      const px = s * d.hip
       const fx = px + sway(fy)
-      const [kf, ky] = ik(hipF, hy, ff, fy, THIGH, SHIN)
+      const [kf, ky] = ik(hipF, hy, ff, fy, d.leg, d.leg)
       pt(v, px + hx, hipF, hy)
       pt(w, px * 1.2 + (hx + sway(fy)) / 2, kf, ky)
-      span(thigh[i], v, w)
+      span(part[`thigh${i}`].o, v, w)
       pt(x, fx, ff, fy)
-      span(shin[i], w, x)
-      shoes[i].position.set(fx, fy - 0.02, -ff - 0.04)
+      span(part[`shin${i}`].o, w, x)
+      part[`shoe${i}`].o.position.set(fx, fy - 0.02, -ff - 0.04)
       // arms
-      const sx = s * 0.26 + hx
+      const sx = s * d.shoulder + hx
       let hf: number, hyy: number
       let handX = s * 0.19
       if (run) {
@@ -228,14 +262,21 @@ export function makeRider(colour: string, seed: number, road = false) {
         hyy = lerp(0.95, sy + P.cheerUp, ch)
         handX = lerp(s * 0.19 + sway(0.95), s * P.cheerWide, ch)
       }
-      const [ef, ey] = ik(sf, sy - 0.05, hf, hyy, ARM, ARM)
+      const [ef, ey] = ik(sf, sy - 0.05, hf, hyy, d.arm, d.arm)
       pt(v, sx, sf, sy - 0.05)
       pt(w, lerp(sx * 1.15, (sx + handX) / 2, ch), ef, ey)
-      span(upper[i], v, w)
+      span(part[`upper${i}`].o, v, w)
       pt(x, handX, hf, hyy)
-      span(fore[i], w, x)
+      span(part[`fore${i}`].o, w, x)
+      part[`hand${i}`].o.position.copy(x)
     }
-    tag.position.set(side * 0.9, sy + 0.9 + (0.35 * (TAG_H - 80)) / 80, -sf)
+    tag.position.set(
+      side * 0.9,
+      sy + d.headUp + SKULL * d.head + 0.33 + (0.35 * (TAG_H - 80)) / 80,
+      -sf,
+    )
+    fig.write()
   }
-  return { root, person, head, bike, label, setLook, fade, pose, heat, tag }
+  rebuild()
+  return { root, person, head, bike, label, setLook, setBody, fade, pose, heat, tag }
 }

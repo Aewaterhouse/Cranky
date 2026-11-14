@@ -76,7 +76,7 @@ export class Pack {
       let e = this.map.get(sr.id)
       if (!e) {
         e = {
-          r: makeRider(COLOURS[this.map.size % COLOURS.length], this.map.size + i),
+          r: makeRider(COLOURS[this.map.size % COLOURS.length], sr.id),
           z: VIS.packBack,
           seed: Math.random() * 6.28,
         }

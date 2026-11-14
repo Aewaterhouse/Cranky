@@ -94,7 +94,7 @@ export class RoadRiders {
       const s = riders[i]
       let e = this.map.get(s.id)
       if (!e) {
-        const r = makeRider(COLOURS[this.map.size % COLOURS.length], this.map.size, true)
+        const r = makeRider(COLOURS[this.map.size % COLOURS.length], s.id, true)
         e = { id: s.id, r, d: s.d, told: s.d, err: 0, phase: this.map.size, seen: true } as Entry
         e.want = newRoadPose()
         e.now = newRoadPose()

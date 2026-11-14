@@ -45,14 +45,14 @@ export class Crew {
       }
     const taken = new Set([...this.map.values()].map((e) => e.slot))
     let runners = 0
-    riders.forEach((sr, i) => {
+    riders.forEach((sr) => {
       let e = this.map.get(sr.id)
       if (!e) {
         let slot = 0
         while (taken.has(slot) && slot < SLOTS.length - 1) slot++
         taken.add(slot)
         e = {
-          r: makeRider(COLOURS[this.map.size % COLOURS.length], this.map.size + i),
+          r: makeRider(COLOURS[this.map.size % COLOURS.length], sr.id),
           cable: makeCable(...SLOTS[slot]),
           slot,
           seed: Math.random() * 6.28,

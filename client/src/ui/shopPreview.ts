@@ -27,7 +27,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic) {
     obj = bus.group
     frame = bus.shell
   } else {
-    const rider = makeRider('#3d7bd9', 1, c.slot === 'bike') // a road bike, so only the trainer skin shows one
+    const rider = makeRider('#3d7bd9', 'shop', c.slot === 'bike') // a road bike, so only the trainer skin shows one
     rider.setLook(look)
     rider.pose('ride', 0.3)
     obj = rider.root
