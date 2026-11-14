@@ -1,0 +1,107 @@
+/* Rider → Body, the character creator: preview beside the options, stacked on a narrow screen. */
+.bc {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(300px, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+.bc-stage {
+  position: sticky;
+  top: 12px;
+}
+.bc-canvas {
+  display: block;
+  width: 100%;
+  height: min(56vh, 520px);
+  border-radius: 10px;
+  background: radial-gradient(120% 90% at 50% 100%, #3a4654 0, #1b2027 70%);
+  touch-action: none;
+  cursor: grab;
+}
+.bc-hint {
+  margin: 6px 0;
+  font-size: 0.85em;
+}
+.bc-tabs {
+  margin-bottom: 12px;
+}
+.bc-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 300px;
+}
+.bc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bc-name {
+  font-weight: 600;
+}
+.bc-slide {
+  display: grid;
+  grid-template-columns: 5.5em 1fr 5.5em;
+  align-items: center;
+  gap: 8px;
+}
+.bc-slide small {
+  color: var(--dim, #9c998f);
+}
+.bc-slide small:last-child {
+  text-align: right;
+}
+.bc-slide input {
+  width: 100%;
+  min-height: 32px;
+}
+.bc-tick {
+  flex-direction: row;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bc-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.bc-picks button.on {
+  border-color: var(--acc);
+  color: var(--acc);
+}
+.bc-picks.swatches button {
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--sw);
+}
+.bc-picks.swatches button.on {
+  outline: 3px solid var(--acc);
+  outline-offset: 2px;
+}
+.bc-random {
+  margin-top: 14px;
+}
+.bc-actions {
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+@media (max-width: 760px) {
+  .bc {
+    grid-template-columns: 1fr;
+  }
+  .bc-stage {
+    z-index: 2;
+    top: 0;
+  }
+  .bc-canvas {
+    height: min(38vh, 320px);
+  }
+  .bc-slide {
+    grid-template-columns: 4.2em 1fr 4.2em;
+  }
+}

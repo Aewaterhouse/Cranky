@@ -3,6 +3,7 @@ import { stickBadges } from '../core/badges'
 import { saveProfile } from '../core/profile'
 import { wkgStr } from '../core/riderMetrics'
 import '../rider.css'
+import { bodyCreator } from './bodyCreator'
 import { avatar, h } from './dom'
 import { riderSettings } from './riderSettings'
 import { historyTab } from './historyList'
@@ -18,6 +19,7 @@ const SUBS = {
   trends: 'Trends',
   history: 'History',
   passport: 'Passport',
+  body: 'Body',
   settings: 'Settings',
 }
 type Sub = keyof typeof SUBS
@@ -91,6 +93,7 @@ export function riderTab(p: Profile) {
       trends: () => trendsTab(p),
       history: () => historyTab(p),
       passport: () => (stickBadges(p) && saveProfile(p), passportTab(p)),
+      body: () => bodyCreator(p),
       settings: () => riderSettings(p, () => root.firstElementChild!.replaceWith(head())),
     }
     body.replaceChildren(views[sub]())
