@@ -12,6 +12,8 @@ export const CFG = {
   watch: { driftS: 2, duckS: 5, duckVolume: 25 },
   /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */
   garage: { confirmMs: 3000, lockMs: 800 },
+  /** The body creator saves itself this long after the last change. */
+  bodySaveMs: 1200,
   /**
    * Extra ride metrics: W′ (J) for the balance, the shortest ride they are shown for, the shortest for HR drift,
    * the share of seconds that need a heart rate, and the cadence band edges (rpm).

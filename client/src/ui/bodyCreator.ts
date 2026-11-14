@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import '../body.css'
 import {
   BODY_FIELDS,
@@ -113,10 +114,22 @@ export function bodyCreator(p: Profile) {
     else draw()
   }
   let lastKey = ''
+  // Like Settings, the creator saves itself a moment after each change, so leaving the tab never loses work.
+  let timer = 0
   const buttons = () => {
     undo.disabled = !history.length
     save.disabled = encodeBody(body) === saved
-    save.textContent = save.disabled ? 'Saved' : 'Save'
+    save.textContent = save.disabled ? 'Saved ✓' : 'Saving…'
+    clearTimeout(timer)
+    if (!save.disabled) timer = window.setTimeout(store, CFG.bodySaveMs)
+  }
+  const store = () => {
+    clearTimeout(timer)
+    if (encodeBody(body) === saved) return
+    p.look = withBody(p.look, body)
+    saveProfile(p)
+    saved = encodeBody(body)
+    buttons()
   }
   const fun = () =>
     h(
@@ -156,13 +169,7 @@ export function bodyCreator(p: Profile) {
     )
     buttons()
   }
-  save.onclick = () => {
-    p.look = withBody(p.look, body)
-    saveProfile(p)
-    saved = encodeBody(body)
-    buttons()
-    toast('Body saved. That is you on every ride now.', 'good')
-  }
+  save.onclick = () => (store(), toast('Body saved. That is you on every ride now.', 'good'))
   const helmet = h('input', {
     type: 'checkbox',
     checked: true,
