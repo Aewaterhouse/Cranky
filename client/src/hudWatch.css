@@ -27,7 +27,6 @@
 .wp-remote button {
   flex: 1;
   padding: 4px 2px;
-  font-size: 0.75rem;
 }
 .wp-in {
   flex: 1;
@@ -93,4 +92,15 @@
   width: 100%;
   height: 100%;
   background: #000;
+}
+/* Over a bright video the usual see-through glass washes out: every panel goes nearly opaque in a watch party. */
+.stage:has(.video-stage) .glass,
+.stage:has(.video-stage) .hud-glass {
+  background: rgb(10 11 14 / 0.86);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+.wp-remote button {
+  min-height: 40px;
+  font-size: 0.85rem;
 }
