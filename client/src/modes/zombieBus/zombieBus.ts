@@ -120,7 +120,7 @@ export function startBusRide(
       onBuy: (item) => net.send({ t: 'buy', item }),
       onAct: (k, v) => net.send({ t: 'act', k, v }),
       game: l.game,
-      panel: ui?.panel(),
+      panel: ui?.panel((k, v) => net.send({ t: 'act', k, v })),
       events: ui?.events,
       mad:
         l.game === 'madness'

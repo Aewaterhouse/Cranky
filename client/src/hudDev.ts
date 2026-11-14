@@ -2,14 +2,15 @@ import './style.css'
 import './screens.css'
 import { frameAt } from './core/plan'
 import { GAME_UI } from './modes/crew/gameUi'
-import type { AmboState, Ask, BusState, Game, RiderTick, Tick } from './net/protocol'
+import type { AmboState, Ask, BusState, DateState, Game, RiderTick, Tick } from './net/protocol'
 import { World } from './scene/world'
 import type { Plan } from './types'
 import { h } from './ui/dom'
 import { makeHud } from './ui/hud'
 
 /**
- * Dev page: a crew game's HUD over its scene, fed made-up ticks (no server). Params: `game=ambo`,
+ * Dev page: a crew game's HUD over its scene, fed made-up ticks (no server). Params: `game=ambo|date`
+ * (date states: `date|card|chap|wedding|divorce|cool`),
  * `state=run|event|siren|me|brake|ramp|reverse|base|cool`, `ask=1` (a question sheet), `fx=delivered|fellout|walked|review`.
  */
 const q = new URLSearchParams(location.search)
@@ -38,7 +39,7 @@ const hud = makeHud(
     meId: 'a',
     weightKg: 75,
     game,
-    panel: ui?.panel(),
+    panel: ui?.panel((k, v) => hud.toast(`act ${k} = ${v}`)),
     events: ui?.events,
     onAct: (k, v) => hud.toast(`act ${k} = ${v}`),
   },
@@ -109,6 +110,55 @@ const ambo = (t: number): AmboState => ({
   score: 312,
   siren: EVENTS[state]?.who ?? null,
 })
+const dating = (t: number): DateState => ({
+  g: 'date',
+  phase:
+    (
+      { wedding: 'wedding', divorce: 'divorce', cool: 'cool' } as Record<string, DateState['phase']>
+    )[state] ?? 'date',
+  n: 3,
+  of: 6,
+  theme: { id: 'dinner', name: 'Dinner', icon: '🍝', text: '80 to 90%. Proper conversation.' },
+  pairs:
+    state === 'chap'
+      ? [['b', 'c', 0.4, 61]]
+      : [
+          ['a', 'b', 0.5 + Math.sin(t / 2) * 0.45, 128],
+          ['c', 'd', 0.3, 61],
+        ],
+  chap: state === 'chap' ? 'a' : null,
+  card:
+    state === 'card'
+      ? { k: 'ex', name: 'Your ex just texted', text: 'surge to 110%!', who: ['a'], left: 11 }
+      : null,
+  profiles: {
+    a: 'Loves long rides, hates hills',
+    b: 'Fluent in watts per kilo, nothing else',
+    c: 'Here for the snacks',
+    d: 'Owns nine bikes, rides one',
+  },
+  emoji: ['😍', '😬', '🔥', '🐢', '🚀', '🙈'],
+  emojiLeft: { a: 3 },
+  said: { b: ['🔥', 480 + t - 2] },
+  table: [
+    { a: 'a', b: 'b', pts: 412 },
+    { a: 'c', b: 'd', pts: 377 },
+    { a: 'a', b: 'c', pts: 240 },
+    { a: 'b', b: 'd', pts: 122 },
+  ],
+  couple: state === 'wedding' || state === 'cool' ? ['a', 'b'] : null,
+  exes: state === 'divorce' || state === 'cool' ? ['b', 'd'] : null,
+  tandem: state === 'wedding' ? { w: 468, tgt: 480 } : null,
+  tug: state === 'divorce' ? Math.sin(t / 3) * 0.7 : null,
+  chat:
+    state === 'cool'
+      ? [
+          'Mo: who brought the tandem',
+          'Kat: 🐢🐢🐢 (sent to Alex, date 2)',
+          'Aunty Carol: I saw EVERYTHING',
+        ]
+      : [],
+})
 const ask: Ask = {
   k: 'fuel',
   title: 'Pick your fuel for the 1990s',
@@ -158,7 +208,7 @@ setInterval(() => {
     el: el0 + t,
     i: 1,
     bel: t,
-    ev: phase,
+    ev: game === 'date' ? dating(t).phase : phase,
     riders: {
       a: rider('Alex', 215, {
         ask: q.has('ask') ? ask : null,
@@ -170,7 +220,7 @@ setInterval(() => {
     },
     bus,
     fx,
-    game: { ...ambo(t) },
+    game: game === 'date' ? { ...dating(t) } : { ...ambo(t) },
   }
   const f = frameAt(plan.blocks, m.el, 'hard', 250)
   const me = m.riders.a

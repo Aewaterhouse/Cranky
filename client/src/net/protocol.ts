@@ -6,7 +6,7 @@ import type { Grade, Plan, Tier } from '../types'
 
 export type TrainerMode = 'erg' | 'gears' | 'choose'
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
-export type Game = 'bus' | 'madness' | 'ambo'
+export type Game = 'bus' | 'madness' | 'ambo' | 'date'
 /** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
 export interface MadState {
   pts: Record<string, number>
@@ -150,6 +150,37 @@ export interface AmboState {
   reviews: { patient: string; icon: string; stars: number; text: string }[]
   score: number
   siren: string | null
+}
+/** Speed Dating state (`tick.game` when the game is `date`). */
+export interface DateState {
+  g: 'date'
+  phase: 'bar' | 'date' | 'gap' | 'proposal' | 'wedding' | 'divorce' | 'cool'
+  /** Date number and how many there are. */
+  n: number
+  of: number
+  theme: { id: string; name: string; icon: string; text: string } | null
+  /** This date's couples: the two riders, their match right now (0..1) and their points on this date. */
+  pairs: [string, string, number, number][]
+  /** The Chaperone: a rider id, or null when the bot aunty has the cards. */
+  chap: string | null
+  /** The card in play and who it is aimed at. */
+  card: { k: string; name: string; text: string; who: string[]; left: number } | null
+  /** Each rider's dating profile line, and the emoji they have left on this date. */
+  profiles: Record<string, string>
+  emoji: string[]
+  emojiLeft: Record<string, number>
+  /** The last emoji each rider sent, with the tick time it was sent. */
+  said: Record<string, [string, number]>
+  /** Couples by total points, best first. */
+  table: { a: string; b: string; pts: number }[]
+  /** The engaged couple (from the Proposal on) and the couple in the Divorce. */
+  couple: [string, string] | null
+  exes: [string, string] | null
+  /** Wedding: the tandem's summed watts and target. Divorce: the rope, -1 (first ex winning) to 1. */
+  tandem: { w: number; tgt: number } | null
+  tug: number | null
+  /** Cooldown: the leaked group chat so far. */
+  chat: string[]
 }
 export interface Fx {
   k: string

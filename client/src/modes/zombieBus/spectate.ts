@@ -127,7 +127,7 @@ export function spectate(code: string, leaveTo: () => void) {
     const lk = looks()
     const game = l.game ?? 'bus'
     if (!panel && (gui = GAME_UI[game])) {
-      panel = gui.panel()
+      panel = gui.panel(() => {})
       bus.root.replaceWith(panel.root)
       setEvents(gui.events)
     }

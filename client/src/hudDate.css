@@ -1,0 +1,85 @@
+/* HUD: Speed Dating panel (shares the ambulance panel's frame). */
+.dt-theme {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  line-height: 1.25;
+}
+.dt-said {
+  font-size: 2rem;
+}
+.dt-track {
+  position: relative;
+  height: 34px;
+  margin: 8px 0 4px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.08);
+}
+.dt-track[hidden],
+.dt-tray[hidden],
+.dt-chat[hidden],
+.dt > div[hidden] {
+  display: none;
+}
+.dt-band {
+  position: absolute;
+  inset: 0 25%;
+  background: rgb(127 209 59 / 0.28);
+  border-inline: 2px solid var(--ok);
+}
+.dt-me,
+.dt-them {
+  position: absolute;
+  translate: -50% 0;
+  font-style: normal;
+  font-size: 0.9rem;
+  transition: left 0.5s linear;
+}
+.dt-me {
+  top: -2px;
+  color: var(--acc);
+}
+.dt-them {
+  bottom: -2px;
+  color: #ff5a8a;
+}
+.dt-chem i {
+  background: linear-gradient(90deg, #e040fb, #ff5a8a);
+}
+.dt-tray {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 10px;
+  pointer-events: auto;
+}
+.dt-tray button {
+  padding: 2px 6px;
+  font-size: 1.2rem;
+}
+.dt-tray small {
+  margin-left: auto;
+  opacity: 0.7;
+}
+.dt-table {
+  margin-top: 10px;
+  font-size: 0.78rem;
+}
+.dt-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+.dt-row.me {
+  color: var(--acc);
+}
+.dt-chat {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgb(255 255 255 / 0.08);
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+.dt-chat p {
+  margin: 0 0 4px;
+}

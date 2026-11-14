@@ -47,11 +47,11 @@ export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
                     ? () => on.gear(k.toLowerCase() === 'x' ? 1 : -1)
                     : k === ';' || k === "'"
                       ? () => on.strength(k === "'" ? 1 : -1)
-                    : mode
-                      ? () => on.mode(mode)
-                      : part
-                        ? () => on.toggle(part)
-                        : undefined
+                      : mode
+                        ? () => on.mode(mode)
+                        : part
+                          ? () => on.toggle(part)
+                          : undefined
     if (!act) return
     act()
     e.preventDefault()

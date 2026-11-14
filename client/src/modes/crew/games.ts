@@ -42,4 +42,14 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Shift score',
     plan: false,
   },
+  date: {
+    icon: '💘',
+    name: 'Speed Dating',
+    blurb:
+      'Six dates in rotating pairs. Match your date’s effort as closely as you can, with only emoji to talk. Odd one out is the Chaperone. Ends in a wedding and a divorce. No ERG. 40 min.',
+    start: 'Open the bar',
+    countdown: 'THE BAR OPENS IN',
+    score: 'Chemistry',
+    plan: false,
+  },
 }
