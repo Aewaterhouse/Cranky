@@ -80,6 +80,25 @@ export const PLACE = {
     shadowChance: 0.35,
     shadowDark: 0.72,
   },
+  /** Farm dressing beside open grass: a fence `fenceOut` m past the verge with posts every `postEvery` m, and per
+   * side of a chunk a chance of bales, a shed or a windmill. A side counts as farm when this share of it is grass. */
+  farm: {
+    grassShare: 0.8,
+    fenceOut: 3,
+    fenceH: 1.1,
+    postEvery: 4,
+    gapChance: 0.06,
+    clear: 6,
+    baleChance: 0.5,
+    shedChance: 0.15,
+    windmillChance: 0.12,
+    post: '#8a6a48',
+    wire: '#b8bcc0',
+    straw: '#d9b95a',
+    shedWall: '#c4c9cc',
+    shedDark: '#3a3530',
+    shedRoof: '#9aa4aa',
+  },
   furniture: {
     /** Gradient signs: a stretch averaging at least `gradeMin` over `gradeWindow` for `gradeLength`, signed `gradeAhead` early. */
     gradeMin: 0.06,

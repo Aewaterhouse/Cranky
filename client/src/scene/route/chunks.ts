@@ -24,6 +24,7 @@ import type { Signs } from './signs'
 import { buildStreets } from './streetGeo'
 import { buildTerrain } from './terrainGeo'
 import { buildVerge } from './vergeGeo'
+import { buildFarm, dropFarmGeos } from './farmGeo'
 
 const R = VIS.route
 const P = R.place
@@ -136,6 +137,7 @@ export class Chunks {
     for (const m of buildFurniture(furniture.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     buildRails(patches, field, features, solid)
     buildVerge(field, patches, cover, d0, d1, level, solid)
+    for (const m of buildFarm(k, field, patches, cover, features, level, solid)) g.add(m)
     for (const m of buildLandmarks(landmarks.get(k) ?? [], field, patches, solid, signs)) g.add(m)
     for (const m of buildOddities(odds, field, patches, solid, signs)) g.add(m)
     const { funSigns, chalk } = this.place
@@ -185,5 +187,6 @@ export class Chunks {
     dropFurnitureGeos()
     dropLandmarkGeos()
     dropOddGeos()
+    dropFarmGeos()
   }
 }
