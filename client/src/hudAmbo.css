@@ -85,3 +85,10 @@
 .am-perk {
   color: var(--ok);
 }
+/* A game panel shares the left column with the gear tile, so the tile shrinks to leave it room. */
+.hud-tl:has(.am) .geartile {
+  zoom: 0.6;
+}
+.hud-tl .am {
+  pointer-events: auto;
+}

@@ -43,7 +43,6 @@ export const GAMES: Record<Game, GameInfo> = {
     countdown: 'SHIFT STARTS IN',
     score: 'Shift score',
     plan: false,
-    soon: true,
   },
   date: {
     icon: '💘',

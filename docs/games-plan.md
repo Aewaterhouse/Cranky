@@ -38,12 +38,12 @@ Five games through `game === 'madness'` switches will not hold, and four files i
 - [x] Server: script runner (`modes/script.py`): segments, seeded event scheduling, the 90 s gap test, time-scale.
 - [x] Server: power-shape stats per rider (`ride_stats.py`): smoothness (spread of 3 s power around the rider's own
       30 s mean, as % FTP), spike count, time punished. Feeds Comfort, dating reports and awards.
-- [ ] Client: a game registry (`modes/crew/games.ts`): per game its name, blurb, HUD panel, scene set-up, event styles,
+- [x] Client: a game registry (`modes/crew/games.ts`): per game its name, blurb, HUD panel, scene set-up, event styles,
       results card and TV panel. Lobby, `hud.ts`, `world.ts`, `spectate.ts` and `resultsGroup.ts` read the registry
       in place of their madness switches. Tick carries a generic `game` object for new modes.
-- [ ] Client: lobby game picker becomes cards (five games will not fit a segmented control); generic prompt bar
+- [x] Client: lobby game picker becomes cards (five games will not fit a segmented control); generic prompt bar
       (countdown, band, "you" vs "everyone") and a choice sheet (pick one of N, used by cards, fuels and votes).
-- [ ] Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
+- [x] Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
 
 ## Phase 1: Kidney Stone Express
 
@@ -70,11 +70,11 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
 - [x] K1 Server: `modes/ambulance.py`: script, five patients as interval sets, speed and distance, Comfort, braking
       zone, walk-off, ramping perk. Unit tests for each rule.
 - [x] K2 Server: the four road events and scoring, reviews, awards. Tests.
-- [ ] K3 Client HUD: Comfort meter, patient card with speech bubbles, distance to hospital and ETA, event prompts,
+- [x] K3 Client HUD: Comfort meter, patient card with speech bubbles, distance to hospital and ETA, event prompts,
       siren-rider callout, ramping queue screen.
-- [ ] K4 Scene: ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
+- [ ] K4 Scene (skin, light bar and siren flash done; hospital arrival and the patient on the road still to do): ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
       road behind when they fall out, debug panel values.
-- [ ] K5 Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
+- [ ] K5 (results, TV view, Strava and Discord text and announcer done; bot characters still to do) Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
 - [ ] K6 Four-rider headless test through a 5 min script, the e2e ride, manual notes in `docs/testing.md`, tuning pass.
 
 ## Phase 2: Speed Dating
@@ -104,8 +104,8 @@ Scene: the Madness road pack at dusk, riders side by side in their pairs, a hear
 **Checklist**
 - [ ] D1 Server: `modes/dating.py`: pairing schedule, six themes as bands and prompts, match scoring. Tests.
 - [ ] D2 Server: Chaperone cards, emoji with limits, profiles, Proposal, Wedding, Divorce, the house. Tests.
-- [ ] D3 Client HUD: date intro card, your bar against theirs, chemistry meter, emoji tray, Chaperone card hand.
-- [ ] D4 Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
+- [x] D3 Client HUD: date intro card, your bar against theirs, chemistry meter, emoji tray, Chaperone card hand.
+- [ ] D4 (couples, heart and Chaperone done; confetti, tandem and rope still to do) Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
 - [ ] D5 Compatibility report, leaked chat, results, TV view, Strava and Discord text, announcer, bots
       (Clingy, Aloof, Chaotic).
 - [ ] D6 Headless test with four and with five riders (Chaperone), e2e, manual notes, tuning pass.
@@ -143,9 +143,9 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - [ ] C1 Server: `modes/climate.py`: decades, four fuels as per-rider targets, profit, emissions, switching costs. Tests.
 - [ ] C2 Server: sea level and stages, seawalls, demand events, the lobbyist. Tests, including the two tuning cases.
 - [ ] C3 Server: Trial, jury vote, sentencing, win and lose, the sash saved on the profile. Tests.
-- [ ] C4 Client HUD: fuel picker, coins and the crew's ledger (profit shown, emissions hidden until the Trial),
+- [x] C4 Client HUD: fuel picker, coins and the crew's ledger (profit shown, emissions hidden until the Trial),
       sea-level gauge, gust and surge prompts, seawall button, the secret bribe sheet, the jury vote.
-- [ ] C5 Scene: the town, stations by fuel, rising water and flood stages, seawall with its sign, courtroom camera.
+- [x] C5 Scene: the town, stations by fuel, rising water and flood stages, seawall with its sign, courtroom camera.
 - [ ] C6 Results, TV view, Strava and Discord text, announcer, bots (Baron, Greenie, Fence-sitter), the sash on avatars.
 - [ ] C7 Headless four-rider test, e2e, manual notes, tuning pass.
 
@@ -155,6 +155,18 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - [ ] Synthesised sounds: siren, heart monitor, wedding bells, gavel, waves.
 - [ ] Owner checks added to `docs/owner-checks.md`; `docs/protocol.md`, `docs/map.md`, `docs/status.md` kept current
       throughout.
+
+## Always open: UI polish (owner, 2026-11-14)
+
+- [ ] Continuous improvement of the UI once the three games are in. Never tick this: there is always more polish
+      to do. Lower priority than anything above. Known rough edges to start from: the lobby still says "Bus lobby"
+      and shows the effort tier and ERG switch for games that use neither; game panels are untested on phones and at
+      Large display size; the question sheet can cover riders mid-screen; history lists do not name the game.
+
+## Dev pages for these games
+
+`/hud-dev.html?game=ambo|date|climate&state=...` (a game's HUD over its scene, made-up ticks, no server),
+`/town-dev.html` (the town), `/scene-dev.html?ambo=1&siren=1` and `?date=1`. Screenshots: `docs/screenshots/games/`.
 
 ## Owner's answers (2026-11-14)
 

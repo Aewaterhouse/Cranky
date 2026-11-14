@@ -142,7 +142,10 @@ export interface AmboState {
   total: number
   speed: number
   par: number
-  eta: number
+  /** Null while the ambulance is stopped. */
+  eta: number | null
+  /** Seconds left in the hospital queue. */
+  queue?: number
   event: { k: string; name: string; text: string; left: number; who?: string | null } | null
   brake: boolean
   perk: 'spike' | 'green' | null

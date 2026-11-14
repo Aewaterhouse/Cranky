@@ -112,7 +112,7 @@ export function makeDatePanel(act: (k: string, v: string) => void): GamePanel {
         )
       }
       table.replaceChildren(
-        ...g.table.slice(0, 4).map((r, i) => {
+        ...g.table.slice(0, 3).map((r, i) => {
           const mine = r.a === meId || r.b === meId
           const tag =
             g.couple && g.couple.includes(r.a) && g.couple.includes(r.b)

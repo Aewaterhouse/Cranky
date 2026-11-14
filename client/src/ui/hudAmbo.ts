@@ -71,10 +71,10 @@ export function makeAmboPanel(): GamePanel {
       road.hidden = !onRoad
       van.style.left = `${g.total ? Math.min(1, Math.max(0, 1 - g.dist / g.total)) * 88 : 0}%`
       set(km, onRoad ? `${(g.dist / 1000).toFixed(1)} km · ${Math.round(g.speed)} km/h` : '')
-      const ahead = Math.round(g.par - g.eta)
+      const ahead = Math.round(g.par - (g.eta ?? g.par))
       set(
         eta,
-        onRoad && g.eta < 3600
+        onRoad && g.eta != null && g.eta < 3600
           ? `ETA ${clock(g.eta)}${Math.abs(ahead) >= 5 ? ` · ${Math.abs(ahead)} s ${ahead > 0 ? 'ahead' : 'behind'}` : ''}`
           : '',
       )
@@ -105,7 +105,12 @@ export function makeAmboPanel(): GamePanel {
         const bar = h('i', {})
         bar.style.width = `${Math.round(g.sweet * 100)}%`
         event.replaceChildren(
-          h('b', {}, '☎️ Sweet-talk triage'),
+          h(
+            'b',
+            {},
+            '☎️ Sweet-talk triage',
+            h('span', {}, g.queue ? `queue ${clock(g.queue)}` : ''),
+          ),
           h('span', {}, 'Spin easy and fast together for a favour on the next run.'),
           h('div', { class: 'bs-bar' }, bar),
         )

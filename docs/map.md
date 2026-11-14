@@ -12,6 +12,8 @@
 - `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `route-dev.html` route world harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
 - `src/main.ts` bootstrap: login, shell, wiring to solo and bus.
 - `src/spike.ts` trainer test UI and Zwift Click test panel.
+- `hud-dev.html` / `src/hudDev.ts` a crew game's HUD over its scene from made-up ticks; `town-dev.html` / `src/townDev.ts` the Climate Lawsuit town (dev server only).
+- `src/modes/crew/games.ts` crew game names for lobby, countdown and score; `gameUi.ts` each newer game's HUD panel, event names, scene state and own 3D scene. `src/ui/hudAmbo.ts`, `hudDate.ts`, `hudClimate.ts` the three game panels; `choiceSheet.ts` a game's question to a rider; `hudOpts.ts` HUD options and the `GamePanel` type. `src/scene/ambulance.ts` ambulance dress for the bus; `src/scene/town/` the town (`townGeo.ts` geometry, `townWorld.ts` scene).
 - `src/sceneDev.ts` scene harness params and keys (see README).
 - `src/routeDev.ts` route world harness: any bundled route at any distance, auto-ride, extra riders (see README); `src/routeDevFixture.ts` made-up map features for it (`fixture=1`).
 - `src/config.ts` client tunables (caps, bands, sprint grades, curve defaults), the one `CFG` everything imports; `src/configRoad.ts` the free-ride, HUD, segment, passport, weekly and group-ride part of it; `src/configProd.ts` the Phase G part (flyover, moments, units, sound mix, performance).
