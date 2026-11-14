@@ -32,4 +32,14 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Pack effort points',
     plan: false,
   },
+  ambo: {
+    icon: '🚑',
+    name: 'Kidney Stone Express',
+    blurb:
+      'Crew an ambulance across South East Queensland. Five patients, each one a different interval. Team power is your speed; smooth power keeps them comfortable. No ERG. 40 min.',
+    start: 'Start the shift',
+    countdown: 'SHIFT STARTS IN',
+    score: 'Shift score',
+    plan: false,
+  },
 }

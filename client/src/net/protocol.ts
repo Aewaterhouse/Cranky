@@ -6,7 +6,7 @@ import type { Grade, Plan, Tier } from '../types'
 
 export type TrainerMode = 'erg' | 'gears' | 'choose'
 export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare'
-export type Game = 'bus' | 'madness'
+export type Game = 'bus' | 'madness' | 'ambo'
 /** VO2 Madness state: effort points, seconds over 90% of max, crown, leader, round and mystery box. */
 export interface MadState {
   pts: Record<string, number>
