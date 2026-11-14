@@ -12,7 +12,7 @@ from fastapi import WebSocket
 from . import config as C
 from . import road_bots
 from .avatars import wear_sash
-from .modes.road import RoadSim
+from .modes.road import RULES, RoadSim
 from .protocol import Bots, ClientMsg, Data, End, Join, RoadSetup, Start, Watch
 from .ride_stats import profile_kg
 from .road_route import load_lap
@@ -30,7 +30,7 @@ class RoadRoom(Room):
     def __init__(self, code: str, store: Store | None = None) -> None:
         super().__init__(code, store)
         self.route, self.laps = C.ROAD_DEFAULT_ROUTE, C.ROAD_DEFAULT_LAPS
-        self.style, self.together, self.drafting = "social", True, C.DRAFT_DEFAULT
+        self.style, self.together, self.drafting, self.game = "social", True, C.DRAFT_DEFAULT, "ride"
         self.sim: RoadSim | None = None
         self.rngs: dict[str, random.Random] = {}
         self.empty_s = 0.0
@@ -61,6 +61,7 @@ class RoadRoom(Room):
             "style": self.style,
             "together": self.together,
             "draft": self.drafting,
+            "game": self.game,
             "riders": [
                 {
                     "id": r.id,
@@ -88,6 +89,7 @@ class RoadRoom(Room):
             "style": self.style,
             "together": self.together,
             "draft": self.drafting,
+            "game": self.game,
             "riders": [r.to_dict() for r in self.riders.values()],
             "sim": self.sim.to_dict() if self.sim else None,
         }
@@ -98,7 +100,7 @@ class RoadRoom(Room):
         room = cls(d["code"], store)
         room.host, room.state, room.route, room.laps = d["host"], d["state"], d["route"], d["laps"]
         room.style, room.together = d["style"], d["together"]
-        room.drafting = d.get("draft", C.DRAFT_DEFAULT)
+        room.drafting, room.game = d.get("draft", C.DRAFT_DEFAULT), d.get("game", "ride")
         room.plan = {"name": load_lap(room.route).name}
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.sim = RoadSim.from_dict(d["sim"]) if d["sim"] else None
@@ -161,6 +163,8 @@ class RoadRoom(Room):
             self.style, self.state, self.plan = msg.style, "lobby", {"name": lap.name}
             self.together = msg.style == "social" if msg.together is None else msg.together
             self.drafting = msg.draft or self.drafting
+            self.game = msg.game if msg.game in RULES else self.game
+            self.together = self.together and not RULES[self.game].race
             await self.lobby()
         elif isinstance(msg, Bots) and self.state != "running":
             road_bots.set_bots(self, msg.n)
@@ -173,7 +177,7 @@ class RoadRoom(Room):
 
     def start(self) -> None:
         road_bots.assume_ftps(self)
-        self.sim = RoadSim(self.route, self.laps, self.together, drafting=self.drafting)
+        self.sim = RoadSim(self.route, self.laps, self.together, self.game, self.drafting)
         for r in self.riders.values():
             self.sim.add(r.id, self.kg_of(r.id), r.ftp, r.bot)
         self.state, self.summary, self.empty_s = "running", None, 0.0
@@ -220,7 +224,9 @@ class RoadRoom(Room):
         assert sim
         rows = [{**x, "name": self.riders[x["id"]].name} for x in sim.rules.results(sim)]
         self.summary = {
+            **sim.rules.extra(sim, rows),
             "kind": "road",
+            "game": self.game,
             "route": self.route,
             "name": lap.name,
             "laps": self.laps,

@@ -1,4 +1,5 @@
 import { api } from '../../core/api'
+import { SFX } from '../../ui/audio'
 import type { Profile } from '../../core/curve'
 import { withLaps } from '../../core/route'
 import { loadRoute } from '../../core/routeLibrary'
@@ -46,6 +47,8 @@ export async function groupRide(
   rememberBus(profile.id, room)
   const net = new WsClient<RoadMsg>(room)
   const link = new RoadLink(profile.id, (m) => net.send(m))
+  // The lap timer already rings my own last lap.
+  link.onBell = (text) => void (/LAST/.test(text) || SFX.bell(1))
   let lobby: RoadLobby | undefined
   let ride: ReturnType<typeof runFreeRide> | undefined
   let starting = false
@@ -72,8 +75,8 @@ export async function groupRide(
   const view = roadLobbyView({
     profile: () => profile,
     status,
-    setup: (route, laps, style, together, draft) =>
-      net.send({ t: 'road', route, laps, style, together, draft }),
+    setup: (route, laps, style, together, draft, game) =>
+      net.send({ t: 'road', route, laps, style, together, draft, game }),
     bots: (n) => net.send({ t: 'bots', n }),
     start: () => net.send({ t: 'start' }),
     leave: () => leave(),

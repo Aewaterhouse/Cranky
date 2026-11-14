@@ -90,7 +90,7 @@ client sends what the trainer measures and draws what the server says. Same sock
 | t | Fields | Notes |
 | --- | --- | --- |
 | `join` | `name, ftp, tier, look` | As the bus (`tier` is ignored). The rider's weight comes from their stored profile (`weightKg`, default 75). Joining a ride that is already running puts the rider on the back of the group; the same id joining again takes its old place on the road back. |
-| `road` | `route, laps, style, together?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race. |
+| `road` | `route, laps, style, together?, draft?, game?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race, and is always off in a race game; `game` is the rule set (`ride`, `race`; left out keeps the room's). |
 | `bots` | `n` | Host only, not while running. 0..5 road bots; humans + bots fit the 8 places. |
 | `data` | `p, w, cad, hr?` | About 2 Hz. Instant power, 3 s power, cadence, heart rate. No data for 3 s reads as zero power: the rider coasts to a stop and the ride goes on. |
 | `start` / `end` | | Host only. `start` begins a 10 s countdown; `end` finishes the ride now. |
@@ -99,16 +99,22 @@ client sends what the trainer measures and draws what the server says. Same sock
 
 | t | Fields |
 | --- | --- |
-| `lobby` | `kind: 'road', code, host, state, route, laps, distance (m, all laps), style, together, riders: [{id, name, ftp, kg, connected, look, bot, line}]`; `line` is a bot's one-line character, null for people |
+| `lobby` | `kind: 'road', code, host, state, route, laps, distance (m, all laps), style, together, draft, game, riders: [{id, name, ftp, kg, connected, look, bot, line}]`; `line` is a bot's one-line character, null for people |
 | `tick` | `kind: 'road', el, riders: {id: {d, v, w, cad, hr, lane, draft, band, st, fin}}, game, fx`; 4 Hz |
-| `end` | `summary: {kind: 'road', route, name, laps, distance, secs, style, together, riders: [{id, name, bot, place, time, dist, late, avgPower, wkg, saved}]}` |
+| `end` | `summary: {kind: 'road', game, route, name, laps, distance, secs, style, together, podium?, riders: [{id, name, bot, place, time, dist, late, avgPower, wkg, saved, gap?}]}` |
 
 `el` is ride seconds, negative during the countdown. Per rider: `d` metres along the whole ride (all laps),
 `v` ground speed in m/s (the keep-together band included), `lane` metres right of the centre line, `draft` the
 drag multiplier (1 is clean air, 0.73 is a 27% saving), `band` the keep-together scale on distance covered
 (1 when off), `st` one of `riding`, `stopped`, `away` (socket gone) or `finished`, `fin` the rider's time in
 seconds once finished. `game` is the rule set's own state (null for a plain ride). `fx` is a list of
-`{k, id, text}`; the only kind so far is `finish`, with `text` the finishing place.
+`{k, id, text}`: `finish` (`text` the finishing place) and, in races, `bell` (`text` the banner, e.g. `LAST LAP`;
+`id` null).
+
+Races (`game` other than `ride`): the tick's `game` is `{kind, lap, laps}` (`lap` the leader's lap). The summary
+adds `podium` (ids of the first three across the line) and each row's `gap` (seconds behind the winner, null
+for a rider who did not finish). A race ends once every human present is home and three riders (or everyone)
+have finished, or 3 min after the first rider home.
 
 Results: `time` is null for a rider who did not finish; `dist` is what they rode; `late` marks a late joiner
 (ranked after everyone who rode the whole way); `saved` is the average watts drafting saved them.

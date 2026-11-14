@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 import statistics
 from dataclasses import asdict, dataclass
 
@@ -52,6 +53,7 @@ class Rules:
     """
 
     name = "ride"
+    race = False  # a race never keeps the group together
 
     def place(self, sim: RoadSim, m: Mover) -> None:
         """Where a rider starts: on the line before the start, later on the back of whoever is moving."""
@@ -79,6 +81,14 @@ class Rules:
     def after(self, sim: RoadSim, dt: float) -> list[dict]:
         """Rule-set effects after the riders have moved (scoring, eliminations). Returns fx."""
         return []
+
+    def line(self, sim: RoadSim, m: Mover) -> float:
+        """The next line worth sprinting for (a sprinter bot's moment): the finish, unless a race says."""
+        return sim.road.distance
+
+    def extra(self, sim: RoadSim, rows: list[dict]) -> dict:
+        """Anything the end summary carries beside the rows (a race's podium and award)."""
+        return {}
 
     def state(self, sim: RoadSim) -> dict | None:
         """Extra game state for the tick's `game` field."""
@@ -126,10 +136,13 @@ class RoadSim:
         together: bool = False,
         game: str = "ride",
         drafting: str = C.DRAFT_DEFAULT,
+        seed: int | str | None = None,
     ) -> None:
-        self.route, self.together, self.game, self.drafting = route, together, game, drafting
+        self.route, self.game, self.drafting = route, game, drafting
         self.road = Road(route, laps)
+        self.rng = random.Random(seed)
         self.rules = RULES[game]()
+        self.together = together and not self.rules.race
         self.movers: dict[str, Mover] = {}
         self.order: list[str] = []
         self.el = -float(C.ROAD_COUNTDOWN_S)
@@ -204,6 +217,7 @@ class RoadSim:
             "el": self.el,
             "first_fin": self.first_fin,
             "movers": [asdict(m) for m in self.movers.values()],
+            "rules": vars(self.rules),
         }
 
     @classmethod
@@ -211,5 +225,6 @@ class RoadSim:
         sim = cls(d["route"], d["laps"], d["together"], d["game"], d.get("drafting", C.DRAFT_DEFAULT))
         sim.el, sim.first_fin = d["el"], d["first_fin"]
         sim.movers = {m["id"]: Mover(**m) for m in d["movers"]}
+        vars(sim.rules).update(d.get("rules", {}))
         sim.order = sorted(sim.movers, key=lambda i: -sim.movers[i].d)
         return sim

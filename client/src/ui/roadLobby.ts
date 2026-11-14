@@ -3,7 +3,7 @@ import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import type { DraftLevel } from '../core/physics'
 import { ROUTE_INDEX } from '../core/routeLibrary'
-import type { RoadLobby, RoadStyle } from '../net/protocol'
+import type { RoadGame, RoadLobby, RoadStyle } from '../net/protocol'
 import { avatar, h, seg } from './dom'
 import { toast } from './toast'
 import { trainerCheck } from './trainer'
@@ -11,7 +11,14 @@ import { trainerCheck } from './trainer'
 export interface RoadLobbyCtx {
   profile: () => Profile
   status: HTMLElement
-  setup(route: string, laps: number, style: RoadStyle, together: boolean, draft: DraftLevel): void
+  setup(
+    route: string,
+    laps: number,
+    style: RoadStyle,
+    together: boolean,
+    draft: DraftLevel,
+    game: RoadGame,
+  ): void
   bots(n: number): void
   start(): void
   leave(): void
@@ -26,17 +33,31 @@ async function copy(text: string) {
   }
 }
 
+/** The road games the host can pick, with a line on each. */
+const GAMES: [RoadGame, string, string][] = [
+  ['ride', 'Ride', 'Ride together. No winner, just a crew on the road.'],
+  ['race', 'Race', 'Everyone from the line. First across it after the last lap wins.'],
+]
+
 /** Group-ride lobby, built once and patched in place: who is in, the route, and the host's choices. */
 export function roadLobbyView(c: RoadLobbyCtx) {
   let l: RoadLobby | undefined
   const send = (
-    over: Partial<Pick<RoadLobby, 'route' | 'laps' | 'style' | 'together' | 'draft'>>,
+    over: Partial<Pick<RoadLobby, 'route' | 'laps' | 'style' | 'together' | 'draft' | 'game'>>,
   ) => {
     if (!l) return
     const next = { ...l, ...over }
-    // Changing the style resets keep-together to that style's usual setting.
-    const together = over.style ? over.style === 'social' : next.together
-    c.setup(next.route, next.laps, next.style, together, next.draft ?? 'strong')
+    // Picking a race makes it a race; changing the style resets keep-together to that style's usual setting.
+    if (over.game) next.style = over.game === 'ride' ? 'social' : 'race'
+    const together = over.style || over.game ? next.style === 'social' : next.together
+    c.setup(
+      next.route,
+      next.laps,
+      next.style,
+      together,
+      next.draft ?? 'strong',
+      next.game ?? 'ride',
+    )
   }
   const riders = h('div', { class: 'road-riders' })
   const code = h('div', { class: 'code-letters' })
@@ -68,6 +89,13 @@ export function roadLobbyView(c: RoadLobbyCtx) {
     step(1, 'One lap more'),
   )
   const total = h('span', { class: 'dim' })
+  const gameSeg = seg<RoadGame>(
+    GAMES.map(([id, name]): [RoadGame, string] => [id, name]),
+    'ride',
+    (game) => send({ game }),
+    'diff',
+  )
+  const gameNote = h('span', { class: 'dim' })
   const styleSeg = seg<RoadStyle>(
     [
       ['social', 'Social'],
@@ -79,6 +107,7 @@ export function roadLobbyView(c: RoadLobbyCtx) {
   )
   const keep = h('input', { type: 'checkbox', onchange: () => send({ together: keep.checked }) })
   const keepNote = h('span', { class: 'dim' })
+  const keepRow = h('label', { class: 'bot-row' }, keep, h('span', {}, 'Keep together'), keepNote)
   const DRAFT_WHAT: Record<DraftLevel, string> = {
     off: 'No drafting: everyone rides in clean air.',
     realistic: 'About what you get outside: a quarter off on a wheel, up to 60% in a bunch.',
@@ -113,7 +142,7 @@ export function roadLobbyView(c: RoadLobbyCtx) {
   )
   let bots = 0
   const startSlot = h('div', { class: 'start-slot' })
-  const hostOnly = [routeSel, lapRow, styleSeg, botRow]
+  const hostOnly = [routeSel, lapRow, styleSeg, botRow, gameSeg]
 
   const update = (m: RoadLobby) => {
     l = m
@@ -158,6 +187,10 @@ export function roadLobbyView(c: RoadLobbyCtx) {
     lapN.textContent = `${m.laps} ${m.laps === 1 ? 'lap' : 'laps'}`
     total.textContent = `${(m.distance / 1000).toFixed(1)} km in all`
     styleSeg.set(m.style)
+    const game = GAMES.find((g) => g[0] === (m.game ?? 'ride')) ?? GAMES[0]
+    gameSeg.set(game[0])
+    gameNote.textContent = `${isHost ? '' : `${game[1]}. `}${game[2]}`
+    keepRow.hidden = game[0] !== 'ride'
     keep.checked = m.together
     draftSeg.set(m.draft ?? 'strong')
     draftSeg.hidden = !isHost
@@ -224,8 +257,9 @@ export function roadLobbyView(c: RoadLobbyCtx) {
           routeText,
           lapRow,
           total,
+          h('div', { class: 'bot-row' }, h('span', {}, 'Game'), gameSeg, gameNote),
           h('div', { class: 'bot-row' }, h('span', {}, 'Style'), styleSeg),
-          h('label', { class: 'bot-row' }, keep, h('span', {}, 'Keep together'), keepNote),
+          keepRow,
           h('div', { class: 'bot-row' }, h('span', {}, 'Drafting'), draftSeg, draftNote),
         ),
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Trainer'), trainerCheck()),

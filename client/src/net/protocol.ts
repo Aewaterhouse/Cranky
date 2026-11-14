@@ -39,6 +39,7 @@ export type ClientMsg =
       style: RoadStyle
       together?: boolean
       draft?: DraftLevel
+      game?: RoadGame
     }
   | {
       t: 'data'
@@ -266,6 +267,8 @@ export interface RideStats {
 
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
 export type RoadStyle = 'social' | 'race'
+/** The road layer's rule sets (the server's `RULES`). */
+export type RoadGame = 'ride' | 'race'
 export interface RoadLobbyRider {
   id: string
   name: string
@@ -293,6 +296,7 @@ export interface RoadLobby {
   together: boolean
   /** The host's drafting level for the ride. */
   draft?: DraftLevel
+  game?: RoadGame
   riders: RoadLobbyRider[]
 }
 export interface RoadRiderTick {
@@ -328,6 +332,9 @@ export interface RoadSummary {
   secs: number
   style: RoadStyle
   together: boolean
+  game?: RoadGame
+  /** Races: the first three across the line, in order. */
+  podium?: string[]
   riders: {
     id: string
     name: string
@@ -341,6 +348,8 @@ export interface RoadSummary {
     wkg: number
     /** Average watts saved by drafting. */
     saved: number
+    /** Races: seconds behind the winner (null for a rider who did not finish). */
+    gap?: number | null
   }[]
 }
 /** What a road room's socket sends. */

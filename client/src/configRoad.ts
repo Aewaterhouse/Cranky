@@ -230,5 +230,7 @@ export const ROAD_CFG = {
     lapsMax: 20,
     /** Places on the road (the server's ROAD_MAX_RIDERS). */
     seats: 8,
+    /** A race's bell banner (last lap, sprint, prime) stays up this long (s). */
+    bannerS: 4,
   },
 }

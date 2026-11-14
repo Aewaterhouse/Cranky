@@ -117,6 +117,17 @@ describe('group ride link', () => {
     expect(link.correct(0, 0, 0.2)[1]).toBeCloseTo(10) // physics speed, without the tow
   })
 
+  it("a race's bell rings and holds a banner for a few seconds", () => {
+    const { link, clock } = make()
+    const rang: string[] = []
+    link.onBell = (t) => rang.push(t)
+    link.tick(tick(60, { me: at(500), kev: at(600) }, [{ k: 'bell', id: null, text: 'LAST LAP' }]))
+    expect(rang).toEqual(['LAST LAP'])
+    expect(link.banner()).toEqual(['LAST LAP', ''])
+    clock.t += R.bannerS + 0.1
+    expect(link.banner()).toBeUndefined()
+  })
+
   it('says who joined, who finished and who caught whom', () => {
     const { link } = make()
     link.lobby(lobby(['me', 'kev', 'shaz']))

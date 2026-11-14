@@ -62,6 +62,7 @@ class RoadSetup(BaseModel):
     style: Literal["social", "race"] = "social"
     together: bool | None = None
     draft: Literal["off", "realistic", "strong"] | None = None  # None keeps the room's drafting
+    game: str | None = Field(default=None, max_length=20)  # a name in `RULES`; None keeps the room's game
 
 
 class Start(BaseModel):

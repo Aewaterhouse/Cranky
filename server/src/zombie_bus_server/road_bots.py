@@ -54,7 +54,7 @@ def bot_power(kind: str, ftp: float, sim: RoadSim, m: Mover, rng: random.Random)
         f = x["surge_x"]
     elif kind == "climber" and sim.road.grade_at(m.d) >= x["climb_pct"]:
         f = x["climb_x"]
-    elif kind == "sprinter" and sim.road.distance - m.d <= x["sprint_m"]:
+    elif kind == "sprinter" and sim.rules.line(sim, m) - m.d <= x["sprint_m"]:
         f = x["sprint_x"]
     elif kind == "sucker" and m.draft < 1:
         f = x["sit_x"]

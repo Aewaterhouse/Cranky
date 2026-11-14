@@ -211,7 +211,7 @@ knowledge of the code, given only the running site, and asked for a verdict, not
 Race games on the free-ride road layer (`docs/road-games.md`: a `Rules` subclass on `RoadSim`, positions owned by
 the server), with bots, results and history like the other games.
 
-- [ ] Normal race: everyone from the line, first across wins; a route and a number of laps picked by the host.
+- [x] Normal race: everyone from the line, first across wins; a route and a number of laps picked by the host.
 - [ ] Points race: laps with a sprint at the end of each (points for the top places, more on the last lap); most
       points wins, whoever crosses first.
 - [ ] Crit: a short loop, many laps, and a sprint prime rung at a random lap around halfway (a bell and a banner);

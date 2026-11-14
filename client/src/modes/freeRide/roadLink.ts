@@ -37,6 +37,9 @@ export class RoadLink {
   private notes: string[] = []
   private together = false
   private drafting: DraftLevel = 'strong'
+  private flash: [string, string, number] | undefined
+  /** Rings the bell for a race's last lap, sprint or prime. */
+  onBell: (text: string) => void = () => {}
 
   constructor(
     readonly me: string,
@@ -65,12 +68,16 @@ export class RoadLink {
     this.got = this.now()
     this.riders = m.riders
     const mine = m.riders[this.me]
-    for (const fx of m.fx)
+    for (const fx of m.fx) {
+      const name = this.info.get(fx.id ?? '')?.name ?? 'Someone'
       if (fx.k === 'finish' && fx.id) {
         const place = ordinal(+(fx.text ?? 0))
-        const name = this.info.get(fx.id)?.name ?? 'Someone'
         this.notes.push(fx.id === this.me ? `Finished: ${place}` : `${name} finished ${place}`)
+      } else if (fx.k === 'bell') {
+        this.flash = [fx.text ?? '', fx.id ? name : '', this.got + R.bannerS]
+        this.onBell(fx.text ?? '')
       }
+    }
     if (!mine || mine.st === 'finished' || m.el <= 0) return
     for (const [id, r] of Object.entries(m.riders)) {
       if (id === this.me || r.st === 'finished') continue
@@ -94,6 +101,7 @@ export class RoadLink {
     this.riders = {}
     this.close.clear()
     this.notes = []
+    this.flash = undefined
   }
 
   private age() {
@@ -118,6 +126,8 @@ export class RoadLink {
   /** The words over the view while nobody is riding: the countdown, then waiting at the finish. */
   banner(): [string, string] | undefined {
     const count = this.countdown()
+    const f = this.flash
+    if (f && this.now() < f[2]) return [f[0], f[1]]
     if (this.mine()?.st === 'finished') return ['Finished', 'Waiting for the others. Esc to leave.']
     if (count <= 0) return undefined
     return [isFinite(count) ? String(Math.ceil(count)) : 'Get ready', 'The ride starts together']

@@ -6,6 +6,7 @@ import { UNIT } from './units'
 
 const km = (m: number) => UNIT.dist(m)
 const lapsText = (n: number) => (n > 1 ? ` · ${n} laps` : '')
+const GAME_NAME = { ride: 'social ride', race: 'race' }
 
 /** The crew table for a road ride: place, time (or how far they got), average power, W/kg and watts saved drafting. */
 export function roadTable(g: RoadSummary, myId = '', faces = false) {
@@ -24,6 +25,7 @@ export function roadTable(g: RoadSummary, myId = '', faces = false) {
           'td',
           {},
           r.time == null ? `${km(r.dist)} ridden` : clock(r.time),
+          r.gap ? h('small', {}, ` +${clock(r.gap)}`) : '',
           r.late ? h('small', {}, ' joined late') : '',
         ),
         h('td', {}, `${r.avgPower} W`),
@@ -66,7 +68,7 @@ export function roadSection(g: RoadSummary, myId: string) {
       h(
         'p',
         { class: 'dim' },
-        `${g.name}${lapsText(g.laps)} · ${km(g.distance)} · ${g.style === 'race' ? 'race' : 'social ride'}${g.together ? ' · kept together' : ''}`,
+        `${g.name}${lapsText(g.laps)} · ${km(g.distance)} · ${g.game && g.game !== 'ride' ? GAME_NAME[g.game] : g.style === 'race' ? 'race' : 'social ride'}${g.together ? ' · kept together' : ''}`,
       ),
       podium(g, myId),
       roadTable(g, myId),

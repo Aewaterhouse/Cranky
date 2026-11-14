@@ -1,7 +1,7 @@
 # Road games
 
 The road layer is the group free ride with the rules taken out. The server owns everyone's position on a route;
-a game is a small rule set on top. Nothing here is built yet beyond the plain ride: this is how to add one.
+a game is a small rule set on top. The races are built (`modes/race.py`); this is how to add another.
 
 ## The layers
 
