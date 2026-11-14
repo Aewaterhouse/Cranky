@@ -153,11 +153,19 @@ export function curveChart(p: Profile, mates: CrewRider[] = []) {
   const legend = h(
     'p',
     { class: 'dim legend' },
-    ...own.flatMap((l) => [
-      h('i', { class: 'lkey', style: `background:${colour(l)}` }),
-      `${l.label}  `,
-    ]),
-    h('span', {}, ' Solid is a real effort, faint and hollow is estimated from FTP.'),
+    ...own.map((l) =>
+      h(
+        'span',
+        { style: 'margin-right:1em;white-space:nowrap' },
+        h('i', { class: 'lkey', style: `background:${colour(l)}` }),
+        l.label,
+      ),
+    ),
+    h(
+      'small',
+      { style: 'display:block' },
+      'Solid is a real effort, faint and hollow is estimated from FTP.',
+    ),
   )
   const chips = h(
     'div',
