@@ -18,6 +18,7 @@ import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
 import type { Frame, Trainer } from '../../types'
 import { GAME_UI } from '../crew/gameUi'
+import { howTo } from '../crew/howTo'
 import { FIRST_VIDEO } from '../../core/watchSync'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
@@ -138,6 +139,9 @@ export function startBusRide(
   )
   hud.setTier(profile.tier)
   stage.append(hud.root)
+  // How to play, during the countdown.
+  const how = howTo(l.game ?? 'bus')
+  stage.append(how.el)
   // C or the camera button: the next camera view (Chase, High, Rear, Side).
   const cycleView = () => {
     const v = world.cycleView()
@@ -213,6 +217,7 @@ export function startBusRide(
     const mb = me?.band
     mine = mb ? { tgt: me.tgt ?? null, band: mb === 'free' ? undefined : mb } : null
     running = m.i >= 0 && !m.hold
+    if (running) how.show(false)
     if (!!m.hold !== held)
       hud.banner(
         (held = !!m.hold) ? 'Paused by the driver: the workout waits too' : 'Back on',
@@ -220,6 +225,7 @@ export function startBusRide(
       )
     if (m.i < 0) {
       hud.countdown(Math.ceil(-m.el), ride.live)
+      how.show(true)
       ride.setFrame(null)
     } else {
       const f = localFrame() ?? frameAt(plan.blocks, m.el, profile.tier, profile.ftp)

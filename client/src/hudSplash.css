@@ -249,3 +249,24 @@
     display: none;
   }
 }
+.howto {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  z-index: 6;
+  max-width: min(88vw, 560px);
+  padding: 14px 20px;
+  translate: -50% 0;
+  pointer-events: none;
+}
+.howto[hidden] {
+  display: none;
+}
+.howto b {
+  font: 400 1.2rem/1.2 var(--display);
+}
+.howto ol {
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  line-height: 1.45;
+}

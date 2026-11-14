@@ -8,6 +8,8 @@ export interface GameInfo {
   tag: string
   blurb: string
   start: string
+  /** Three short lines on how to play, shown during the countdown. */
+  how: [string, string, string]
   countdown: string
   score: string
   /** The host picks a workout and a difficulty; false when the game deals its own session. */
@@ -22,6 +24,11 @@ export const GAMES: Record<Game, GameInfo> = {
   bus: {
     icon: '🧟',
     name: 'Zombie Bus',
+    how: [
+      "Hold your target: the crew's power drives the bus.",
+      'Fall short for too long and you fall off. Ride hard to haul mates back.',
+      'Roadblocks are all-out sprints. Smash them together.',
+    ],
     tag: 'Outrun the horde',
     blurb: 'Hold your targets to keep the bus ahead of the horde.',
     start: 'Start the bus',
@@ -32,6 +39,11 @@ export const GAMES: Record<Game, GameInfo> = {
   madness: {
     icon: '🤯',
     name: 'VO2 Madness',
+    how: [
+      'Recover, then the mystery box picks the interval.',
+      'Points for effort: heart rate with a strap, power without.',
+      "The hardest trier wears the crown. Don't get caught having a picnic.",
+    ],
     tag: 'Mystery VO2 rounds',
     blurb:
       'Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for effort: heart rate if you wear a strap, power if you don’t.',
@@ -43,6 +55,11 @@ export const GAMES: Record<Game, GameInfo> = {
   ambo: {
     icon: '🚑',
     name: 'Kidney Stone Express',
+    how: [
+      "Team power is the ambulance's speed.",
+      'Smooth power keeps the patient comfortable. Spikes hurt.',
+      'Ease off at the hospital doors, or out the back they go.',
+    ],
     tag: 'Ambulance co-op · 40 min',
     blurb:
       'Crew an ambulance across South East Queensland. Five patients, each one a different interval. Team power is your speed; smooth power keeps them comfortable. No ERG. 40 min.',
@@ -55,6 +72,11 @@ export const GAMES: Record<Game, GameInfo> = {
   date: {
     icon: '💘',
     name: 'Speed Dating',
+    how: [
+      "Match your date's effort, both inside the band.",
+      "Five emoji a date. That's all the talking you get.",
+      'Best couple marries. Worst couple divorces.',
+    ],
     tag: 'Match your date · 40 min',
     blurb:
       'Six dates in rotating pairs. Match your date’s effort as closely as you can, with only emoji to talk. Odd one out is the Chaperone. Ends in a wedding and a divorce. No ERG. 40 min.',
@@ -67,6 +89,11 @@ export const GAMES: Record<Game, GameInfo> = {
   climate: {
     icon: '🌊',
     name: 'Climate Lawsuit',
+    how: [
+      'Watts earn coins. Each fuel pays a different way.',
+      'Emissions raise the sea for everyone. Seawalls buy time.',
+      'The worst polluter stands trial at the end.',
+    ],
     tag: 'Profit or flood · 45 min',
     blurb:
       'Everyone runs an energy company in the same coastal town. Watts earn coins; emissions raise the sea. Flood the town and everyone loses, then the worst polluter stands trial. No ERG. 45 min.',
@@ -79,6 +106,11 @@ export const GAMES: Record<Game, GameInfo> = {
   watch: {
     icon: '📺',
     name: 'Watch Party',
+    how: [
+      'The driver picks the workout and holds the remote.',
+      'Anyone can paste a YouTube or Twitch link.',
+      'Pause the video and the workout waits too.',
+    ],
     tag: 'Ride to a video',
     blurb:
       'Ride the same workout while you watch the same YouTube video, in sync. The driver picks the workout and holds the remote; anyone can queue a video. No Premium needed.',
