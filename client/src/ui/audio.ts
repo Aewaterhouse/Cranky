@@ -48,6 +48,16 @@ export const SFX = {
   LEGEND: () => seq([523, 659, 784, 1047, 784, 1047, 1319, 1568], 0.1, 'sawtooth'),
   cue: () => (beep(784, 0.5, 'sine', 0.05), beep(1047, 0.7, 'sine', 0.05, 0.15)),
   scrap: () => seq([1200, 1600], 0.05, 'triangle'),
+  /** The bus horn: two notes a minor third apart, twice. */
+  horn: () =>
+    [0, 0.32].forEach((at) => [311, 370].forEach((hz) => beep(hz, 0.26, 'sawtooth', 0.05, at))),
+  /** A boss turns up: a low growl under a falling siren. */
+  boss: () => (beep(48, 1.2, 'sawtooth', 0.12), seq([660, 520, 400, 300], 0.18, 'square')),
+  /** The harpoon: a rising whoosh and a clank. */
+  harpoon: () => (
+    seq([300, 450, 700, 1050, 1500], 0.04, 'triangle'),
+    beep(140, 0.25, 'square', 0.1, 0.22)
+  ),
   /** A hand bell at the line: one ring for a lap, a good shake of it for the last lap. */
   bell: (rings = 1) => {
     for (let r = 0; r < rings; r++)

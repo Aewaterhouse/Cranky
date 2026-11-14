@@ -12,6 +12,7 @@ import type { Tick } from '../net/protocol'
 import type { Frame, SprintResult, Tier } from '../types'
 import { TIER_NAME, TIERS } from '../types'
 import { h } from './dom'
+import { SFX } from './audio'
 import { choiceSheet } from './choiceSheet'
 import { emojiFloat } from './emojiFloat'
 import { makeBusPanel } from './hudBus'
@@ -276,6 +277,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         o.panel?.fx?.(fx, sp)
         if (fx.k === 'emoji') {
           if (!o.panel && fx.text) emoji.show(fx.text)
+          if (!o.panel && fx.text === '📯') SFX.horn()
           continue
         }
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
@@ -301,7 +303,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
         else if (fx.k === 'turn' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR TURN ON THE FRONT', 'Hold your target for a minute', 2600, 1)
-        else if (fx.k === 'boss') sp.splash('sp-fell', '☠ BOSS FIGHT', text, 3600, 3)
+        if (fx.k === 'boss') SFX.boss()
+        if (fx.k === 'harpoon' || fx.k === 'bosswin') SFX.harpoon()
+        if (fx.k === 'boss') sp.splash('sp-fell', '☠ BOSS FIGHT', text, 3600, 3)
         else if (fx.k === 'bosswin') sp.splash('sp-smash', '🏆 BOSS BEATEN', text, 3600, 3)
         else if (fx.k === 'harpoon') sp.splash('sp-smash', '🔱 HARPOON!', text, 3200, 2)
         else if (fx.k === 'leg') sp.splash('sp-smash', '🗺️ NEXT LEG', text, 3200, 2)
