@@ -1,6 +1,8 @@
 import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
+import { GAMES } from '../modes/crew/games'
+import type { Game } from '../net/protocol'
 import { badgeCard, headline, lastTime, nextUp, scoreContext } from './resultsTop'
 import { ftpSuggestion, level, recordFtp, type Profile } from '../core/curve'
 import { rideRewards } from './resultsRewards'
@@ -151,7 +153,16 @@ export function finishRide(
         'div',
         { class: 'res-hero' },
         h('h1', {}, headline(profile.id, group, road)),
-        h('p', {}, h('b', {}, s.planName), ` · ${when}`),
+        h(
+          'p',
+          {},
+          // A crew game leads with its name; the workout underneath it is the detail.
+          group?.mode && group.mode !== 'bus' && GAMES[group.mode as Game]
+            ? h('b', {}, `${GAMES[group.mode as Game].icon} ${GAMES[group.mode as Game].name}`)
+            : '',
+          group?.mode && group.mode !== 'bus' ? ` · ${s.planName}` : h('b', {}, s.planName),
+          ` · ${when}`,
+        ),
       ),
       // What you earned leads, then the game's story, then the training numbers.
       s.record.secs < 30

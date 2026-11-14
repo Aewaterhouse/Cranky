@@ -125,7 +125,11 @@ class CrewStore:
             "kudos",
             "mine",
         )
-        return [{**dict(zip(keys, r, strict=True)), "mine": bool(r[11])} for r in rows]
+        out = [{**dict(zip(keys, r, strict=True)), "mine": bool(r[11])} for r in rows]
+        for row in out:  # a bus ride's result has no mode: it is still the bus
+            if row["game"] is None and row["score"] is not None:
+                row["game"] = "bus"
+        return out
 
     def give_kudos(self, me: str, ride: int) -> bool:
         """A kudos from `me` on someone else's ride, once each. False if it is their own or already given."""
