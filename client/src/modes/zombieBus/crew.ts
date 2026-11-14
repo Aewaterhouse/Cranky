@@ -3,7 +3,7 @@ import { api } from '../../core/api'
 import { saveProfile } from '../../core/profile'
 import { saveSettings, settings } from '../../core/settings'
 import { forgetBus, rememberBus } from '../../core/snapshot'
-import type { Lobby, ServerMsg } from '../../net/protocol'
+import type { Game, Lobby, ServerMsg } from '../../net/protocol'
 import { WsClient } from '../../net/wsClient'
 import { h, show } from '../../ui/dom'
 import { lobbyView } from '../../ui/lobby'
@@ -19,6 +19,8 @@ export async function crew(
   profile: Profile,
   trainer: Trainer,
   home: (p?: Profile) => void,
+  /** A new room's game, picked on the home screen; the host sets it on the first lobby. */
+  game?: Game,
 ) {
   if (!code) {
     try {
@@ -86,6 +88,8 @@ export async function crew(
         sessionStorage.removeItem('zombiebus.code')
         return void groupRide(code, null, profile, trainer, home)
       }
+      if (game && m.host === profile.id && m.game !== game) net.send({ t: 'game', game })
+      game = undefined
       lobby = m
       ride?.lobby(m)
       if (m.state === 'running' && !ride) {

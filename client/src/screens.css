@@ -518,16 +518,6 @@ kbd {
 .solo + .solo {
   margin-top: 12px;
 }
-.solo.soon {
-  opacity: 0.55;
-  border: 1px dashed var(--line);
-  background: none;
-}
-.solo.soon .arrow {
-  font: 700 0.7rem/1 var(--ui);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-}
 
 /* Resume / rejoin cards on the Ride tab */
 .resume {
@@ -590,4 +580,27 @@ kbd {
   box-shadow:
     inset 0 0 0 1px rgb(255 176 32 / 0.7),
     0 0 18px rgb(255 176 32 / 0.15);
+}
+.home-games {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 10px 0 16px;
+}
+.home-game {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 92px;
+  padding: 10px 8px;
+  text-align: center;
+  white-space: normal;
+}
+.home-game .gc-icon {
+  font-size: 1.7rem;
+}
+.home-game small {
+  font-size: 0.72rem;
+  opacity: 0.75;
 }

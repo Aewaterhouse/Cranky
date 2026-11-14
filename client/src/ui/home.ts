@@ -9,6 +9,8 @@ import type { Route } from '../core/route'
 import type { Plan } from '../types'
 import { avatar, fmt, h } from './dom'
 import { freeRideSetup } from './freeRideSetup'
+import { gamePicker } from './gamePicker'
+import type { Game } from '../net/protocol'
 import { soloSetup } from './solo'
 import { planScreen, todayCard } from './planCalendar'
 import { needTrainer } from './trainer'
@@ -20,7 +22,8 @@ export interface HomeActions {
   /** Make a group-ride room on a bundled route. Joining one by code is `join`. */
   groupRide(route: string, laps: number): void
   resume(snap: SoloSnap): void
-  create(): void
+  /** Opens a new crew room, set to `game` if given. */
+  create(game?: Game): void
   join(code: string): void
   watch(code: string): void
   logout(): void
@@ -110,16 +113,6 @@ function busCard(r: Room, act: HomeActions) {
   )
 }
 
-/** Ride tab: open buses first, then a new bus, then solo. */
-const soon = (emoji: string, name: string, blurb: string) =>
-  h(
-    'div',
-    { class: 'solo soon' },
-    h('span', { class: 'big-emoji' }, emoji),
-    h('span', {}, h('b', {}, name), h('small', {}, blurb)),
-    h('span', { class: 'arrow' }, 'coming soon'),
-  )
-
 /** Card offering to carry on a solo ride that a refresh or crash cut short. */
 function resumeCard(p: Profile, act: HomeActions) {
   const snap = loadSnap<SoloSnap>(soloKey(p.id))
@@ -206,13 +199,14 @@ export function rideTab(p: Profile, act: HomeActions) {
     h(
       'section',
       { class: 'hero' },
-      h('h2', { class: 'label' }, 'Crew game'),
-      h('h1', {}, '🧟 Zombie Bus'),
+      h('h2', { class: 'label' }, 'Ride with your crew'),
+      h('h1', {}, 'Crew ride'),
       h(
         'p',
         { class: 'lede' },
-        'Everyone pedals at their own FTP. Keep the bus moving or the horde eats you.',
+        'Everyone rides at their own FTP. Pick a game, share the code, bots fill the empty seats.',
       ),
+      gamePicker((g) => needTrainer(() => act.create(g))()),
       h(
         'div',
         { class: 'hero-grid' },
@@ -225,7 +219,7 @@ export function rideTab(p: Profile, act: HomeActions) {
             { class: 'mega', onclick: needTrainer(act.create) },
             h('span', { class: 'plus' }, '+'),
             h('b', {}, 'Start a new bus'),
-            h('small', {}, 'You drive. Pick the plan, share the code.'),
+            h('small', {}, 'Zombie Bus. You drive: pick the plan, share the code.'),
           ),
           h(
             'form',
@@ -236,7 +230,7 @@ export function rideTab(p: Profile, act: HomeActions) {
             h(
               'button',
               { type: 'button', class: 'ghost', onclick: withCode(act.watch) },
-              '📺 Watch',
+              '📺 TV view',
             ),
           ),
         ),
@@ -291,8 +285,6 @@ export function rideTab(p: Profile, act: HomeActions) {
       ),
       h('span', { class: 'arrow' }, '→'),
     ),
-    soon('📺', 'Watch party', 'Same workout, same video, all in sync.'),
-    soon('🎮', 'More games', 'Handicap race, chaingang, last rider standing.'),
   )
   const wrap = h('div', {}, main)
   home()

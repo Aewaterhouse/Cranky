@@ -4,6 +4,8 @@ import type { Game } from '../../net/protocol'
 export interface GameInfo {
   icon: string
   name: string
+  /** A few words for the home screen's card. */
+  tag: string
   blurb: string
   start: string
   countdown: string
@@ -20,6 +22,7 @@ export const GAMES: Record<Game, GameInfo> = {
   bus: {
     icon: '🧟',
     name: 'Zombie Bus',
+    tag: 'Outrun the horde',
     blurb: 'Hold your targets to keep the bus ahead of the horde.',
     start: 'Start the bus',
     countdown: 'BUS LEAVES IN',
@@ -29,6 +32,7 @@ export const GAMES: Record<Game, GameInfo> = {
   madness: {
     icon: '🤯',
     name: 'VO2 Madness',
+    tag: 'Mystery VO2 rounds',
     blurb:
       'Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for heart-rate effort. Set your max heart rate first.',
     start: 'Start the madness',
@@ -39,6 +43,7 @@ export const GAMES: Record<Game, GameInfo> = {
   ambo: {
     icon: '🚑',
     name: 'Kidney Stone Express',
+    tag: 'Ambulance co-op · 40 min',
     blurb:
       'Crew an ambulance across South East Queensland. Five patients, each one a different interval. Team power is your speed; smooth power keeps them comfortable. No ERG. 40 min.',
     start: 'Start the shift',
@@ -50,6 +55,7 @@ export const GAMES: Record<Game, GameInfo> = {
   date: {
     icon: '💘',
     name: 'Speed Dating',
+    tag: 'Match your date · 40 min',
     blurb:
       'Six dates in rotating pairs. Match your date’s effort as closely as you can, with only emoji to talk. Odd one out is the Chaperone. Ends in a wedding and a divorce. No ERG. 40 min.',
     start: 'Open the bar',
@@ -61,6 +67,7 @@ export const GAMES: Record<Game, GameInfo> = {
   climate: {
     icon: '🌊',
     name: 'Climate Lawsuit',
+    tag: 'Profit or flood · 45 min',
     blurb:
       'Everyone runs an energy company in the same coastal town. Watts earn coins; emissions raise the sea. Flood the town and everyone loses, then the worst polluter stands trial. No ERG. 45 min.',
     start: 'Start the 1980s',
@@ -72,6 +79,7 @@ export const GAMES: Record<Game, GameInfo> = {
   watch: {
     icon: '📺',
     name: 'Watch Party',
+    tag: 'Ride to a video',
     blurb:
       'Ride the same workout while you watch the same YouTube video, in sync. The driver picks the workout and holds the remote; anyone can queue a video. No Premium needed.',
     start: 'Start the show',
