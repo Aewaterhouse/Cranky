@@ -173,3 +173,15 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] With six riders on the bus the ride is as smooth as before on the iPad.
 - [ ] On a phone the Rider tabs scroll sideways to reach Body and Settings, and the preview stays at the top while you scroll the options.
 - [ ] A mate on an old tab (not reloaded) still joins and rides; they just see default bodies.
+
+## New games and bus rules, 2026-11-15 (only bots have ridden them)
+- [ ] Zombie Bus with a mate: the servo stop shows three upgrades and a "Which way next?" card; the most votes wins as the stop closes. If nobody buys, the servo picks.
+- [ ] Your crew role shows in the bus panel (driver, gunner, mechanic, lookout) and fires when you hold its cue; a role call-out every 90 s or so is fun, not noise.
+- [ ] Rolling turns: "take the front" every minute feels right, or is it too chatty?
+- [ ] The weather: rain, dust (the gap reads "?? m" and the mirror goes) and a night run all look right on the iPad.
+- [ ] A boss at the end: the road train, giant or bridge shows behind the bus and the health bar empties as you ride on target.
+- [ ] The 📯 horn honks, and the emoji float up for everyone; a rider who has fallen off can still heckle.
+- [ ] A campaign ride: tick Campaign in the lobby, finish, then the next ride starts on the carried armour at the next town.
+- [ ] Last Rider Standing: the steps climb to 150% and stop there; going out after 10 s off your step feels fair.
+- [ ] Pub Quiz, Galley Ship, The Hunt and Team Time Trial each play through with a mate; the question card, the drum's beat, the fox and the Red/Blue bars read at a glance mid-effort.
+- [ ] Handicap race and chaingang on a route with mates of different FTPs: the handicap is close, and "TO THE FRONT" calls work.
