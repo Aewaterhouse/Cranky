@@ -22,6 +22,8 @@ const SUBS = {
 }
 type Sub = keyof typeof SUBS
 let sub: Sub = 'overview'
+/** The Rider tab opens on Settings next time (after Strava sends the rider back). */
+export const openRiderSettings = () => (sub = 'settings')
 
 const panel = (title: string, ...kids: (Node | string)[]) =>
   h('section', { class: 'panel' }, h('h2', { class: 'label' }, title), ...kids)

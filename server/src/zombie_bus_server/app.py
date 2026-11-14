@@ -12,14 +12,16 @@ from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocke
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError
 
-from . import config, efforts, files, ladder
+from . import config, efforts, files, ladder, strava_api
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
 from .session import Room
 from .store import Store, restore_pending
+from .strava import Strava
 
 restore_pending()
 store = Store()
+strava = Strava(store)
 
 
 def backup_wait(now: float, newest: float | None) -> float:
@@ -70,6 +72,7 @@ def user(authorization: str = Header(default="")) -> dict:
 User = Annotated[dict, Depends(user)]
 app.include_router(efforts.router(store, User))
 app.include_router(files.router(User))
+app.include_router(strava_api.router(strava, User))
 
 
 class Login(BaseModel):

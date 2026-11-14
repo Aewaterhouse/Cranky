@@ -24,6 +24,8 @@ import { spectate } from './modes/zombieBus/spectate'
 import { showLogin } from './ui/login'
 import { showHome } from './ui/shell'
 import { currentTrainer } from './ui/trainer'
+import { openRiderSettings } from './ui/rider'
+import { stravaReturn } from './ui/strava'
 
 let profile: Profile
 
@@ -55,6 +57,7 @@ async function enter(u: Me) {
   profile = loadProfile(u)
   const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
   if (watch?.length === 4) return spectate(watch, () => home())
+  if (stravaReturn()) openRiderSettings()
   home()
   // Anything ridden while the server was out of reach goes up now, and again whenever the network returns.
   const sync = () => (void flushEfforts(u.id), void flushRides(u.id))

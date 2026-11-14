@@ -35,6 +35,9 @@ cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless 
 | --- | --- | --- |
 | `ZB_DB` | `server/zombie_bus.db` | SQLite file path |
 | `ZB_TIME_SCALE` | `1` | Server clock speed multiplier (e.g. `10` to run a 45 min ride in about 4.5 min) |
+| `PUBLIC_URL` | `https://www.cranky.life` | The site's own address, for Strava's redirect and links that leave the app |
+| `STRAVA_CLIENT_ID` | none | Strava API app id (strava.com/settings/api); without it the Strava section says it isn't set up |
+| `STRAVA_CLIENT_SECRET` | none | Strava API app secret; stays on the server |
 
 Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profiles. On Railway, attach the volume at `/data` in the dashboard, because Railway does not allow `VOLUME` in a Dockerfile. `PORT` sets the listen port in the container (Railway sets it).
 
@@ -99,6 +102,10 @@ On the bus, in VO2 Madness, the TV view and group free rides, the crew is a colu
 | --- | --- |
 | Click or tap a card | open it for every number (now and this ride), again to close |
 | `D` or the button at the top | open or close every card (remembered on this device) |
+
+## Strava
+
+Each rider connects once under Rider → Settings → Connect with Strava, approves "upload activities" on Strava's page and comes back to Settings. The connection is kept on the server, so it works from any browser after that. On an iPad in Bluefy, Strava may open its own app instead of coming back; connect once from Safari or a laptop. The Strava app's Authorization Callback Domain (strava.com/settings/api) must be the host of `PUBLIC_URL` (`www.cranky.life`). Disconnect in the same place removes Cranky from the rider's Strava account and deletes the tokens.
 
 ## Zwift Click and virtual gears
 

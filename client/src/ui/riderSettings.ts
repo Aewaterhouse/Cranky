@@ -15,6 +15,7 @@ import { TIERS, type Tier } from '../types'
 import { h, seg } from './dom'
 import { ZONE_COLOURS } from './planGraph'
 import { chartBox, niceTicks, svgEl } from './svg'
+import { stravaPanel } from './strava'
 import { setSimFtp } from './trainer'
 
 const TIER_HELP: Record<Tier, string> = {
@@ -249,6 +250,12 @@ export function riderSettings(p: Profile, changed: () => void) {
         hrBox,
       ),
     ),
-    h('div', {}, panel('Power zones', zoneTables(p)), panel('FTP history', hist)),
+    h(
+      'div',
+      {},
+      panel('Strava', stravaPanel()),
+      panel('Power zones', zoneTables(p)),
+      panel('FTP history', hist),
+    ),
   )
 }
