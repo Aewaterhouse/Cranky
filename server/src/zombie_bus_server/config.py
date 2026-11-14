@@ -285,6 +285,18 @@ ROLE_QUIET = ("warmup", "cooldown", "roadblock", "servo")
 HIGHLIGHTS = ("slowmo", "harpoon", "bosswin", "smash", "escape", "airstrike", "gunship")
 HIGHLIGHT_MAX = 10
 WHISKER = (3, 15)
+# Campaign: one journey for the whole crew, a leg per campaign bus ride. Armour carries from leg to leg,
+# patched up by CAMPAIGN_REPAIR between rides; a leg that ends with the armour gone is ridden again.
+CAMPAIGN_STOPS = [
+    "Brisbane",
+    "Gold Coast",
+    "Byron Bay",
+    "Coffs Harbour",
+    "Port Macquarie",
+    "Newcastle",
+    "Sydney",
+]
+CAMPAIGN_REPAIR = 30
 # Boss fight: the last long effort before the cool-down. The crew wears it down by riding on target: beaten
 # once BOSS_SHARE of the block's seconds have been ridden at full compliance (the crew's mean).
 BOSS_EVENTS = ("longhaul", "surge", "rampup")

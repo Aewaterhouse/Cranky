@@ -54,6 +54,7 @@ class Room:
         self.plan_id = "bus-crew-45"
         self.minutes = 0
         self.difficulty = "normal"
+        self.campaign = False  # this bus ride is the crew's next campaign leg
         self.trainers = "choose"  # erg, gears or choose: the host's pick for this ride
         self.game = "bus"
         self.plan = generate(load_plans()[self.plan_id], 0)
@@ -99,9 +100,9 @@ class Room:
             "plan_id": self.plan_id,
             "minutes": self.minutes,
             "difficulty": self.difficulty,
+            "campaign": self.campaign,
             "trainers": self.trainers,
             "game": self.game,
-            "trophies": self.store.legends() if hasattr(self.store, "legends") and self.game == "bus" else 0,
             "plan": self.plan,
             "el": self.el,
             "riders": [r.to_dict() for r in self.riders.values()],
@@ -115,6 +116,7 @@ class Room:
         room.host, room.state, room.plan_id = d["host"], d["state"], d["plan_id"]
         room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
         room.difficulty = d.get("difficulty", "normal")
+        room.campaign = d.get("campaign", False)
         room.trainers = d.get("trainers", "choose")
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.game = d.get("game", "bus")
@@ -147,6 +149,8 @@ class Room:
             "difficulty": self.difficulty,
             "trainers": self.trainer_mode,
             "game": self.game,
+            "trophies": self.store.legends() if hasattr(self.store, "legends") and self.game == "bus" else 0,
+            "campaign": self.campaign_view(),
             "riders": [
                 {
                     "id": r.id,
@@ -162,6 +166,21 @@ class Room:
                 }
                 for r in self.riders.values()
             ],
+        }
+
+    def campaign_view(self) -> dict | None:
+        """The campaign leg this bus ride counts as, for the lobby, or None when it is a one-off."""
+        if not (self.campaign and self.game == "bus" and hasattr(self.store, "campaign")):
+            return None
+        c, stops = self.store.campaign(), C.CAMPAIGN_STOPS
+        return {
+            "leg": c["leg"] + 1,
+            "of": len(stops) - 1,
+            "from": stops[c["leg"]],
+            "to": stops[c["leg"] + 1],
+            "armour": c["armour"],
+            "stops": stops,
+            "trips": c["trips"],
         }
 
     def titles(self, rid: str) -> list[str]:
@@ -232,6 +251,8 @@ class Room:
             mode.mut = mut or {}
         else:
             mode.weather = roll_weather(random.Random())
+            if self.campaign_view():
+                mode.armour = float(self.store.campaign()["armour"])
         self.state, self.el, self.mode, self.summary = ("running", -float(C.COUNTDOWN_S), mode, None)
         for r in self.riders.values():
             r.reset_stats()
@@ -265,6 +286,8 @@ class Room:
             self.store and self.summary.get("score") is not None
         ):  # the crew's best before this ride, for context
             self.summary["crewBest"] = self.store.crew_best(self.game, self.summary["score"])
+        if self.campaign_view():
+            self.summary["campaign"] = self.store.ride_leg(self.summary["armour"])
         if hasattr(self.store, "take_titles") and self.summary.get("awards"):
             self.summary["titles"] = self.store.take_titles(self.summary["awards"])
         await self.broadcast({"t": "end", "summary": self.summary})

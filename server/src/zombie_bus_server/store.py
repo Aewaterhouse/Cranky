@@ -41,6 +41,7 @@ class Store:
             CREATE TABLE IF NOT EXISTS sashes (id TEXT PRIMARY KEY, until REAL);
             CREATE TABLE IF NOT EXISTS bests (game TEXT PRIMARY KEY, score REAL, date TEXT);
             CREATE TABLE IF NOT EXISTS titles (title TEXT PRIMARY KEY, holder TEXT, name TEXT);
+            CREATE TABLE IF NOT EXISTS campaign (id INTEGER PRIMARY KEY CHECK (id = 1), json TEXT);
             """)
 
     def sash_until(self, rid: str) -> float | None:
@@ -293,6 +294,29 @@ class Store:
             if (s := json.loads(j)).get("game", "bus") == "bus"
             for r in s.get("riders", [])
         )
+
+    def campaign(self) -> dict:
+        """The crew's journey: the leg they are on (0 first), the armour it starts on, trips finished."""
+        with self.lock:
+            row = self.db.execute("SELECT json FROM campaign WHERE id = 1").fetchone()
+        return json.loads(row[0]) if row else {"leg": 0, "armour": 100, "trips": 0}
+
+    def ride_leg(self, armour: float) -> str:
+        """Records a campaign ride that ended on `armour`: the next leg or this one again; says how."""
+        c, stops = self.campaign(), config.CAMPAIGN_STOPS
+        here, there = stops[c["leg"]], stops[c["leg"] + 1]
+        if armour <= 0:
+            c["armour"] = config.CAMPAIGN_REPAIR
+            text = f"The bus broke down short of {there}. Patched up, the crew rides {here} to {there} again."
+        elif c["leg"] + 2 == len(stops):
+            c = {"leg": 0, "armour": 100, "trips": c["trips"] + 1}
+            text = f"{there}! The whole trip from {stops[0]} done. The bus gets a wash and starts again."
+        else:
+            c = {**c, "leg": c["leg"] + 1, "armour": min(100, round(armour) + config.CAMPAIGN_REPAIR)}
+            text = f"Made it to {there} on {round(armour)} armour. Next: {there} to {stops[c['leg'] + 1]}."
+        with self.lock, self.db:
+            self.db.execute("INSERT OR REPLACE INTO campaign VALUES (1, ?)", (json.dumps(c),))
+        return text
 
     def titles_of(self, rid: str) -> list[str]:
         """The titles this rider holds right now."""

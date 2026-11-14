@@ -204,3 +204,42 @@ def test_every_legend_sprint_on_the_bus_is_a_trophy(tmp_path):
     s.add_result("Run", {"riders": [rider], "game": "ambo"})
     s.add_result("Run", {"riders": [{"name": "Old", "sprints": ["LEGEND"]}]})  # from before games were stored
     assert s.legends() == 4
+
+
+def test_the_campaign_carries_armour_and_rides_a_leg_again_after_a_breakdown(tmp_path):
+    from zombie_bus_server import config as C
+    from zombie_bus_server.store import Store
+
+    s = Store(tmp_path / "c.db")
+    assert s.campaign() == {"leg": 0, "armour": 100, "trips": 0}
+    assert "Gold Coast" in s.ride_leg(40)
+    assert s.campaign()["leg"] == 1 and s.campaign()["armour"] == 40 + C.CAMPAIGN_REPAIR
+    assert "broke down" in s.ride_leg(0)
+    assert s.campaign() == {"leg": 1, "armour": C.CAMPAIGN_REPAIR, "trips": 0}
+    for _ in range(len(C.CAMPAIGN_STOPS) - 3):
+        s.ride_leg(50)
+    assert "whole trip" in s.ride_leg(50) and s.campaign() == {"leg": 0, "armour": 100, "trips": 1}
+
+
+def test_a_campaign_ride_starts_on_the_carried_armour_and_records_its_leg(tmp_path):
+    import asyncio
+
+    from test_bots import lobby_with
+
+    from zombie_bus_server.store import Store
+
+    async def main():
+        room, ws = await lobby_with(1, code="CAMP")
+        room.store = Store(tmp_path / "r.db")
+        room.store.ride_leg(55)
+        await room.handle("h0", ws, {"t": "campaign", "on": True})
+        lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        assert lobby["campaign"]["from"] == "Gold Coast" and lobby["campaign"]["leg"] == 2
+        assert "trophies" in lobby
+        room.start()
+        room.task.cancel()
+        assert room.mode.armour == 85
+        await room.finish()
+        assert "Byron Bay" in room.summary["campaign"]
+
+    asyncio.run(main())

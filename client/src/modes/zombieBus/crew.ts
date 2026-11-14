@@ -76,6 +76,7 @@ export async function crew(
     game: (game) => net.send({ t: 'game', game }),
     start: () => net.send({ t: 'start' }),
     ready: (on) => net.send({ t: 'ready', on }),
+    campaign: (on) => net.send({ t: 'campaign', on }),
     leave,
   })
   const renderLobby = (l: Lobby) => {

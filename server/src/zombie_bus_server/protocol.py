@@ -45,6 +45,13 @@ class Bots(BaseModel):
     n: int = Field(ge=0, le=5)
 
 
+class Campaign(BaseModel):
+    """Host: this bus ride is the crew's next campaign leg (armour carries over), or a one-off."""
+
+    t: Literal["campaign"]
+    on: bool
+
+
 class Difficulty(BaseModel):
     t: Literal["difficulty"]
     level: Literal["easy", "normal", "hard", "nightmare"]
@@ -142,6 +149,7 @@ ClientMsg = TypeAdapter(
         | RoadSetup
         | Bots
         | Difficulty
+        | Campaign
         | Game
         | Start
         | End

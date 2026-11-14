@@ -16,6 +16,7 @@ from .protocol import (
     Act,
     Bots,
     Buy,
+    Campaign,
     ClientMsg,
     Data,
     Difficulty,
@@ -109,6 +110,9 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         await room.lobby()
     elif isinstance(msg, TrainerMode) and room.state != "running":
         room.trainers = msg.mode
+        await room.lobby()
+    elif isinstance(msg, Campaign) and room.state != "running":
+        room.campaign = msg.on
         await room.lobby()
     elif isinstance(msg, Difficulty) and room.state != "running":
         room.difficulty = msg.level

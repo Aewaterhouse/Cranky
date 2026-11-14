@@ -40,6 +40,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
       ...view.tiles(g),
     ),
     view.extra?.(g) ?? '',
+    g.campaign ? h('div', { class: 'card hl' }, h('b', {}, '🗺️ Campaign: '), g.campaign) : '',
     g.awards.length
       ? h(
           'div',

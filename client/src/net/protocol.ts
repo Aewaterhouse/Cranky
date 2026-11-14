@@ -52,6 +52,7 @@ export type ClientMsg =
     }
   | { t: 'buy'; item: ShopItem }
   | { t: 'ready'; on: boolean }
+  | { t: 'campaign'; on: boolean }
   | { t: 'erg'; on: boolean }
   | { t: 'act'; k: string; v?: string | number | boolean | null }
   | { t: 'trainers'; mode: TrainerMode }
@@ -74,6 +75,16 @@ export interface LobbyRider {
   ready?: boolean
 }
 export interface Lobby {
+  /** Bus rooms on a campaign ride: the leg it is and the armour it starts on. */
+  campaign?: {
+    leg: number
+    of: number
+    from: string
+    to: string
+    armour: number
+    stops: string[]
+    trips: number
+  } | null
   /** Bus rooms: every LEGEND sprint the crew has ever ridden on the bus (trophies on the roof). */
   trophies?: number
   t: 'lobby'

@@ -3,6 +3,7 @@ import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
 import { FIRST_VIDEO, videoSource } from '../core/watchSync'
+import { campaignRow } from './campaignRow'
 import { gameCard } from './gameCard'
 import { TIER_NAME, TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
@@ -27,6 +28,8 @@ export interface LobbyCtx {
   difficulty(level: Difficulty): void
   game(game: Game): void
   start(): void
+  /** Host: this bus ride is the crew's next campaign leg. */
+  campaign(on: boolean): void
   /** A guest says they are ready, or not. */
   ready(on: boolean): void
   leave(): void
@@ -113,6 +116,7 @@ export function lobbyView(c: LobbyCtx) {
     diffWhat,
   )
   const mutRow = h('div', { class: 'bot-row mut-row' })
+  const camp = campaignRow(c.campaign)
   // Watch Party: a link pasted here goes on the moment the countdown starts.
   const firstNote = h('span', { class: 'dim' })
   const firstIn = h('input', {
@@ -223,6 +227,7 @@ export function lobbyView(c: LobbyCtx) {
         : `${driver} has everyone on ${trainers === 'erg' ? 'ERG' : 'gears (ERG off, you shift)'} this ride.`
     diffSeg.set(l.difficulty)
     mutRow.hidden = !l.mutator
+    camp.update(l, isHost)
     if (l.mutator)
       mutRow.replaceChildren(
         h('span', {}, '🎲 This week'),
@@ -344,6 +349,7 @@ export function lobbyView(c: LobbyCtx) {
           diffRow,
           trainRow,
           mutRow,
+          camp.root,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
       ),
