@@ -156,6 +156,27 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 - [ ] Owner checks added to `docs/owner-checks.md`; `docs/protocol.md`, `docs/map.md`, `docs/status.md` kept current
       throughout.
 
+## Phase 5: Watch party (owner, 2026-11-14; after Climate Lawsuit)
+
+Build the items in `docs/roadmap.md` section 6 in their order: a room joined by code where the host picks a workout
+and a YouTube video or playlist, everyone's ERG follows the shared workout clock, and playback stays in step.
+
+**YouTube without Premium (the owner's question).** Nobody needs Premium, or even a YouTube account: embedded videos
+play for anyone. What Premium changes is ads.
+- A monetised video can show an ad in the embedded player. Each rider gets their own ads at their own times, so one
+  rider's video stops for 5 to 30 s while everyone else's carries on. A rider signed in to YouTube Premium in the same
+  browser normally gets no ads.
+- So the workout never waits for the video: the ERG clock runs off the server as in the bus. The video is synced to
+  a shared position on the server, and each player that drifts more than about 2 s (an ad, a buffer, a late join)
+  seeks back to it. A rider who gets an ad misses that bit of the video instead of holding the room up.
+- The host's play, pause, seek and next video go through the server; nobody else controls playback.
+- Some videos (many music videos, some sport) block embedding. Check each video when it is added and say so plainly
+  instead of showing a black box.
+- Browsers block sound on autoplay until the rider taps the page, so joining shows a "Tap to start the video" button.
+- We do not block or skip ads; that breaks YouTube's terms.
+- Assumed: YouTube's IFrame Player API (load, play, pause, seek, read the time and state) over the youtube-nocookie
+  domain, as the solo media corner already uses. Check against YouTube's current docs when building.
+
 ## Always open: UI polish (owner, 2026-11-14)
 
 - [ ] Continuous improvement of the UI once the three games are in. Never tick this: there is always more polish
