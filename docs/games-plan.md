@@ -105,7 +105,7 @@ Scene: the Madness road pack at dusk, riders side by side in their pairs, a hear
 - [x] D1 Server: `modes/dating.py`: pairing schedule, six themes as bands and prompts, match scoring. Tests.
 - [ ] D2 Server: Chaperone cards, emoji with limits, profiles, Proposal, Wedding, Divorce, the house. Tests.
 - [x] D3 Client HUD: date intro card, your bar against theirs, chemistry meter, emoji tray, Chaperone card hand.
-- [ ] D4 (couples, heart and Chaperone done; confetti, tandem and rope still to do) Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
+- [x] D4 Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
 - [ ] D5 Compatibility report, leaked chat, results, TV view, Strava and Discord text, announcer, bots
       (Clingy, Aloof, Chaotic).
 - [ ] D6 Headless test with four and with five riders (Chaperone), e2e, manual notes, tuning pass.

@@ -38,7 +38,16 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     scene: (m) => {
       const g = m.game as unknown as DateState | null | undefined
       const pairs = (g?.pairs ?? []).map((p) => [p[0], p[1], p[2]] as [string, string, number])
-      const mad = { pts: {}, crown: null, lead: null, work: g?.phase === 'date', pairs }
+      const rite = g?.phase === 'wedding' || g?.phase === 'divorce' ? g.phase : null
+      const mad = {
+        pts: {},
+        crown: null,
+        lead: null,
+        work: g?.phase === 'date',
+        pairs,
+        rite,
+        tug: g?.tug,
+      }
       return { gap: null, armour: null, roadblock: null, mood: 'longhaul', mad }
     },
   },

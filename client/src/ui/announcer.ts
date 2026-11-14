@@ -55,6 +55,16 @@ const LINES: Record<string, string[]> = {
   ],
   fine: ['{name}, that is a speeding fine.', 'Roadworks, {name}. Sixty means sixty.'],
   perk: ['Triage owes us a favour.'],
+  match: ['Now that is chemistry.', 'Get a room. A well ventilated one.'],
+  card: ['The Chaperone has opinions.', 'Card played. Somebody is about to suffer.'],
+  engaged: ['They are engaged. Somebody tell the group chat.'],
+  married: ['Just married. Tandem for life.'],
+  divorced: ['{name} keeps the house.'],
+  stage: ['The sea is coming up. Nobody panic.', 'That used to be a beach.'],
+  flood: ['The town has flooded. Lawyers, start your engines.'],
+  blackout: ['Blackout. The whole town is in the dark.'],
+  wall: ['A seawall. Not designed by an engineer.'],
+  verdict: ['The court has reached a verdict.'],
 }
 const MIN_GAP_MS = 3500
 let last = 0
@@ -72,7 +82,16 @@ function voice() {
 export function announce(kind: string, name = 'Someone') {
   const lines = LINES[kind]
   if (!lines || !settings.announcer || !settings.volume || !('speechSynthesis' in window)) return
-  const urgent = ['roadblock', 'fell', 'fellout', 'walked', 'LEGEND', 'MEGA'].includes(kind)
+  const urgent = [
+    'roadblock',
+    'fell',
+    'fellout',
+    'walked',
+    'flood',
+    'verdict',
+    'LEGEND',
+    'MEGA',
+  ].includes(kind)
   const now = performance.now()
   if (!urgent && now - last < MIN_GAP_MS) return
   last = now

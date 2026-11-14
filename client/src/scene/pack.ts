@@ -13,6 +13,9 @@ export interface MadScene {
   work: boolean
   /** Speed Dating: the couples on this date with their match (0..1). Anyone left over is the Chaperone. */
   pairs?: [string, string, number][]
+  /** Speed Dating finale: the first couple rides as a tandem under confetti, or pulls a rope (`tug` -1..1). */
+  rite?: 'wedding' | 'divorce' | null
+  tug?: number | null
 }
 
 const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5']
@@ -52,13 +55,20 @@ export class Pack {
   private crowned: string | null = null
   private hearts = [0, 1, 2].map(() => emoji('💗'))
   private eyes = emoji('👀')
+  private rope = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 0.08, 0.08),
+    new THREE.MeshBasicMaterial({ color: '#c9a36a' }),
+  )
 
   constructor() {
-    this.group.add(this.crown, this.medal, this.eyes, ...this.hearts)
+    this.rope.visible = false
+    this.group.add(this.crown, this.medal, this.eyes, this.rope, ...this.hearts)
   }
 
   /** Speed Dating places: couples side by side with a heart between them, the Chaperone lurking behind. */
-  private dates(pairs: [string, string, number][], t: number) {
+  private dates(mad: MadScene, t: number, dt: number, sparks: Particles) {
+    const pairs = mad.pairs ?? []
+    this.rope.visible = false
     const spot = new Map<string, [number, number]>()
     const mid = (VIS.packBack + VIS.packFront) / 2
     this.hearts.forEach((s, j) => {
@@ -67,9 +77,30 @@ export class Pack {
       if (!p) return
       const x = (j - (pairs.length - 1) / 2) * VIS.packLane * 2.6
       const z = mid + (j % 2) * 2.5
-      spot.set(p[0], [x - VIS.packLane * 0.55, z])
-      spot.set(p[1], [x + VIS.packLane * 0.55, z])
+      const rite = j === 0 ? mad.rite : null
+      // A tandem rides nose to tail; a divorcing couple stands off across the rope.
+      const dx = rite === 'wedding' ? 0 : VIS.packLane * (rite === 'divorce' ? 1.5 : 0.55)
+      const dz = rite === 'wedding' ? 0.95 : 0
+      spot.set(p[0], [x - dx, z - dz])
+      spot.set(p[1], [x + dx, z + dz])
       s.position.set(x, 1.8 + Math.sin(t * 3 + j) * 0.1, z)
+      if (rite === 'divorce') {
+        this.rope.visible = true
+        this.rope.position.set(x, 1.15, z)
+        this.rope.scale.x = dx * 2
+        s.position.x = x + (mad.tug ?? 0) * dx
+      }
+      if (rite === 'wedding' && Math.random() < dt * 30)
+        sparks.emit({
+          p: { x: x + rand(-3, 3), y: rand(4, 6), z: z + rand(-3, 3) },
+          v: { x: rand(-1, 1), y: rand(-1, 0.5), z: rand(-1, 1) },
+          life: rand(1, 2),
+          s0: 0.35,
+          s1: 0.2,
+          c: col.set(PARTY[Math.floor(Math.random() * PARTY.length)]),
+          a: 1,
+          g: 3,
+        })
       s.scale.setScalar((0.5 + p[2] * 1.5) * (1 + Math.sin(t * (4 + p[2] * 8)) * 0.1 * p[2]))
       s.material.opacity = 0.35 + p[2] * 0.65
     })
@@ -95,7 +126,7 @@ export class Pack {
     const top = Math.max(0, ...pts)
     const low = Math.min(top, ...pts)
     this.crown.visible = this.medal.visible = this.eyes.visible = false
-    const spot = mad.pairs ? this.dates(mad.pairs, t) : null
+    const spot = mad.pairs ? this.dates(mad, t, dt, sparks) : null
     if (!spot) this.hearts.forEach((s) => (s.visible = false))
     riders.forEach((sr, i) => {
       let e = this.map.get(sr.id)

@@ -100,6 +100,8 @@ function apply() {
             ['a', 'b', 0.9],
             ['d', 'f', 0.25],
           ],
+          rite: (q.get('rite') as 'wedding' | 'divorce' | null) ?? null,
+          tug: num('tug', 0),
         }
       : q.has('mad')
         ? { pts: { a: 320, b: 140, c: 20, d: 260, f: 90 }, crown: 'a', lead: 'a', work: true }
