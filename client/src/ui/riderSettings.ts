@@ -11,7 +11,7 @@ import {
   wkgStr,
   zoneBounds,
 } from '../core/riderMetrics'
-import { TIERS, type Tier } from '../types'
+import { TIER_NAME, TIERS, type Tier } from '../types'
 import { h, seg } from './dom'
 import { toast } from './toast'
 import { ZONE_COLOURS } from './planGraph'
@@ -20,7 +20,7 @@ import { stravaPanel } from './strava'
 import { setSimFtp } from './trainer'
 
 const TIER_HELP: Record<Tier, string> = {
-  hard: 'Full targets, the plan as written.',
+  hard: 'The workout as written: every target at 100%.',
   medium: `Targets at ${CFG.tierFactor.medium * 100}%. Still a proper workout.`,
   easy: `Targets at ${CFG.tierFactor.easy * 100}%. Recovery day or new to the bike.`,
 }
@@ -218,7 +218,7 @@ export function riderSettings(p: Profile, changed: () => void) {
   const hist = h('div', {}, ftpChart(p))
   const help = h('p', { class: 'dim' }, TIER_HELP[p.tier])
   const tiers = seg(
-    TIERS.map((t) => [t, t[0].toUpperCase() + t.slice(1)]),
+    TIERS.map((t) => [t, `${TIER_NAME[t]} · ${Math.round(CFG.tierFactor[t] * 100)}%`]),
     p.tier,
     (t) => ((p.tier = t), saveProfile(p), (help.textContent = TIER_HELP[t])),
   )

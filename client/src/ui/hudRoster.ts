@@ -1,3 +1,4 @@
+import { TIER_NAME } from '../types'
 import { CFG } from '../config'
 import { crewShares } from '../core/hud'
 import { rideShares } from '../core/crewStats'
@@ -30,7 +31,7 @@ export function makeRoster(cls = 'crew') {
         return {
           id,
           name: r.name,
-          tier: r.tier[0].toUpperCase(),
+          tier: TIER_NAME[r.tier][0],
           w: r.w,
           st: r.st,
           s: r.s,

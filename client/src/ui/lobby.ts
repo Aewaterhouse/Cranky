@@ -1,8 +1,9 @@
+import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
 import { gameCard } from './gameCard'
-import { TIERS, type Tier } from '../types'
+import { TIER_NAME, TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
 import { avatar, h, seg } from './dom'
 import { planGraph } from './planGraph'
@@ -11,7 +12,6 @@ import { toast } from './toast'
 import { trainerCheck } from './trainer'
 
 const SEATS = 6
-const cap = (s: string) => s[0].toUpperCase() + s.slice(1)
 
 export interface LobbyCtx {
   profile: () => Profile
@@ -44,7 +44,7 @@ export function lobbyView(c: LobbyCtx) {
   const code = h('div', { class: 'code-letters' })
   const run = h('section', { class: 'panel run' })
   const tierSeg = seg(
-    TIERS.map((t) => [t, cap(t)]),
+    TIERS.map((t) => [t, `${TIER_NAME[t]} · ${Math.round(CFG.tierFactor[t] * 100)}%`]),
     c.profile().tier,
     (t) => c.tier(t),
   )
@@ -128,7 +128,7 @@ export function lobbyView(c: LobbyCtx) {
           }),
           avatar(r.name, 'lg'),
           h('b', {}, r.name),
-          h('span', { class: `tier-badge ${r.tier}` }, r.tier),
+          h('span', { class: `tier-badge ${r.tier}` }, TIER_NAME[r.tier]),
           h('small', {}, `${r.ftp} W`),
           r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
           r.bot

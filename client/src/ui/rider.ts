@@ -1,3 +1,4 @@
+import { TIER_NAME } from '../types'
 import type { Profile } from '../core/curve'
 import { stickBadges } from '../core/badges'
 import { saveProfile } from '../core/profile'
@@ -70,7 +71,7 @@ export function riderTab(p: Profile) {
         h(
           'p',
           { class: 'dim' },
-          `FTP ${p.ftp} W${p.weightKg ? ` · ${wkgStr(p.ftp, p.weightKg)}` : ''} · ${p.tier} tier`,
+          `FTP ${p.ftp} W${p.weightKg ? ` · ${wkgStr(p.ftp, p.weightKg)}` : ''} · ${TIER_NAME[p.tier]} effort`,
         ),
       ),
     )

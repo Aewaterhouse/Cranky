@@ -1,5 +1,7 @@
 export type Tier = 'hard' | 'medium' | 'easy'
 export const TIERS: Tier[] = ['hard', 'medium', 'easy']
+/** What each effort level is called on screen: the ids stay, the riders see Full (the plan as written), Medium, Easy. */
+export const TIER_NAME: Record<Tier, string> = { hard: 'Full', medium: 'Medium', easy: 'Easy' }
 export type BlockType = 'steady' | 'ramp' | 'over-under' | 'sprint' | 'free' | 'set'
 /** Percent of FTP: one number (hard tier, scaled for other tiers) or explicit per tier. */
 export type Pct = number | Record<Tier, number>

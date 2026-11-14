@@ -37,7 +37,7 @@ re-run the review after a big round.
 end of the queue. Owner's own to-dos go first:*
 
 - [ ] Watch Party: paste a video link in the lobby, so the video is on as the ride starts.
-- [ ] "Your effort" levels: say what they are (Hard is the workout as written) instead of Hard, Medium, Easy.
+- [x] "Your effort" levels: say what they are (Hard is the workout as written) instead of Hard, Medium, Easy.
 
 **Results and history: the story is the product**
 1. [x] A ride's History page drops the game story: Trial, couples, reviews, awards, crew (lobby 1, blocker).

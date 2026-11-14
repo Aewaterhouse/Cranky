@@ -10,7 +10,7 @@ import { hudCues } from './hudCues'
 import type { Live } from '../modes/rideController'
 import type { Tick } from '../net/protocol'
 import type { Frame, SprintResult, Tier } from '../types'
-import { TIERS } from '../types'
+import { TIER_NAME, TIERS } from '../types'
 import { h } from './dom'
 import { choiceSheet } from './choiceSheet'
 import { makeBusPanel } from './hudBus'
@@ -56,10 +56,12 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const tier = h(
     'select',
     {
-      title: 'Your tier',
+      title: 'Your effort',
       onchange: (e: Event) => onTier((e.target as HTMLSelectElement).value as Tier),
     },
-    ...TIERS.map((t) => h('option', { value: t }, t)),
+    ...TIERS.map((t) =>
+      h('option', { value: t }, `${TIER_NAME[t]} ${Math.round(CFG.tierFactor[t] * 100)}%`),
+    ),
   )
   const roster = makeRoster()
   const toggle = (part: string) => root.classList.toggle(`hud-${part}`)

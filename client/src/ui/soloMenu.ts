@@ -1,10 +1,9 @@
-import type { Plan, Tier } from '../types'
+import { TIER_NAME, TIERS, type Plan, type Tier } from '../types'
+import { CFG } from '../config'
 import { h } from './dom'
 import { hudMenu } from './hudParts'
 import { modeSwitch } from './soloMode'
 import type { SoloHandlers, SoloPart } from './soloView'
-
-const TIERS: Tier[] = ['hard', 'medium', 'easy']
 
 /** A − value + stepper on glass, for the dock. */
 const stepper = (down: () => void, up: () => void, titles: [string, string]) => {
@@ -41,9 +40,11 @@ export function soloMenu(
     'select',
     {
       onchange: (e: Event) => on.tier((e.target as HTMLSelectElement).value as Tier),
-      title: 'Tier',
+      title: 'Effort',
     },
-    ...TIERS.map((t) => h('option', { value: t }, t)),
+    ...TIERS.map((t) =>
+      h('option', { value: t }, `${TIER_NAME[t]} ${Math.round(CFG.tierFactor[t] * 100)}%`),
+    ),
   )
   tierSel.value = tier
   const pauseBtn = h('button', { onclick: () => (m.close(), on.pause()) })
@@ -59,7 +60,7 @@ export function soloMenu(
   m.el.append(
     h('h2', {}, plan.name),
     modes.root,
-    h('label', { class: 'tier' }, 'Tier', tierSel),
+    h('label', { class: 'tier' }, 'Effort', tierSel),
     m.grid(
       pauseBtn,
       m.item('Skip interval', 'N', on.skip),

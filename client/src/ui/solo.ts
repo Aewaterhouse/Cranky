@@ -7,6 +7,7 @@ import { planFor, type HomeActions } from './home'
 import { planGraph } from './planGraph'
 import { mainWatts, minsLabel, planPicker, tagEls } from './planPicker'
 import { needTrainer } from './trainer'
+import { TIER_NAME } from '../types'
 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1)
 const same = (a: Block, b: Block) => JSON.stringify(a) === JSON.stringify(b)
@@ -113,7 +114,12 @@ export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
   const tierSeg = seg(
     TIERS.map((t) => [
       t,
-      h('span', {}, h('b', {}, cap(t)), h('small', {}, `${Math.round(CFG.tierFactor[t] * 100)}%`)),
+      h(
+        'span',
+        {},
+        h('b', {}, TIER_NAME[t]),
+        h('small', {}, `${Math.round(CFG.tierFactor[t] * 100)}%`),
+      ),
     ]),
     tier,
     (t) => ((tier = t), paint()),
@@ -122,7 +128,10 @@ export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
   const paint = () => {
     const plan = planFor(id, minutes)
     watts.textContent = mainWatts(plan, tier, p.ftp)
-    startLabel.replaceChildren(h('b', {}, plan.name), ` · ${minsLabel(plan.blocks)} · ${cap(tier)}`)
+    startLabel.replaceChildren(
+      h('b', {}, plan.name),
+      ` · ${minsLabel(plan.blocks)} · ${TIER_NAME[tier]} effort`,
+    )
     summary.replaceChildren(
       h('h2', { class: 'label' }, 'Your ride'),
       h(
