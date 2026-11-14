@@ -384,3 +384,18 @@ def test_no_harpoon_unless_every_rider_lands_their_sprint():
     assert snap.rb["landed"] == {"r0", "r1", "r2"}
     fx = run(room, bus, 1, i=1, ev="roadblock", bel0=1)
     assert any(f["k"] == "smash" for f in fx) and not any(f["k"] == "harpoon" for f in fx)
+
+
+def test_rolling_turns_rotate_and_a_clean_turn_gains_metres():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    fx = run(room, bus, 1)
+    assert bus.front["id"] == "r0" and [f["text"] for f in fx if f["k"] == "turn"] == ["R0, take the front."]
+    gap = bus.gap
+    fx = run(room, bus, C.FRONT_S)
+    assert bus.gap > gap
+    turn = [f for f in fx if f["k"] == "turn"]
+    assert turn[0]["id"] == "r1" and "R0 did a clean turn" in turn[0]["text"]
+    room.riders["r1"].s = 0.85
+    fx = run(room, bus, C.FRONT_S)
+    assert [f["text"] for f in fx if f["k"] == "turn"] == ["R2, take the front."]

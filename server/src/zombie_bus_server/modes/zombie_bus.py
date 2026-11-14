@@ -59,6 +59,7 @@ class ZombieBus(CrewGame):
         self.fx: list[dict] = []
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
+        self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
         self.ram = False
         self.magnet = 1.0
@@ -108,6 +109,7 @@ class ZombieBus(CrewGame):
         comp = statistics.fmean([r.s if r.s is not None else 1.0 for r in active]) if active else 0.0
         tally(active, dt)
         self.hauling(room, active, dt)
+        self.turns(room, active, ev)
         self.cadence_sync(active, dt)
 
         self.run_challenge(room, active, ev)
@@ -337,6 +339,29 @@ class ZombieBus(CrewGame):
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
+
+    def turns(self, room: Room, active: list[Rider], ev: str) -> None:
+        """Rolling turns, a team move: each rider takes the front for FRONT_S; a clean turn gains metres."""
+        if len(active) < 2 or ev in C.FELL_FREE_EVENTS:
+            self.front = None
+            return
+        f = self.front
+        r = room.riders.get(f["id"]) if f else None
+        if f and r in active and room.el - f["t"] < C.FRONT_S:
+            if r.s is not None:
+                f["s"], f["n"] = f["s"] + r.s, f["n"] + 1
+            return
+        order = sorted(a.id for a in active)
+        nxt = order[(order.index(f["id"]) + 1) % len(order)] if f and f["id"] in order else order[0]
+        name = room.riders[nxt].name
+        if f and r in active and f["n"] and f["s"] / f["n"] >= C.FRONT_CLEAN:
+            self.gap += C.FRONT_GAP
+            self.emit(
+                "turn", f"{r.name} did a clean turn on the front (+{C.FRONT_GAP} m). {name}, you're up.", nxt
+            )
+        else:
+            self.emit("turn", f"{name}, take the front.", nxt)
+        self.front = {"id": nxt, "t": room.el, "s": 0.0, "n": 0}
 
     def ask(self, room: Room, r: Rider) -> dict | None:
         """At a servo stop: which way next. Everyone votes; the most votes wins as the stop closes."""
