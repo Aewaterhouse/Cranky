@@ -296,12 +296,16 @@ export function finishRide(
             : '',
         ),
         blocksCard(s),
+        h(
+          'div',
+          { class: 'row' },
+          h('button', { class: 'ghost', onclick: () => void downloadFit(s) }, 'Download .fit'),
+          h('button', { class: 'ghost', onclick: () => downloadJson(s) }, 'Export JSON'),
+        ),
       ),
       h(
         'div',
         { class: 'row res-actions' },
-        h('button', { onclick: () => void downloadFit(s) }, 'Download .fit'),
-        h('button', { onclick: () => downloadJson(s) }, 'Export JSON'),
         group ? h('button', { onclick: () => postcard(group, s.planName) }, 'Postcard') : '',
         s.route
           ? h(
