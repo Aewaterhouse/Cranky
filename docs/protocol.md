@@ -51,7 +51,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 | `tier` | `tier` | Rider changes own tier. |
 | `data` | `p, w, cad, s` | 2 Hz. Instant power, 3 s power, cadence, compliance (0..1 or null). |
 | `sprint` | `blk, dur, avg, pct, grade, combo` | Sent once when a sprint block ends; graded client-side. |
-| `buy` | `item` | `plating`, `repellent` or `sync`. Only at a Servo Stop, paid from the bus scrap tin (40, 60, 50). |
+| `buy` | `item` | `plating`, `repellent`, `sync`, `nitro`, `ram` or `magnet` (prices in `config.SHOP`). Only at a Servo Stop and only the three that stop offers (`bus.wares`), paid from the bus scrap tin. |
 | `ready` | `on` | A guest in the lobby is ready (or not). The lobby carries `ready` per rider (bots always true); every ride starts everyone unready. |
 | `end` | | Host only: finish the ride now. |
 

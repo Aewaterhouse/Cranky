@@ -230,7 +230,10 @@ RB_GRACE_S = 4
 COMBO_STEP = 0.25
 
 # Servo Stop session shop (costs in bus scrap)
-SHOP = {"plating": 40, "repellent": 60, "sync": 50}
+SHOP = {"plating": 40, "repellent": 60, "sync": 50, "nitro": 45, "ram": 55, "magnet": 50}
+SHOP_OFFER = 3  # each stop offers this many of SHOP, drawn at random
+RAM_MULT = 1.5  # bull-bar ram: the next roadblock takes this much more damage
+MAGNET_SCRAP = 1.5  # scrap magnet: distance scrap until the next stop
 # Route vote at each servo stop: the crew picks the next leg; damage and scrap scale until the next stop. The
 # shortcut is a coin flip worth SHORTCUT_GAP metres either way.
 LEGS = {

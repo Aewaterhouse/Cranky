@@ -180,3 +180,6 @@
     font-size: 1.15em;
   }
 }
+.sh-card[hidden] {
+  display: none;
+}

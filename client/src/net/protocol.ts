@@ -57,7 +57,7 @@ export type ClientMsg =
   | { t: 'trainers'; mode: TrainerMode }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
-export type ShopItem = 'plating' | 'repellent' | 'sync'
+export type ShopItem = 'plating' | 'repellent' | 'sync' | 'nitro' | 'ram' | 'magnet'
 export interface LobbyRider {
   id: string
   name: string
@@ -125,6 +125,8 @@ export interface BusState {
   rb: number | null
   combo: number
   shop: boolean
+  /** The three upgrades this servo stop offers. */
+  wares?: ShopItem[]
   repel: number
   syncw: number
   nitro: number

@@ -106,7 +106,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Item | What | Size |
 | --- | --- | --- |
 | ✅ Route vote and map | At each Servo Stop the crew votes on a branching map: short and brutal, long and easy, risky shortcut. Built as a vote card (no drawn map yet): most votes wins as the stop closes, bots vote too | M |
-| Pick-one upgrades | Roguelike choice of three random upgrades at each stop instead of a fixed shop | M |
+| ✅ Pick-one upgrades | Roguelike choice of three random upgrades at each stop instead of a fixed shop. Six in the pool (plating, repellent, sync, nitro, ram, magnet); buy as many of the three as the tin allows | M |
 | Zombie types | Runners punish slow cadence, brutes need sustained power, spitters need a sprint; each maps to a workout demand | L |
 | Boss fights | A final event per ride: a giant, a chasing road train, a collapsing bridge | L |
 | ✅ Ramp-up hill | The planned ramp event: the bus climbs out of a valley | S |

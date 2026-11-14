@@ -12,9 +12,30 @@ const ITEMS: { id: ShopItem; icon: string; name: string; desc: string; cost: num
   },
   { id: 'repellent', icon: '🧴', name: 'Horde repellent', desc: 'Cancels the next hit', cost: 60 },
   { id: 'sync', icon: '🔧', name: 'Wider sync window', desc: '+3 rpm engine tolerance', cost: 50 },
+  {
+    id: 'nitro',
+    icon: '🧨',
+    name: 'Can of nitro',
+    desc: 'Fires the nitro straight away',
+    cost: 45,
+  },
+  {
+    id: 'ram',
+    icon: '🐏',
+    name: 'Bull-bar ram',
+    desc: 'Next roadblock takes half as much again',
+    cost: 55,
+  },
+  {
+    id: 'magnet',
+    icon: '🧲',
+    name: 'Scrap magnet',
+    desc: '+50% scrap until the next stop',
+    cost: 50,
+  },
 ]
 
-/** Servo Stop shop: three upgrade cards plus a "who bought what" feed. Closes to a small bar until the next stop. */
+/** Servo Stop shop: the stop's three upgrade cards (of six) plus a "who bought what" feed. Closes to a small bar until the next stop. */
 export function makeShop(buy: (item: ShopItem) => void) {
   const scrapN = h('b', {}, '0')
   let shut = false
@@ -60,7 +81,7 @@ export function makeShop(buy: (item: ShopItem) => void) {
   root.hidden = true
   return {
     root,
-    update(open: boolean, scrap: number) {
+    update(open: boolean, scrap: number, wares?: ShopItem[]) {
       root.hidden = !open
       if (!open) {
         shut = false // the next servo stop opens it again
@@ -68,6 +89,7 @@ export function makeShop(buy: (item: ShopItem) => void) {
       }
       set(scrapN, `${scrap}`)
       for (const { it, btn, need } of cards) {
+        btn.hidden = !!wares && !wares.includes(it.id)
         btn.disabled = scrap < it.cost
         set(need, scrap < it.cost ? `need ${it.cost - scrap} more` : 'tap to buy')
       }

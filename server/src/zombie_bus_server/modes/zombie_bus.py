@@ -59,6 +59,9 @@ class ZombieBus(CrewGame):
         self.fx: list[dict] = []
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
+        self.wares: list[str] = []  # what this stop's shop offers
+        self.ram = False
+        self.magnet = 1.0
         self.road_votes: dict[str, str] = {}  # the next leg, voted at the servo
         self.leg: dict = {}  # the leg the crew picked: damage and scrap multipliers until the next stop
         self.repel = 0
@@ -115,7 +118,14 @@ class ZombieBus(CrewGame):
         self.gap += C.NITRO_GAP * dt if boost else 0
         self.speed *= C.LIMP_MULT if self.armour <= 0 else 1
         self.dist += self.speed * dt
-        self.scrap += self.speed * dt * C.SCRAP_PER_M * self.mut.get("scrap", 1) * self.leg.get("scrap", 1)
+        self.scrap += (
+            self.speed
+            * dt
+            * C.SCRAP_PER_M
+            * self.mut.get("scrap", 1)
+            * self.leg.get("scrap", 1)
+            * self.magnet
+        )
         neutral = C.NEUTRAL[ev]
         if ev == "longhaul":
             neutral += min(C.LONGHAUL_CREEP_MAX, C.LONGHAUL_CREEP * bel / 60)
@@ -232,6 +242,10 @@ class ZombieBus(CrewGame):
             self.shopped = False
             rng = random.Random(f"{room.code}:{i}")
             self.road_votes = {r.id: rng.choice(list(C.LEGS)) for r in room.riders.values() if r.bot}
+            self.wares, self.magnet = (
+                sorted(rng.sample(sorted(C.SHOP), C.SHOP_OFFER), key=list(C.SHOP).index),
+                1.0,
+            )
             self.emit("servo", f"Servo stop! {int(self.scrap)} scrap in the tin. Shop's open.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
@@ -359,17 +373,21 @@ class ZombieBus(CrewGame):
         """Nobody bought at the stop: the tin buys what helps most, so nobody lets go of the bars."""
         if self.shopped:
             return
-        order = (
-            ["plating", "repellent", "sync"] if self.armour < C.AUTO_PLATING_UNDER else ["repellent", "sync"]
-        )
-        item = next((k for k in order if self.scrap >= C.SHOP[k]), None)
+        order = ["plating"] * (self.armour < C.AUTO_PLATING_UNDER) + [
+            "repellent",
+            "ram",
+            "nitro",
+            "sync",
+            "magnet",
+        ]
+        item = next((k for k in order if k in self.wares and self.scrap >= C.SHOP[k]), None)
         if item:
             self.buy(None, item)
 
     def buy(self, r: Rider | None, item: str) -> None:
         """Servo Stop shop: session-only upgrades paid from the bus scrap tin (no rider: the servo picked)."""
         cost = C.SHOP[item]
-        if self.ev != "servo" or self.scrap < cost or self.mut.get("no_shop"):
+        if self.ev != "servo" or item not in self.wares or self.scrap < cost or self.mut.get("no_shop"):
             return
         self.scrap -= cost
         self.shopped = True
@@ -380,6 +398,15 @@ class ZombieBus(CrewGame):
         elif item == "repellent":
             self.repel += 1
             text = f"{name} bought horde repellent (one free fail)"
+        elif item == "nitro":
+            self.nitro = 1.0
+            text = f"{name} poured a can of nitro in the tank"
+        elif item == "ram":
+            self.ram = True
+            text = f"{name} welded on a ram: the next roadblock takes half as much again"
+        elif item == "magnet":
+            self.magnet = C.MAGNET_SCRAP
+            text = f"{name} hung a scrap magnet off the back: more scrap until the next stop"
         else:
             self.syncw += C.SYNC_WIDEN_RPM
             text = f"{name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"
@@ -394,7 +421,7 @@ class ZombieBus(CrewGame):
         rb["reported"].add(r.id)
         mult = 1 + C.COMBO_STEP * max(0, combo - 1)
         self.combo = max(self.combo, combo)
-        dmg = C.RB_DAMAGE[grade] * mult
+        dmg = C.RB_DAMAGE[grade] * mult * (C.RAM_MULT if self.ram else 1)
         rb["dmg"] += dmg
         r.rb_dmg += dmg
         self.scrap += C.RB_SCRAP[grade] * mult
@@ -409,7 +436,7 @@ class ZombieBus(CrewGame):
             self.emit("sprint", f"{r.name}: {grade}{combo_txt}", r.id)
 
     def resolve_roadblock(self) -> None:
-        rb, self.rb = self.rb, None
+        rb, self.rb, self.ram = self.rb, None, False
         assert rb
         if rb["dmg"] >= rb["hp"]:
             self.scrap += C.RB_SMASH_SCRAP
@@ -438,6 +465,7 @@ class ZombieBus(CrewGame):
             "nitro": round(self.nitro, 2),
             "boost": room.el < self.nitro_until,
             "shop": self.ev == "servo" and not self.mut.get("no_shop"),
+            "wares": self.wares,
             "repel": self.repel,
             "syncw": self.syncw,
             "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),

@@ -109,7 +109,7 @@ def test_servo_shop_upgrades():
     bus.buy(r0, "plating")
     assert bus.armour == 50, "shop is closed outside servo stops"
     run(room, bus, 1, ev="servo")
-    bus.scrap = 500
+    bus.scrap, bus.wares = 500, list(C.SHOP)
     bus.buy(r0, "plating")
     bus.buy(r0, "repellent")
     bus.buy(r0, "sync")
@@ -302,7 +302,7 @@ def test_a_servo_stop_where_nobody_buys_picks_for_the_crew():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0)
     run(room, bus, 1, ev="servo")
-    bus.scrap, bus.armour = 100, 50
+    bus.scrap, bus.armour, bus.wares = 100, 50, list(C.SHOP)
     fx = run(room, bus, 1, ev="longhaul")
     assert bus.armour == 50 + C.PLATING_ARMOUR and bus.scrap < 100 - C.SHOP["plating"] + 5
     assert any(f["k"] == "buy" and f["id"] is None and "servo" in f["text"] for f in fx)
@@ -343,3 +343,20 @@ def test_the_shortcut_moves_the_horde_one_way_or_the_other():
     gap = bus.gap
     run(room, bus, 0.5, ev="longhaul")
     assert abs(abs(bus.gap - gap) - C.SHORTCUT_GAP) < 3
+
+
+def test_each_stop_offers_three_upgrades_and_only_those_sell():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, i=0)
+    run(room, bus, 1, ev="servo")
+    assert len(bus.wares) == C.SHOP_OFFER and set(bus.wares) <= set(C.SHOP)
+    assert bus.state(room, 1, 0)["wares"] == bus.wares
+    off = next(k for k in C.SHOP if k not in bus.wares)
+    bus.scrap = 500
+    bus.buy(room.riders["r0"], off)
+    assert bus.scrap == 500
+    bus.wares = ["nitro", "ram", "magnet"]
+    for k in bus.wares:
+        bus.buy(room.riders["r0"], k)
+    assert bus.nitro == 1.0 and bus.ram and bus.magnet == C.MAGNET_SCRAP

@@ -121,7 +121,7 @@ class Ready(BaseModel):
 
 class Buy(BaseModel):
     t: Literal["buy"]
-    item: Literal["plating", "repellent", "sync"]
+    item: Literal["plating", "repellent", "sync", "nitro", "ram", "magnet"]
 
 
 class Act(BaseModel):

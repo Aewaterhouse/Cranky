@@ -261,7 +261,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m, meId)
       cues.tick(m)
-      shop.update(m.bus.shop, m.bus.scrap)
+      shop.update(m.bus.shop, m.bus.scrap, m.bus.wares)
       for (const fx of m.fx) {
         if (fx.id !== meId || fx.k === 'fell')
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
