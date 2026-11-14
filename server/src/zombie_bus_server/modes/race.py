@@ -45,7 +45,11 @@ class Race(Rules):
         home = sum(m.fin is not None for m in sim.movers.values())
         late = sim.first_fin is not None and sim.el - sim.first_fin > C.RACE_GRACE_S
         full = home >= min(C.RACE_PODIUM, len(sim.movers))
-        return late or (bool(humans) and full and all(m.fin is not None for m in humans))
+        # Every rider still here gets to the line: no DNF because a bot won. Once the humans are home,
+        # wait for the podium to fill (or the grace to run out); with nobody left, it is over.
+        if not humans:
+            return True
+        return all(m.fin is not None for m in humans) and (full or late)
 
     def results(self, sim: RoadSim) -> list[dict]:
         rows = super().results(sim)

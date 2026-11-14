@@ -348,3 +348,4 @@ EFFORT_MAX_S = 24 * 3600
 EFFORT_TRACE_MAX = 6000
 EFFORT_BATCH_MAX = 500
 LEADERBOARD_ROWS = 10
+ROAD_BOT_FORM = (0.94, 1.06)  # a road bot's form on the day, drawn once per ride

@@ -193,3 +193,17 @@ def test_four_riders_crit_with_bots():
     s = room.summary
     assert s["game"] == "crit" and s["award"]["kind"] == "prime" and len(s["podium"]) == 3
     assert sum(r["prime"] for r in s["riders"]) == 1
+
+
+def test_a_slow_human_is_not_cut_off_when_the_bots_finish():
+    sim = racers("race", 1)
+    for m in list(sim.movers.values())[:3]:
+        m.bot = True
+    slow = sim.movers["r3"]
+    slow.p = 0  # stopped until well after the grace
+    while sim.first_fin is None or sim.el - sim.first_fin <= C.RACE_GRACE_S + 5:
+        sim.step(DT)
+    assert slow.fin is None and not sim.rules.over(sim)  # well past the grace, still racing
+    slow.p = 250
+    race_out(sim)
+    assert slow.fin is not None

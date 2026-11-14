@@ -61,13 +61,19 @@ def bot_power(kind: str, ftp: float, sim: RoadSim, m: Mover, rng: random.Random)
     return ftp * f * rng.uniform(1 - C.ROAD_BOT_JITTER, 1 + C.ROAD_BOT_JITTER)
 
 
+forms: dict[str, float] = {}
+
+
 def drive(room: RoadRoom, rngs: dict[str, random.Random]) -> None:
     """Sets every bot's power, cadence and a faked heart rate for this tick."""
     sim = room.sim
     for r in room.riders.values():
         if r.bot and sim and sim.el > 0:
             rng = rngs.setdefault(r.id, random.Random(f"{room.code}:{r.id}"))
-            r.p = r.w = bot_power(BOTS[r.id][1], r.ftp, sim, sim.movers[r.id], rng)
+            # Form on the day, drawn once per ride: bots split up, and no two rides in a room play out the same.
+            key = f"{r.id}:form:{id(sim)}"
+            form = forms.setdefault(key, random.Random(key + room.code).uniform(*C.ROAD_BOT_FORM))
+            r.p = r.w = form * bot_power(BOTS[r.id][1], r.ftp, sim, sim.movers[r.id], rng)
             r.cad = C.ROAD_BOT_CAD + rng.uniform(-C.BOT_CAD_JITTER, C.BOT_CAD_JITTER)
             frac = min(1.0, C.BOT_HR_REST + (C.BOT_HR_AT_FTP - C.BOT_HR_REST) * r.p / max(1, r.ftp))
             r.hr = round(frac * C.BOT_HR_MAX)
