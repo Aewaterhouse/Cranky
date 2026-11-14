@@ -68,6 +68,6 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     panel: makeWatchPanel,
     scene: (m) => ({ game: m.game, el: m.el }) as Partial<SceneState>,
     world: (stage, say, act) =>
-      videoStage(stage, say, (vid, t) => act('title', `${vid}${t}`.slice(0, 64))),
+      videoStage(stage, say, (vid, t) => act('title', `${vid}\t${t}`.slice(0, 300))),
   },
 }

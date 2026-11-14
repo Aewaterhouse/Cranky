@@ -347,3 +347,4 @@ Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
 - A video whose owner blocks embedding shows a toast saying so. An ad on one rider's video holds only that rider's video; it jumps to the room's spot when the ad ends.
 - `/watch-dev.html` has two players on one clock with play, pause, +30 s and load.
 - Volume dip: in a watch party with sound on, the video goes quiet for the five seconds before each change of target (the 5, 4, 3, 2, 1 beeps) and comes back after. Not yet checked by ear.
+- Other sources: paste a Twitch channel link (twitch.tv/name) or a link to a video file (.mp4, .webm). Twitch shows the live stream with no syncing; a file plays in step like YouTube. Checked in headless Chromium with a Wikimedia WebM and Twitch's gcn channel.

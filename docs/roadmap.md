@@ -136,7 +136,7 @@ A shared room where the crew does the same ERG workout while watching the same v
 | ✅ Crew strip | Small row of everyone's watts, compliance and heart rate, plus emoji reactions over the video | S |
 | ✅ Pause rules | Workout pause and video pause are linked: if the host pauses, both stop for everyone | S |
 | ✅ Workout-aware video | Optional: dip the video volume and flash the strip a few seconds before each interval change | S |
-| Other sources | Twitch streams and direct video links, where they can be embedded | M |
+| ✅ Other sources | Twitch streams and direct video links, where they can be embedded | M |
 
 Notes: YouTube's embedded player supports synced control and is the safe starting point. Netflix and other paid services block embedding, so they are out. Each rider needs a device that can show video and pair the trainer, or use the second-screen mode.
 

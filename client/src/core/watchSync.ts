@@ -59,3 +59,36 @@ export function videoId(text: string): string | null {
     return null
   }
 }
+
+/**
+ * What a watch party can show from a pasted link: a YouTube video id, `tw:<channel>` for a Twitch stream (live, so
+ * nobody syncs it) or `url:<link>` for a video file on the web. Null when it is none of these.
+ */
+export function videoSource(text: string): string | null {
+  const yt = videoId(text)
+  if (yt) return yt
+  try {
+    const u = new URL(text.trim())
+    if (/(^|\.)twitch\.tv$/.test(u.hostname)) {
+      const ch = u.pathname.split('/')[1]
+      return /^\w{3,25}$/.test(ch ?? '') ? `tw:${ch}` : null
+    }
+    if (
+      u.protocol === 'https:' &&
+      /\.(mp4|webm|ogv|mov)$/i.test(u.pathname) &&
+      u.href.length <= 250
+    )
+      return `url:${u.href}`
+  } catch {
+    /* not a link */
+  }
+  return null
+}
+
+/** A short name for a source until its title is known. */
+export const sourceName = (src: string) =>
+  src.startsWith('tw:')
+    ? `📡 ${src.slice(3)} on Twitch`
+    : src.startsWith('url:')
+      ? decodeURIComponent(src.split('/').pop() ?? src)
+      : src

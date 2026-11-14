@@ -75,8 +75,8 @@ def test_a_player_names_the_video_for_everyone():
     room, w, host, guest = party()
     for v in (VID, VID2):
         w.on_act(room, guest, "add", v)
-    w.on_act(room, guest, "title", f"{VID}Big Buck Bunny")
-    w.on_act(room, guest, "title", f"{VID2}Never Gonna Give You Up")
+    w.on_act(room, guest, "title", f"{VID}\tBig Buck Bunny")
+    w.on_act(room, guest, "title", f"{VID2}\tNever Gonna Give You Up")
     assert w.game(room, 1, 0)["title"] == "Big Buck Bunny"
     w.on_act(room, host, "next", None)
     assert w.game(room, 1, 0)["title"] == "Never Gonna Give You Up"
@@ -113,3 +113,10 @@ def test_the_driver_reorders_and_drops_queued_videos_and_anyone_reacts():
     w.on_act(room, guest, "emoji", "not an emoji")
     fx = w.tick(room, 0.5, 1, 0, "longhaul")
     assert [(f["k"], f["text"], f["id"]) for f in fx if f["k"] == "emoji"] == [("emoji", "🔥", guest.id)]
+
+
+def test_twitch_channels_and_video_files_queue_like_videos():
+    room, w, host, guest = party()
+    for v in ("tw:gcn", "url:https://example.com/ride.mp4", "tw:x", "url:http://example.com/a.mp4"):
+        w.on_act(room, guest, "add", v)
+    assert w.vid == "tw:gcn" and [q["vid"] for q in w.queue] == ["url:https://example.com/ride.mp4"]

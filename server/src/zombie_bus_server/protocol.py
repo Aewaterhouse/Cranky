@@ -121,7 +121,9 @@ class Act(BaseModel):
 
     t: Literal["act"]
     k: str = Field(min_length=1, max_length=24, pattern=r"^[a-z0-9_]+$")
-    v: bool | int | float | Annotated[str, Field(max_length=64)] | None = None
+    v: bool | int | float | Annotated[str, Field(max_length=300)] | None = (
+        None  # long enough for a video link
+    )
 
 
 ClientMsg = TypeAdapter(

@@ -56,3 +56,18 @@ describe('watch party sync', () => {
     expect(videoId('not a link')).toBeNull()
   })
 })
+
+describe('watch party sources', () => {
+  it('takes YouTube, Twitch channels and video files', async () => {
+    const { videoSource, sourceName } = await import('../src/core/watchSync')
+    expect(videoSource('https://youtu.be/dQw4w9WgXcQ')).toBe('dQw4w9WgXcQ')
+    expect(videoSource('https://www.twitch.tv/gcn')).toBe('tw:gcn')
+    expect(videoSource('https://example.com/rides/stage%203.mp4')).toBe(
+      'url:https://example.com/rides/stage%203.mp4',
+    )
+    expect(videoSource('http://example.com/a.mp4')).toBeNull()
+    expect(videoSource('https://example.com/page.html')).toBeNull()
+    expect(sourceName('tw:gcn')).toBe('📡 gcn on Twitch')
+    expect(sourceName('url:https://example.com/rides/stage%203.mp4')).toBe('stage 3.mp4')
+  })
+})

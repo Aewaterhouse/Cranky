@@ -158,7 +158,7 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
 
 ## Phase 5: Watch party (owner, 2026-11-14; after Climate Lawsuit)
 
-*Built 2026-11-14 as a crew game (`watch`): the room, synced playback and the layout from roadmap section 6, plus adding and skipping videos. Tried for real in headless Chromium with a YouTube video on ERG. Still to do from the roadmap: YouTube playlist links, other sources. A video's title shows once a player has loaded it (queued videos show their id until then).*
+*Built 2026-11-14 as a crew game (`watch`): the room, synced playback and the layout from roadmap section 6, plus adding and skipping videos. Tried for real in headless Chromium with a YouTube video on ERG. Still to do from the roadmap: YouTube playlist links. A video's title shows once a player has loaded it (queued videos show their id until then).*
 
 Build the items in `docs/roadmap.md` section 6 in their order: a room joined by code where the host picks a workout
 and a YouTube video or playlist, everyone's ERG follows the shared workout clock, and playback stays in step.

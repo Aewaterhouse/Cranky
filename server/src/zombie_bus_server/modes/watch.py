@@ -16,7 +16,8 @@ if TYPE_CHECKING:
     from ..rider import Rider
     from ..session import Room
 
-VID = re.compile(r"^[\w-]{11}$")
+# A YouTube id, a Twitch channel or a video file on the web (see `videoSource` in the client).
+VID = re.compile(r"^([\w-]{11}|tw:\w{3,25}|url:https://\S{8,250})$")
 
 
 class Watch(CrewGame):
@@ -54,9 +55,10 @@ class Watch(CrewGame):
                 self.queue.append({"vid": v, "title": None, "by": r.name})
                 self.emit("say", f"{r.name} queued a video.")
             return
-        if k == "title" and isinstance(v, str) and len(v) > 11:
-            # A player names the video it loaded: the 11-character id, then the title.
-            vid, title = v[:11], v[11:].strip()
+        if k == "title" and isinstance(v, str) and "\t" in v:
+            # A player names the video it loaded: the source, a tab, then the title.
+            vid, title = v.split("\t", 1)
+            title = title.strip()[:120]
             if vid == self.vid:
                 self.title = title
             for q in self.queue:

@@ -1,5 +1,5 @@
 import '../hudWatch.css'
-import { videoId } from '../core/watchSync'
+import { sourceName, videoSource } from '../core/watchSync'
 import type { Tick, WatchState } from '../net/protocol'
 import { h } from './dom'
 import type { GamePanel } from './hudOpts'
@@ -13,13 +13,13 @@ export function makeWatchPanel(
   const now = h('div', { class: 'wp-now' })
   const queue = h('div', { class: 'dt-table' })
   const input = h('input', {
-    placeholder: 'Paste a YouTube link',
+    placeholder: 'Paste a YouTube or Twitch link',
     class: 'wp-in',
   }) as HTMLInputElement
   const note = h('small', { class: 'wp-note' })
   const add = () => {
-    const v = videoId(input.value)
-    set(note, v ? 'Added.' : 'That doesn’t look like a YouTube link.')
+    const v = videoSource(input.value)
+    set(note, v ? 'Added.' : 'Paste a YouTube or Twitch link, or a link to a video file.')
     if (v) {
       act('add', v)
       input.value = ''
@@ -63,7 +63,7 @@ export function makeWatchPanel(
       set(
         now,
         g.vid
-          ? `${g.playing ? '▶' : '⏸'} ${g.title ?? g.vid}`
+          ? `${g.playing ? '▶' : '⏸'} ${g.title ?? sourceName(g.vid)}`
           : 'Nothing on. Paste a link to start the show.',
       )
       remote.hidden = !host()
@@ -79,7 +79,7 @@ export function makeWatchPanel(
               h(
                 'div',
                 { class: 'dt-row wp-q' },
-                h('span', {}, `${n + 1}. ${q.title ?? q.vid}`),
+                h('span', {}, `${n + 1}. ${q.title ?? sourceName(q.vid)}`),
                 host()
                   ? h(
                       'span',

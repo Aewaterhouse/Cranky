@@ -133,7 +133,7 @@ def test_a_games_question_rides_in_that_riders_tick_only(monkeypatch):
 
 
 @pytest.mark.parametrize(
-    "bad", [{"k": "Bad Key"}, {"k": ""}, {"k": "x", "v": "y" * 65}, {"k": "x", "v": [1]}]
+    "bad", [{"k": "Bad Key"}, {"k": ""}, {"k": "x", "v": "y" * 301}, {"k": "x", "v": [1]}]
 )
 def test_act_is_validated(monkeypatch, bad):
     async def main():

@@ -82,3 +82,15 @@
     opacity: 0;
   }
 }
+.video-stage > div {
+  position: absolute;
+  inset: 0;
+}
+.video-stage > div[hidden] {
+  display: none;
+}
+.video-stage video {
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
