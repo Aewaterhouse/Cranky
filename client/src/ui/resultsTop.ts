@@ -30,10 +30,14 @@ export function scoreContext(me: string, g: GroupSummary) {
   } catch {
     /* none kept */
   }
-  localStorage.setItem(
-    key,
-    JSON.stringify({ best: Math.max(was?.best ?? 0, g.score), last: g.score }),
-  )
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify({ best: Math.max(was?.best ?? 0, g.score), last: g.score }),
+    )
+  } catch {
+    /* storage blocked: the score still shows */
+  }
   if (!was) return 'Your first go. Beat it next time.'
   if (g.score > was.best) return `New best! Up from ${was.best.toLocaleString()}.`
   return `Your best ${was.best.toLocaleString()} · last time ${was.last.toLocaleString()}`
