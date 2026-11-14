@@ -105,3 +105,32 @@ CHAT_OPEN = "📱 The group chat has leaked."
 CHAT_EMOJI = "Date {n} · {a} → {b}: {e}"
 CHAT_QUIET = "{a} sent nothing all night. Strong, silent, or asleep."
 CHAT_MATCH = "Aunty Carol: {a} and {b} on date {n}. I nearly cried."
+CARDS = {
+    "ex": "surge to 110%! Will your date follow?",
+    "check": "easy to 55%. Somebody has to pay.",
+    "ring": "both of you to 100%. Now.",
+}
+AUNTY = "Aunty Carol"
+CARD_FX = '{by} plays "{card}"! {who}: {text}'
+CHAT_CARD = '{by}: I played "{card}" on {who}. No regrets.'
+CARD_ASK = "Play a card"
+CARD_SUB = "{n} left this date. You bank whatever the couple drops."
+AIM_ASK = '"{card}": who gets it?'
+PROFILE_ASK = "Pick your dating profile"
+PROFILE_SUB = "Your dates will see it."
+CONFETTI = "Confetti! Guests: 100% for ten seconds."
+ENGAGED = "{a} and {b} are engaged! {c} and {d} will always have Ikea."
+ENGAGED_SOLO = "{a} and {b} are engaged! Nobody else was close."
+MARRIED = "{a} and {b} are married. They held the tandem {pct}% of the time."
+DIVORCED = "{w} keeps the house. {l} keeps the tandem."
+RIDE_OFF = "The Proposal: {a} + {b} against {c} + {d}. Sweet spot. Best match gets the ring."
+FLAGS = {
+    "ahead": "Always half a wheel ahead",
+    "behind": "Sits on and lets their date do the work",
+    "out": "Left the band for {n} s",
+    "slow": "Slow to react ({n} s)",
+    "read": "Left everyone on read",
+    "turtle": "Called {n} dates slow",
+    "target": "The Chaperone's favourite",
+    "cold": "Does not play well with others",
+}

@@ -12,6 +12,9 @@ from .. import config_games as G
 from . import dating_text as T
 from . import script
 from .common import Band, CrewGame, tally
+from .dating_finale import Finale
+from .dating_match import Matching, key, match, prompts, rounds
+from .dating_social import Social
 from .dating_view import DateView
 from .script import Seg
 
@@ -23,57 +26,10 @@ THEMES = G.DATE_THEMES
 FIXED = {"bar": G.DATE_BAR, "gap": G.DATE_GAP, "cool": G.DATE_COOL}
 
 
-def key(a: str, b: str) -> str:
-    """A couple's name in the books, whichever way round they are."""
-    return "|".join(sorted((a, b)))
+__all__ = ["Dating", "key", "match", "prompts", "rounds"]
 
 
-def rounds(ids: list[str], n: int) -> list[dict]:
-    """Round-robin couples for `n` dates. With an odd number one rider per date is the Chaperone, in turn.
-
-    Returns:
-        One `{"pairs": [[a, b], ...], "chap": id | None}` per date.
-    """
-    ring: list[str | None] = [*ids, *([None] if len(ids) % 2 else [])]
-    out = []
-    for _ in range(n):
-        pairs, chap = [], None
-        for j in range(len(ring) // 2):
-            a, b = ring[j], ring[-1 - j]
-            if a is None or b is None:
-                chap = a or b
-            else:
-                pairs.append([a, b])
-        out.append({"pairs": pairs, "chap": chap})
-        ring = [ring[0], ring[-1], *ring[1:-1]]
-    return out
-
-
-def match(pa: float, pb: float, ba: tuple[float, float], bb: tuple[float, float]) -> float:
-    """How well two riders match, 0 to 1, from their shares of FTP. Nothing unless both are in their band."""
-    tol = G.DATE_BAND_TOL
-    if not (ba[0] - tol <= pa <= ba[1] + tol and bb[0] - tol <= pb <= bb[1] + tol):
-        return 0.0
-    full, none = G.DATE_MATCH_FULL, G.DATE_MATCH_NONE
-    return min(1.0, max(0.0, (none - abs(pa - pb)) / (none - full)))
-
-
-def prompts(theme: str, rng: random.Random) -> list[dict]:
-    """A date's prompts (surges, efforts, the sprint) as `{"t", "secs", "k", "band"}`, `t` seconds in."""
-    p = THEMES[theme].get("prompt")
-    if not p:
-        return []
-    if "at" in p:
-        at = list(p["at"])
-    elif "every" in p:
-        slack = p["every"] - p["secs"] - 4
-        at = [w + rng.uniform(4, slack) for w in range(0, G.DATE_DATE_S, p["every"])]
-    else:
-        at = sorted(rng.uniform(30, G.DATE_DATE_S - 30 - p["secs"]) for _ in range(p["n"]))
-    return [{"t": round(t, 1), "secs": p["secs"], "k": p["k"], "band": p["band"]} for t in at]
-
-
-class Dating(DateView, CrewGame):
+class Dating(Social, Finale, Matching, DateView, CrewGame):
     """One night. `pairs` are the couples riding together right now; `rounds` is who dates whom, when."""
 
     no_erg = True
@@ -94,8 +50,16 @@ class Dating(DateView, CrewGame):
         self.emoji_left: dict[str, int] = {}
         self.said: dict[str, list] = {}
         self.card: dict | None = None
+        self.used: dict[str, list[str]] = {}  # cards each Chaperone has played on this date
+        self.pick: str | None = None  # the card the Chaperone is aiming
+        self.chap_pts: dict[str, float] = {}  # points each Chaperone has cost the couples
+        self.picked: list[str] = []
+        self.prof_opts: dict[str, list[str]] = {}
+        self.met: dict[str, int] = {}  # dates each couple has had
+        self.date_end = 0.0
         self.chat_log: list[str] = []
         self.chat: list[str] = []
+        self.finale_init()
 
     @classmethod
     def deal(cls, minutes: int) -> dict:
@@ -148,9 +112,6 @@ class Dating(DateView, CrewGame):
     def rng(self, *tag: object) -> random.Random:
         return random.Random(f"{self.seed}:{tag}")
 
-    def meet(self, room: Room) -> None:
-        """Hook: the bar opens (profiles are dealt here)."""
-
     # --- the script -------------------------------------------------------------------------------------
 
     def sync(self, room: Room, i: int) -> None:
@@ -176,7 +137,8 @@ class Dating(DateView, CrewGame):
         self.n, self.pairs, self.chap = n, [list(p) for p in rnd["pairs"]], rnd["chap"]
         self.match = {key(a, b): 0.0 for a, b in self.pairs}
         self.pts = {key(a, b): 0.0 for a, b in self.pairs}
-        self.spark, self.card = {}, None
+        self.spark, self.card, self.used, self.pick = {}, None, {}, None
+        self.emoji_left = {x: G.DATE_EMOJI_N for p in self.pairs for x in p}
 
     def start_date(self, room: Room, b: dict, start: float) -> None:
         k = room.plan.get("scale", 1.0)
@@ -184,18 +146,10 @@ class Dating(DateView, CrewGame):
             {**p, "t": start + p["t"] * k, "end": start + (p["t"] + p["secs"]) * k, "done": False}
             for p in prompts(b["theme"], self.rng("prompts", b["n"]))
         ]
-        self.reacts = {}
+        self.reacts, self.date_end = {}, start + b["dur"]
+        for a, c in self.pairs:
+            self.met[key(a, c)] = self.met.get(key(a, c), 0) + 1
         self.emit("say", f"Date {b['n']}: {THEMES[b['theme']]['name']}. {T.THEME_TEXT[b['theme']]}")
-
-    def open(self, room: Room, b: dict, start: float) -> None:
-        """Hook: a block that is not a date or the walk to one begins."""
-        self.pairs, self.chap, self.match, self.pts = [], None, {}, {}
-
-    def close(self, room: Room, b: dict) -> None:
-        """Hook: a block ends."""
-        if b["kind"] == "date":
-            for p in self.prompts:
-                self.settle(room, p)
 
     def phase(self, room: Room, i: int) -> str:
         return room.plan["blocks"][i]["kind"]
@@ -226,16 +180,9 @@ class Dating(DateView, CrewGame):
             return self.card_band(room, r, self.date_band(room, r, b))
         return FIXED.get(b["kind"]) or self.finale_band(room, r, b)
 
-    def card_band(self, room: Room, r: Rider, band: Band) -> Band:
-        """Hook: what a Chaperone's card does to a dater's band."""
-        return band
-
-    def finale_band(self, room: Room, r: Rider, b: dict) -> Band:
-        """Hook: bands for the proposal, wedding and divorce."""
-        return G.DATE_BAR
-
     def say(self, room: Room, b: dict) -> None:
-        lines = T.DATE[b["theme"]] if b["kind"] == "date" else getattr(T, b["kind"].upper())
+        kind = "reception" if b["kind"] == "divorce" and not self.exes else b["kind"]
+        lines = T.DATE[b["theme"]] if kind == "date" else getattr(T, kind.upper())
         self.emit("say", self.rng("say", round(room.el)).choice(lines))
 
     # --- one tick ---------------------------------------------------------------------------------------
@@ -253,83 +200,6 @@ class Dating(DateView, CrewGame):
         if b["kind"] == "date":
             self.react(room, act)
             self.score(room, self.pairs, dt, i, bel, self.table)
-        self.extra_tick(room, act, dt, i, bel)
+        self.social_tick(room, act, dt)
+        self.finale_tick(room, act, dt, i, bel)
         return super().tick(room, dt, i, bel, ev)
-
-    def on_event(self, room: Room, b: dict, e: dict) -> None:
-        """Hook: a scripted card or confetti moment."""
-
-    def extra_tick(self, room: Room, act: list[Rider], dt: float, i: int, bel: float) -> None:
-        """Hook: cards, bots' emoji and the finale."""
-
-    def score(
-        self, room: Room, pairs: list[list[str]], dt: float, i: int, bel: float, book: dict[str, float]
-    ) -> None:
-        """Scores each couple for this tick into `book` and keeps the numbers for the report."""
-        k, secs = room.plan.get("scale", 1.0), dt / room.plan.get("scale", 1.0)
-        a_ = min(1.0, dt / max(dt, G.DATE_SMOOTH_S * k))
-        for a, b in pairs:
-            ra, rb, kk = room.riders.get(a), room.riders.get(b), key(a, b)
-            if not ra or not rb or ra.st != "riding" or rb.st != "riding":
-                self.match[kk] = self.match.get(kk, 0.0) * (1 - a_)
-                continue
-            ba, bb = self.band(room, ra, i, bel), self.band(room, rb, i, bel)
-            if isinstance(ba, str) or isinstance(bb, str) or ba is None or bb is None:
-                continue
-            pa, pb = ra.w / ra.ftp, rb.w / rb.ftp
-            m = match(pa, pb, ba, bb)
-            self.match[kk] = self.match.get(kk, 0.0) + (m - self.match.get(kk, 0.0)) * a_
-            gain = m * G.DATE_PTS_S * secs
-            self.pts[kk] = self.pts.get(kk, 0.0) + gain
-            book[kk] = book.get(kk, 0.0) + gain
-            self.lost(kk, G.DATE_PTS_S * secs - gain)
-            for r, o, p, q, band in ((ra, rb, pa, pb, ba), (rb, ra, pb, pa, bb)):
-                st = self.stats.setdefault(r.id, self.blank())
-                st["m"], st["n"], st["lead"] = st["m"] + m, st["n"] + 1, st["lead"] + (p > q)
-                st["out"] += secs * (not band[0] - G.DATE_BAND_TOL <= p <= band[1] + G.DATE_BAND_TOL)
-                by = st["by"].setdefault(o.id, [0.0, 0])
-                by[0], by[1] = by[0] + m, by[1] + 1
-            held = self.spark.get(kk, 0.0)
-            if held >= 0:
-                held = held + secs if self.match[kk] > G.DATE_SPARK[0] else 0.0
-                if held >= G.DATE_SPARK[1]:
-                    held = -1.0
-                    self.emit("match", f"{ra.name} and {rb.name} are in sync. Get a room.", a)
-                    self.chat_log.append(T.CHAT_MATCH.format(a=ra.name, b=rb.name, n=self.n))
-                self.spark[kk] = held
-
-    def lost(self, kk: str, pts: float) -> None:
-        """Hook: points a couple dropped this tick (a Chaperone's card banks them)."""
-
-    def react(self, room: Room, act: list[Rider]) -> None:
-        """Notes when each dater first answers the prompt that is on, and settles prompts that have ended."""
-        el = room.el
-        for n, p in enumerate(self.prompts):
-            if p["t"] <= el < p["end"]:
-                at = G.DATE_SPRINT_AT if isinstance(p["band"], str) else p["band"][0] - G.DATE_REACT_UNDER
-                if str(n) not in self.reacts:
-                    self.reacts[str(n)] = {}
-                    self.emit("say", self.rng("prompt", n, self.n).choice(T.PROMPT_TEXT[p["k"]]))
-                seen = self.reacts[str(n)]
-                for r in act:
-                    if r.id not in seen and self.partner(r.id) and r.p / r.ftp >= at:
-                        seen[r.id] = el
-            elif el >= p["end"]:
-                self.settle(room, p)
-
-    def settle(self, room: Room, p: dict) -> None:
-        """Pays each couple for reacting to a prompt together: full marks at the same instant."""
-        if p["done"]:
-            return
-        p["done"] = True
-        seen, k = self.reacts.get(str(self.prompts.index(p)), {}), room.plan.get("scale", 1.0)
-        for a, b in self.pairs:
-            if a not in seen or b not in seen:
-                continue
-            gap, kk = abs(seen[a] - seen[b]) / k, key(a, b)
-            gain = G.DATE_REACT_PTS * max(0.0, 1 - gap / G.DATE_REACT_MAX_S)
-            self.pts[kk] = self.pts.get(kk, 0.0) + gain
-            self.table[kk] = self.table.get(kk, 0.0) + gain
-            for rid in (a, b):
-                st = self.stats.setdefault(rid, self.blank())
-                st["gap"], st["gaps"] = st["gap"] + gap, st["gaps"] + 1

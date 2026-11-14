@@ -20,6 +20,17 @@ def format_summary(plan_name: str, s: dict) -> str:
                 f"Pack: {crew}",
             ]
         )
+    if s.get("mode") == "date":
+        wed, div = s.get("married"), s.get("divorced")
+        return "\n".join(
+            [
+                f"💘 **Speed Dating** · chemistry **{s['score']}**",
+                *([f"💒 {wed['a']} and {wed['b']} got married"] if wed else []),
+                *([f"⚖️ {div['winner']} kept the house; {div['loser']} kept the tandem"] if div else []),
+                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
+                *(f"🚩 {r['name']}: {'; '.join(r['flags'])}" for r in s["riders"] if r.get("flags")),
+            ]
+        )
     if s.get("mode") == "ambo":
         return "\n".join(
             [

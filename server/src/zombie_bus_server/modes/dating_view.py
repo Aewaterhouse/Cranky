@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from ..session import Room
 
 THEMES = G.DATE_THEMES
-EMOJI = ["😍", "😬", "🔥", "🐢", "🚀", "🙈"]
 
 
 class DateView:
@@ -46,7 +45,7 @@ class DateView:
             "chap": self.chap,
             "card": self.card_view(room),
             "profiles": self.profiles,
-            "emoji": EMOJI,
+            "emoji": G.DATE_EMOJI,
             "emojiLeft": self.emoji_left,
             "said": self.said,
             "table": self.couples(),
@@ -54,15 +53,10 @@ class DateView:
             **self.finale_view(room),
         }
 
-    def card_view(self, room: Room) -> dict | None:
-        return None
-
-    def finale_view(self, room: Room) -> dict:
-        return {"couple": None, "exes": None, "tandem": None, "tug": None}
-
     def summary(self, room: Room) -> dict:
         rs = list(room.riders.values())
         comp = compliance(rs)
+        rows = [rider_row(r, comp, **self.report(room, r.id)) for r in rs]
         return {
             "mode": "date",
             "distance": round(self.dist),
@@ -71,20 +65,61 @@ class DateView:
             "score": round(sum(self.table.values())),
             "difficulty": "normal",
             "syncPct": 0,
-            "couples": self.couples(),
-            "riders": [rider_row(r, comp, **self.report(room, r.id)) for r in rs],
-            "awards": [],
+            "couples": [
+                {**c, "names": [self.name(room, c["a"]), self.name(room, c["b"])]} for c in self.couples()
+            ],
+            "married": self.married,
+            "divorced": self.divorced,
+            "chat": self.leak or self.leaked(room),
+            "riders": sorted(rows, key=lambda r: -r["match"]),
+            "awards": self.awards(room, rows),
         }
 
+    def awards(self, room: Room, rows: list[dict]) -> list[dict]:
+        """Best Match (a couple), Third Wheel (the costliest Chaperone) and Red Flag (the worst match)."""
+        out, best = [], self.ranked()
+        if best:
+            a, b = best[0]
+            rate = self.table.get("|".join(sorted((a, b))), 0.0) / self.met["|".join(sorted((a, b)))]
+            who = f"{self.name(room, a)} + {self.name(room, b)}"
+            out.append({"award": "Best Match", "id": a, "name": who, "why": f"{rate:.0f} points a date"})
+        chaps = {rid: p for rid, p in self.chap_pts.items() if rid in room.riders and p > 0}
+        if chaps:
+            rid = max(chaps, key=chaps.get)
+            why = f"cost the couples {chaps[rid]:.0f} points"
+            out.append({"award": "Third Wheel", "id": rid, "name": self.name(room, rid), "why": why})
+        dated = [r for r in rows if self.stats.get(r["id"], {}).get("n")]
+        if dated:
+            r = min(dated, key=lambda r: r["match"])
+            why = f"{r['match']:.0%} average match"
+            out.append({"award": "Red Flag", "id": r["id"], "name": r["name"], "why": why})
+        return out
+
     def report(self, room: Room, rid: str) -> dict:
-        """A rider's compatibility report: how well they matched, with whom, and who led."""
-        st = self.stats.get(rid) or {"m": 0.0, "n": 0, "lead": 0, "gap": 0.0, "gaps": 0, "by": {}}
-        name = lambda o: room.riders[o].name if o in room.riders else "?"  # noqa: E731
+        """A rider's compatibility report: how well they matched, with whom, who led, and their red flags."""
+        st = {**self.blank(), **(self.stats.get(rid) or {})}
         by = sorted(((s / n, o) for o, (s, n) in st["by"].items() if n), reverse=True)
+        avg = st["m"] / st["n"] if st["n"] else 0.0
+        lead = st["lead"] / st["n"] if st["n"] else 0.5
+        react = st["gap"] / st["gaps"] if st["gaps"] else None
+        turtles = st["sent"].get("🐢", 0)
+        flags = [
+            T.FLAGS["ahead"] if lead > 0.65 else T.FLAGS["behind"] if lead < 0.35 else "",
+            T.FLAGS["out"].format(n=round(st["out"])) if st["out"] >= 60 else "",
+            T.FLAGS["slow"].format(n=round(react, 1)) if react and react >= 2 else "",
+            T.FLAGS["read"] if st["n"] and not st["sent"] else "",
+            T.FLAGS["turtle"].format(n=turtles) if turtles >= 2 else "",
+            T.FLAGS["target"] if st["hit"] >= 3 else "",
+            T.FLAGS["cold"] if st["n"] and avg < 0.3 else "",
+        ]
+        mine = sum(p for kk, p in self.table.items() if rid in kk.split("|")) + self.chap_pts.get(rid, 0.0)
         return {
-            "match": round(st["m"] / st["n"], 3) if st["n"] else 0.0,
-            "best": name(by[0][1]) if by else None,
-            "worst": name(by[-1][1]) if len(by) > 1 else None,
-            "lead": round(st["lead"] / st["n"], 2) if st["n"] else 0.0,
-            "react": round(st["gap"] / st["gaps"], 1) if st["gaps"] else None,
+            "match": round(avg, 3),
+            "best": self.name(room, by[0][1]) if by else None,
+            "worst": self.name(room, by[-1][1]) if len(by) > 1 else None,
+            "lead": round(lead, 2),
+            "react": None if react is None else round(react, 1),
+            "flags": [f for f in flags if f],
+            "points": round(mine),
+            "confetti": round(self.confetti_s.get(rid, 0.0)),
         }

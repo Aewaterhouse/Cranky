@@ -156,3 +156,27 @@ DATE_REACT_UNDER = 0.03  # a rider has reacted once within this of the prompt's 
 DATE_SPRINT_AT = 1.2  # and to a sprint once over this share of FTP
 DATE_EVENT_S = {"say": 0, "card": 15, "confetti": 10}
 DATE_MS_AT_FTP = 10.0  # the pack's speed with everyone at FTP
+DATE_EMOJI = ["😍", "😬", "🔥", "🐢", "🚀", "🙈"]
+DATE_EMOJI_N = 5  # emoji a rider may send on each date
+DATE_PROFILE_S = 90  # how long into The Bar a rider may pick a profile
+# Chaperone cards: the band the target gets. `both`: it lands on the couple, not one of them.
+DATE_CARDS = {
+    "ex": {"name": "Your ex just texted", "icon": "📱", "band": (1.05, 1.15), "both": False},
+    "check": {"name": "Check's here", "icon": "🧾", "band": (0.50, 0.60), "both": False},
+    "ring": {"name": "Is that a ring?", "icon": "💍", "band": (0.95, 1.05), "both": True},
+}
+DATE_CARD_S = 15
+DATE_PROPOSAL = (0.88, 0.94)  # the two couples riding off for the ring
+DATE_TEMPO = (0.76, 0.86)  # everyone else during the proposal
+DATE_TANDEM = 0.95  # the wedding tandem's target: this share of the couple's summed FTP
+DATE_TANDEM_BAND = (0.85, 1.05)  # each of them rides in here; the sum is what is judged
+DATE_TANDEM_TOL = 0.05  # the tandem is "held" within this of its target
+DATE_GUEST = (0.55, 0.70)
+DATE_CONFETTI = (0.97, 1.05)  # guests throwing confetti
+DATE_WATCH = (0.50, 0.65)  # everyone not in the divorce
+DATE_TUG_RATE = 0.06  # rope (0 to 1) a second for each FTP of difference between the exes
+DATE_BOTS = ("clingy", "aloof", "chaotic")  # by the bot's place in BOT_NAMES
+DATE_CLING = 0.7  # how much of a clingy bot's power is copied from its date
+DATE_CHAOS = 0.12  # how far a chaotic bot wanders from its target
+DATE_BOT_EMOJI_PER_S = 0.03
+DATE_CHAT_MAX = 36  # lines of leaked chat

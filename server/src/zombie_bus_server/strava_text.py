@@ -32,6 +32,19 @@ def describe(s: dict[str, Any], rider: str, link: str = "") -> tuple[str, str]:
             f"Crew: {names}",
             *awards,
         ]
+    elif g.get("mode") == "date":
+        wed, div = g.get("married") or {}, g.get("divorced") or {}
+        title = f"💘 Speed Dating · {round((me.get('match') or 0) * 100)}% compatible"
+        flags = "; ".join(me.get("flags") or []) or "none, suspiciously"
+        lines = [
+            f"Chemistry {g.get('score', 0)} · {km(g.get('distance'))} · {power}",
+            f"Best match: {me.get('best') or 'nobody'} · worst: {me.get('worst') or 'nobody'}",
+            f"Red flags: {flags}",
+            *([f"💒 {wed.get('a')} and {wed.get('b')} got married"] if wed else []),
+            *([f"⚖️ {div.get('winner')} kept the house"] if div else []),
+            f"Crew: {names}",
+            *awards,
+        ]
     elif g.get("mode") == "ambo":
         runs = [r for r in g.get("reviews", []) if isinstance(r, dict)]
         title = f"🚑 Kidney Stone Express · {g.get('delivered', 0)}/{len(runs)} patients delivered"
