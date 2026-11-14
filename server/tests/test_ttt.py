@@ -13,6 +13,8 @@ def test_teams_alternate_and_the_steadier_team_wins():
         room.start()
         room.task.cancel()
         g = room.mode
+        g.mut = {}
+        g.begin(room)  # deal again by seat, whatever this week's twist is
         assert g.team["h0"] != g.team["h1"]
         for _ in range(40):
             for r in room.riders.values():

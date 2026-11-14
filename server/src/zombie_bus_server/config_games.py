@@ -283,6 +283,10 @@ GAME_MUTATORS = {
         {"id": "short", "name": "Short Head Start", "desc": "The fox starts only 40 m up.", "start": 40},
         {"id": "normal", "name": "Tally Ho", "desc": "The fox starts 60 m up, as usual.", "start": 60},
     ],
+    "ttt": [
+        {"id": "hat", "name": "Out of a Hat", "desc": "Teams drawn at random, not by seat.", "shuffle": True},
+        {"id": "normal", "name": "Seat Order", "desc": "Teams dealt round the seats, as usual."},
+    ],
 }
 
 # Last Rider Standing: steps of LAST_STEP % FTP a minute from LAST_FROM to the 150% cap, LAST_HOLDS more

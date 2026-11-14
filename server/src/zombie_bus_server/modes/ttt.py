@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 
 from .. import config_games as G
@@ -23,6 +24,8 @@ class TeamTrial(CrewGame):
     def begin(self, room: Room) -> None:
         # Alternate seats, humans first, so two mates end up on different teams.
         seats = sorted(room.riders.values(), key=lambda r: (r.bot, r.id))
+        if self.mut.get("shuffle"):  # this week's twist: teams out of a hat
+            random.Random(room.code).shuffle(seats)
         self.team = {r.id: k % 2 for k, r in enumerate(seats)}
 
     def scores(self, room: Room) -> list[float]:
