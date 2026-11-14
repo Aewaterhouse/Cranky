@@ -297,7 +297,7 @@ export class World {
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
       this.cam.rig.shake = Math.max(this.cam.rig.shake, 1.6)
     const climb = (this.climb += ((s.mood === 'rampup' ? 1 : 0) - this.climb) * clamp(dt * 0.8))
-    const o = { speed: v, gap: g, hit: this.hit, slow: sm < 1, pack: !!s.mad, climb }
+    const o = { speed: v, gap: g, hit: this.hit, slow: sm < 1, pack: !!s.mad, climb, horde: hz }
     this.cam.update(this.camera, this.t, dt, o, dt / sm, this.strikes, !!s.gunship, hz)
     const px = this.renderer.domElement.height / (2 * Math.tan((this.camera.fov * Math.PI) / 360))
     this.smoke.update(dt, px)

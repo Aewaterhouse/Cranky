@@ -9,6 +9,9 @@ export class CamRig {
   /** Where the chase camera aims this frame, for the player's orbit. */
   look = new THREE.Vector3()
   private near = 0
+  /** 0 to 1: how far the camera has swung round to face the horde. */
+  dread = 0
+  private tmp = new THREE.Vector3()
   private fov = VIS.fov
 
   update(
@@ -23,6 +26,8 @@ export class CamRig {
       climb?: number
       /** VO2 Madness: sit lower and closer, behind the pack. */
       pack?: boolean
+      /** Where the horde front is (z behind the bus), for the dread shot. */
+      horde?: number | null
     },
   ) {
     this.near += ((o.pack ? 1 : 0) - this.near) * clamp(dt * 2)
@@ -51,6 +56,14 @@ export class CamRig {
       2.6 + (o.climb ?? 0) * VIS.climbLook - this.pull * 0.4,
       VIS.camLook + this.pull * 6,
     )
+    // The horde nearly on us: swing round to look back past the bus at it, so the tension is on screen.
+    const D = VIS.dread
+    const want2 = o.gap === null || o.horde == null || o.pack ? 0 : 1 - smooth(D.near, D.far, o.gap)
+    this.dread += (want2 - this.dread) * clamp(dt * 1.2)
+    if (this.dread > 0.001 && o.horde != null) {
+      cam.position.lerp(this.tmp.set(D.x, D.y, D.z), this.dread)
+      this.look.lerp(this.tmp.set(0, D.aimY, o.horde * D.aimBack), this.dread)
+    }
     cam.lookAt(this.look)
     cam.rotateZ(nx * sh * 0.012 + Math.sin(t * 0.3) * 0.012 * sway)
     const fov = VIS.fov + clamp(o.speed / 20) * VIS.fovKick * 20 + o.hit * 3 + (o.slow ? -4 : 0)

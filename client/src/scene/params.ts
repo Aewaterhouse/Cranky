@@ -52,6 +52,9 @@ export const VIS = {
   fovKick: 0.35,
   fogNear: 25,
   gapScale: 0.3,
+  /** Horde close: under `far` m (all the way by `near`) the chase camera swings ahead and to the side to look back
+   * past the bus at the horde. Position and aim are in bus space (+z is behind). */
+  dread: { near: 8, far: 20, x: 7, y: 3.6, z: -11, aimY: 1.8, aimBack: 0.45 },
   hordeSize: 220,
   /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
   bust: 0.17,
