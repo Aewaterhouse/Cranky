@@ -67,7 +67,7 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
   Awards: Paramedic of the Week (smoothest), Learner Driver (spikiest), Lead Foot (most fines).
 
 **Checklist**
-- [ ] K1 Server: `modes/ambulance.py`: script, five patients as interval sets, speed and distance, Comfort, braking
+- [x] K1 Server: `modes/ambulance.py`: script, five patients as interval sets, speed and distance, Comfort, braking
       zone, walk-off, ramping perk. Unit tests for each rule.
 - [ ] K2 Server: the four road events and scoring, reviews, awards. Tests.
 - [ ] K3 Client HUD: Comfort meter, patient card with speech bubbles, distance to hospital and ETA, event prompts,

@@ -132,3 +132,11 @@ position, through `ErgController.setGrade`.
 ## Downloads
 - `PUT /api/rides/files/<name>` (logged in; body is the file, a .fit, .json or .png up to 8 MB) returns `{"url": "/api/rides/files/<key>/<name>"}`.
 - `GET /api/rides/files/<key>/<name>` (no login) serves it as an attachment for 10 minutes; `?inline=1` serves it inline.
+
+## Kidney Stone Express (`game: 'ambo'`)
+- A bus room, never on ERG. The plan is free blocks with `kind` (`base`, `run`, `ramp`, `cool`) and, on runs, `patient` (`hook`, `kidney`, `magpie`, `bin`, `trainer`). `tick.ev` is the phase: `base`, `run`, `ramp`, `reverse` or `cool` (a crew that arrives early is already in `ramp` while the run block finishes).
+- `tick.game`: `{g: 'ambo', phase, run, runs, patient: {id, name, icon, line} | null, comfort (0..100), dist (metres left), total, speed (km/h), par (seconds left in the run block), eta (seconds at this speed, or null when stopped), event, brake, perk: null | 'spike' | 'green', sweet (0..1), queue (seconds left in the hospital queue), reviews, score, siren}`. `patient` is null once they are delivered or have walked.
+- `reviews` (finished runs, also in the summary): `{id, patient, icon, comfort, delta (seconds early, negative late), walked, fell, pts}`.
+- fx kinds: `say` (radio banter and patient lines), `delivered`, `fellout`, `walked`, `perk`. All carry `text`.
+- Summary: `mode: 'ambo'`, `score`, `distance`, `delivered`, `reviews`, `awards` and rider rows with `spread` (mean roughness, % of FTP), `spikes` and `fines`. Not on the season ladder.
+- No `act` keys yet.
