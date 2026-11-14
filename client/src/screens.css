@@ -692,3 +692,11 @@ kbd {
   margin: 0 0 12px;
   font-weight: 600;
 }
+.sw.try {
+  cursor: zoom-in;
+}
+.try-on {
+  display: block;
+  width: min(100%, 480px);
+  border-radius: 12px;
+}

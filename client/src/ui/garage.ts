@@ -13,8 +13,8 @@ import {
 import type { Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import { h } from './dom'
-import { shopPreview } from './shopPreview'
-import { toast } from './toast'
+import { portrait, shopPreview } from './shopPreview'
+import { modal, toast } from './toast'
 
 const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲' }
 const WHERE: Record<Slot, string> = {
@@ -65,6 +65,15 @@ export function garageTab(p: Profile, changed: () => void) {
     shopPreview(c, { id: p.id, body: p.look.body }, (src) =>
       sw.replaceChildren(h('img', { src, alt: '' })),
     )
+    // Rider items: tap the picture to see it on you, with everything else you wear.
+    if (c.slot === 'hat' || c.slot === 'outfit' || c.slot === 'bike') {
+      sw.title = 'Try it on'
+      sw.classList.add('try')
+      sw.onclick = () =>
+        portrait({ id: p.id, look: { ...p.look, [c.slot]: c.id } }, (src) =>
+          modal(c.name, h('img', { class: 'try-on', src, alt: `You in the ${c.name}` })),
+        )
+    }
     return h(
       'div',
       { class: `item ${c.rarity}${on ? ' on' : owned ? ' owned' : ''}` },
