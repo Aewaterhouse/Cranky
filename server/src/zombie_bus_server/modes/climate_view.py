@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from .. import config_games as G
 from . import climate_text as T
-from .common import compliance, rider_row
+from .common import compliance, crew_scrap, rider_row
 
 if TYPE_CHECKING:
     from ..session import Room
@@ -103,7 +103,7 @@ class ClimateView:
             "mode": "climate",
             "distance": round(self.dist),
             "armour": 100,
-            "scrap": 0,
+            "scrap": crew_scrap(self.dist, 0 if self.flooded else G.SCRAP_TOWN_SAVED),
             "syncPct": 0,
             "difficulty": "normal",
             "score": 0 if self.flooded else round(coins),

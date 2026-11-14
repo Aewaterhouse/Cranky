@@ -45,7 +45,7 @@ end of the queue. Owner's own to-dos go first:*
 1. [x] A ride's History page drops the game story: Trial, couples, reviews, awards, crew (lobby 1, blocker).
 2. [x] Results open with eight generic training tiles; the game outcome is 1.5 screens down on a phone (lobby 2).
 3. [ ] (phone) Phone award cards lose the winner's name (fixed: a top-bar rule hid it); the crew table breaks on phones (lobby 3, 4).
-4. [ ] No scrap reward shown for the non-bus games (lobby 7).
+4. [x] No scrap reward shown for the non-bus games (lobby 7).
 5. [ ] Postcard downloads silently, no preview or share, always named `zombie-bus-…` (lobby 8).
 6. [ ] No "ride again with this crew" (lobby 9). History rows don't name the game or outcome (lobby 18).
 7. [ ] The leaked group chat is a 40-line dump (lobby 5).

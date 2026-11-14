@@ -120,3 +120,14 @@ def test_twitch_channels_and_video_files_queue_like_videos():
     for v in ("tw:gcn", "url:https://example.com/ride.mp4", "tw:x", "url:http://example.com/a.mp4"):
         w.on_act(room, guest, "add", v)
     assert w.vid == "tw:gcn" and [q["vid"] for q in w.queue] == ["url:https://example.com/ride.mp4"]
+
+
+def test_every_crew_game_pays_scrap_for_distance_and_how_it_went():
+    from zombie_bus_server import config as C
+    from zombie_bus_server.modes.common import crew_scrap
+
+    assert crew_scrap(20000) == int(20000 * C.SCRAP_PER_M)
+    assert crew_scrap(20000, 100) == int(20000 * C.SCRAP_PER_M) + 100
+    room, w, host, guest = party()
+    w.dist = 12000
+    assert w.summary(room)["scrap"] == crew_scrap(12000)

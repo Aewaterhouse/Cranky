@@ -155,6 +155,11 @@ def shape_awards(
     award(awards, rs, punished, lambda r: r.rs_punished, lambda r: f"{r.rs_punished:.0f} s of punishment")
 
 
+def crew_scrap(dist: float, bonus: float = 0) -> int:
+    """A game's scrap for the crew: the bus's rate for the distance, plus what the game adds for how it went."""
+    return int(dist * C.SCRAP_PER_M + bonus)
+
+
 def rider_row(r: Rider, comp: dict[str, float], **extra: object) -> dict:
     """A rider's row on the results screen; a game adds its own columns through `extra`."""
     return {

@@ -232,3 +232,8 @@ WATCH_QUEUE_MAX = 20
 WATCH_SEEK_MAX = 600
 WATCH_SPEED = 8.0
 WATCH_EMOJI = ("😂", "🔥", "😱", "👏", "🥵", "💀")  # reactions anyone can float over the video
+
+# Scrap a game adds to the bus rate for distance (`common.crew_scrap`) for how it went.
+SCRAP_PER_PATIENT = 20
+SCRAP_WEDDING = 50
+SCRAP_TOWN_SAVED = 100

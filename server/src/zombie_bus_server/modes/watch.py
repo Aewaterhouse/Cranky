@@ -10,7 +10,7 @@ import re
 from typing import TYPE_CHECKING
 
 from .. import config_games as G
-from .common import CrewGame, award, compliance, rider_row, tally
+from .common import CrewGame, award, compliance, crew_scrap, rider_row, tally
 
 if TYPE_CHECKING:
     from ..rider import Rider
@@ -122,7 +122,7 @@ class Watch(CrewGame):
             "mode": "watch",
             "distance": round(self.dist),
             "armour": 100,
-            "scrap": 0,
+            "scrap": crew_scrap(self.dist),
             "score": round(100 * sum(comp.values()) / max(1, len(comp))),
             "difficulty": "normal",
             "syncPct": 0,

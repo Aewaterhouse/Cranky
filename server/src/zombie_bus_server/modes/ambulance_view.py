@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from .. import config_games as G
 from . import ambulance_text as T
-from .common import award, compliance, rider_row
+from .common import award, compliance, crew_scrap, rider_row
 
 if TYPE_CHECKING:
     from ..rider import Rider
@@ -57,7 +57,7 @@ class AmboView:
             "mode": "ambo",
             "distance": round(self.dist),
             "armour": 100,
-            "scrap": 0,
+            "scrap": crew_scrap(self.dist, G.SCRAP_PER_PATIENT * sum(not x["walked"] for x in self.reviews)),
             "score": self.score,
             "difficulty": "normal",
             "syncPct": 0,

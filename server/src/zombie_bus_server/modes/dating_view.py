@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from .. import config_games as G
 from . import dating_text as T
-from .common import compliance, rider_row
+from .common import compliance, crew_scrap, rider_row
 
 if TYPE_CHECKING:
     from ..session import Room
@@ -61,7 +61,7 @@ class DateView:
             "mode": "date",
             "distance": round(self.dist),
             "armour": 100,
-            "scrap": 0,
+            "scrap": crew_scrap(self.dist, G.SCRAP_WEDDING if self.married else 0),
             "score": round(sum(self.table.values())),
             "difficulty": "normal",
             "syncPct": 0,
