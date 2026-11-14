@@ -6,17 +6,23 @@ import { makeRider } from '../scene/riders'
 const W = 240
 const H = 150
 const cache = new Map<string, string>()
-const queue: [Cosmetic, (url: string) => void][] = []
+/** Whose body wears the item: the rider's id and their saved body, if they have made one. */
+export interface Wearer {
+  id: string
+  body?: string
+}
+const queue: [Cosmetic, Wearer, (url: string) => void][] = []
 let busy = false
+const key = (c: Cosmetic, who: Wearer) => `${c.id}|${who.id}|${who.body ?? ''}`
 
-/** The bus or the rider wearing just this item, framed for its slot, drawn to a PNG data URL. */
-function draw(r: THREE.WebGLRenderer, c: Cosmetic) {
+/** The bus or the rider (their own body) wearing just this item, framed for its slot, drawn to a PNG data URL. */
+function draw(r: THREE.WebGLRenderer, c: Cosmetic, who: Wearer) {
   const scene = new THREE.Scene()
   scene.add(new THREE.HemisphereLight('#fff6e0', '#3a3530', 2.2))
   const sun = new THREE.DirectionalLight('#ffffff', 1.6)
   sun.position.set(-4, 8, -6)
   scene.add(sun)
-  const look: Look = { [c.slot]: c.id }
+  const look: Look = { [c.slot]: c.id, body: who.body }
   const onBus = c.slot === 'paint' || c.slot === 'bullbar' || c.slot === 'spikes'
   let obj: THREE.Object3D
   let frame: THREE.Object3D // what the camera frames: the shell, or the rider without bike and name tag
@@ -27,7 +33,7 @@ function draw(r: THREE.WebGLRenderer, c: Cosmetic) {
     obj = bus.group
     frame = bus.shell
   } else {
-    const rider = makeRider('#3d7bd9', 'shop', c.slot === 'bike') // a road bike, so only the trainer skin shows one
+    const rider = makeRider('#3d7bd9', who.id, c.slot === 'bike') // a road bike, so only the trainer skin shows one
     rider.setLook(look)
     rider.pose('ride', 0.3)
     obj = rider.root
@@ -77,9 +83,9 @@ function pump() {
       busy = false
       return
     }
-    const [c, done] = next
-    const url = cache.get(c.id) ?? draw(r, c)
-    cache.set(c.id, url)
+    const [c, who, done] = next
+    const url = cache.get(key(c, who)) ?? draw(r, c, who)
+    cache.set(key(c, who), url)
     done(url)
     requestAnimationFrame(step)
   }
@@ -87,9 +93,9 @@ function pump() {
 }
 
 /** Calls `done` with a 3D preview of the item once it is drawn (straight away when cached). */
-export function shopPreview(c: Cosmetic, done: (url: string) => void) {
-  const hit = cache.get(c.id)
+export function shopPreview(c: Cosmetic, who: Wearer, done: (url: string) => void) {
+  const hit = cache.get(key(c, who))
   if (hit) return done(hit)
-  queue.push([c, done])
+  queue.push([c, who, done])
   pump()
 }

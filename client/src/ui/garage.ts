@@ -36,7 +36,9 @@ export function garageTab(p: Profile, changed: () => void) {
       { class: 'sw', style: c.colour ? `--sw:${c.colour}` : '' },
       c.colour ? '' : (ICON[c.slot] ?? '★'),
     )
-    shopPreview(c, (src) => sw.replaceChildren(h('img', { src, alt: '' })))
+    shopPreview(c, { id: p.id, body: p.look.body }, (src) =>
+      sw.replaceChildren(h('img', { src, alt: '' })),
+    )
     return h(
       'div',
       { class: `item ${c.rarity}${on ? ' on' : owned ? ' owned' : ''}` },

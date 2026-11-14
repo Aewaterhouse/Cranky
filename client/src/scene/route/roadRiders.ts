@@ -9,6 +9,8 @@ import { newPose, type Pose, type RoadPath } from './roadPath'
 const COLOURS = ['#e94f37', '#3f88c5', '#44bba4', '#f6ae2d', '#9b5de5', '#f15bb5']
 /** A reported position this far from where we drew the rider is a jump, not drift. */
 const SNAP_M = 60
+/** The id of the ghost of my own best effort (core/ghost.ts); a mate's is `ghost:<their id>`. */
+const GHOST_ME = 'ghost:me'
 const P = VIS.route.feel.rider
 /** Name tags are sized for the bus roof; on the road riders are nearer the camera. */
 const TAG_SCALE = 0.55
@@ -90,11 +92,16 @@ export class RoadRiders {
 
   update(riders: RoadRider[], me: string, dt: number) {
     for (let i = 0; i < this.list.length; i++) this.list[i].seen = false
+    const mine = riders.find((r) => r.id === me)
     for (let i = 0; i < riders.length; i++) {
       const s = riders[i]
       let e = this.map.get(s.id)
       if (!e) {
-        const r = makeRider(COLOURS[this.map.size % COLOURS.length], s.id, true)
+        const r = makeRider(
+          COLOURS[this.map.size % COLOURS.length],
+          s.id === GHOST_ME ? me : s.id.replace('ghost:', ''),
+          true,
+        )
         e = { id: s.id, r, d: s.d, told: s.d, err: 0, phase: this.map.size, seen: true } as Entry
         e.want = newRoadPose()
         e.now = newRoadPose()
@@ -127,7 +134,9 @@ export class RoadRiders {
       // Coasting: the cranks stop and settle level. Otherwise they turn at the cadence.
       if (want.coast) e.phase += (levelPhase(e.phase) - e.phase) * clamp(dt * P.levelRate)
       else e.phase += (s.cadence / 60) * Math.PI * 2 * dt
-      if (e.look !== s.look) r.setLook((e.look = s.look))
+      // My own ghost has my body (not my hat: a ghost's parts are made see-through once, when it appears).
+      const look = s.id === GHOST_ME ? { body: mine?.look?.body } : s.look
+      if (e.look !== look) r.setLook((e.look = look))
       r.pose('ride', e.phase, 0, now)
       r.bike.roll(e.d)
       r.root.position.set(p.x + p.rx * e.off, p.y - e.off * Math.sin(p.bank), p.z + p.rz * e.off)

@@ -160,3 +160,15 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Retry: revoke Cranky on strava.com (Settings → My Apps), then ride again: within a few minutes History shows the ride as "Strava: retry", with the reason in the ride. In Cranky, Disconnect and Connect with Strava again, open the ride and tap Retry: it uploads.
 - [ ] An older ride (from before connecting) shows Upload to Strava in History, and uploads.
 - [ ] Disconnect in Settings: Cranky disappears from strava.com → Settings → My Apps.
+
+## Rider bodies on an iPad (Bluefy) and a phone
+- [ ] Rider → Body opens with your rider pedalling. One finger on the preview turns them; two fingers pinch to zoom; the page doesn't scroll or zoom while you do.
+- [ ] Every tab (Body, Skin, Hair, Face, Fun) works with a finger: sliders drag smoothly and the rider changes as you drag; pickers and colour dots are easy to hit.
+- [ ] Skin, Hair and Face move the preview in on the head; Body moves it back out. "Helmet on" off shows the hair.
+- [ ] Randomise and a preset change everything at once; Undo steps back; Reset gives your original rider; nothing sticks until Save.
+- [ ] Save, then start a bus with a mate: each of you sees the other's body on the roof, and the TV view shows both. The same in a group free ride.
+- [ ] Your Garage hat sits on your head whatever its size (try Bobblehead with the Akubra and the Viking Helmet), and the outfit colours the jersey.
+- [ ] Huge calves, a keg belly and a giraffe neck still pedal properly, and fall off and run properly, on the bus.
+- [ ] With six riders on the bus the ride is as smooth as before on the iPad.
+- [ ] On a phone the Rider tabs scroll sideways to reach Body and Settings, and the preview stays at the top while you scroll the options.
+- [ ] A mate on an old tab (not reloaded) still joins and rides; they just see default bodies.
