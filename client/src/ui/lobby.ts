@@ -278,7 +278,21 @@ export function lobbyView(c: LobbyCtx) {
   const el = h(
     'div',
     { class: 'lobby page' },
-    h('h1', {}, title, ' ', c.status),
+    // Everything a host or guest acts on sits in one bar at the top: the game, the code to share, Start and Leave.
+    h(
+      'div',
+      { class: 'lobby-bar' },
+      h('h1', {}, title, ' ', c.status),
+      h(
+        'div',
+        { class: 'lb-code' },
+        h('span', { class: 'label' }, 'Code'),
+        code,
+        h('button', { class: 'copy', onclick: () => copy(link) }, 'Copy invite link'),
+      ),
+      startSlot,
+      h('button', { class: 'ghost leave', onclick: c.leave }, 'Leave'),
+    ),
     h(
       'div',
       { class: 'lobby-cols' },
@@ -298,12 +312,6 @@ export function lobbyView(c: LobbyCtx) {
           mutRow,
           h('div', { class: 'bus-floor' }, h('i', {}), h('i', {})),
         ),
-        h(
-          'section',
-          { class: 'panel codebox' },
-          h('div', {}, h('h2', { class: 'label' }, 'Bus code'), code),
-          h('button', { class: 'copy', onclick: () => copy(link) }, 'Copy invite link'),
-        ),
       ),
       h(
         'div',
@@ -311,8 +319,6 @@ export function lobbyView(c: LobbyCtx) {
         run,
         effort,
         h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Trainer'), trainerCheck()),
-        startSlot,
-        h('button', { class: 'ghost leave', onclick: c.leave }, 'Leave the bus'),
       ),
     ),
     pickerBox,

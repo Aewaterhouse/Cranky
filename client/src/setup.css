@@ -788,3 +788,43 @@
   min-width: 0;
   max-width: 420px;
 }
+/* The lobby's action bar: always in view at the top while the host sets up below. */
+.lobby-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  margin: 0 -12px 16px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+}
+.lobby-bar h1 {
+  flex: 1 1 auto;
+  margin: 0;
+  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+}
+.lb-code {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lobby-bar .start-slot .mega-go {
+  margin: 0;
+  padding: 12px 28px;
+}
+.lobby-bar .leave {
+  margin: 0;
+}
+.lobby-bar .leave {
+  width: auto;
+  flex: 0 0 auto;
+}
+.lobby-bar .code-letters span {
+  width: 40px;
+  height: 46px;
+  font-size: 1.6rem;
+}

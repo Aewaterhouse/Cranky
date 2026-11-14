@@ -51,9 +51,9 @@ end of the queue. Owner's own to-dos go first:*
 7. [x] The leaked group chat is a 40-line dump (lobby 5).
 
 **The lobby**
-8. [ ] Long scroll, host decisions scattered, bus code and Start below the fold, top nav gone, Leave buried
+8. [ ] (code, invite link, Start and Leave now in a bar that stays at the top; the settings below are still one long column) Long scroll, host decisions scattered, bus code and Start below the fold, top nav gone, Leave buried
    (nav 3, 4; lobby 10, 11, 16).
-9. [ ] Run picker and effort rows shown for games that ignore them; game cards are walls of small text (lobby 12, 13).
+9. [ ] (run picker, effort and trainer rows now hidden for scripted games) Run picker and effort rows shown for games that ignore them; game cards are walls of small text (lobby 12, 13).
 10. [ ] Joining by code asks for a trainer before checking the code (nav 5).
 11. [ ] Guests have no ready state; a host who leaves leaves a ghost seat (lobby 15, 27).
 
