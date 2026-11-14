@@ -24,6 +24,12 @@ T_SHORTCUT = {
 }
 
 
+def roll_weather(rng: random.Random) -> str:
+    """A ride's weather, mostly clear: each kind with its weight in `config.WEATHER`."""
+    kinds = list(C.WEATHER)
+    return rng.choices(kinds, [C.WEATHER[k]["weight"] for k in kinds])[0]
+
+
 def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
     """This ISO week's twist for a game, or None for a game without any."""
     week = (today or date.today()).isocalendar().week
@@ -59,6 +65,7 @@ class ZombieBus(CrewGame):
         self.fx: list[dict] = []
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
+        self.weather = "clear"  # rolled by the room as the ride starts (`roll_weather`)
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
         self.ram = False
@@ -127,6 +134,7 @@ class ZombieBus(CrewGame):
             * self.mut.get("scrap", 1)
             * self.leg.get("scrap", 1)
             * self.magnet
+            * C.WEATHER[self.weather].get("scrap", 1)
         )
         neutral = C.NEUTRAL[ev]
         if ev == "longhaul":
@@ -265,7 +273,11 @@ class ZombieBus(CrewGame):
         self.armour = max(
             0.0,
             self.armour
-            - n * C.DIFFICULTY[self.level]["damage"] * self.mut.get("damage", 1) * self.leg.get("damage", 1),
+            - n
+            * C.DIFFICULTY[self.level]["damage"]
+            * self.mut.get("damage", 1)
+            * self.leg.get("damage", 1)
+            * C.WEATHER[self.weather].get("damage", 1),
         )
         self.emit("hit", text if self.armour > 0 else "Armour gone! Limping on...")
 
@@ -500,6 +512,7 @@ class ZombieBus(CrewGame):
             "boost": room.el < self.nitro_until,
             "shop": self.ev == "servo" and not self.mut.get("no_shop"),
             "wares": self.wares,
+            "weather": self.weather,
             "repel": self.repel,
             "syncw": self.syncw,
             "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),

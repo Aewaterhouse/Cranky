@@ -225,6 +225,14 @@ RB_FAIL_ARMOUR = 6
 RB_FAIL_GAP = 10
 RB_SMASH_SCRAP = 20
 RB_SMASH_GAP = 20
+# The bus ride's weather, rolled as it starts. damage and scrap multiply; dust hides the gap and the
+# mirror on the client. Weights are chances out of their sum.
+WEATHER = {
+    "clear": {"weight": 60, "name": "Clear"},
+    "rain": {"weight": 15, "name": "Rain", "damage": 1.2},
+    "dust": {"weight": 12, "name": "Dust storm"},
+    "night": {"weight": 13, "name": "Night run", "scrap": 1.25},
+}
 FRONT_S = 60  # rolling turns: each rider's time on the front
 FRONT_CLEAN = 0.9  # mean compliance on the front that counts as a clean turn
 FRONT_GAP = 4  # metres on the horde for a clean turn

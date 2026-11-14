@@ -5,7 +5,7 @@ import { runCamCheck } from './scene/camCheck'
 
 /**
  * Scene dev harness. Open /scene-dev.html with optional params:
- *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  trophies=N  armour=0..100 (or none)
+ *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  trophies=N  weather=clear|rain|dust|night  armour=0..100 (or none)
  *   speed=m/s  roadblock=0..1  paint=paint-rust  bullbar=1  spikes=1  riders=1..6  debug=1  hud=0
  *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  mad=1 (VO2 Madness pack)  date=1 (Speed Dating couples)  ambo=1 siren=1 (ambulance)  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
  * Keys: 1-6 mood, [ ] gap, - = armour, , . speed, r roadblock (hold to approach), h hit, j shake,
@@ -90,6 +90,7 @@ function apply() {
     roadblock: st.roadblock,
     busLook: look,
     trophies: num('trophies', 0) as number,
+    weather: (q.get('weather') ?? 'clear') as 'clear' | 'rain' | 'dust' | 'night',
     gunship: st.gunship,
     mad: q.has('date')
       ? {

@@ -84,8 +84,10 @@ export function makeBusPanel() {
         pulse(armour, 'hit')
       }
       lastArmour = b.armour
-      set(gapN, `${Math.round(b.gap)} m`)
-      const f = Math.max(0, Math.min(1, b.gap / GAP_MAX))
+      // In a dust storm nobody can see how far back the horde is.
+      const dust = b.weather === 'dust'
+      set(gapN, dust ? '?? m' : `${Math.round(b.gap)} m`)
+      const f = dust ? 0.5 : Math.max(0, Math.min(1, b.gap / GAP_MAX))
       zombie.style.left = `${(1 - f) * 78}%`
       gapTrack.classList.toggle('close', b.gap < GAP_CLOSE)
       set(speed, `${Math.round(b.speed * 3.6)}`)

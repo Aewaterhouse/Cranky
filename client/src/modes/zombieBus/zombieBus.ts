@@ -264,6 +264,7 @@ export function startBusRide(
       gap: b.mad ? null : b.gap,
       mad: b.mad,
       armour: b.armour,
+      weather: b.weather,
       mood: (calm ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],

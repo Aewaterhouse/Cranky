@@ -114,7 +114,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | ✅ Personal mini-challenges | "Spin 110 rpm for 20 s", "hold exactly 200 W": quick prompts for bonus scrap | M |
 | ✅ Team moves | Synchronised sprint fires the harpoon; rolling turns on the front like a chaingang. Built: every rider landing their roadblock sprint (HIT or better) adds 25 m; each rider takes a minute on the front in turn and a clean turn (90% on target) adds 4 m | M |
 | ✅ Streak power-ups | Near-perfect group riding charges a nitro meter; when full it fires a 15 s boost by itself (no button to press mid-effort) | S |
-| Weather and night | Rain, dust storms, night driving with headlights; visibility as a mechanic | M |
+| ✅ Weather and night | Rain, dust storms, night driving with headlights; visibility as a mechanic. Built: each bus ride rolls clear (60%), rain (hits ×1.2, streaks), dust (the gap readout and mirror go blind) or a night run (headlights, scrap ×1.25) | M |
 | Campaign | A multi-ride journey across a map with a persistent bus, damage carried over and unlocks | L |
 | ✅ Difficulty and mutators | Easy to nightmare, picked by the host, plus a mutator that changes every week (Hungry Horde, Closed Servos, Scrap Rush, Loose Bolts, Tailwind) on everything above easy | S |
 | ✅ Daily and weekly challenges | Rotating goals with scrap rewards. Built: a daily challenge (six goals, the same for everyone, 25 scrap once a day) beside the weekly route and climb on home and free ride | M |

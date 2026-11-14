@@ -11,7 +11,8 @@ import { FxLayer } from './fxLayer'
 import { Ground, ROAD_HALF, groundH } from './ground'
 import { Billboards, Servo } from './landmarks'
 import { Mirror } from './mirror'
-import { MoodBlend } from './moods'
+import { MoodBlend, weatherEnv, type Env, type Weather } from './moods'
+import { Rain } from './route/rain'
 import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
 import { VIS, type Mood } from './params'
@@ -52,6 +53,8 @@ export interface SceneState {
   busLook?: Look
   /** LEGEND sprints the crew has ever ridden: trophies on the roof. */
   trophies?: number
+  /** The bus ride's weather. Dust hides the mirror. */
+  weather?: Weather
   /** The crew's gunship is up and firing on the horde. */
   gunship?: boolean
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
@@ -90,6 +93,8 @@ export class World {
   private dateDress = new DateDress(0)
   private bigThings = new BigThings()
   private mirror!: Mirror
+  private wenv = {} as Env
+  private rain = new Rain()
   private bus = makeBus()
   private ambo = makeAmboProps()
   private horde = new Horde()
@@ -164,6 +169,7 @@ export class World {
     this.camera.add(this.fxl.lines)
     this.ground.group.children.forEach((o) => (o.receiveShadow = true))
     this.mirror = new Mirror(this.host)
+    this.scene.add(this.rain.lines)
     // The land under the camera, so no view or orbit goes inside a hill (the road is flat at 0).
     const land = (x: number, z: number) =>
       Math.abs(x) < ROAD_HALF + 0.5 ? 0 : Math.max(0, groundH(x, z - this.dist)) + 1.5
@@ -220,12 +226,17 @@ export class World {
     this.t += dt
     this.step(dt, sm)
     this.renderer.render(this.scene, this.camera)
-    this.mirror.render(this.renderer, this.scene, this.state.gap !== null && !this.state.mad)
+    this.mirror.render(
+      this.renderer,
+      this.scene,
+      this.state.gap !== null && !this.state.mad && this.state.weather !== 'dust',
+    )
   }
 
   private step(dt: number, sm: number) {
     const s = this.state
-    const env = this.mood.update(dt / sm, s.mood)
+    const env = weatherEnv(this.mood.update(dt / sm, s.mood), s.weather, this.wenv)
+    this.rain.update(s.weather === 'rain', this.camera.position, this.t, dt)
     const night = clamp(env.head * 1.1)
     this.fog.color.copy(env.fog)
     this.fog.near = VIS.fogNear

@@ -129,6 +129,8 @@ export interface BusState {
   shop: boolean
   /** The three upgrades this servo stop offers. */
   wares?: ShopItem[]
+  /** The ride's weather: rain hurts more, a night run pays more scrap, dust hides the gap. */
+  weather?: 'clear' | 'rain' | 'dust' | 'night'
   repel: number
   syncw: number
   nitro: number

@@ -1,3 +1,5 @@
+import pytest
+
 from zombie_bus_server import config as C
 from zombie_bus_server.modes.zombie_bus import ZombieBus
 from zombie_bus_server.session import Rider
@@ -399,3 +401,25 @@ def test_rolling_turns_rotate_and_a_clean_turn_gains_metres():
     room.riders["r1"].s = 0.85
     fx = run(room, bus, C.FRONT_S)
     assert [f["text"] for f in fx if f["k"] == "turn"] == ["R2, take the front."]
+
+
+def test_weather_is_mostly_clear_and_each_kind_bites():
+    import random as rnd
+
+    from zombie_bus_server.modes.zombie_bus import roll_weather
+
+    rng = rnd.Random(4)
+    rolls = [roll_weather(rng) for _ in range(2000)]
+    assert set(rolls) == set(C.WEATHER) and rolls.count("clear") > 1000
+    room, wet = FakeRoom(STEADY), ZombieBus()
+    wet.weather = "rain"
+    wet.damage(10, "x")
+    assert 100 - wet.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 1.2
+    room2, night, clear = FakeRoom(STEADY), ZombieBus(), ZombieBus()
+    night.weather = "night"
+    set_all(room, 1.0)
+    set_all(room2, 1.0)
+    run(room, clear, 10)
+    run(room2, night, 10)
+    assert night.scrap == pytest.approx(clear.scrap * 1.25, rel=0.01)
+    assert night.state(room2, 1, 0)["weather"] == "night"

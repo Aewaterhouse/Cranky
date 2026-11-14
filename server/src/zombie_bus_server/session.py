@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import random
 import time
 from typing import TYPE_CHECKING
 
@@ -15,7 +16,7 @@ from .modes.climate import Climate
 from .modes.dating import Dating
 from .modes.vo2_madness import Vo2Madness
 from .modes.watch import Watch
-from .modes.zombie_bus import ZombieBus, weekly_mutator
+from .modes.zombie_bus import ZombieBus, roll_weather, weekly_mutator
 from .plan import generate, load_plans, total
 from .rider import Rider
 
@@ -229,6 +230,8 @@ class Room:
         mode = ZombieBus(self.difficulty, mut) if self.game == "bus" else MODES[self.game](self.difficulty)
         if self.game != "bus":
             mode.mut = mut or {}
+        else:
+            mode.weather = roll_weather(random.Random())
         self.state, self.el, self.mode, self.summary = ("running", -float(C.COUNTDOWN_S), mode, None)
         for r in self.riders.values():
             r.reset_stats()
