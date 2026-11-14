@@ -155,7 +155,7 @@ export async function sendToStrava(
 
 /** After the server saves a ride: up to Strava by itself when the rider is connected with auto-upload on. */
 export async function autoStrava(p: Profile, s: RideSummary, n: number) {
-  if (s.record.secs < CFG.stravaMinSecs || !s.power?.length) return
+  if (s.test || s.record.secs < CFG.stravaMinSecs || !s.power?.length) return
   const st = await stravaStatus().catch(() => null)
   if (st?.connected && st.auto) await sendToStrava(p, s, n).catch(() => {})
 }
@@ -228,7 +228,7 @@ export function stravaRow(p: Profile, s: RideSummary, n: number) {
   const draw = (j?: StravaJob) => {
     if (!j || j.status === 'none')
       return box.replaceChildren(
-        s.record.secs >= CFG.stravaMinSecs && s.power?.length
+        !s.test && s.record.secs >= CFG.stravaMinSecs && s.power?.length
           ? h('button', { onclick: send }, 'Upload to Strava')
           : '',
       )

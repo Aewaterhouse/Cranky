@@ -26,6 +26,7 @@ class Effort(BaseModel):
     date: str = Field(min_length=10, max_length=40)
     rideDate: str | None = Field(default=None, max_length=40)
     trace: list[int] | None = Field(default=None, max_length=config.EFFORT_TRACE_MAX)
+    test: bool = False  # ridden on the simulated trainer: never stored
 
 
 class Efforts:
@@ -51,6 +52,8 @@ class Efforts:
         saved = 0
         with self.store.lock, self.store.db:
             for e in efforts:
+                if e.test or self.store.test_ride(rider, e.rideDate):
+                    continue
                 cur = self.store.db.execute(
                     "INSERT OR IGNORE INTO efforts (rider, route, segment, secs, watts, wkg, date, ride_date,"
                     " trace) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",

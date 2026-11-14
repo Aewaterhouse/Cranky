@@ -23,6 +23,9 @@ export const seat = (meId: string, r?: Lobby['riders'][number], host?: string) =
         h('span', { class: `tier-badge ${r.tier}` }, TIER_NAME[r.tier]),
         h('small', {}, `${r.ftp} W`),
         r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
+        r.sim
+          ? h('em', { class: 'test-tag', title: "On the simulator: this ride won't count" }, 'sim')
+          : '',
         r.bot
           ? ''
           : h(

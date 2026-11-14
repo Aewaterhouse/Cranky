@@ -48,6 +48,11 @@ class Rider(RideStats):
     erg: bool = True
     ready: bool = False  # in the lobby; a fresh ride starts everyone unready
     kg: float | None = None  # from the rider's stored profile, for W/kg
+    sim: bool = False  # on the simulated trainer: a test rider whose ride counts for nothing
+
+    def note_sim(self, on: bool, riding: bool) -> None:
+        """Takes the join's simulator flag: in the lobby it is the trainer now; once riding it only sticks."""
+        self.sim = on or (self.sim and riding)
 
     def reset_stats(self) -> None:
         fresh = Rider(
@@ -61,6 +66,7 @@ class Rider(RideStats):
             bot=self.bot,
             erg=self.erg,
             kg=self.kg,
+            sim=self.sim,
         )
         self.__dict__.update(
             {k: v for k, v in fresh.__dict__.items() if k not in ("ws", "connected", "last_data")}

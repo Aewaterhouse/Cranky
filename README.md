@@ -47,7 +47,7 @@ Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profi
 
 ## Simulated trainer
 
-On the home screen pick the simulated trainer (no hardware needed). Keys:
+On the home screen pick the simulated trainer (no hardware needed). A ride that uses the simulator at any point is a test ride: it is kept in History with a "Test ride (simulator)" badge but counts for nothing (no bests, streaks, scrap, badges, ladder, crew records, feed, segments or Strava), and lobbies and rides show "Simulator: this ride won't count" while it is connected. In a crew, only riders on real trainers count. Keys:
 
 | Key | Effect |
 | --- | --- |

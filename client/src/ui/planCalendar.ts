@@ -41,7 +41,10 @@ const sub = (id: string) => {
 
 /** Rides to match sessions against: the server's history, or this device's when offline. */
 const loadRides = (p: Profile): Promise<RideLite[]> =>
-  api<RideLite[]>('/api/rides').catch(() => p.rides)
+  api<RideLite[]>('/api/rides').then(
+    (rs) => rs.filter((r) => !r.test),
+    () => p.rides,
+  )
 
 /** The rider's plan and its sessions, or null when they are on none. */
 function active(p: Profile) {

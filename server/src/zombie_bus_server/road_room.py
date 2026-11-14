@@ -73,6 +73,7 @@ class RoadRoom(Room):
                     "look": r.look,
                     "bot": r.bot,
                     "line": road_bots.BOTS[r.id][4] if r.bot else None,
+                    "sim": r.sim,
                 }
                 for r in self.riders.values()
             ],
@@ -124,6 +125,7 @@ class RoadRoom(Room):
             r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, "hard", look=look)
             if self.state == "running" and self.sim:  # late: on the back of the group
                 self.sim.add(rid, self.kg_of(rid), r.ftp)
+        r.note_sim(msg.sim, self.state == "running")
         r.ws, r.connected, r.last_data = ws, True, time.monotonic()
         if self.paused:
             self.paused = False
@@ -150,6 +152,7 @@ class RoadRoom(Room):
             return
         if isinstance(msg, Data):
             r.p, r.w, r.cad, r.hr, r.last_data = msg.p, msg.w, msg.cad, msg.hr or None, time.monotonic()
+            r.sim = r.sim or msg.sim
         elif not isinstance(msg, RoadSetup | Bots | Start | End):
             return
         elif rid != self.host:
@@ -224,7 +227,10 @@ class RoadRoom(Room):
             self.task.cancel()
         sim, lap = self.sim, load_lap(self.route)
         assert sim
-        rows = [{**x, "name": self.riders[x["id"]].name} for x in sim.rules.results(sim)]
+        rows = [
+            {**x, "name": self.riders[x["id"]].name, **({"test": True} if self.riders[x["id"]].sim else {})}
+            for x in sim.rules.results(sim)
+        ]
         self.summary = {
             **sim.rules.extra(sim, rows),
             "kind": "road",

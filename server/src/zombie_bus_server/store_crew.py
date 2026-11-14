@@ -108,7 +108,8 @@ class CrewStore:
                           json_extract(r.json, '$.prs'),
                           (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n),
                           (SELECT COUNT(*) FROM kudos k WHERE k.ride = r.n AND k.giver = ?)
-                   FROM rides r LEFT JOIN users u ON u.id = r.rider ORDER BY r.date DESC, r.n DESC LIMIT ?""",
+                   FROM rides r LEFT JOIN users u ON u.id = r.rider
+                   WHERE json_extract(r.json, '$.test') IS NOT 1 ORDER BY r.date DESC, r.n DESC LIMIT ?""",
                 (me, n),
             ).fetchall()
         keys = (
@@ -134,8 +135,10 @@ class CrewStore:
     def give_kudos(self, me: str, ride: int) -> bool:
         """A kudos from `me` on someone else's ride, once each. False if it is their own or already given."""
         with self.lock, self.db:
-            row = self.db.execute("SELECT rider FROM rides WHERE n = ?", (ride,)).fetchone()
-            if not row or row[0] == me:
+            row = self.db.execute(
+                "SELECT rider, json_extract(json, '$.test') FROM rides WHERE n = ?", (ride,)
+            ).fetchone()
+            if not row or row[0] == me or row[1]:  # a test ride (simulator) gets no kudos
                 return False
             return self.db.execute("INSERT OR IGNORE INTO kudos VALUES (?, ?)", (ride, me)).rowcount == 1
 

@@ -1,6 +1,7 @@
 import { setBack } from '../../ui/back'
 import type { Profile } from '../../core/curve'
 import { api } from '../../core/api'
+import { usesSim } from '../../core/testRide'
 import { saveProfile } from '../../core/profile'
 import { saveSettings, settings } from '../../core/settings'
 import { forgetBus, rememberBus } from '../../core/snapshot'
@@ -45,6 +46,7 @@ export async function crew(
       ftp: profile.ftp,
       tier: profile.tier,
       look: profile.look,
+      sim: usesSim(trainer),
     })
     net.send({ t: 'erg', on: settings.busErg })
   }

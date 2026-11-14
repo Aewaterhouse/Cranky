@@ -1,6 +1,7 @@
 import { FtmsTrainer } from '../trainer/ftms'
 import { BleHr, currentHr, hrSource, onHrChange, setHr, SimHr } from '../trainer/heartRate'
 import { bindKeys, SimTrainer } from '../trainer/simTrainer'
+import { noteTrainer } from '../core/testRide'
 import type { Trainer, TrainerStatus } from '../types'
 import { clickSection } from './clickPair'
 import { h } from './dom'
@@ -20,6 +21,7 @@ const set = (t: Trainer | null) => {
   const same = trainer === t
   if (trainer && !same) trainer.close?.()
   trainer = t
+  noteTrainer(t)
   last = null
   status = 'connected'
   if (!same)
@@ -44,6 +46,9 @@ export function listen() {
     notify()
   })
 }
+
+/** Calls `f` whenever the trainer (or its reading) changes; returns a way to stop. */
+export const onTrainer = (f: () => void) => (subs.add(f), () => void subs.delete(f))
 
 /** Calls `f` on every reading or connection change while `el` stays in the page. */
 function live(el: HTMLElement, f: () => void) {

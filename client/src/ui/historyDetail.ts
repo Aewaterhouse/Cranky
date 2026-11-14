@@ -179,6 +179,9 @@ async function savePostcard(p: Profile, s: RideSummary & { group?: GroupSummary 
   return savePng(await postcardCanvas(p, s), `cranky-${s.route?.id ?? 'ride'}-${day}`)
 }
 
+/** The badge a test ride (simulated trainer) wears in History. */
+export const testTag = () => h('em', { class: 'test-tag' }, 'Test ride (simulator)')
+
 export function rideDetail(p: Profile, n: number, back: () => void) {
   const root = h('div', { class: 'ride-detail' })
   const head = (s?: RideSummary) =>
@@ -191,7 +194,7 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
             'div',
             {},
             h('h2', {}, s.planName ?? 'Ride'),
-            h('p', { class: 'dim' }, dateStr(s.record.date, true)),
+            h('p', { class: 'dim' }, dateStr(s.record.date, true), ' ', s.test ? testTag() : ''),
           )
         : '',
     )
@@ -204,7 +207,9 @@ export function rideDetail(p: Profile, n: number, back: () => void) {
           h(
             'p',
             {},
-            'It leaves your history and lifetime totals. Your power bests stay, and this cannot be undone.',
+            s.test
+              ? 'It leaves your history. As a test ride it never counted towards anything. This cannot be undone.'
+              : 'It leaves your history and lifetime totals. Your power bests stay, and this cannot be undone.',
           ),
           h(
             'div',

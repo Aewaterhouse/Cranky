@@ -28,6 +28,8 @@ export interface RideLite {
   date: string
   plan?: string | null
   secs: number
+  /** A test ride (simulator) never completes a session. */
+  test?: boolean
 }
 export type SessionState = 'done' | 'missed' | 'today' | 'upcoming'
 

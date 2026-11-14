@@ -184,6 +184,13 @@ def crew_curves(u: User) -> list[dict]:
 @app.post("/api/rides")
 def post_ride(body: dict, u: User) -> dict:
     summary = body.get("summary") or {}
+    if not isinstance(summary, dict) or not isinstance(summary.get("test", False), bool):
+        raise HTTPException(422, "A ride's test flag is true or false")
+    group = summary.get("group") if isinstance(summary.get("group"), dict) else {}
+    mine = [r for r in group.get("riders") or [] if isinstance(r, dict) and r.get("id") == u["id"]]
+    # A ride on the simulated trainer is a test ride; the room's own result says so too.
+    if summary.pop("test", False) or any(r.get("test") for r in mine):
+        summary["test"] = True
     saved = store.add_ride(u["id"], summary)
     return {
         "ok": True,

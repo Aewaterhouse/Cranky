@@ -81,7 +81,7 @@ export function finishRide(
   // The new bests ride along, so the crew feed can say so.
   if (s.record.secs >= 30)
     void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew, prs: prs.length })
-  const sug = ftpSuggestion(p)
+  const sug = s.test ? null : ftpSuggestion(p)
   const ftpBox = h('div')
   if (sug)
     ftpBox.append(
@@ -167,7 +167,14 @@ export function finishRide(
       // What you earned leads, then the game's story, then the training numbers.
       s.record.secs < 30
         ? h('div', { class: 'card' }, 'Under 30 s, so this one is not saved to your History.')
-        : '',
+        : s.test
+          ? h(
+              'div',
+              { class: 'card test-ride' },
+              h('b', {}, 'Test ride (simulator). '),
+              'It is in your History, but it counts for nothing: no bests, streaks, scrap, badges, ladder or Strava.',
+            )
+          : '',
       level(p).n > level(profile).n
         ? h(
             'div',
@@ -198,7 +205,9 @@ export function finishRide(
           )
         : '',
       // The game's outcome is the story of a crew ride: it comes before the training numbers.
-      group ? groupSection(group, profile.id, scoreContext(profile.id, group)) : '',
+      group
+        ? groupSection(group, profile.id, s.test ? undefined : scoreContext(profile.id, group))
+        : '',
       race ? roadSection(road!, profile.id) : '',
       h(
         'div',
@@ -330,7 +339,7 @@ export function finishRide(
               'Save postcard',
             )
           : '',
-        stravaCardButton(p, s, group, still),
+        s.test ? '' : stravaCardButton(p, s, group, still),
         menu ? h('button', { onclick: () => menu(p) }, '⌂ Main menu') : '',
         h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
       ),

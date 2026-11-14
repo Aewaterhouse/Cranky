@@ -22,6 +22,7 @@ export const resistancePower = (levelPct: number, cadence: number) => levelPct *
 /** Fake trainer: ERG mode forces target * effort; sim mode uses `manual` watts. */
 export class SimTrainer implements Trainer {
   name = 'Simulated trainer'
+  readonly sim = true
   erg: number | null = null
   resistance: number | null = null
   grade = 0

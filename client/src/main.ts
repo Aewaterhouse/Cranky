@@ -21,6 +21,7 @@ import { runDrill } from './modes/drill/drill'
 import { keepAwake as stayAwake } from './ui/wakeLock'
 import { lockZoom } from './ui/noZoom'
 import { diagOverlay } from './ui/diag'
+import { simNote } from './ui/simNote'
 import { runFreeRide } from './modes/freeRide/freeRide'
 import { groupRide } from './modes/freeRide/group'
 import { crew } from './modes/zombieBus/crew'
@@ -33,7 +34,7 @@ import { autoStrava, stravaReturn } from './ui/strava'
 
 let profile: Profile
 /** A ride (or its lobby) keeps the screen on and stops the page zooming. */
-const keepAwake = (on: boolean) => (stayAwake(on), lockZoom(on))
+const keepAwake = (on: boolean) => (stayAwake(on), lockZoom(on), simNote(on))
 
 function home(p: Profile = profile) {
   keepAwake(false)

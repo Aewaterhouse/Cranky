@@ -51,6 +51,8 @@ export class RideRecorder {
   route?: { id: string; name: string; laps?: number; done: boolean }
   segments?: SegResult[]
   startedAt = new Date().toISOString()
+  /** The simulated trainer was used at some point: a test ride that counts for nothing. */
+  sim = false
   constructor(
     public plan: Plan,
     public ftp: number,
@@ -58,8 +60,8 @@ export class RideRecorder {
 
   /** Plain-data copy of everything recorded so far, for crash recovery. */
   toJSON() {
-    const { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints } = this
-    return { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints }
+    const { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints, sim } = this
+    return { plan, ftp, startedAt, power, cadence, target, hr, rows, sprints, sim }
   }
 
   static fromJSON(j: ReturnType<RideRecorder['toJSON']>): RideRecorder {
@@ -143,6 +145,8 @@ export class RideRecorder {
       dist: this.dist.length ? [...this.dist] : undefined,
       route: this.route,
       segments: this.segments,
+      /** Only on a test ride (simulator); a ride on a real trainer has no `test` at all. */
+      test: this.sim || undefined,
     }
   }
 }

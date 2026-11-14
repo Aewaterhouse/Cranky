@@ -13,6 +13,7 @@ from . import bots, discord, room_handle, room_tick
 from . import config as C
 from .modes.ambulance import Ambulance
 from .modes.climate import Climate
+from .modes.common import counted, mark_test
 from .modes.dating import Dating
 from .modes.galley import Galley
 from .modes.hunt import Hunt
@@ -173,6 +174,7 @@ class Room:
                     "erg": self.erg_of(r),
                     "titles": self.titles(r.id),
                     "ready": r.ready or r.bot,
+                    "sim": r.sim,
                 }
                 for r in self.riders.values()
             ],
@@ -292,19 +294,22 @@ class Room:
         if self.task and self.task is not asyncio.current_task():
             self.task.cancel()
         self.summary = self.mode.summary(self)
-        if (
-            self.store and self.summary.get("score") is not None
-        ):  # the crew's best before this ride, for context
-            self.summary["crewBest"] = self.store.crew_best(self.game, self.summary["score"])
-        if self.campaign_view():
-            self.summary["campaign"] = self.store.ride_leg(self.summary["armour"])
-        if hasattr(self.store, "take_titles") and self.summary.get("awards"):
-            self.summary["titles"] = self.store.take_titles(self.summary["awards"])
+        mark_test(self.summary, self.riders)
+        # Test riders (simulator) count for nothing: the records see the real riders only, or nothing at all.
+        real = counted(self.summary)
+        if self.store and real and real.get("score") is not None:  # the crew's best before this ride
+            self.summary["crewBest"] = self.store.crew_best(self.game, real["score"])
+        if real and self.campaign_view():
+            self.summary["campaign"] = self.store.ride_leg(real["armour"])
+        if real and hasattr(self.store, "take_titles") and real.get("awards"):
+            self.summary["titles"] = self.store.take_titles(real["awards"])
         await self.broadcast({"t": "end", "summary": self.summary})
+        if not real:
+            return await self.lobby()
         if (
             self.store and self.game != "watch"
         ):  # the season ladder: bus scores, and rides and awards in every game
-            self.store.add_result(self.plan["name"], {**self.summary, "game": self.game})
-        text = discord.format_summary(self.plan["name"], self.summary)
+            self.store.add_result(self.plan["name"], {**real, "game": self.game})
+        text = discord.format_summary(self.plan["name"], real)
         self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))
         await self.lobby()

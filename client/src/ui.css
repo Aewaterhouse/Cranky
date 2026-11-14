@@ -562,3 +562,28 @@ a.button.primary {
   border-radius: 50%;
   background: var(--acc);
 }
+
+/* Lobbies and rides on the simulated trainer: the ride counts for nothing (ui/simNote.ts). */
+.sim-note {
+  position: fixed;
+  z-index: 40;
+  top: calc(env(safe-area-inset-top) + 2px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.6);
+  color: #ffd27a;
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.test-tag {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgb(255 210 122 / 0.15);
+  color: #ffd27a;
+  font-size: 0.8em;
+  font-style: normal;
+}

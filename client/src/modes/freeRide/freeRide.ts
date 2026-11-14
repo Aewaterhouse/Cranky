@@ -172,7 +172,7 @@ export function runFreeRide(
       ;[dist, speed] = link.correct(dist, speed, dt)
       dist = Math.min(route.distance, Math.max(0, dist))
       if (!paused) el = link.clock()
-      link.report(live.power, live.avg, live.cadence, live.hr ?? null)
+      link.report(live.power, live.avg, live.cadence, live.hr ?? null, ride.noteSim())
       link.takeNotes().forEach((n) => view.toast(n))
     }
     // Game speed comes from power and the real gradient; the trainer gets the road just ahead (see trainerTarget).

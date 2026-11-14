@@ -37,7 +37,8 @@ export function rideExtras(
       if (level) (level > 1 ? SFX.MEGA : SFX.GREAT)()
       if (level) speak(text)
     },
-    (e) => void saveEfforts(rider.id, [{ ...e, rideDate: rec.startedAt }]),
+    // A test ride (simulator) times segments for the toasts but keeps no efforts.
+    (e) => rec.sim || void saveEfforts(rider.id, [{ ...e, rideDate: rec.startedAt }]),
   )
   let was = { dist: 0, el: 0 }
   const G = VIS.route.ghost

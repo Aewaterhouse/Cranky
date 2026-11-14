@@ -11,9 +11,11 @@ import type { GroupSummary } from './resultsViews'
 /**
  * What a finished ride earns the rider, applied to a copy of their profile: the ride itself (bests, totals,
  * streak), any badges it unlocked, scrap (the crew's share or solo minutes), passport stamps and the weekly and
- * daily rewards. Rides under 30 s count for nothing.
+ * daily rewards. Rides under 30 s and test rides (simulator) count for nothing.
  */
 export function rideRewards(profile: Profile, s: RideSummary, group?: GroupSummary) {
+  if (s.test)
+    return { p: profile, unlocked: [], banked: 0, myAwards: 0, week: { p: profile, won: [] } }
   let p = s.record.secs >= 30 ? applyRide(profile, rideRecord(s)) : profile
   const myAwards = group?.awards.filter((a) => a.id === profile.id).length ?? 0
   // Badges this ride unlocked, for a moment of their own at the top of the results.

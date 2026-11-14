@@ -11,6 +11,8 @@ export interface GroupSummary {
   riders: {
     id: string
     name: string
+    /** On the simulated trainer: a test rider, left out of the crew's records and best bits. */
+    test?: boolean
     compliance: number
     inBandSecs: number
     sprints: string[]
@@ -239,7 +241,9 @@ const MVP: [string, (r: Row) => number | undefined][] = [
   ['Most on the beat', (r) => r.beat],
   ['Most sprints', (r) => r.sprints.length || undefined],
 ]
-export function mvpLine(r: Row, all: Row[]) {
+export function mvpLine(r: Row, everyone: Row[]) {
+  if (r.test) return 'Test ride (simulator)'
+  const all = everyone.filter((o) => !o.test)
   let best: [string, number] | null = null
   for (const [label, get] of MVP) {
     const v = get(r)

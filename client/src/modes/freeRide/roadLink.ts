@@ -284,11 +284,11 @@ export class RoadLink {
   }
 
   /** Sends my measured numbers, no more often than `sendS`. */
-  report(power: number, avg: number, cadence: number, hr: number | null) {
+  report(power: number, avg: number, cadence: number, hr: number | null, sim = false) {
     const t = this.now()
     if (t - this.sent < R.sendS) return
     this.sent = t
-    this.out({ t: 'data', p: power, w: avg, cad: cadence, hr })
+    this.out({ t: 'data', p: power, w: avg, cad: cadence, hr, ...(sim ? { sim } : {}) })
   }
 
   /** The toasts gathered since the last call. */

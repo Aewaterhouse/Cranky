@@ -105,6 +105,8 @@ def router(strava: Strava, uploads: Uploads, user: Any) -> APIRouter:
             raise HTTPException(404)
         if not strava.status(u["id"])["connected"]:
             raise HTTPException(409, "Connect Strava first")
+        if ride.get("test"):
+            raise HTTPException(422, "Test rides (simulator) don't go to Strava")
         if (ride.get("record") or {}).get("secs", 0) < config.STRAVA_MIN_SECS:
             raise HTTPException(422, "That ride is too short for Strava")
         fit = unpack(body.fit, ".fit")

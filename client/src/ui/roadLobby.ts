@@ -195,6 +195,7 @@ export function roadLobbyView(c: RoadLobbyCtx) {
               {},
               r.name,
               r.bot ? ' 🤖' : '',
+              r.sim ? h('em', { class: 'test-tag' }, 'sim') : '',
               r.id === m.host ? h('span', { class: 'driver' }, 'Host') : '',
             ),
             h(

@@ -23,7 +23,7 @@ export interface MadState {
 }
 
 export type ClientMsg =
-  | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look }
+  | { t: 'join'; name: string; ftp: number; tier: Tier; look: Look; sim?: boolean }
   | { t: 'watch' }
   | { t: 'setup'; plan: string; minutes: number }
   | { t: 'bots'; n: number }
@@ -49,6 +49,8 @@ export type ClientMsg =
       s?: number | null
       hr: number | null
       hrp?: number | null
+      /** The simulator was used at some point this ride: a test rider. */
+      sim?: boolean
     }
   | { t: 'buy'; item: ShopItem }
   | { t: 'ready'; on: boolean }
@@ -67,6 +69,8 @@ export interface LobbyRider {
   connected: boolean
   look: Look
   bot?: boolean
+  /** On the simulated trainer: a test rider whose ride counts for nothing. */
+  sim?: boolean
   /** ERG holds this rider's target; false means they ride on virtual gears. */
   erg?: boolean
   /** Held titles, from awards, until someone takes them ("🚑 Paramedic of the Week"). */
@@ -319,6 +323,8 @@ export interface RoadLobbyRider {
   connected: boolean
   look: Look
   bot: boolean
+  /** On the simulated trainer: a test rider whose ride counts for nothing. */
+  sim?: boolean
   /** A bot's one-line character. */
   line: string | null
 }
@@ -382,6 +388,7 @@ export interface RoadSummary {
     id: string
     name: string
     bot: boolean
+    test?: boolean
     place: number
     /** Null for a rider who did not finish. */
     time: number | null

@@ -8,7 +8,7 @@ import { downloadFit, downloadJson } from './rideExport'
 import { stravaMark, stravaRides, stravaTag, type StravaJob } from './strava'
 import { fmt, h, kmStr, pctStr } from './dom'
 import { routeTrace } from './routeTrace'
-import { dateStr, rideDetail } from './historyDetail'
+import { dateStr, rideDetail, testTag } from './historyDetail'
 
 /** One row of GET /api/rides. Rides from before a field existed have it as null. */
 export interface RideRow {
@@ -28,6 +28,8 @@ export interface RideRow {
   /** A crew game's id and score (older rides have none). */
   game?: Game | null
   score?: number | null
+  /** A test ride (simulated trainer): kept here, counted nowhere. */
+  test?: boolean
 }
 
 const num = (v: number | null, unit = '') => (v == null ? '–' : `${Math.round(v)}${unit}`)
@@ -65,6 +67,7 @@ function list(rows: RideRow[], open: (n: number) => void, strava?: Record<string
               ? h('em', { class: 'crew-tag' }, 'Crew')
               : '',
           stravaTag(strava?.[r.id]),
+          r.test ? testTag() : '',
         ),
         h('span', {}, r.secs == null ? '–' : fmt(r.secs)),
         h('span', {}, num(r.avgPower)),

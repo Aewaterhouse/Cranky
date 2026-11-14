@@ -1,4 +1,5 @@
 import { api } from '../../core/api'
+import { usesSim } from '../../core/testRide'
 import { SFX } from '../../ui/audio'
 import type { Profile } from '../../core/curve'
 import { withLaps } from '../../core/route'
@@ -63,6 +64,7 @@ export async function groupRide(
       ftp: profile.ftp,
       tier: profile.tier,
       look: profile.look,
+      sim: usesSim(trainer),
     })
     if (pending) net.send({ t: 'road', ...pending, style: 'social' })
     pending = null

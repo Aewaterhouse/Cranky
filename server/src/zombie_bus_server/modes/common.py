@@ -175,3 +175,26 @@ def rider_row(r: Rider, comp: dict[str, float], **extra: object) -> dict:
         "bot": r.bot,
         **extra,
     }
+
+
+def mark_test(summary: dict, riders: dict[str, Rider]) -> None:
+    """Flags the result rows of riders on the simulated trainer (test riders) with `test`."""
+    for row in summary.get("riders", []):
+        if (r := riders.get(row.get("id", ""))) and r.sim:
+            row["test"] = True
+
+
+def counted(summary: dict) -> dict | None:
+    """The result as the crew's records see it: test riders' rows and awards left out.
+
+    None when test riders rode and no real one did: then the room adds nothing anywhere. A room with no
+    test riders is returned as it is.
+    """
+    rows = summary.get("riders", [])
+    test = {r.get("id") for r in rows if r.get("test")}
+    if not test:
+        return summary
+    if not any(not r.get("bot") and not r.get("test") for r in rows):
+        return None
+    awards = [a for a in summary.get("awards", []) if a.get("id") not in test]
+    return {**summary, "riders": [r for r in rows if not r.get("test")], "awards": awards}

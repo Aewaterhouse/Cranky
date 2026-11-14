@@ -182,6 +182,7 @@ export function startBusRide(
       s: busScore(ride.frame, v.c),
       hr,
       hrp: hr && profile.maxHr ? Math.round((hr / profile.maxHr) * 100) / 100 : null,
+      ...(ride.noteSim() ? { sim: true } : {}),
     })
   }, 1000 / CFG.net.sendHz)
   const saver = setInterval(

@@ -105,6 +105,11 @@ class Store(CrewStore):
             self.db.execute(
                 "INSERT INTO rides (rider, date, json) VALUES (?, ?, ?)", (rid, date, json.dumps(summary))
             )
+            if (
+                summary.get("test")
+                and self.db.execute("SELECT 1 FROM sqlite_master WHERE name = 'efforts'").fetchone()
+            ):  # a test ride's segment times never count
+                self.db.execute("DELETE FROM efforts WHERE rider = ? AND ride_date = ?", (rid, date))
         return True
 
     def rides(self, rid: str) -> list[dict]:
@@ -122,7 +127,8 @@ class Store(CrewStore):
                           json_extract(json, '$.record.kj'), json_extract(json, '$.compliance'),
                           json_extract(json, '$.crew'), json_extract(json, '$.route.id'),
                           json_extract(json, '$.distance'), json_extract(json, '$.group.mode'),
-                          json_extract(json, '$.group.score'), json_extract(json, '$.group') IS NOT NULL
+                          json_extract(json, '$.group.score'), json_extract(json, '$.group') IS NOT NULL,
+                          json_extract(json, '$.test')
                    FROM rides WHERE rider = ? ORDER BY date DESC, n DESC""",
                 (rid,),
             ).fetchall()
@@ -136,9 +142,22 @@ class Store(CrewStore):
                 # a crew game's name and score, for the list (bus results from before modes had none)
                 "game": r[12] or ("bus" if r[14] else None),
                 "score": r[13],
+                **({"test": True} if r[15] else {}),
             }
             for r in rows
         ]
+
+    def test_ride(self, rid: str, date: str | None) -> bool:
+        """True if the rider's ride that started at `date` is a test ride (simulated trainer)."""
+        with self.lock:
+            row = (
+                date
+                and self.db.execute(
+                    "SELECT 1 FROM rides WHERE rider = ? AND date = ? AND json_extract(json, '$.test')",
+                    (rid, date),
+                ).fetchone()
+            )
+        return bool(row)
 
     def ride_id(self, rid: str, date: str) -> int | None:
         """The number of the rider's ride that started at `date`, or None."""
@@ -273,7 +292,8 @@ class Store(CrewStore):
         with self.lock, self.db:
             rides = self.db.execute(
                 "SELECT n, rider, json FROM rides WHERE json_extract(json, '$.crew') AND "
-                "json_extract(json, '$.group') IS NULL AND json_extract(json, '$.route') IS NULL ORDER BY n"
+                "json_extract(json, '$.group') IS NULL AND json_extract(json, '$.route') IS NULL AND "
+                "json_extract(json, '$.test') IS NOT 1 ORDER BY n"
             ).fetchall()
             results = self.db.execute("SELECT date, plan, json FROM results ORDER BY n").fetchall()
             pool: dict[tuple[str, str, str], list[dict]] = {}

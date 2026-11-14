@@ -317,7 +317,8 @@ export function runDrill(
     await ride.stop()
     profile.tier = origTier
     tally.record(ride.rec, el, ride.live)
-    const r = ftpResult(plan, ride.rec.power, tally.xs)
+    // A test ride (simulator) never sets an FTP.
+    const r = ride.rec.sim ? null : ftpResult(plan, ride.rec.power, tally.xs)
     if (r) {
       const pick = await view.prompt(
         `Your new FTP: ${r} W`,

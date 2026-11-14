@@ -61,6 +61,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
             look = wear_sash(room.store, rid, msg.look)
             r = room.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=look)
         r.kg = profile_kg(room.store, rid)
+        r.note_sim(msg.sim, room.state == "running")
         r.ws, r.connected, r.last_data = ws, True, time.monotonic()
         if room.paused:
             room.paused = False
@@ -76,6 +77,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
     if isinstance(msg, Data):
         r.p, r.w, r.cad, r.s, r.last_data = msg.p, msg.w, msg.cad, msg.s, time.monotonic()
         r.hr, r.hrp = msg.hr or None, msg.hrp if msg.hr else None
+        r.sim = r.sim or msg.sim
     elif isinstance(msg, Erg):
         r.erg = msg.on
         await room.lobby()

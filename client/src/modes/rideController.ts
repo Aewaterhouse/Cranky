@@ -5,6 +5,7 @@ import { EffectsBus } from '../core/effects'
 import { RideRecorder } from '../core/ride'
 import { currentHr } from '../trainer/heartRate'
 import { ErgController } from '../trainer/ergController'
+import { usesSim } from '../core/testRide'
 import type { Frame, Plan, SprintResult, Trainer, TrainerStatus } from '../types'
 
 export interface Live {
@@ -44,6 +45,7 @@ export class RideController {
   ) {
     this.erg = new ErgController(trainer, profile.ftp, now)
     this.rec = rec ?? new RideRecorder(plan, profile.ftp)
+    this.noteSim()
     trainer.onData((d) => this.data(d.power, d.cadence))
     trainer.onStatus((s) => {
       if (this.stopped) return
@@ -105,7 +107,14 @@ export class RideController {
     this.onSprint(r)
   }
 
+  /** Once the simulator is used, at the start or after a switch mid-ride, the ride is a test ride. */
+  noteSim() {
+    if (usesSim(this.trainer)) this.rec.sim = true
+    return this.rec.sim
+  }
+
   private second() {
+    this.noteSim()
     const f = this.frame
     if (!f || this.paused) return
     const hr = this.hrNow()

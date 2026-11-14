@@ -70,6 +70,8 @@ export type TrainerStatus = 'connected' | 'reconnecting'
 
 export interface Trainer {
   name: string
+  /** The simulated trainer: any ride on it is a test ride that counts for nothing. */
+  readonly sim?: boolean
   connect(): Promise<void>
   onData(cb: (d: { power: number; cadence: number }) => void): void
   /** Fires 'reconnecting' when the link drops and 'connected' once it is back. Listeners add up. */

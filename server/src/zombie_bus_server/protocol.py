@@ -16,6 +16,7 @@ class Join(BaseModel):
     ftp: int = Field(ge=50, le=600)
     tier: Tier
     look: dict[str, str] = Field(default_factory=dict)
+    sim: bool = False  # on the simulated trainer
 
     @field_validator("look", mode="before")
     @classmethod
@@ -95,6 +96,7 @@ class Data(BaseModel):
     s: float | None = Field(default=None, ge=0, le=1)
     hr: int | None = Field(default=None, ge=0, le=250)
     hrp: float | None = Field(default=None, ge=0, le=1.5)
+    sim: bool = False  # the simulator was used at some point this ride
 
 
 class Sprint(BaseModel):
