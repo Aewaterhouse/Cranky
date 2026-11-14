@@ -1,5 +1,5 @@
 // End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride, a Kidney Stone
-// Express shift and a Speed Dating night, the last two with bots.
+// Express shift, a Speed Dating night and a Climate Lawsuit game, the last three with bots.
 // Run with scripts/e2e.sh, which starts a sped-up server on E2E_URL.
 const { chromium } = require('playwright')
 
@@ -87,6 +87,22 @@ async function night(page) {
     if (!new RegExp(want, 'i').test(text)) throw new Error(`dating results missing "${want}"`)
 }
 
+// Climate Lawsuit with three bots: four decades, a fuel change, the Trial and Sentencing.
+async function town(page) {
+  await page.click('text=Start a new bus')
+  await useSim(page)
+  await page.waitForSelector('.code-letters')
+  await page.click('.game-card:has-text("Climate Lawsuit")')
+  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
+  await page.click('text=Start the 1980s')
+  await page.waitForSelector('.cl', { timeout: 20000 })
+  await page.locator('.ch-opt:has-text("Solar")').click({ timeout: 120000 })
+  await page.waitForSelector('text=Made it!', { timeout: 300000 })
+  const text = await page.innerText('body')
+  for (const want of ['Town profit', 'The Trial', 'Polluter of the Decade', 'Coal|Solar|Gas|Wind|Pty|Corp'])
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`climate results missing "${want}"`)
+}
+
 ;(async () => {
   const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
   try {
@@ -100,6 +116,8 @@ async function night(page) {
     console.log('Kidney Stone Express: ok')
     await night(await rider(browser, 'Jack'))
     console.log('Speed Dating: ok')
+    await town(await rider(browser, 'Angus'))
+    console.log('Climate Lawsuit: ok')
     if (errors.length) throw new Error(`page errors:\n${errors.join('\n')}`)
     console.log('e2e passed')
   } catch (e) {

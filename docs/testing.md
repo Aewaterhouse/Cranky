@@ -326,3 +326,12 @@ Built against the simulated trainer and bots, and looked at in headless Chromium
 - TV view (`/?watch=CODE`): the same panel in place of the bus status, the ambulance and the hospital.
 - Dev pages: `/hud-dev.html?game=ambo&state=run|event|siren|me|brake|ramp|reverse|base|cool` (add `&fx=fellout` or `&ask=1`), `/scene-dev.html?ambo=1&siren=1&dist=40&fell=1`.
 - Not checked: any of it on a real trainer (how noisy real power is against the Comfort tolerances is the big unknown), phones and tablets, the announcer's lines, the postcard, Strava text against the real Strava.
+
+## Speed Dating and Climate Lawsuit (2026-11-14)
+
+Same footing as Kidney Stone Express: simulated trainer and bots, headless stills only (`docs/screenshots/games/`), and both are in `scripts/e2e.sh`. Nobody has ridden either.
+
+- Speed Dating: pick it, add three bots, "Open the bar". In The Bar a sheet asks for your dating profile (keys 1 to 3). On each date the panel shows your date, their profile and last emoji, both of you against the band (you ▼, them ▲), chemistry, the emoji tray (five a date) and the couples table; couples ride side by side with a heart that grows with the match. A Chaperone card turns the box orange (red when it is aimed at you). The Wedding rides as a tandem under confetti; the Divorce pulls a rope. Results: Chemistry, Married, Kept the house, the couples, the leaked group chat, the awards and each rider's red flags.
+- Climate Lawsuit: pick it, add three bots, "Start the 1980s". The town replaces the road; your station and its rider sit on the ridge. Before each decade a sheet offers coal, gas, solar and wind with their costs. Solar earns only in its band ("Clouds came over" when you leave it), wind only on gusts. The sea rises through Beach, Surf club, Main Street and Everything; "Build a seawall" spends coins. At the Trial everyone's emissions and bribes come out, the jury votes on an effort and the defendant holds it or is found guilty. A guilty rider in a flooded town wears a red GUILTY ribbon on their name tag in every game for 30 days.
+- Not checked: real trainers, phones and tablets, the announcer, and whether the flood mark suits real riders (bots ride band middles; real riders above them will flood sooner).
+- Test speed-up artefact: with `?fast=` in the browser and `ZB_TIME_SCALE` on the server, your own Time in zone (server game time) can read longer than the Duration (the browser's sped-up recording). They agree at normal speed.

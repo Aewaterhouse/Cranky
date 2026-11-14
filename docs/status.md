@@ -34,8 +34,9 @@
 ## In progress
 - **Three new crew games** (`docs/games-plan.md`, the current priority), started 2026-11-14. All non-ERG, scripted sessions with their own targets, built on a shared kit (per-rider target bands, `act` input, `ask` questions, seeded events with a 90 s quiet limit, a per-game HUD panel, scene and results view).
   - Kidney Stone Express (`ambo`): done end to end. A sped-up shift with bots runs from lobby to results in `scripts/e2e.sh`. Never ridden by a person; Comfort tolerances against real trainer noise are guesses.
-  - Speed Dating (`date`): playable. A sped-up night with three bots runs from The Bar through six dates, the Proposal, Wedding and Divorce to the results (screenshots in `docs/screenshots/games/`). Not yet in `scripts/e2e.sh`; never ridden by a person.
-  - Climate Lawsuit (`climate`): the town scene, HUD and results built the same way on `/hud-dev.html?game=climate`; the GUILTY ribbon draws on name tags; no server rules yet. "Coming soon" in the lobby.
+  - Speed Dating (`date`): playable. A sped-up night with three bots runs from The Bar through six dates, the Proposal, Wedding and Divorce to the results (screenshots in `docs/screenshots/games/`). In `scripts/e2e.sh`; never ridden by a person.
+  - Climate Lawsuit (`climate`): playable. A sped-up game with three bots runs from the 1980s through four decades, the Trial and Sentencing to the results; the GUILTY sash is stored on the server for 30 days. In `scripts/e2e.sh`. Never ridden by a person; the flood mark is tuned on bots.
+  - Watch party: client built (video behind the workout HUD, queue and remote) and its YouTube sync checked against real YouTube; the server side is next.
 - Zwift Click v2: the driver pairs a v2 puck and reads its buttons (from the public bikecontrol source), never run on hardware; the reference's keep-awake logic is not public, so presses may stop after a while. Check in `docs/owner-checks.md`.
 - Zombie Bus: Lunch Break Quickie, a 15 min plan, and a 15 min length chip.
 - `docs/ride-notes-plan.md` worked through on 2026-11-14. Three items stay open: gear strength and falling-off tuning are waiting on the owner (`docs/questions.md`), and the shift-strength slider needs an iPad check. Trainer and iPad checks are in `docs/owner-checks.md`.

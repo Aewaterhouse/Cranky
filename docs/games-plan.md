@@ -108,7 +108,7 @@ Scene: the Madness road pack at dusk, riders side by side in their pairs, a hear
 - [x] D4 Scene: pairs side by side, heart, confetti, tandem for the Wedding, tug-of-war rope for the Divorce.
 - [x] D5 Compatibility report, leaked chat, results, TV view, Strava and Discord text, announcer, bots
       (Clingy, Aloof, Chaotic).
-- [ ] D6 Headless test with four and with five riders (Chaperone), e2e, manual notes, tuning pass.
+- [x] D6 Headless test with four and with five riders (Chaperone), e2e, manual notes, tuning pass.
 
 ## Phase 3: Climate Lawsuit
 
@@ -147,7 +147,7 @@ company that changes with its fuel (stack and smoke, gas flare, panels, turbine)
       sea-level gauge, gust and surge prompts, seawall button, the secret bribe sheet, the jury vote.
 - [x] C5 Scene: the town, stations by fuel, rising water and flood stages, seawall with its sign, courtroom camera.
 - [x] C6 Results, TV view, Strava and Discord text, announcer, bots (Baron, Greenie, Fence-sitter), the sash on avatars.
-- [ ] C7 Headless four-rider test, e2e, manual notes, tuning pass.
+- [x] C7 Headless four-rider test, e2e, manual notes, tuning pass.
 
 ## Phase 4: after all three
 

@@ -68,7 +68,6 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Town profit',
     plan: false,
     fixed: true,
-    soon: true,
   },
   watch: {
     icon: '📺',
