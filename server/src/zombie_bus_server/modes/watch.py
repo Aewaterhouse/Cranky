@@ -32,6 +32,8 @@ class Watch(CrewGame):
         self.at = 0.0
         self.queue: list[dict] = []
         self.added: dict[str, int] = {}
+        self.title: str | None = None
+        self.played: list[dict] = []  # queue entries already played, for their titles
 
     def where(self, el: float) -> float:
         """The video's position at ride time `el`."""
@@ -39,6 +41,7 @@ class Watch(CrewGame):
 
     def cue(self, room: Room, vid: str | None, play: bool) -> None:
         self.vid, self.pos, self.at, self.playing = vid, 0.0, room.el, play and vid is not None
+        self.title = next((q["title"] for q in self.played if q["vid"] == vid), None)
 
     def on_act(self, room: Room, r: Rider, k: str, v: str | float | bool | None) -> None:
         if k == "add" and isinstance(v, str) and VID.match(v) and len(self.queue) < G.WATCH_QUEUE_MAX:
@@ -49,6 +52,15 @@ class Watch(CrewGame):
             else:
                 self.queue.append({"vid": v, "title": None, "by": r.name})
                 self.emit("say", f"{r.name} queued a video.")
+            return
+        if k == "title" and isinstance(v, str) and len(v) > 11:
+            # A player names the video it loaded: the 11-character id, then the title.
+            vid, title = v[:11], v[11:].strip()
+            if vid == self.vid:
+                self.title = title
+            for q in self.queue:
+                if q["vid"] == vid:
+                    q["title"] = title
             return
         if r.id != room.host:
             return
@@ -62,6 +74,8 @@ class Watch(CrewGame):
             self.pos, self.at = max(0.0, self.where(room.el) + step), room.el
         elif k == "next":
             nxt = self.queue.pop(0) if self.queue else None
+            if nxt:
+                self.played.append(nxt)
             self.cue(room, nxt["vid"] if nxt else None, True)
 
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
@@ -74,7 +88,7 @@ class Watch(CrewGame):
         return {
             "g": "watch",
             "vid": self.vid,
-            "title": None,
+            "title": self.title,
             "playing": self.playing,
             "pos": round(self.pos, 2),
             "at": round(self.at, 2),

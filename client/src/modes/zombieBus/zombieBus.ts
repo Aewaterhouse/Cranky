@@ -59,7 +59,12 @@ export function startBusRide(
   if (location.search.includes('debug')) debugPanel()
   let l = lobby0
   const ui = GAME_UI[l.game ?? 'bus']
-  const world = ui?.world?.(stage, (t) => hud?.toast(t)) ?? new World(stage)
+  const world =
+    ui?.world?.(
+      stage,
+      (t) => hud?.toast(t),
+      (k, v) => net.send({ t: 'act', k, v }),
+    ) ?? new World(stage)
   const plan = l.plan
   const total = planTotal(plan.blocks)
   const key = busKey(profile.id, l.code)

@@ -28,7 +28,12 @@ const state = q.get('state') ?? 'run'
 const ui = GAME_UI[game]
 const stage = h('div', { class: 'stage' })
 document.getElementById('app')!.append(stage)
-const world = ui?.world?.(stage, (t) => hud.toast(t)) ?? new World(stage)
+const world =
+  ui?.world?.(
+    stage,
+    (t) => hud.toast(t),
+    (k, v) => hud.toast(`act ${k} = ${v}`),
+  ) ?? new World(stage)
 const plan: Plan = {
   id: 'dev',
   name: 'Dev',

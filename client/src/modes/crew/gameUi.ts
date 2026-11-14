@@ -17,7 +17,11 @@ export interface GameUi {
   /** Scene state the game sets over the bus's own. */
   scene: (m: Tick) => Partial<SceneState>
   /** The game's own 3D scene in place of the road, when it has one. */
-  world?: (stage: HTMLElement, say: (text: string) => void) => Stage
+  world?: (
+    stage: HTMLElement,
+    say: (text: string) => void,
+    act: (k: string, v: string) => void,
+  ) => Stage
 }
 /** What the ride and TV screens ask of a scene. */
 export type Stage = Pick<World, 'fx' | 'cycleView' | 'dispose' | 'snapshot'> & { state: SceneState }
@@ -63,6 +67,7 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     events: {},
     panel: makeWatchPanel,
     scene: (m) => ({ game: m.game, el: m.el }) as Partial<SceneState>,
-    world: videoStage,
+    world: (stage, say, act) =>
+      videoStage(stage, say, (vid, t) => act('title', `${vid}${t}`.slice(0, 64))),
   },
 }

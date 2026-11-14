@@ -7,7 +7,11 @@ import type { SceneState } from './world'
  * The watch party's stage: a YouTube player filling the screen behind the HUD, kept on the room's position. It takes
  * the same state as the 3D world; times are ride time, carried forward between ticks by the local clock.
  */
-export function videoStage(host: HTMLElement, onError: (text: string) => void) {
+export function videoStage(
+  host: HTMLElement,
+  onError: (text: string) => void,
+  onTitle: (vid: string, title: string) => void = () => {},
+) {
   const box = document.createElement('div')
   box.className = 'video-stage'
   host.append(box)
@@ -32,12 +36,18 @@ export function videoStage(host: HTMLElement, onError: (text: string) => void) {
   tap.onclick = () => (yt.apply({ k: 'play' }), (tap.hidden = true), (refused = 0))
   host.append(tap)
   let refused = 0
+  const told = new Set<string>()
   const timer = setInterval(() => {
     const me = yt.local()
     if (!me) return
     const step = syncStep(room, me, now())
     refused = step?.k === 'play' ? refused + 1 : me.state === 1 ? 0 : refused
     tap.hidden = refused < 6
+    const t = me.vid && room.vid === me.vid && !told.has(me.vid) ? yt.title() : null
+    if (t && me.vid) {
+      told.add(me.vid)
+      onTitle(me.vid, t)
+    }
     yt.apply(step)
   }, 500)
   return {

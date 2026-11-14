@@ -9,6 +9,7 @@ interface YtPlayer {
   seekTo(s: number, allowSeekAhead: boolean): void
   getCurrentTime(): number
   getPlayerState(): number
+  getVideoData?(): { title?: string }
   destroy(): void
 }
 interface YtNs {
@@ -62,6 +63,8 @@ export function ytPlayer(host: HTMLElement, onError: (code: number) => void = ()
       if (!p?.getPlayerState) return null
       return { vid, state: p.getPlayerState(), time: p.getCurrentTime() }
     },
+    /** The loaded video's title, once YouTube knows it. */
+    title: () => p?.getVideoData?.()?.title || null,
     apply(s: Step) {
       if (!p || !s) return
       if (s.k === 'load') {

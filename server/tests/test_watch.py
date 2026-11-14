@@ -69,3 +69,14 @@ def test_a_watch_party_room_rides_its_workout_on_erg_and_sends_the_video():
 
     room = asyncio.run(main())
     assert room.mode.vid == VID and room.mode.summary(room)["mode"] == "watch"
+
+
+def test_a_player_names_the_video_for_everyone():
+    room, w, host, guest = party()
+    for v in (VID, VID2):
+        w.on_act(room, guest, "add", v)
+    w.on_act(room, guest, "title", f"{VID}Big Buck Bunny")
+    w.on_act(room, guest, "title", f"{VID2}Never Gonna Give You Up")
+    assert w.game(room, 1, 0)["title"] == "Big Buck Bunny"
+    w.on_act(room, host, "next", None)
+    assert w.game(room, 1, 0)["title"] == "Never Gonna Give You Up"

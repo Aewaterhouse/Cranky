@@ -133,7 +133,11 @@ export function spectate(code: string, leaveTo: () => void) {
       )
       if (gui.world) {
         world.dispose()
-        world = gui.world(stage, () => {})
+        world = gui.world(
+          stage,
+          () => {},
+          () => {},
+        )
       }
       bus.root.replaceWith(panel.root)
       setEvents(gui.events)
