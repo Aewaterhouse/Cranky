@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   applyRide,
+  level,
   liveStreak,
   rideRecord,
   bestEfforts,
@@ -99,5 +100,14 @@ describe('rideRecord', () => {
     expect(rideRecord({ record, tss: 1, np: 200, sprints: [], planName: 'Mondo' }).plan).toBe(
       'Mondo',
     )
+  })
+})
+
+describe('level', () => {
+  it('climbs with kJ and rides, each level a bit further than the last', () => {
+    const p = newProfile('a')
+    expect(level(p)).toEqual({ n: 1, xp: 0, from: 0, to: 300 })
+    p.stats = { ...p.stats, kj: 950, rides: 1 }
+    expect(level(p)).toMatchObject({ n: 2, xp: 1000, from: 300, to: 1200 })
   })
 })

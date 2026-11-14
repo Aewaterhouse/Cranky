@@ -276,3 +276,12 @@ export const zoneOf = (w: number, ftp: number) => {
   const i = CFG.zones.findIndex((z) => f < z)
   return i < 0 ? CFG.zones.length : i
 }
+
+/** Rider level from all riding: a point per kJ plus a bonus per ride; each level needs a bit more than the last. */
+export function level(p: Profile) {
+  const xp = Math.round(p.stats.kj + p.stats.rides * CFG.level.perRide)
+  const at = (n: number) => CFG.level.base * (n - 1) ** 2
+  let n = 1
+  while (xp >= at(n + 1)) n++
+  return { n, xp, from: at(n), to: at(n + 1) }
+}

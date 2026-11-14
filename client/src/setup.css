@@ -846,3 +846,8 @@ details.ftp-card > summary {
   color: var(--acc);
   font-weight: 700;
 }
+.level-bar {
+  max-width: 280px;
+  margin-top: 6px;
+  height: 24px;
+}

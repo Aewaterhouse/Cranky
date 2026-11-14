@@ -69,6 +69,8 @@ export const CFG = {
   streak: { freezeEvery: 4, freezeMax: 2 },
   /** Rider Overview: kJ per meat pie and per Tim Tam (a kJ at the pedals is about a kcal burned). */
   funStats: { pieKj: 420, timTamKj: 95 },
+  /** Rider level: XP is kJ plus `perRide` a ride; level n starts at base × (n − 1)². */
+  level: { base: 300, perRide: 50 },
   /** Training plans: a ride this share of a session's length on its day counts it done, whatever was ridden. */
   trainingPlan: { doneFrac: 0.8 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],

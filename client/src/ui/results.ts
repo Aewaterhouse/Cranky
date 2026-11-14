@@ -4,7 +4,7 @@ import { CFG } from '../config'
 import { badges } from '../core/badges'
 import { badgeCard, headline, lastTime, nextUp, scoreContext } from './resultsTop'
 import { bankScrap, soloScrap } from '../core/cosmetics'
-import { applyRide, ftpSuggestion, recordFtp, rideRecord, type Profile } from '../core/curve'
+import { applyRide, ftpSuggestion, level, recordFtp, rideRecord, type Profile } from '../core/curve'
 import { stampRide } from '../core/passport'
 import { saveProfile } from '../core/profile'
 import { postRide } from '../core/rideQueue'
@@ -171,6 +171,14 @@ export function finishRide(
       // What you earned leads, then the game's story, then the training numbers.
       s.record.secs < 30
         ? h('div', { class: 'card' }, 'Under 30 s, so this one is not saved to your History.')
+        : '',
+      level(p).n > level(profile).n
+        ? h(
+            'div',
+            { class: 'card hl' },
+            h('b', {}, `⬆ Level ${level(p).n}!`),
+            ' Every ride counts towards the next one.',
+          )
         : '',
       ...unlocked.map(badgeCard),
       banked

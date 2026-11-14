@@ -1,7 +1,7 @@
 import { portrait } from './shopPreview'
 import { CFG } from '../config'
 import { TIER_NAME } from '../types'
-import { liveStreak, type Profile } from '../core/curve'
+import { level, liveStreak, type Profile } from '../core/curve'
 import { stickBadges } from '../core/badges'
 import { saveProfile } from '../core/profile'
 import { wkgStr } from '../core/riderMetrics'
@@ -69,6 +69,17 @@ function overview(p: Profile) {
   )
 }
 
+/** Level and the bar to the next one. */
+function levelBar(p: Profile) {
+  const l = level(p)
+  return h(
+    'div',
+    { class: 'need-bar level-bar', title: `${l.xp} XP` },
+    h('i', { style: `width:${Math.round(((l.xp - l.from) / (l.to - l.from)) * 100)}%` }),
+    h('span', {}, `Level ${l.n} · ${l.to - l.xp} XP to ${l.n + 1}`),
+  )
+}
+
 /** Initials straight away, swapped for the rider in their Garage look once it is drawn. */
 function face(p: Profile) {
   let el: HTMLElement = avatar(p.name, 'xl')
@@ -97,6 +108,7 @@ export function riderTab(p: Profile) {
           { class: 'dim' },
           `FTP ${p.ftp} W${p.weightKg ? ` · ${wkgStr(p.ftp, p.weightKg)}` : ''} · ${TIER_NAME[p.tier]} effort`,
         ),
+        levelBar(p),
       ),
     )
   const body = h('div', { class: 'rider-body' })
