@@ -154,3 +154,13 @@ def test_leaving_a_lobby_frees_the_seat_and_hands_over_the_drivers_seat():
 
     room = asyncio.run(main())
     assert "h0" not in room.riders and room.host == "g1"
+
+
+def test_the_crew_best_is_the_best_before_this_ride(tmp_path):
+    from zombie_bus_server.store import Store
+
+    s = Store(tmp_path / "b.db")
+    assert s.crew_best("ambo", 900) is None
+    assert s.crew_best("ambo", 700) == 900
+    assert s.crew_best("ambo", 1200) == 900
+    assert s.crew_best("ambo", 100) == 1200 and s.crew_best("date", 5) is None

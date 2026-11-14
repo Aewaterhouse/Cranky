@@ -39,6 +39,7 @@ class Store:
             CREATE TABLE IF NOT EXISTS rooms (code TEXT PRIMARY KEY, json TEXT, saved_at REAL);
             CREATE TABLE IF NOT EXISTS results (n INTEGER PRIMARY KEY, date TEXT, plan TEXT, json TEXT);
             CREATE TABLE IF NOT EXISTS sashes (id TEXT PRIMARY KEY, until REAL);
+            CREATE TABLE IF NOT EXISTS bests (game TEXT PRIMARY KEY, score REAL, date TEXT);
             """)
 
     def sash_until(self, rid: str) -> float | None:
@@ -244,6 +245,17 @@ class Store:
         for old in sorted(folder.glob("cranky-*.db"))[:-keep]:
             old.unlink()
         return dest
+
+    def crew_best(self, game: str, score: float) -> float | None:
+        """The crew's best score in this game before this one (None the first time), then keeps the higher."""
+        with self.lock, self.db:
+            row = self.db.execute("SELECT score FROM bests WHERE game = ?", (game,)).fetchone()
+            if not row or score > row[0]:
+                self.db.execute(
+                    "INSERT OR REPLACE INTO bests (game, score, date) VALUES (?, ?, ?)",
+                    (game, score, time.strftime("%Y-%m-%d")),
+                )
+        return row[0] if row else None
 
     def add_result(self, plan: str, summary: dict) -> None:
         """Records a finished bus ride for the season ladder."""

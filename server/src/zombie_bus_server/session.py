@@ -251,6 +251,10 @@ class Room:
         if self.task and self.task is not asyncio.current_task():
             self.task.cancel()
         self.summary = self.mode.summary(self)
+        if (
+            self.store and self.summary.get("score") is not None
+        ):  # the crew's best before this ride, for context
+            self.summary["crewBest"] = self.store.crew_best(self.game, self.summary["score"])
         await self.broadcast({"t": "end", "summary": self.summary})
         if self.store and self.game == "bus":  # the season ladder ranks bus scores only
             self.store.add_result(self.plan["name"], self.summary)

@@ -172,3 +172,4 @@ position, through `ErgController.setGrade`.
 - Watch party `act` keys, more: `emoji` (one of six; anyone; comes back to everyone as fx `emoji` with the rider's id), and for the host `up` and `drop` with a queued video's id.
 - Watch party sources: `add` takes a YouTube id, `tw:<channel>` (a Twitch stream: live, shown but never synced) or `url:https://…` (a .mp4, .webm, .ogv or .mov file, synced like YouTube). `title` is the source, a tab, then the title. `act` values may be up to 300 characters, for links.
 - `GET /api/rooms/{code}`: `{code, kind, state}` for a ride that exists (any case), 404 otherwise. The home screen checks a typed code with it before asking for a trainer.
+- Crew ride summaries carry `crewBest`: the crew's best score in that game before this ride (null the first time). The server keeps one best per game (`bests` table).

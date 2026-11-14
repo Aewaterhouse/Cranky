@@ -42,6 +42,8 @@ export interface GroupSummary {
   flooded?: boolean
   stageName?: string
   verdicts?: Record<string, 'guilty' | 'acquitted'>
+  /** The crew's best score in this game before this ride (none the first time). */
+  crewBest?: number | null
   /** Kidney Stone Express: each patient's Google review. */
   reviews?: { patient: string; icon: string; stars: number; text: string }[]
   awards: { award: string; id: string; name: string; why: string }[]

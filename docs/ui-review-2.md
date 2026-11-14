@@ -31,7 +31,7 @@ say where you are, and free-ride places that don't look like where they are.
 3. [x] A "what you earned" card at the top of every results screen; one number for scrap, not two (rider 3).
 4. [x] Badge unlock moments and progress bars on locked badges (rider 4).
 5. [ ] (the weekly streak now shows on home and results; Overview and Trends still count differently; no freeze yet) One weekly streak, shown on home and results, with a freeze (rider 5).
-6. [ ] (your best and last time per game now show under the score, per device; a crew-wide best needs the server) Scores with context: crew best and last time (games 3, rider 14).
+6. [x] (crew best from the server, your best and last time per device) Scores with context: crew best and last time (games 3, rider 14).
 
 **Races**
 7. [ ] (live place and gap done: "P3 of 6 · 4 s to Kat" under the speed panel; sprint points still badges) Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).

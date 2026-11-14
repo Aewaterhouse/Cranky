@@ -38,6 +38,11 @@ export function scoreContext(me: string, g: GroupSummary) {
   } catch {
     /* storage blocked: the score still shows */
   }
+  const crew = g.crewBest
+  if (crew != null && g.score > crew)
+    return `New crew record! The old best was ${crew.toLocaleString()}.`
+  const mine = was ? ` · your best ${was.best.toLocaleString()}` : ''
+  if (crew != null) return `Crew best ${crew.toLocaleString()}${mine}`
   if (!was) return 'Your first go. Beat it next time.'
   if (g.score > was.best) return `New best! Up from ${was.best.toLocaleString()}.`
   return `Your best ${was.best.toLocaleString()} · last time ${was.last.toLocaleString()}`
