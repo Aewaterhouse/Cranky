@@ -33,6 +33,8 @@ def test_ride_list_detail_and_delete():
         "crew": True,
         "route": None,
         "distance": None,
+        "game": None,
+        "score": None,
     }
     assert rows[1]["crew"] is False
     detail = client.get(f"/api/rides/{rows[0]['id']}", headers=h).json()
