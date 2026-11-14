@@ -828,3 +828,7 @@
   height: 46px;
   font-size: 1.6rem;
 }
+.game-cards .switch-game {
+  align-self: center;
+  justify-self: start;
+}

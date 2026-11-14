@@ -135,6 +135,7 @@ export function lobbyView(c: LobbyCtx) {
     firstNote,
   )
   const gameRow = h('div', { class: 'game-cards' })
+  let allGames = false
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -183,8 +184,19 @@ export function lobbyView(c: LobbyCtx) {
     botRow.hidden = !isHost
     const game = l.game ?? 'bus'
     const info = GAMES[game]
-    const ids = isHost ? (Object.keys(GAMES) as Game[]) : [game]
-    gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost, c.game)))
+    // Only the game on; the host opens the rest with Switch game, so the run and Start stay above the fold.
+    const ids = isHost && allGames ? (Object.keys(GAMES) as Game[]) : [game]
+    const pick = (g: Game) => ((allGames = false), c.game(g))
+    gameRow.replaceChildren(
+      ...ids.map((g) => gameCard(g, g === game, isHost, pick)),
+      isHost
+        ? h(
+            'button',
+            { class: 'ghost switch-game', onclick: () => ((allGames = !allGames), update(l)) },
+            allGames ? 'Close ▴' : 'Switch game ▾',
+          )
+        : '',
+    )
     diffRow.hidden = game !== 'bus' // the horde only chases the bus
     firstRow.hidden = game !== 'watch'
     title.textContent = game === 'bus' ? 'Bus lobby' : `${info.name} lobby`
