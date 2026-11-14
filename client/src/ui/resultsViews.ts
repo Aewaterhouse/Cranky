@@ -235,6 +235,8 @@ const MVP: [string, (r: Row) => number | undefined][] = [
   ['Best matched', (r) => r.match],
   ['Richest company', (r) => r.coins],
   ['Top points', (r) => r.points],
+  ['Highest step', (r) => r.reached],
+  ['Most on the beat', (r) => r.beat],
   ['Most sprints', (r) => r.sprints.length || undefined],
 ]
 export function mvpLine(r: Row, all: Row[]) {
