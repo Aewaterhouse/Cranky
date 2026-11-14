@@ -6,6 +6,8 @@ export type Fuel = 'coal' | 'gas' | 'solar' | 'wind'
 /** Terrace tops (m) from the beach up to the ridge the power stations sit on. The ridge never floods. */
 export const TOPS = { beach: 1, shore: 2.4, main: 4.4, hill: 8, ridge: 14 }
 const W = 96
+/** The land's width, the front (seaward) edge of each terrace from the beach up, its back, and the seawall's face. */
+export const LAND = { w: W, fronts: [36, 20, 8, -10, -30], back: -52, wall: 37.2 }
 
 const sign = (w: number, h: number, lines: string[], bg: string, fg: string) =>
   new THREE.Mesh(

@@ -5,6 +5,7 @@ import type { SceneState } from '../world'
 import { makeRider } from '../riders'
 import { clamp, lerp } from '../util'
 import { TOPS, seawall, station, townLand, type Fuel } from './townGeo'
+import { TownWater } from './townWater'
 
 /** Tunables for the Climate Lawsuit town (debug panel on /town-dev.html?debug=1). */
 export const TOWN = {
@@ -66,7 +67,7 @@ export class TownWorld {
   scene = new THREE.Scene()
   camera = new THREE.PerspectiveCamera(TOWN.fov, 1, 1, 600)
   town: TownState = { level: 0, walls: 0, riders: [] }
-  private water: THREE.Mesh
+  private water = new TownWater()
   private wall = seawall()
   private plants = new Map<string, Plant>()
   private y = TOWN.heights[0]
@@ -95,13 +96,8 @@ export class TownWorld {
     )
     bed.rotation.x = -Math.PI / 2
     bed.position.y = -0.6
-    this.water = new THREE.Mesh(
-      new THREE.PlaneGeometry(900, 900),
-      new THREE.MeshLambertMaterial({ color: TOWN.sea, transparent: true }),
-    )
-    this.water.rotation.x = -Math.PI / 2
     this.wall.group.position.set(0, 0, 36.5)
-    this.scene.add(bed, this.water, this.wall.group)
+    this.scene.add(bed, this.water.group, this.wall.group)
     this.ro = new ResizeObserver(() => this.resize())
     this.ro.observe(host)
     this.resize()
@@ -159,10 +155,9 @@ export class TownWorld {
     const s = this.town
     const t = this.t
     this.y = lerp(this.y, waterY(s.level), clamp(dt * TOWN.rise))
-    this.water.position.y = this.y + Math.sin(t * 0.8) * 0.06
-    const wm = this.water.material as THREE.MeshLambertMaterial
-    wm.color.set(TOWN.sea)
-    wm.opacity = TOWN.seaOpacity
+    this.water.mat.color.set(TOWN.sea)
+    this.water.mat.opacity = TOWN.seaOpacity
+    this.water.update(t, this.y, s.level, s.walls)
     this.wall.group.visible = s.walls > 0
     // A wall is a delay, not a fix: it always stands just proud of whatever the sea has got to.
     const wh = Math.max(s.walls * TOWN.wallStep, this.y + 0.7)

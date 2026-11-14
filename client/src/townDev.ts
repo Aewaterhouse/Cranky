@@ -1,5 +1,6 @@
 import GUI from 'lil-gui'
 import { TOWN, TownWorld } from './scene/town/townWorld'
+import { WATER } from './scene/town/townWater'
 import type { Fuel } from './scene/town/townGeo'
 
 /**
@@ -37,4 +38,14 @@ if (q.has('debug')) {
   ] as const)
     gui.add(TOWN, k)
   for (const k of ['sea', 'sky', 'storm'] as const) gui.addColor(TOWN, k)
+  for (const k of [
+    'swell',
+    'swellS',
+    'foam',
+    'foamPulse',
+    'debrisFrom',
+    'debrisSize',
+    'gullSize',
+  ] as const)
+    gui.add(WATER, k)
 }
