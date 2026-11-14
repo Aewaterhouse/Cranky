@@ -36,7 +36,9 @@ re-run the review after a big round.
 *Owner, 2026-11-14: phones are an edge case. Phone-only findings (3, 12 and the phone halves of 8 and 19) go to the
 end of the queue. Owner's own to-dos go first:*
 
-- [ ] Watch Party: paste a video link in the lobby, so the video is on as the ride starts.
+- [ ] Power curve and other graphs: higher detail and a smoothed line instead of chunky segments.
+
+- [x] Watch Party: paste a video link in the lobby, so the video is on as the ride starts.
 - [x] "Your effort" levels: say what they are (Hard is the workout as written) instead of Hard, Medium, Easy.
 
 **Results and history: the story is the product**

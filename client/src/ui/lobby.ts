@@ -2,6 +2,7 @@ import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
+import { FIRST_VIDEO, videoSource } from '../core/watchSync'
 import { gameCard } from './gameCard'
 import { TIER_NAME, TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
@@ -110,6 +111,29 @@ export function lobbyView(c: LobbyCtx) {
     diffWhat,
   )
   const mutRow = h('div', { class: 'bot-row mut-row' })
+  // Watch Party: a link pasted here goes on the moment the countdown starts.
+  const firstNote = h('span', { class: 'dim' })
+  const firstIn = h('input', {
+    placeholder: 'Paste a YouTube or Twitch link to start with',
+    value: sessionStorage.getItem(FIRST_VIDEO) ?? '',
+    oninput: () => {
+      const v = videoSource(firstIn.value)
+      if (v) sessionStorage.setItem(FIRST_VIDEO, v)
+      else sessionStorage.removeItem(FIRST_VIDEO)
+      firstNote.textContent = !firstIn.value
+        ? ''
+        : v
+          ? '✓ It starts with the ride'
+          : 'That doesn’t look like a video link'
+    },
+  }) as HTMLInputElement
+  const firstRow = h(
+    'div',
+    { class: 'bot-row first-video' },
+    h('span', {}, '📺 First video'),
+    firstIn,
+    firstNote,
+  )
   const gameRow = h('div', { class: 'game-cards' })
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
@@ -162,6 +186,7 @@ export function lobbyView(c: LobbyCtx) {
     const ids = isHost ? (Object.keys(GAMES) as Game[]) : [game]
     gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost, c.game)))
     diffRow.hidden = !info.plan
+    firstRow.hidden = game !== 'watch'
     title.textContent = game === 'bus' ? 'Bus lobby' : `${info.name} lobby`
     roof.textContent = info.name.toUpperCase()
     effort.hidden = trainRow.hidden = !!info.fixed
@@ -267,6 +292,7 @@ export function lobbyView(c: LobbyCtx) {
           seats,
           botRow,
           gameRow,
+          firstRow,
           diffRow,
           trainRow,
           mutRow,

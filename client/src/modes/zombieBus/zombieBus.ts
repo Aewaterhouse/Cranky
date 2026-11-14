@@ -18,6 +18,7 @@ import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
 import type { Frame, Trainer } from '../../types'
 import { GAME_UI } from '../crew/gameUi'
+import { FIRST_VIDEO } from '../../core/watchSync'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
 import { camButton, camKey } from '../../ui/camButton'
@@ -196,6 +197,12 @@ export function startBusRide(
   let lastCount = 0
 
   function tick(m: Tick) {
+    // A watch party's first video, pasted in the lobby, goes on as the countdown starts.
+    const first = l.game === 'watch' && sessionStorage.getItem(FIRST_VIDEO)
+    if (first) {
+      sessionStorage.removeItem(FIRST_VIDEO)
+      net.send({ t: 'act', k: 'add', v: first })
+    }
     const me = m.riders[profile.id]
     if (me && me.tier !== profile.tier) {
       profile.tier = me.tier

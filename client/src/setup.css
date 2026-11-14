@@ -783,3 +783,8 @@
   line-height: 1.25;
   opacity: 0.8;
 }
+.first-video input {
+  flex: 1;
+  min-width: 0;
+  max-width: 420px;
+}

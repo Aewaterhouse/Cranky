@@ -92,3 +92,6 @@ export const sourceName = (src: string) =>
     : src.startsWith('url:')
       ? decodeURIComponent(src.split('/').pop() ?? src)
       : src
+
+/** Session storage key for the watch party's first video, pasted in the lobby and sent as the countdown starts. */
+export const FIRST_VIDEO = 'cranky.firstVideo'
