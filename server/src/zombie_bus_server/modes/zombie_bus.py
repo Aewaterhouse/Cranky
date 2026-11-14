@@ -66,6 +66,7 @@ class ZombieBus(CrewGame):
         self.ev = ""
         self.shopped = False  # anyone bought at this servo stop
         self.boss: dict | None = None  # the final fight: {i, kind, need (s on target), done}
+        self.roles: dict[str, dict] = {}  # rider -> {role, held (s on the cue), ready (ride time)}
         self.weather = "clear"  # rolled by the room as the ride starts (`roll_weather`)
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
@@ -118,6 +119,7 @@ class ZombieBus(CrewGame):
         tally(active, dt)
         self.hauling(room, active, dt)
         self.turns(room, active, ev)
+        self.role_tick(room, active, ev, dt)
         if self.boss and self.boss["i"] == i and not self.boss.get("over"):
             self.boss["done"] += comp * dt
         self.cadence_sync(active, dt)
@@ -362,6 +364,32 @@ class ZombieBus(CrewGame):
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
 
+    def role_tick(self, room: Room, active: list[Rider], ev: str, dt: float) -> None:
+        """Crew roles: each rider's ability fires by itself once they hold its cue, then cools down."""
+        for n, rid in enumerate(sorted(room.riders)):
+            self.roles.setdefault(rid, {"role": list(C.ROLES)[n % len(C.ROLES)], "held": 0.0, "ready": 0.0})
+        if ev in C.ROLE_QUIET:
+            return
+        cads = [r.cad for r in active]
+        mean = statistics.fmean(cads) if cads else 0.0
+        for r in active:
+            st = self.roles[r.id]
+            role = C.ROLES[st["role"]]
+            cue = {
+                "spin": r.cad >= role.get("rpm", 0),
+                "grind": 0 < r.cad <= role.get("rpm", 0),
+                "target": (r.s or 0) >= role.get("s", 1),
+                "steady": abs(r.cad - mean) <= role.get("rpm", 0) and r.cad > 0,
+            }[role["cue"]]
+            st["held"] = st["held"] + dt if cue and room.el >= st["ready"] else 0.0
+            if st["held"] < role["hold"]:
+                continue
+            st["held"], st["ready"] = 0.0, room.el + C.ROLE_CD
+            self.gap += role.get("gap", 0)
+            self.armour = min(100.0, self.armour + role.get("armour", 0))
+            self.scrap += role.get("scrap", 0)
+            self.emit("role", f"{r.name}, {role['name'].lower()}: {role['done']}", r.id)
+
     def zed_pull(self, ev: str, active: list[Rider], comp: float) -> float:
         """Metres a second the event's zombie type gains when the crew rides the way it hunts: runners chase a
         low cadence, brutes a crew off target."""
@@ -557,6 +585,14 @@ class ZombieBus(CrewGame):
             "wares": self.wares,
             "weather": self.weather,
             "zed": C.ZED_TYPES[self.ev]["tip"] if self.ev in C.ZED_TYPES else None,
+            "roles": {
+                rid: {
+                    "role": st["role"],
+                    "tip": C.ROLES[st["role"]]["tip"],
+                    "cd": max(0, round(st["ready"] - room.el)),
+                }
+                for rid, st in self.roles.items()
+            },
             "boss": (
                 {
                     "name": C.BOSSES[self.boss["kind"]]["name"],

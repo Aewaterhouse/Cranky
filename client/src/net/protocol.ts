@@ -135,6 +135,8 @@ export interface BusState {
   boss?: { name: string; left: number } | null
   /** The zombie type this event brings and what beats it ("🏃 RUNNERS: keep your cadence over 85"). */
   zed?: string | null
+  /** Crew roles: each rider's role, what fires it and seconds until it is ready again. */
+  roles?: Record<string, { role: string; tip: string; cd: number }>
   repel: number
   syncw: number
   nitro: number

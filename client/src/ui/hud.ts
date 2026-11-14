@@ -260,7 +260,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     tick(m: Tick) {
       const meId = o.meId ?? ''
       rbProg = m.bus.rb
-      bus.update(m.bus, m.riders)
+      bus.update(m.bus, m.riders, meId)
       const ms = m.bus.mad
       if (ms) mad?.update(ms, m.riders, meId)
       o.panel?.update(m, meId)

@@ -30,6 +30,7 @@ export function makeBusPanel() {
   const busIco = h('span', { class: 'bs-bus' }, '🚌')
   const gapTrack = h('div', { class: 'bs-gap' }, zombie, busIco)
   const zed = h('div', { class: 'bs-zed-tip' })
+  const role = h('div', { class: 'bs-role' })
   const armour = h('div', { class: 'bs-bar' }, armourFill)
   // The boss fight: its name and a health bar that empties as the crew rides on target.
   const bossName = h('label', {})
@@ -59,6 +60,7 @@ export function makeBusPanel() {
     h('div', { class: 'bs-head' }, h('label', {}, 'HORDE GAP'), gapN),
     gapTrack,
     zed,
+    role,
     h(
       'div',
       { class: 'bs-stats' },
@@ -86,7 +88,14 @@ export function makeBusPanel() {
     )
   return {
     root,
-    update(b: BusState, riders: Record<string, RiderTick>) {
+    update(b: BusState, riders: Record<string, RiderTick>, me = '') {
+      const mine = b.roles?.[me]
+      set(
+        role,
+        mine
+          ? `🎭 ${mine.role.toUpperCase()} · ${mine.cd ? `ready in ${mine.cd} s` : mine.tip}`
+          : '',
+      )
       const a = Math.round(b.armour)
       set(armourN, `${a}`)
       armourFill.style.width = `${Math.max(0, Math.min(100, b.armour))}%`

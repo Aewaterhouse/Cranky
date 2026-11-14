@@ -226,3 +226,11 @@
 .bs-zed-tip:empty {
   display: none;
 }
+.bs-role {
+  margin: 2px 0;
+  font-size: 0.78em;
+  color: #9fd8ff;
+}
+.bs-role:empty {
+  display: none;
+}

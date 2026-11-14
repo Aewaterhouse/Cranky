@@ -465,10 +465,26 @@ def test_runners_chase_a_slow_cadence_and_brutes_a_crew_off_target():
     set_all(slow[0], 1.0, cad=70)
     for room, bus in (fast, slow):
         run(room, bus, 20)
-    assert slow[1].gap < fast[1].gap - 10
+    assert slow[1].gap < fast[1].gap - 3  # the gunner claws a few metres back at 70 rpm
     assert fast[1].state(fast[0], 1, 0)["zed"].startswith("🏃 RUNNERS")
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 0.8)
     assert bus.zed_pull("rampup", list(room.riders.values()), 0.8) == C.ZED_TYPES["rampup"]["pull"]
     assert bus.zed_pull("rampup", list(room.riders.values()), 0.95) == 0
     assert bus.zed_pull("servo", list(room.riders.values()), 0.1) == 0
+
+
+def test_crew_roles_fire_on_their_cue_then_cool_down():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0, cad=90)
+    run(room, bus, 1)
+    assert [bus.roles[f"r{i}"]["role"] for i in range(4)] == list(C.ROLES)
+    room.riders["r0"].cad = 105  # the driver spins it up
+    gap = bus.gap
+    fx = run(room, bus, 6)
+    roles = [f for f in fx if f["k"] == "role"]
+    assert [f["id"] for f in roles if "floored" in f["text"]] == ["r0"]
+    assert bus.state(room, 1, 0)["roles"]["r0"]["cd"] > 80
+    fx = run(room, bus, 10)
+    assert not [f for f in fx if f["k"] == "role" and f["id"] == "r0"]  # cooling down
+    assert bus.gap > gap
