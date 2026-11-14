@@ -16,6 +16,7 @@ def test_a_question_opens_scores_and_names_who_got_it():
         room.start()
         room.task.cancel()
         g = room.mode
+        g.mut = {}  # whatever this week's twist is, the plain night
         for r in room.riders.values():
             r.s, r.st = 1.0, "riding"
         fx = []

@@ -52,3 +52,12 @@ def test_strava_names_the_newer_games_too():
     ride = {"planName": "Sweet Spot", "record": {"secs": 1800}, "group": room.summary}
     title, text = describe(ride, "h0")
     assert title == "🛶 Galley Ship · Sweet Spot" and "Zombie Bus" not in text
+
+
+def test_this_weeks_twist_sets_the_beat_window():
+    from zombie_bus_server.modes.galley import Galley
+
+    g = Galley()
+    assert g.tol() == G.GALLEY_TOL
+    g.mut = next(m for m in G.GAME_MUTATORS["galley"] if m["id"] == "chop")
+    assert g.tol() == 3

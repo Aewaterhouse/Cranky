@@ -21,6 +21,10 @@ class Galley(CrewGame):
         self.on: dict[str, float] = {}  # seconds each rider rowed on the beat
         self.beat = G.GALLEY_BEATS[0]
 
+    def tol(self) -> int:
+        """How close to the beat counts: this week's twist may make it tighter or looser."""
+        return self.mut.get("tol", G.GALLEY_TOL)
+
     def beat_at(self, el: float) -> int:
         return G.GALLEY_BEATS[int(max(0.0, el) // G.GALLEY_BEAT_S) % len(G.GALLEY_BEATS)]
 
@@ -31,7 +35,7 @@ class Galley(CrewGame):
         if beat != self.beat:
             self.beat = beat
             self.emit("drum", f"The drum changes: row at {beat} rpm!")
-        on = [r for r in rowing if abs(r.cad - beat) <= G.GALLEY_TOL]
+        on = [r for r in rowing if abs(r.cad - beat) <= self.tol()]
         for r in on:
             self.on[r.id] = self.on.get(r.id, 0.0) + dt
         share = len(on) / len(rowing) if rowing else 0.0
@@ -52,7 +56,7 @@ class Galley(CrewGame):
             "sync": round(self.sync, 2),
             "gap": round(self.gap, 1),
             "hull": round(self.hull),
-            "tol": G.GALLEY_TOL,
+            "tol": self.tol(),
         }
 
     def summary(self, room: Room) -> dict:

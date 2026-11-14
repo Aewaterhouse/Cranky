@@ -65,12 +65,12 @@ class PubQuiz(CrewGame):
             self.n += 1
             q, answers = QUESTIONS[self.draw[self.n]]
             self.opts = random.Random(f"{room.code}:{self.n}").sample(answers, 4)
-            self.open_at, self.close_at, self.got = room.el, room.el + G.QUIZ_OPEN_S, {}
+            self.open_at, self.close_at, self.got = room.el, room.el + self.mut.get("open", G.QUIZ_OPEN_S), {}
             self.emit("quiz", f"Question {self.n + 1}: {q}")
         for r in room.riders.values():  # bots answer after a think, about half of them right
             if r.bot and self.is_open(room) and r.id not in self.got:
                 rng = random.Random(f"{room.code}:{self.n}:{r.id}")
-                if room.el - self.open_at >= rng.uniform(4, G.QUIZ_OPEN_S - 2):
+                if room.el - self.open_at >= rng.uniform(4, self.mut.get("open", G.QUIZ_OPEN_S) - 2):
                     right = self.opts.index(QUESTIONS[self.draw[self.n]][1][0])
                     self.got[r.id] = [right if rng.random() < 0.5 else (right + 1) % 4, room.el, True]
         return super().tick(room, dt, i, bel, ev)

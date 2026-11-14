@@ -263,6 +263,16 @@ GAME_MUTATORS = {
         {"id": "chatty", "name": "Chatty Night", "desc": "Double emoji for everyone.", "emoji": 2.0},
         {"id": "normal", "name": "Regular Night", "desc": "The usual handful of emoji.", "emoji": 1.0},
     ],
+    "galley": [
+        {"id": "chop", "name": "Choppy Seas", "desc": "The beat is harder to hold: within 3 rpm.", "tol": 3},
+        {"id": "calm", "name": "Calm Waters", "desc": "An easy beat: within 6 rpm.", "tol": 6},
+        {"id": "normal", "name": "Fair Winds", "desc": "Within 4 rpm, as usual.", "tol": 4},
+    ],
+    "quiz": [
+        {"id": "lightning", "name": "Lightning Round", "desc": "15 seconds to answer.", "open": 15},
+        {"id": "slow", "name": "Slow Night", "desc": "40 seconds to answer.", "open": 40},
+        {"id": "normal", "name": "Trivia Night", "desc": "25 seconds to answer.", "open": 25},
+    ],
 }
 
 # Last Rider Standing: steps of LAST_STEP % FTP a minute from LAST_FROM to the 150% cap, LAST_HOLDS more
