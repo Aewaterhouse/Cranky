@@ -700,3 +700,10 @@ kbd {
   width: min(100%, 480px);
   border-radius: 12px;
 }
+.garage-shelves {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 8px 0;
+  background: var(--bg);
+}

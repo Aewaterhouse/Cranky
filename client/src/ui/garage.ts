@@ -160,10 +160,26 @@ export function garageTab(p: Profile, changed: () => void) {
           h('div', { class: 'shopgrid' }, ...treats.map(item)),
         )
       : '',
+    // Shelf chips: jump straight to a slot instead of scrolling the whole shop.
+    h(
+      'nav',
+      { class: 'chips garage-shelves' },
+      ...slots.map((s) =>
+        h(
+          'button',
+          {
+            class: 'chip-sel',
+            onclick: () =>
+              document.getElementById(`shelf-${s}`)?.scrollIntoView({ behavior: 'smooth' }),
+          },
+          SLOT_NAMES[s],
+        ),
+      ),
+    ),
     ...slots.map((s) =>
       h(
         'section',
-        { class: 'slot' },
+        { class: 'slot', id: `shelf-${s}` },
         h('h2', { class: 'label' }, SLOT_NAMES[s], h('small', {}, WHERE[s])),
         h('div', { class: 'shopgrid' }, ...COSMETICS.filter((c) => c.slot === s).map(item)),
       ),

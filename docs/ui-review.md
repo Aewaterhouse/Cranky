@@ -69,7 +69,7 @@ end of the queue. Owner's own to-dos go first:*
 17. [ ] (crew rides now show time to go on the bottom strip) Crew modes show no total time left (riding 17). Zone and W/kg describe power, not the target (riding 18).
 
 **Rider and Garage**
-18. [ ] Garage: no try-on preview, paint thumbnails without the bike, a 3,300 px wall without tabs (rider 3, 4, 8).
+18. [ ] (try-on for hats, outfits and bikes, sticky shelf chips, a deal of the week, Treat yourself and progress bars done; paint thumbnails still without the bike) Garage: no try-on preview, paint thumbnails without the bike, a 3,300 px wall without tabs (rider 3, 4, 8).
 19. [ ] Phone Settings wider than the screen; clipped "OPTIONAL" placeholders in the display font (rider 9, 10).
 20. [ ] (crew line colours fixed) Crew comparison line is the same yellow as yours (rider 7). Recent rides can't be opened from Overview (rider 11).
 
