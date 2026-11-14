@@ -42,7 +42,7 @@ export function hello(p: Profile, act: HomeActions) {
       h(
         'small',
         {},
-        `${p.stats.rides} rides · ${Math.round(p.stats.secs / 3600)} h · ${p.stats.kj.toLocaleString()} kJ` +
+        `${p.stats.rides} ride${p.stats.rides === 1 ? '' : 's'} · ${Math.round(p.stats.secs / 3600)} h · ${p.stats.kj.toLocaleString()} kJ` +
           (p.stats.streak > 1 ? ` · ${p.stats.streak} week streak` : ''),
       ),
     ),
