@@ -266,6 +266,8 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       if (ms) mad?.update(ms, m.riders, meId)
       o.panel?.update(m, meId)
       sheet.update(m.riders[meId]?.ask)
+      // A question on screen: splashes go small and high so they never sit on the card.
+      root.classList.toggle('asking', !!m.riders[meId]?.ask)
       mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m, meId)
       cues.tick(m)
