@@ -353,3 +353,8 @@ tr.me td {
   color: var(--acc);
   letter-spacing: 1px;
 }
+/* Tiles that hold words (names, a town's fate) wrap and shrink instead of being cut off. */
+.res-tile.words b {
+  white-space: normal;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+}

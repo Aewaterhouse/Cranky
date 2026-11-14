@@ -43,7 +43,7 @@ Five games through `game === 'madness'` switches will not hold, and four files i
       in place of their madness switches. Tick carries a generic `game` object for new modes.
 - [x] Client: lobby game picker becomes cards (five games will not fit a segmented control); generic prompt bar
       (countdown, band, "you" vs "everyone") and a choice sheet (pick one of N, used by cards, fuels and votes).
-- [ ] (Strava and Discord text done for Kidney Stone Express; history labels still to do) Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
+- [x] (history shows each game by name: a scripted game's ride is saved under the game's name with the Crew tag) Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
 
 ## Phase 1: Kidney Stone Express
 

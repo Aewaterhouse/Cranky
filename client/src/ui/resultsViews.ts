@@ -110,8 +110,8 @@ export const VIEWS: Record<
   },
   date: {
     tiles: (g) => [
-      tile('Married', g.married ? `${g.married.a} + ${g.married.b}` : 'Nobody'),
-      tile('Kept the house', g.divorced ? g.divorced.winner : 'No divorce'),
+      tile('Married', g.married ? `${g.married.a} + ${g.married.b}` : 'Nobody', 'words'),
+      tile('Kept the house', g.divorced ? g.divorced.winner : 'No divorce', 'words'),
     ],
     col: 'Match · best date · red flags',
     cell: (r) =>
@@ -134,8 +134,8 @@ export const VIEWS: Record<
   },
   climate: {
     tiles: (g) => [
-      tile('The town', g.flooded ? 'Flooded' : 'Survived'),
-      tile('Sea level', g.stageName ?? 'Dry'),
+      tile('The town', g.flooded ? 'Flooded' : 'Survived', 'words'),
+      tile('Sea level', g.stageName ?? 'Dry', 'words'),
     ],
     col: 'Company · coins · emissions',
     cell: (r) =>
