@@ -33,7 +33,7 @@ export const openRiderSettings = () => (sub = 'settings')
 const panel = (title: string, ...kids: (Node | string)[]) =>
   h('section', { class: 'panel' }, h('h2', { class: 'label' }, title), ...kids)
 
-function overview(p: Profile) {
+function overview(p: Profile, toHistory: () => void) {
   if (stickBadges(p)) saveProfile(p)
   const s = p.stats
   const stat = (v: string | number, l: string) =>
@@ -63,7 +63,11 @@ function overview(p: Profile) {
       'div',
       { class: 'cols' },
       panel('Time in zone', zoneBar(s.zones)),
-      panel('Recent rides', history(p)),
+      panel(
+        'Recent rides',
+        history(p),
+        h('button', { class: 'link', onclick: toHistory }, 'Open any ride in History →'),
+      ),
     ),
     badgeGrid(p),
   )
@@ -125,7 +129,7 @@ export function riderTab(p: Profile) {
       ),
     )
     const views: Record<Sub, () => Node> = {
-      overview: () => overview(p),
+      overview: () => overview(p, () => ((sub = 'history'), draw())),
       power: () => h('div', {}, powerTab(p), prTimelinePanel(p)),
       trends: () => trendsTab(p),
       history: () => historyTab(p),
