@@ -49,6 +49,20 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
           ...(g.titles ?? []).map((t) => h('p', { class: 'res-title' }, t)),
         )
       : '',
+    g.highlights?.length
+      ? h(
+          'div',
+          { class: 'card' },
+          h('h2', {}, 'Best moments'),
+          h(
+            'ol',
+            { class: 'res-moments' },
+            ...g.highlights.map((m) =>
+              h('li', {}, h('time', {}, fmt(Math.max(0, m.t))), ` ${m.text}`),
+            ),
+          ),
+        )
+      : '',
     h(
       'div',
       { class: 'card' },

@@ -62,6 +62,9 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
         self.shopped = False  # anyone bought at this servo stop
         self.boss: dict | None = None  # the final fight: {i, kind, need (s on target), done}
         self.roles: dict[str, dict] = {}  # rider -> {role, held (s on the cue), ready (ride time)}
+        self.highlights: list[dict] = []  # the ride's best moments for the results: {t (ride s), text}
+        self.clock = 0.0
+        self.whisker = False  # the horde got within a whisker and has not been shaken off yet
         self.weather = "clear"  # rolled by the room as the ride starts (`roll_weather`)
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
@@ -95,10 +98,13 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
 
     def emit(self, k: str, text: str | None = None, rid: str | None = None) -> None:
         self.fx.append({"k": k, "text": text, "id": rid})
+        if k in C.HIGHLIGHTS and text and len(self.highlights) < C.HIGHLIGHT_MAX:
+            self.highlights.append({"t": round(self.clock), "text": text})
 
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
         """Advances the bus by `dt` seconds in block `i` (event `ev`). Returns fx since the last tick."""
         b = room.plan["blocks"][i]
+        self.clock = room.el
         if self.ev == "servo" and ev != "servo":
             self.auto_shop()
             self.pick_leg(room)
@@ -148,7 +154,13 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
             self.gap += (k * (comp - neutral) - creep + (C.TUNE_GAP_BONUS if self.tune else 0)) * dt
         self.gap -= self.zed_pull(ev, active, comp) * dt
         self.gap = min(C.GAP_MAX, self.gap)
+        if 0 < self.gap < C.WHISKER[0]:
+            self.whisker = True
+        elif self.whisker and self.gap > C.WHISKER[1]:
+            self.whisker = False
+            self.emit("escape", "Escaped the horde by a whisker!")
         if self.gap <= 0:
+            self.whisker = False
             self.gap = 0
             if self.armour > 0:
                 self.damage(C.HIT_DAMAGE, "The horde caught the bus!")
@@ -472,4 +484,5 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
             "syncPct": round(100 * self.sync_ticks / self.ticks) if self.ticks else 0,
             "riders": [rider_row(r, comp, kj=round(r.rs_joules / 1000, 1)) for r in rs],
             "awards": awards,
+            "highlights": self.highlights,
         }

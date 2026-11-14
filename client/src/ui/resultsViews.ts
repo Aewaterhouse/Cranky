@@ -46,6 +46,8 @@ export interface GroupSummary {
   crewBest?: number | null
   /** Held titles that changed hands or stayed put this ride ("Kat takes 🚑 Paramedic of the Week from Dazza"). */
   titles?: string[]
+  /** The bus ride's best moments: ride seconds and what happened. */
+  highlights?: { t: number; text: string }[]
   /** Kidney Stone Express: each patient's Google review. */
   reviews?: { patient: string; icon: string; stars: number; text: string }[]
   awards: { award: string; id: string; name: string; why: string }[]

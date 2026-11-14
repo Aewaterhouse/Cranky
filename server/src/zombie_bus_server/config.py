@@ -280,6 +280,11 @@ ROLES = {
 }
 ROLE_CD = 90
 ROLE_QUIET = ("warmup", "cooldown", "roadblock", "servo")
+# Highlights: the fx kinds that make the results' best moments, at most this many a ride. WHISKER: the horde
+# within the first many metres, then shaken off past the second, is a last-gasp escape.
+HIGHLIGHTS = ("slowmo", "harpoon", "bosswin", "smash", "escape", "airstrike", "gunship")
+HIGHLIGHT_MAX = 10
+WHISKER = (3, 15)
 # Boss fight: the last long effort before the cool-down. The crew wears it down by riding on target: beaten
 # once BOSS_SHARE of the block's seconds have been ridden at full compliance (the crew's mean).
 BOSS_EVENTS = ("longhaul", "surge", "rampup")

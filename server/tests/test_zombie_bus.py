@@ -488,3 +488,18 @@ def test_crew_roles_fire_on_their_cue_then_cool_down():
     fx = run(room, bus, 10)
     assert not [f for f in fx if f["k"] == "role" and f["id"] == "r0"]  # cooling down
     assert bus.gap > gap
+
+
+def test_the_best_moments_land_in_the_summary_with_their_time():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 2)
+    bus.gap = 2
+    run(room, bus, 1)
+    bus.gap = 20
+    run(room, bus, 1)
+    bus.emit("slowmo", "R0: LEGEND!", "r0")
+    bus.emit("hit", "ouch")
+    h = bus.summary(room)["highlights"]
+    assert [x["text"] for x in h] == ["Escaped the horde by a whisker!", "R0: LEGEND!"]
+    assert h[0]["t"] == 4
