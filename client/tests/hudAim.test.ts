@@ -100,6 +100,12 @@ describe('what the power panel is told', () => {
     expect(gears.chip).toBe('⚙ Gears')
     expect(gears.target).toBe(200)
   })
+  it('leads with the target on ERG and with power on gears, as solo does', () => {
+    const erg = busAim(frame('steady', 200), 190, 640)
+    expect([erg.cap, erg.targetLeads]).toEqual(['Target', true])
+    expect(busAim(frame('steady', 200), 190, 640, false).targetLeads).toBeFalsy()
+    expect(soloAim(frame('steady', 200), null).targetLeads).toBe(true)
+  })
   it('shows the best sprint so far, and says when it is beaten', () => {
     expect(busAim(frame('sprint', null), 300, 640).note).toBe('All out · best 640 W')
     expect(busAim(frame('sprint', null), 700, 640).note).toBe('All out · new best!')

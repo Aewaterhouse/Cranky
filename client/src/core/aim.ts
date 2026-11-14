@@ -32,7 +32,7 @@ export function soloAim(f: Frame, mode: string | null): Aim {
     : { cap: 'Power · 3 s', chip: `aim ${f.tgt} W`, target: f.tgt, note: mode, cad: f.cad }
 }
 
-/** The bus's power panel: power leads, the target beneath. A sprint shows the rider's best so far, never a target. */
+/** The crew rides' power panel, on the solo rule. A sprint shows the rider's best so far, never a target. */
 export function busAim(f: Frame | null, power: number, best: number, erg = true): Aim {
   if (!f) return { cap: 'Power · 3 s', note: 'Get ready' }
   if (f.type === 'sprint' || f.band === 'sprint')
@@ -44,7 +44,10 @@ export function busAim(f: Frame | null, power: number, best: number, erg = true)
     }
   if (Array.isArray(f.band))
     return { cap: 'Power · 3 s', chip: `${f.band[0]}–${f.band[1]} W`, target: f.tgt!, cad: f.cad }
+  // As in solo: on ERG the trainer holds the target, so it leads; on gears the rider steers their power, so that leads.
   return f.tgt
-    ? { cap: 'Power · 3 s', chip: erg ? '🔒 ERG' : '⚙ Gears', target: f.tgt, cad: f.cad }
+    ? erg
+      ? { cap: 'Target', chip: '🔒 ERG', target: f.tgt, targetLeads: true, cad: f.cad }
+      : { cap: 'Power · 3 s', chip: '⚙ Gears', target: f.tgt, cad: f.cad }
     : { cap: 'Power · 3 s', chip: 'ERG off', note: 'Free ride', cad: f.cad }
 }
