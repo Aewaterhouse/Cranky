@@ -1,5 +1,7 @@
 # Zombie Bus
 
+[![CI](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml)
+
 A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in from name tiles; the server seeds Alex, Luke, Steve, Angus, Ali and Jack, and the password is the name (case-insensitive). Security is deliberately light: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
 
 See `PLAN.md` for the design, `docs/protocol.md` for the wire protocol, `docs/map.md` for a file-by-file map and `docs/testing.md` for manual test notes.
@@ -28,6 +30,8 @@ Production: `cd client && pnpm build`, then the server serves `client/dist` itse
 cd client && pnpm test      # vitest: plan, compliance, curve, ERG caps, cosmetics, load (NP/IF/TSS)
 cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless multiplayer test
 ```
+
+GitHub Actions runs the same checks (workflow "CI", `.github/workflows/ci.yml`) on every push to master and every pull request: a client job (Node 24 and pnpm 10, as the Dockerfile builds; tsc, lint, tests, build) and a server job (uv, Python 3.12; pytest) in parallel. It never deploys: Railway deploys by itself once CI passes. `scripts/e2e.sh` (headless browser ride) is run by hand, not in CI.
 
 ## Server environment variables
 

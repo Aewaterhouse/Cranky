@@ -2,6 +2,7 @@
 
 ## Root
 - `PLAN.md` design and phases; `AGENTS.md` working rules; `README.md` setup; `Dockerfile` production image (client build + server).
+- `.github/workflows/ci.yml` GitHub Actions "CI": client and server checks in parallel on pushes to master and pull requests (no deploy).
 - `scripts/run.sh` build client and start server on :8000; `scripts/selfsigned.sh` self-signed certs for LAN HTTPS.
 - `scripts/routes/build_routes.py` builds bundled route packs from OpenStreetMap and SRTM; `terrain.py` SRTM tile reader and the height grid around a route; `features.py` land cover, side roads, buildings and landmarks from OpenStreetMap; `gpx.py` routes cut from a recorded ride; `fit.py` minimal FIT reader for course files; `net.py` cached fetch; `routes.json` route definitions (waypoints, published figures); `test_build_routes.py` its tests (`cd server && uv run pytest ../scripts/routes`).
 - `content/routes/index.json` route cards; `content/routes/<id>.json` one pack per bundled route.
