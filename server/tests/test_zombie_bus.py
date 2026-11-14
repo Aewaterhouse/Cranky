@@ -41,10 +41,11 @@ def test_fell_off_drops_tier_and_haul_back():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0)
     room.riders["r0"].s = 0.3
-    fx = run(room, bus, 31)
+    room.el = C.FELL_GRACE_S  # past the start's grace, as is the block
+    fx = run(room, bus, 31, bel0=C.FELL_STEP_GRACE_S)
     r0 = room.riders["r0"]
     assert r0.st == "fell" and r0.tier == "medium" and any(f["k"] == "fell" for f in fx)
-    fx = run(room, bus, 21, bel0=31)
+    fx = run(room, bus, 21, bel0=31 + C.FELL_STEP_GRACE_S)
     assert r0.st == "riding" and any(f["k"] == "hauled" and "+" in f["text"] for f in fx)
 
 
@@ -279,6 +280,17 @@ def test_nightmare_catches_a_perfect_crew_and_harder_levels_drop_riders_sooner()
     for level in ("easy", "nightmare"):
         room, bus = FakeRoom(STEADY), ZombieBus(level)
         set_all(room, 0.55)  # under nightmare's line, over easy's
-        run(room, bus, C.FELL_AFTER_S + 2)
+        room.el = C.FELL_GRACE_S
+        run(room, bus, C.FELL_AFTER_S + 2, bel0=C.FELL_STEP_GRACE_S)
         falls[level] = sum(r.st == "fell" for r in room.riders.values())
     assert falls == {"easy": 0, "nightmare": 4}
+
+
+def test_nobody_falls_off_while_erg_ramps_at_the_start_a_new_block_or_the_warm_up():
+    for el0, bel0, ev in ((0.0, 60.0, "longhaul"), (120.0, 0.0, "longhaul"), (120.0, 60.0, "warmup")):
+        room, bus = FakeRoom(STEADY), ZombieBus()
+        set_all(room, 0.2)
+        room.el = el0
+        secs = C.FELL_STEP_GRACE_S - 1 if bel0 == 0 else (C.FELL_GRACE_S - 1 if el0 == 0 else 40)
+        run(room, bus, secs, ev=ev, bel0=bel0)
+        assert all(r.st == "riding" for r in room.riders.values()), (el0, bel0, ev)

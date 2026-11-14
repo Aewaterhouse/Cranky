@@ -58,6 +58,9 @@ TIERS = ["hard", "medium", "easy"]
 FELL_COMPLIANCE = 0.6  # bots aim under this to fall off; riders use their level's `fell` (DIFFICULTY)
 FELL_AFTER_S = 30
 FELL_COOLDOWN_S = 60
+FELL_GRACE_S = 30  # nobody falls off in the ride's first seconds
+FELL_STEP_GRACE_S = 10  # nor in the first seconds of a block, while ERG ramps to the new target
+FELL_FREE_EVENTS = ("warmup", "cooldown")
 # While riders are off the bus everyone still on it carries them: targets rise by FELL_LOAD per fallen
 # rider, up to FELL_LOAD_MAX in all. The 150% FTP cap still applies.
 FELL_LOAD = 0.05

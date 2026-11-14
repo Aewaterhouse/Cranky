@@ -1,3 +1,4 @@
+import { isRest } from '../core/hud'
 import { listWindow } from '../core/hud'
 import type { BlockStat } from '../core/ride'
 import { blockTarget } from '../core/plan'
@@ -117,10 +118,12 @@ export function soloPanel(plan: Plan, tier: () => Tier, ftp: number) {
         if (!r || s.i >= upto) continue
         const spr = sprints.find((x) => x.blk === s.i)
         const ok = s.compliance >= 0.85
-        r.result.className = `rg ${spr ? `g-${spr.grade}` : ok ? 'good' : 'miss'}`
+        // Warm-ups, recoveries and cool-downs are not graded: only the work is (as TrainerRoad does).
+        const easy = isRest(r.b.type, s.avgTarget || null, ftp)
+        r.result.className = `rg ${spr ? `g-${spr.grade}` : easy ? '' : ok ? 'good' : 'miss'}`
         r.result.textContent = spr
           ? spr.grade
-          : r.b.type === 'free'
+          : easy
             ? `${s.avgPower} W`
             : `${s.avgPower} W ${ok ? '✓' : '✗'}`
       }

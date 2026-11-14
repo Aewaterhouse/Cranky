@@ -83,7 +83,9 @@ class ZombieBus(CrewGame):
         if i != self.last_i:
             self.block_change(room, i, b, ev)
         active = [r for r in room.riders.values() if r.st == "riding"]
-        self.fell_off(room, active, dt)
+        # No falling off while ERG is still ramping (the start, a new block) or in the warm-up and cool-down.
+        if room.el >= C.FELL_GRACE_S and bel >= C.FELL_STEP_GRACE_S and ev not in C.FELL_FREE_EVENTS:
+            self.fell_off(room, active, dt)
         active = [r for r in active if r.st == "riding"]
         comp = statistics.fmean([r.s if r.s is not None else 1.0 for r in active]) if active else 0.0
         tally(active, dt)
