@@ -17,6 +17,7 @@ import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
 import { eventOf, FX_DEFAULT, madEvents } from './hudKit'
 import { makeMadPanel } from './hudMad'
+import { GAMES } from '../modes/crew/games'
 import { hudMenu, hudToast, hudUnit } from './hudParts'
 import { powerPanel } from './hudPower'
 import { makeRoster } from './hudRoster'
@@ -251,7 +252,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       root.classList.add('pre')
       fit()
       setPower(null, live)
-      sp.splash('sp-count sp-pre', `${n}`, mad ? 'MADNESS STARTS IN' : 'BUS LEAVES IN', 1100, 0)
+      sp.splash('sp-count sp-pre', `${n}`, GAMES[o.mad ? 'madness' : 'bus'].countdown, 1100, 0)
     },
     /** Everything that comes from the server tick: bus, roster, shop, fx. */
     tick(m: Tick) {

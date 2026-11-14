@@ -1,5 +1,6 @@
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
+import { GAMES } from '../modes/crew/games'
 import { TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
 import { avatar, h, seg } from './dom'
@@ -108,13 +109,15 @@ export function lobbyView(c: LobbyCtx) {
     diffWhat,
   )
   const mutRow = h('div', { class: 'bot-row mut-row' })
-  const GAMES: [Game, string][] = [
-    ['bus', '🧟 Zombie Bus'],
-    ['madness', '🤯 VO2 Madness'],
-  ]
-  const gameSeg = seg(GAMES, 'bus', (v) => c.game(v), 'diff')
-  const gameNote = h('span', { class: 'dim' })
-  const gameRow = h('div', { class: 'bot-row' }, h('span', {}, '🎮 Game'), gameSeg, gameNote)
+  const gameRow = h('div', { class: 'game-cards' })
+  const gameCard = (g: Game, on: boolean, pick: boolean) =>
+    h(
+      'button',
+      { class: `game-card${on ? ' on' : ''}`, disabled: !pick, onclick: () => c.game(g) },
+      h('span', { class: 'gc-icon' }, GAMES[g].icon),
+      h('b', {}, GAMES[g].name),
+      h('small', {}, GAMES[g].blurb),
+    )
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -161,11 +164,11 @@ export function lobbyView(c: LobbyCtx) {
     bots = l.riders.filter((r) => r.bot).length
     botN.textContent = String(bots)
     botRow.hidden = !isHost
-    const mad = l.game === 'madness'
-    gameSeg.set(l.game ?? 'bus')
-    gameSeg.hidden = !isHost
-    gameNote.textContent = isHost ? '' : GAMES.find(([g]) => g === (l.game ?? 'bus'))![1]
-    diffRow.hidden = mad
+    const game = l.game ?? 'bus'
+    const info = GAMES[game]
+    const ids = isHost ? (Object.keys(GAMES) as Game[]) : [game]
+    gameRow.replaceChildren(...ids.map((g) => gameCard(g, g === game, isHost)))
+    diffRow.hidden = !info.plan
     const trainers = l.trainers ?? 'choose'
     trainSeg.set(trainers)
     trainSeg.hidden = !isHost
@@ -197,7 +200,7 @@ export function lobbyView(c: LobbyCtx) {
     tierSeg.set(tier)
     tierNote.textContent = `${mainWatts(l.plan, tier, me.ftp)} on the big block at ${me.ftp} W FTP.`
 
-    const key = `${l.plan.id}|${l.minutes}|${l.plan.blocks.length}|${tier}|${isHost}|${mad}`
+    const key = `${l.plan.id}|${l.minutes}|${l.plan.blocks.length}|${tier}|${isHost}|${game}`
     if (key !== runKey) {
       runKey = key
       run.replaceChildren(
@@ -209,13 +212,7 @@ export function lobbyView(c: LobbyCtx) {
           h('span', { class: 'dur-big' }, minsLabel(l.plan.blocks)),
         ),
         h('div', { class: 'tags' }, ...tagEls(l.plan)),
-        mad
-          ? h(
-              'p',
-              {},
-              '🎁 Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for heart-rate effort. Set your max heart rate first.',
-            )
-          : planGraph(l.plan.blocks, tier),
+        info.plan ? planGraph(l.plan.blocks, tier) : h('p', {}, `${info.icon} ${info.blurb}`),
         h('p', { class: 'dim' }, l.plan.desc ?? ''),
         isHost ? '' : h('p', { class: 'dim' }, `${driver} picks the run. It updates here live.`),
       )
@@ -236,11 +233,7 @@ export function lobbyView(c: LobbyCtx) {
 
     startSlot.replaceChildren(
       isHost
-        ? h(
-            'button',
-            { class: 'primary mega-go', onclick: c.start },
-            mad ? 'Start the madness' : 'Start the bus',
-          )
+        ? h('button', { class: 'primary mega-go', onclick: c.start }, info.start)
         : h(
             'div',
             { class: 'waiting' },

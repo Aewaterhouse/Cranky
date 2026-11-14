@@ -1,3 +1,5 @@
+import type { Game } from '../net/protocol'
+import { GAMES } from '../modes/crew/games'
 import { fmt, h, pctStr } from './dom'
 import type { GroupSummary } from './results'
 import { savePng } from './ridePostcard'
@@ -32,7 +34,7 @@ export function groupSection(g: GroupSummary, myId: string) {
       h(
         'div',
         { class: 'res-score' },
-        h('span', {}, mad ? 'Pack effort points' : 'Bus score'),
+        h('span', {}, GAMES[(g.mode ?? 'bus') as Game].score),
         h('b', {}, g.score.toLocaleString()),
       ),
       tile('Distance', `${(g.distance / 1000).toFixed(1)} km`),
