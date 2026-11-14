@@ -46,6 +46,7 @@ class Rider(RideStats):
     look: dict[str, str] = field(default_factory=dict)
     bot: bool = False
     erg: bool = True
+    ready: bool = False  # in the lobby; a fresh ride starts everyone unready
     kg: float | None = None  # from the rider's stored profile, for W/kg
 
     def reset_stats(self) -> None:

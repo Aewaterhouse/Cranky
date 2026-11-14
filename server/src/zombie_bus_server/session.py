@@ -156,6 +156,7 @@ class Room:
                     "bot": r.bot,
                     "erg": self.erg_of(r),
                     "titles": self.titles(r.id),
+                    "ready": r.ready or r.bot,
                 }
                 for r in self.riders.values()
             ],

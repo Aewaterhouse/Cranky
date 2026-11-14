@@ -51,6 +51,7 @@ export type ClientMsg =
       hrp?: number | null
     }
   | { t: 'buy'; item: ShopItem }
+  | { t: 'ready'; on: boolean }
   | { t: 'erg'; on: boolean }
   | { t: 'act'; k: string; v?: string | number | boolean | null }
   | { t: 'trainers'; mode: TrainerMode }
@@ -69,6 +70,8 @@ export interface LobbyRider {
   erg?: boolean
   /** Held titles, from awards, until someone takes them ("🚑 Paramedic of the Week"). */
   titles?: string[]
+  /** Said they are ready in the lobby (bots always are). */
+  ready?: boolean
 }
 export interface Lobby {
   t: 'lobby'

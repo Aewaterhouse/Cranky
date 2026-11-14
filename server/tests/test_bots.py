@@ -213,3 +213,16 @@ def test_every_crew_game_twist_has_a_name_and_a_line():
         assert all(t["name"] and t["desc"] for t in twists)
         assert weekly_mutator(date(2026, 11, 12), game) in twists
     assert weekly_mutator(game="watch") is None
+
+
+def test_a_guest_can_say_they_are_ready_and_a_new_ride_clears_it():
+    async def main():
+        room, ws = await lobby_with(2, code="REDY")
+        await room.handle("h1", ws, {"t": "ready", "on": True})
+        lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
+        assert {r["id"]: r["ready"] for r in lobby["riders"]} == {"h0": False, "h1": True}
+        room.start()
+        room.task.cancel()
+        assert not room.riders["h1"].ready
+
+    asyncio.run(main())

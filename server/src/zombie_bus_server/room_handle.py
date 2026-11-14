@@ -23,6 +23,7 @@ from .protocol import (
     Erg,
     Game,
     Join,
+    Ready,
     Setup,
     Sprint,
     Start,
@@ -87,6 +88,9 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         if room.state == "running" and (room.el >= 0 or room.mode.early_acts) and len(recent) < most:
             recent.append(now)
             room.mode.on_act(room, r, msg.k, msg.v)
+    elif isinstance(msg, Ready) and room.state != "running":
+        r.ready = msg.on
+        await room.lobby()
     elif isinstance(msg, TierMsg):
         r.tier = msg.tier
         await room.lobby()

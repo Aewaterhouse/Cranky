@@ -112,6 +112,13 @@ class Erg(BaseModel):
     on: bool
 
 
+class Ready(BaseModel):
+    """A guest in the lobby says they are ready (or not). Shown on their seat; cleared after each ride."""
+
+    t: Literal["ready"]
+    on: bool
+
+
 class Buy(BaseModel):
     t: Literal["buy"]
     item: Literal["plating", "repellent", "sync"]
@@ -144,6 +151,7 @@ ClientMsg = TypeAdapter(
         | Erg
         | TrainerMode
         | Buy
+        | Ready
         | Act,
         Field(discriminator="t"),
     ]

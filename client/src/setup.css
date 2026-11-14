@@ -851,3 +851,6 @@ details.ftp-card > summary {
   margin-top: 6px;
   height: 24px;
 }
+.ready-tick {
+  color: var(--tox);
+}

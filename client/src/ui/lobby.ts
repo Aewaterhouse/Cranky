@@ -27,6 +27,8 @@ export interface LobbyCtx {
   difficulty(level: Difficulty): void
   game(game: Game): void
   start(): void
+  /** A guest says they are ready, or not. */
+  ready(on: boolean): void
   leave(): void
 }
 
@@ -152,7 +154,14 @@ export function lobbyView(c: LobbyCtx) {
             title: r.connected ? 'Connected' : 'Away',
           }),
           avatar(r.name, 'lg'),
-          h('b', {}, r.name),
+          h(
+            'b',
+            {},
+            r.name,
+            r.ready && r.id !== host
+              ? h('span', { class: 'ready-tick', title: 'Ready' }, ' ✓')
+              : '',
+          ),
           ...(r.titles ?? []).map((t) => h('small', { class: 'seat-title' }, t)),
           h('span', { class: `tier-badge ${r.tier}` }, TIER_NAME[r.tier]),
           h('small', {}, `${r.ftp} W`),
@@ -265,12 +274,24 @@ export function lobbyView(c: LobbyCtx) {
       } else picker.set(l.plan.id, l.minutes)
     }
 
+    const guests = l.riders.filter((r) => r.id !== l.host)
+    const set = guests.filter((r) => r.ready).length
     startSlot.replaceChildren(
       isHost
-        ? h('button', { class: 'primary mega-go', onclick: c.start }, info.start)
+        ? h(
+            'button',
+            { class: 'primary mega-go', onclick: c.start },
+            info.start,
+            guests.length ? h('small', {}, ` · ${set} of ${guests.length} ready`) : '',
+          )
         : h(
             'div',
             { class: 'waiting' },
+            h(
+              'button',
+              { class: mine?.ready ? 'ghost' : 'primary', onclick: () => c.ready(!mine?.ready) },
+              mine?.ready ? '✓ Ready (tap to undo)' : "I'm ready",
+            ),
             h('i', { class: 'spin' }),
             `Waiting for ${driver} to start…`,
           ),
