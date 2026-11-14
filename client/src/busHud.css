@@ -275,3 +275,13 @@
   background: color-mix(in srgb, var(--bad) 75%, transparent);
   animation: sp-rise 0.4s;
 }
+.bus-ride .bs-extra {
+  grid-area: 6 / 1 / 7 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+}
+.bus-ride .bs-extra .bs-boss {
+  flex: 1 1 100%;
+}

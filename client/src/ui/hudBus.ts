@@ -54,13 +54,10 @@ export function makeBusPanel() {
   const root = h(
     'section',
     { class: 'hud-glass bs' },
-    boss,
     h('div', { class: 'bs-head' }, h('label', {}, '🛡 ARMOUR'), armourN),
     armour,
     h('div', { class: 'bs-head' }, h('label', {}, 'HORDE GAP'), gapN),
     gapTrack,
-    zed,
-    role,
     h(
       'div',
       { class: 'bs-stats' },
@@ -75,6 +72,8 @@ export function makeBusPanel() {
     h('div', { class: 'bs-head' }, h('label', {}, 'STREAK'), streakState),
     h('div', { class: 'bs-nitro bs-streak' }, streakFill),
     pipsEl,
+    // Last, so the strip's places for everything above stay put: the boss, this event's zombies, your role.
+    h('div', { class: 'bs-extra' }, boss, zed, role),
   )
   const dots = new Map<string, HTMLElement>()
   let lastArmour = -1
