@@ -156,7 +156,7 @@ def shape_awards(
 
 
 def crew_scrap(dist: float, bonus: float = 0) -> int:
-    """A game's scrap for the crew: the bus's rate for the distance, plus what the game adds for how it went."""
+    """A game's crew scrap: the bus's rate for the distance, plus what the game adds for how it went."""
     return int(dist * C.SCRAP_PER_M + bonus)
 
 
