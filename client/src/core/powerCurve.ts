@@ -53,9 +53,11 @@ export function curveLines(p: Profile, now = Date.now()): CurveLine[] {
         date: last.date,
       }))
     : []
+  // Estimates from FTP only stand in until there is a real effort; mixed in, they make the curve climb.
+  const tidy = (pts: CurvePt[]) => (pts.some((q) => q.real) ? pts.filter((q) => q.real) : pts)
   return [
-    { key: 'all', label: 'All time', pts: all },
-    { key: 'd90', label: 'Last 90 days', pts: d90 },
+    { key: 'all', label: 'All time', pts: tidy(all) },
+    { key: 'd90', label: 'Last 90 days', pts: tidy(d90) },
     { key: 'last', label: 'Last ride', pts: lastPts },
   ]
 }

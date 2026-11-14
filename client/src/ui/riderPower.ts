@@ -218,9 +218,12 @@ export function powerTab(p: Profile) {
   const cell = (q?: CurvePt) =>
     h(
       'td',
-      { class: q?.real ? 'real' : 'est' },
-      q ? `${q.w} W` : '–',
-      q && p.weightKg ? h('small', {}, ` ${(q.w / p.weightKg).toFixed(1)}`) : '',
+      {
+        class: q?.real ? 'real' : 'est',
+        title: q && !q.real ? `About ${q.w} W from your FTP` : '',
+      },
+      q?.real ? `${q.w} W` : '–',
+      q?.real && p.weightKg ? h('small', {}, ` ${(q.w / p.weightKg).toFixed(1)}`) : '',
     )
   return h(
     'div',

@@ -22,7 +22,9 @@ describe('power curve maths', () => {
     const [all, d90, last] = curveLines(p, NOW)
     expect(all.pts.find((q) => q.d === 5)).toMatchObject({ w: 900, real: true })
     expect(all.pts.find((q) => q.d === 5)!.date).toContain('2026-01-10')
-    expect(all.pts.find((q) => q.d === 3600)).toMatchObject({ real: false, date: null })
+    // Once a line has real efforts, FTP estimates drop out of it.
+    expect(all.pts.find((q) => q.d === 3600)).toBeUndefined()
+    expect(all.pts.every((q) => q.real)).toBe(true)
     expect(d90.pts.find((q) => q.d === 5)).toMatchObject({ w: 800 })
     expect(d90.pts.find((q) => q.d === 5)!.date).toContain('2026-05-20')
     expect(last.pts.map((q) => q.d)).toEqual([5, 60])
@@ -30,6 +32,11 @@ describe('power curve maths', () => {
   })
   it('has an empty last-ride line for a new rider', () => {
     expect(curveLines(newProfile('b'), NOW)[2].pts).toEqual([])
+  })
+  it('shows the FTP estimate to a rider with no efforts yet', () => {
+    const [all] = curveLines(newProfile('b'), NOW)
+    expect(all.pts.length).toBeGreaterThan(5)
+    expect(all.pts.every((q) => !q.real && q.date === null)).toBe(true)
   })
   it('log axis and snapping', () => {
     expect(xFrac(1)).toBe(0)

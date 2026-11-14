@@ -1,3 +1,4 @@
+import { CFG } from '../config'
 import { buy, COSMETICS, equip, SLOT_NAMES, type Cosmetic, type Slot } from '../core/cosmetics'
 import type { Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
@@ -18,12 +19,26 @@ const WHERE: Record<Slot, string> = {
 export const scrapIcon = () => h('span', { class: 'scrap-ico', 'aria-hidden': 'true' }, '⚙')
 
 /** Cosmetics shop grouped by slot. `changed` re-renders the shell so the balance updates. */
+let armed = ''
+let lockUntil = 0
+
 export function garageTab(p: Profile, changed: () => void) {
   const item = (c: Cosmetic) => {
     const owned = p.owned.includes(c.id)
     const on = p.look[c.slot] === c.id
     const short = c.price - p.scrap
-    const act = () => {
+    const act = (e: Event) => {
+      // Buying takes two taps (Buy, then Confirm), and a fresh purchase ignores taps for a moment, so a double
+      // tap can never buy something and take it off again.
+      if (performance.now() < lockUntil) return
+      if (!owned && armed !== c.id) {
+        armed = c.id
+        ;(e.target as HTMLElement).textContent = `Confirm ⚙ ${c.price}`
+        setTimeout(() => armed === c.id && ((armed = ''), changed()), CFG.garage.confirmMs)
+        return
+      }
+      armed = ''
+      if (!owned) lockUntil = performance.now() + CFG.garage.lockMs
       const r = owned ? equip(p, c.id) : buy(p, c.id)
       if (typeof r === 'string') return toast(r, 'bad')
       if (!owned) toast(`Bought ${c.name}`, 'good')

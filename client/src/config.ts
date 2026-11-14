@@ -10,6 +10,8 @@ export const CFG = {
   click: { backoffMs: [1000, 2000, 4000, 5000] },
   /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
   watch: { driftS: 2, duckS: 5, duckVolume: 25 },
+  /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */
+  garage: { confirmMs: 3000, lockMs: 800 },
   /**
    * Extra ride metrics: W′ (J) for the balance, the shortest ride they are shown for, the shortest for HR drift,
    * the share of seconds that need a heart rate, and the cadence band edges (rpm).
