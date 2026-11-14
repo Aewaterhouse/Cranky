@@ -198,9 +198,16 @@ export function trendsTab(p: Profile, now = new Date()) {
     h(
       'section',
       { class: 'panel stats' },
-      stat(Math.round(last.ctl), 'fitness (CTL)'),
-      stat(Math.round(last.atl), 'fatigue (ATL)'),
-      stat((last.tsb > 0 ? '+' : '') + Math.round(last.tsb), 'form (TSB)'),
+      stat(Math.round(last.ctl), 'fitness · CTL'),
+      stat(Math.round(last.atl), 'tiredness · ATL'),
+      stat(
+        (last.tsb > 0 ? '+' : '') + Math.round(last.tsb),
+        last.tsb >= 5
+          ? 'freshness · ready to go 🔋'
+          : last.tsb <= -20
+            ? 'freshness · cooked 🪫'
+            : 'freshness · TSB',
+      ),
       stat(
         `${liveStreak(p, +now)} / ${Math.max(weekStreak(p.rides).best, liveStreak(p, +now))}`,
         'week streak / best',

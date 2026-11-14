@@ -212,7 +212,7 @@ export function finishRide(
         ...(s.distance == null
           ? [
               tile(
-                'Compliance',
+                'On target',
                 pctStr(s.compliance),
                 `FTP ${s.ftp} W`,
                 s.compliance >= 0.9 ? 'good' : '',
