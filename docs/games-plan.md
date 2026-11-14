@@ -179,6 +179,31 @@ play for anyone. What Premium changes is ads.
 - Assumed: YouTube's IFrame Player API (load, play, pause, seek, read the time and state) over the youtube-nocookie
   domain, as the solo media corner already uses. Check against YouTube's current docs when building.
 
+## Phase 6: Full UI review by independent agents (owner, 2026-11-14; next after training plans)
+
+The owner wants the whole app judged by reviewers who did not build it. Each reviewer is a fresh agent with no
+knowledge of the code, given only the running site, and asked for a verdict, not a code review.
+
+- **Set-up.** Run the app locally (dev or built server, bots on, simulated trainer, `?fast=` and `ZB_TIME_SCALE` to
+  reach later screens quickly). Reviewers drive it with headless Chromium and look at their own screenshots at
+  1280×720, iPad (1024×768) and phone (390×844) sizes. The dev pages (`/hud-dev.html`, `/scene-dev.html`) cover
+  states that are slow to reach.
+- **Reviewers (one or two at a time, to keep the PC cool), each on one area:**
+  1. First run and navigation: login, welcome, the home screen, the top menu and how you find each mode. Are the
+     menus logical? Could a new rider start a group ride in under a minute?
+  2. Riding: the solo player, the shared ride HUD on the bus and the three games, free ride. Can you read what to do
+     at a glance while working hard?
+  3. Lobbies and results: the crew lobby and game cards, the watch party, results screens, history, training plans.
+  4. Rider and Garage: profile, settings, the body creator, cosmetics, leaderboards, Strava.
+- **The brief for each:** judge it as a player, against well-designed apps and games they know: Zwift, TrainerRoad,
+  MyWhoosh, Strava, Apple Fitness+, Peloton, and game front ends such as Mario Kart, Rocket League, Fortnite and
+  Duolingo. Look at menu structure and naming, how many taps things take, consistency, readability during effort,
+  touch targets, empty and error states, and what is confusing or missing. Every finding names the screen, shows a
+  screenshot, says what a good app does instead and rates it (blocker, annoying, polish).
+- **Then:** one consolidating pass merges the reports into `docs/ui-review.md`, ranked, with duplicates folded. The
+  top findings become items under the standing UI polish item below and are worked through in order. Re-run the
+  review after a big round of fixes.
+
 ## Always open: UI polish (owner, 2026-11-14)
 
 - [ ] Continuous improvement of the UI once the three games are in. Never tick this: there is always more polish
