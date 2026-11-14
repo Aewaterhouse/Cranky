@@ -222,6 +222,8 @@ the server), with bots, results and history like the other games.
 
 ## Phase 8: Second review round (owner, 2026-11-14; once the races and the current polish are done)
 
+*Done 2026-11-14: four reports and the queue in `docs/ui-review-2.md`, now the work queue.*
+
 A fresh set of independent reviewers, none of whom saw the first round or the code, each given only the running site.
 They judge the whole thing (the site, every game mode, the 3D scenes) and answer one question: what would make it a
 funner, better, cleaner, more intuitive experience? Same set-up as Phase 6 (headless Chromium, desktop and iPad sizes;
