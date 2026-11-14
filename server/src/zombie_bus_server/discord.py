@@ -9,6 +9,17 @@ from . import config
 log = logging.getLogger(__name__)
 
 
+# The crew games without their own format: a title and what their score means.
+GAME_NAMES = {
+    "last": ("🏁 **Last Rider Standing**", "top step"),
+    "ttt": ("⏱ **Team Time Trial**", "winning team on target"),
+    "quiz": ("🍺 **Pub Quiz**", "top score"),
+    "galley": ("🛶 **Galley Ship**", "voyage"),
+    "hunt": ("🦊 **The Hunt**", "top points"),
+    "watch": ("📺 **Watch Party**", "crew on target"),
+}
+
+
 def format_summary(plan_name: str, s: dict) -> str:
     """Builds the chat message for a finished Zombie Bus ride."""
     if s.get("mode") == "madness":
@@ -55,6 +66,16 @@ def format_summary(plan_name: str, s: dict) -> str:
             ]
         )
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
+    if s.get("mode") in GAME_NAMES:
+        name, score = GAME_NAMES[s["mode"]]
+        return "\n".join(
+            [
+                f"{name} · {plan_name} · {score} **{s['score']}**",
+                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
+                *s.get("titles", []),
+                f"Crew: {crew}",
+            ]
+        )
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",
         f"{s['distance'] / 1000:.1f} km · armour {s['armour']} · sync {s['syncPct']}% · {s['scrap']} scrap",

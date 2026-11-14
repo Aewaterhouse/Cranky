@@ -35,3 +35,11 @@ def test_on_the_beat_the_ship_pulls_away_and_the_drum_changes():
 def test_off_the_beat_the_pirates_board():
     room, g, fx = row(60)
     assert g.hull < 100 and any(f["k"] == "boarded" for f in fx)
+
+
+def test_discord_names_the_newer_games_not_the_bus():
+    from zombie_bus_server import discord
+
+    room, g, fx = row(None)
+    text = discord.format_summary("Sweet Spot", room.summary)
+    assert text.startswith("🛶 **Galley Ship** · Sweet Spot") and "Zombie Bus" not in text
