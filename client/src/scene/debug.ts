@@ -40,6 +40,7 @@ export async function debugPanel(onRoute?: () => void) {
   mir.add(VIS, 'mirrorX', 0, 1)
   mir.add(VIS, 'mirrorY', 0, 0.8)
   mir.add(VIS, 'mirrorHeight', 1, 10)
+  addAll(gui.addFolder('Bosses and zombie types').close(), VIS.boss)
   const sv = gui.addFolder('Servo stop').close()
   sv.add(VIS, 'servoStop', -30, 10)
   sv.add(VIS, 'servoBrake', 5, 120)

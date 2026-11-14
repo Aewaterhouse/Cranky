@@ -31,9 +31,16 @@ interface Z {
   /** Thrown by an impact: velocity, time since launch. */
   fly: { v: THREE.Vector3; t: number; spin: number } | null
   cloth: THREE.Color
+  /** 0..1: where this zombie falls in the share of runners or brutes. */
+  role: number
 }
 
 const tint = (m: THREE.InstancedMesh, i: number, c: THREE.Color) => m.setColorAt(i, c)
+export type ZedKind = 'runners' | 'brutes'
+/** The zombie type the server's tip names, or null. */
+export const zedKind = (tip: string | null | undefined): ZedKind | null =>
+  /RUNNER/i.test(tip ?? '') ? 'runners' : /BRUTE/i.test(tip ?? '') ? 'brutes' : null
+const K = VIS.boss
 
 /** Instanced shambling horde. Origin is the front-centre of the pack; it extends towards +z. */
 export class Horde {
@@ -50,6 +57,8 @@ export class Horde {
   /** Extra forward lunge on impact, decays to 0. */
   swarm = 0
   dust: { x: number; z: number }[] = []
+  private zed: ZedKind | null = null
+  private kit = new THREE.Color()
 
   constructor(n = VIS.hordeSize) {
     const mat = () => new THREE.MeshLambertMaterial({ flatShading: true })
@@ -95,6 +104,7 @@ export class Horde {
         cling,
         fly: null,
         cloth,
+        role: Math.random(),
       })
       const skin = col.set(pick(SKIN)).multiplyScalar(rand(0.8, 1.1)).clone()
       tint(this.parts[0], i, cloth.clone().multiplyScalar(rand(0.8, 1.1)))
@@ -128,7 +138,29 @@ export class Horde {
       }
   }
 
-  update(t: number, dt: number, gap: number) {
+  /** Runners (a share in neon running kit) lean in and sprint up front; brutes (hi-vis, huge) plod. */
+  private dress(zed: ZedKind | null) {
+    this.zed = zed
+    this.zs.forEach((z, i) => {
+      const c =
+        this.kind(z) === 'run'
+          ? this.kit.set(K.runnerKit[i % K.runnerKit.length])
+          : this.kind(z) === 'brute'
+            ? this.kit.set(K.bruteKit)
+            : z.cloth
+      tint(this.parts[0], i, c)
+    })
+    this.parts[0].instanceColor!.needsUpdate = true
+  }
+
+  private kind(z: Z) {
+    if (z.cling) return ''
+    if (this.zed === 'runners') return z.runner || z.role < K.runnerShare ? 'run' : ''
+    return this.zed === 'brutes' && z.role < K.bruteShare ? 'brute' : ''
+  }
+
+  update(t: number, dt: number, gap: number, zed: ZedKind | null = null) {
+    if (zed !== this.zed) this.dress(zed)
     const reach = 1 - smooth(4, 38, gap)
     const clingK = 1 - smooth(0, 16, gap)
     this.swarm = Math.max(0, this.swarm - dt * 1.2)
@@ -137,14 +169,18 @@ export class Horde {
     const { B, L, M, p, s, q, e } = this
     let k = 0
     this.zs.forEach((z, i) => {
+      const role = this.kind(z)
+      const run = z.runner || role === 'run'
+      const pace = role === 'run' ? K.runnerPace : role === 'brute' ? K.brutePace : 1
+      const ph = t * pace
       let x = z.x + Math.sin(t * 0.7 + z.ph) * 0.35
-      let zz = z.z - (z.runner ? 0 : lunge * 0.5) - (z.runner ? lunge : 0)
-      let y = Math.abs(Math.sin(t * 5 * z.sp + z.ph)) * 0.14 * (z.runner ? 1.6 : 1)
-      let lean = -0.18 - (z.runner ? 0.25 : 0) - reach * 0.12
+      let zz = z.z - (run ? lunge : lunge * 0.5) - (role === 'run' && !z.runner ? z.z * 0.5 : 0)
+      let y = Math.abs(Math.sin(ph * 5 * z.sp + z.ph)) * 0.14 * (run ? 1.6 : 1)
+      let lean = -0.18 - (run ? 0.25 : 0) - (role === 'run' ? K.runnerLean : 0) - reach * 0.12
       let roll = Math.sin(t * 5 * z.sp + z.ph) * 0.1
       let arm = 1.15 + reach * 0.35 + Math.sin(t * 3 + z.ph) * 0.12
       let yaw = z.yaw + Math.sin(t * 1.3 + z.ph) * 0.15
-      let legAmp = z.runner ? 0.95 : 0.55
+      let legAmp = run ? 1.1 : role === 'brute' ? 0.35 : 0.55
       const ck = z.cling && clingK > 0.02 ? clingK : 0
       if (ck) {
         const side = (z.cling % 3) - 1
@@ -169,11 +205,13 @@ export class Horde {
         arm = 2.4
         if (f.t > 1.4) z.fly = null
       }
-      const sw = Math.sin(t * 5 * z.sp + z.ph)
+      const sw = Math.sin(ph * 5 * z.sp + z.ph)
+      if (role === 'run') arm = 0.4 + sw * 0.8
+      if (role === 'brute') arm = 0.8
       p.set(x, y, zz)
       e.set(lean, yaw, roll)
       q.setFromEuler(e)
-      s.setScalar(z.sc)
+      s.setScalar(z.sc * (role === 'brute' ? K.bruteScale : 1))
       B.compose(p, q, s)
       this.part(0, i, B, 0, 0.62, 0, 0)
       this.part(1, i, B, 0, 1.38, -0.02, Math.sin(t * 2 + z.ph) * 0.3 - 0.25 + reach * 0.15)

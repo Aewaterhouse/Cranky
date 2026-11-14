@@ -1,4 +1,5 @@
 import { CAM } from './camVis'
+import { BOSS } from './bossVis'
 import { DATE } from './dateVis'
 import { FEEL } from './route/feelVis'
 import { FLY, ORBIT, PARTY, PODIUM } from './route/shotVis'
@@ -110,6 +111,8 @@ export const VIS = {
   bigThingScale: 1.5,
   /** Speed Dating's road dressing and its dusk (scene/dateVis.ts). */
   date: DATE,
+  /** The bosses behind the bus and the zombie types (scene/bossVis.ts). */
+  boss: BOSS,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
   route: {
     roadHalf: 3.1,
