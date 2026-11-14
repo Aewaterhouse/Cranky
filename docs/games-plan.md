@@ -181,6 +181,8 @@ play for anyone. What Premium changes is ads.
 
 ## Phase 6: Full UI review by independent agents (owner, 2026-11-14; next after training plans)
 
+*Done 2026-11-14: four reports and the ranked list in `docs/ui-review.md`, which is now the polish work queue.*
+
 The owner wants the whole app judged by reviewers who did not build it. Each reviewer is a fresh agent with no
 knowledge of the code, given only the running site, and asked for a verdict, not a code review.
 
