@@ -152,3 +152,18 @@
     font-size: 0.4em;
   }
 }
+/* Two columns, so the menu is half as tall and never climbs over the target and power card above it. */
+.rhud .hmenu {
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  align-items: start;
+  column-gap: calc(2 * var(--u));
+  max-height: calc(100vh - var(--st) - var(--sb) - 34 * var(--u));
+  overflow-y: auto;
+}
+.rhud .hmenu[hidden] {
+  display: none;
+}
+.rhud .hmenu > :first-child {
+  grid-column: 1 / -1;
+}

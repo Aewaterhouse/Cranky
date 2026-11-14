@@ -22,15 +22,33 @@ export const hudStat = (label: string) => {
 export function hudMenu() {
   const el = h('div', { class: 'glass hmenu' })
   el.hidden = true
+  // Escape or a tap anywhere outside shuts it, in every mode; the listeners go when the menu leaves the page.
+  const outside = (e: Event) => {
+    if (!el.isConnected) return off()
+    if (!el.hidden && !el.contains(e.target as Node) && e.target !== button) close()
+  }
+  const esc = (e: KeyboardEvent) => {
+    if (!el.isConnected) return off()
+    if (e.key !== 'Escape' || el.hidden) return
+    e.stopImmediatePropagation()
+    close()
+  }
+  const off = () => (
+    removeEventListener('pointerdown', outside, true),
+    removeEventListener('keydown', esc, true)
+  )
+  addEventListener('pointerdown', outside, true)
+  addEventListener('keydown', esc, true)
   const close = () => (el.hidden = true)
+  const button = h(
+    'button',
+    { class: 'glass', 'aria-label': 'Menu', onclick: () => (el.hidden = !el.hidden) },
+    '☰',
+  )
   return {
     el,
     close,
-    button: h(
-      'button',
-      { class: 'glass', 'aria-label': 'Menu', onclick: () => (el.hidden = !el.hidden) },
-      '☰',
-    ),
+    button,
     /** A menu button showing its key; picking it shuts the menu. */
     item: (label: string | Node, key: string, act: () => void, cls = '') =>
       h(
