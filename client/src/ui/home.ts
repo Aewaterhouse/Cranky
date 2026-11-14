@@ -234,7 +234,6 @@ export function rideTab(p: Profile, act: HomeActions) {
       'section',
       { class: 'hero' },
       h('h2', { class: 'label' }, 'Pick a ride'),
-      h('h1', {}, 'Ride'),
       h(
         'div',
         { class: 'home-games home-modes' },
