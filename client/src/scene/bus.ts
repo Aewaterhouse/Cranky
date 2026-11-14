@@ -14,6 +14,9 @@ import {
   plateGroups,
   spikesGeo,
   trimGeo,
+  trophyGeo,
+  ROOF_Y,
+  TROPHY_MAX,
 } from './busParts'
 import { makeAmbo } from './ambulance'
 import { VIS } from './params'
@@ -161,6 +164,18 @@ export function makeBus() {
   beam.scale.set(0.5, 0.4, 1)
   g.add(beam)
 
+  // LEGEND trophies on the roof rails, alternating sides from the front: shown up to `TROPHY_MAX`.
+  const cups = new THREE.InstancedMesh(trophyGeo(), VC, TROPHY_MAX)
+  for (let i = 0; i < TROPHY_MAX; i++) {
+    const at = new THREE.Matrix4().makeTranslation(
+      i % 2 ? 1.1 : -1.1,
+      ROOF_Y + 0.02,
+      -3.8 + Math.floor(i / 2) * 1.0,
+    )
+    cups.setMatrixAt(i, at)
+  }
+  cups.count = 0
+  shell.add(cups)
   const ambo = makeAmbo(shell)
   let lookKey = ''
   let baseCol = new THREE.Color(VIS.busColour)
@@ -232,5 +247,16 @@ export function makeBus() {
   /** Where the hood, exhaust and body are in the bus group, for effects. */
   const hood = new THREE.Vector3(...HOOD)
   const exhaust = new THREE.Vector3(...EXHAUST)
-  return { group: g, setLook, update, hood, exhaust, wheels: wheels.map((w) => w.g), shell }
+  /** How many LEGEND sprints the crew has ever ridden: a cup each, to the cap. */
+  const setTrophies = (n: number) => (cups.count = Math.min(TROPHY_MAX, Math.max(0, n)))
+  return {
+    group: g,
+    setLook,
+    setTrophies,
+    update,
+    hood,
+    exhaust,
+    wheels: wheels.map((w) => w.g),
+    shell,
+  }
 }

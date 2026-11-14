@@ -232,3 +232,15 @@ export function eskyGeo() {
   m.add(cone(0.12, 0.3, 4), '#f2e3b0', [-0.75, ROOF_Y + 0.5, 4.6], [0.4, 0, 0])
   return m.build()
 }
+
+/** LEGEND trophies the bus can carry on its roof rails. */
+export const TROPHY_MAX = 14
+
+/** One small gold cup for the roof rail: a LEGEND sprint trophy. */
+export function trophyGeo() {
+  const m = new Mesher(0)
+  m.add(box(0.22, 0.06, 0.22), '#3a2a12', [0, 0.03, 0])
+  m.add(cyl(0.03, 0.05, 0.16, 6), '#f2b705', [0, 0.14, 0])
+  m.add(cone(0.12, 0.2, 7).rotateX(Math.PI), '#f2b705', [0, 0.32, 0])
+  return m.build().scale(2.2, 2.2, 2.2)
+}

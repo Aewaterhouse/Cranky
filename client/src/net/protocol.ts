@@ -74,6 +74,8 @@ export interface LobbyRider {
   ready?: boolean
 }
 export interface Lobby {
+  /** Bus rooms: every LEGEND sprint the crew has ever ridden on the bus (trophies on the roof). */
+  trophies?: number
   t: 'lobby'
   /** `road` means this code is a group ride and the message is really a RoadLobby: hand over to that flow. */
   kind?: 'bus' | 'road'

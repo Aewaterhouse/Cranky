@@ -100,6 +100,7 @@ class Room:
             "difficulty": self.difficulty,
             "trainers": self.trainers,
             "game": self.game,
+            "trophies": self.store.legends() if hasattr(self.store, "legends") and self.game == "bus" else 0,
             "plan": self.plan,
             "el": self.el,
             "riders": [r.to_dict() for r in self.riders.values()],

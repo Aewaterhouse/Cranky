@@ -118,7 +118,7 @@ The suggested order below attacks them in that order: reliable first, then serio
 | Campaign | A multi-ride journey across a map with a persistent bus, damage carried over and unlocks | L |
 | ✅ Difficulty and mutators | Easy to nightmare, picked by the host, plus a mutator that changes every week (Hungry Horde, Closed Servos, Scrap Rush, Loose Bolts, Tailwind) on everything above easy | S |
 | Daily and weekly challenges | Rotating goals with scrap rewards | M |
-| Trophies and bus history | LEGEND sprints bolt a permanent trophy on the bus; a plaque lists past runs | S |
+| ✅ Trophies and bus history | LEGEND sprints bolt a permanent trophy on the bus; a plaque lists past runs. Built: every LEGEND sprint ever ridden on the bus is a gold cup on the roof rails (up to 14); the past runs are the Ladder's Top bus runs | S |
 | Horn, emotes and heckles | Quick reactions; spectators and fallen riders can cheer or heckle | S |
 | Highlights and replay | Auto-clip the best moments (MEGA sprint, last-second escape) for the results page | L |
 | ✅ Season ladder | Crew score table per season with resets and titles | M |

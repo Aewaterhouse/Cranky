@@ -283,6 +283,17 @@ class Store:
                 self.db.execute("INSERT OR REPLACE INTO titles VALUES (?, ?, ?)", (title, a["id"], a["name"]))
         return said
 
+    def legends(self) -> int:
+        """Every LEGEND sprint ever ridden on the bus: each one bolts a trophy on it."""
+        with self.lock:
+            rows = self.db.execute("SELECT json FROM results").fetchall()
+        return sum(
+            r.get("sprints", []).count("LEGEND")
+            for (j,) in rows
+            if (s := json.loads(j)).get("game", "bus") == "bus"
+            for r in s.get("riders", [])
+        )
+
     def titles_of(self, rid: str) -> list[str]:
         """The titles this rider holds right now."""
         with self.lock:

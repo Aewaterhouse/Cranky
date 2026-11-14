@@ -50,6 +50,8 @@ export interface SceneState {
   roadblock: number | null
   /** The driver's bus cosmetics. */
   busLook?: Look
+  /** LEGEND sprints the crew has ever ridden: trophies on the roof. */
+  trophies?: number
   /** The crew's gunship is up and firing on the horde. */
   gunship?: boolean
   /** VO2 Madness: no bus, the riders race along the road as a pack. */
@@ -261,6 +263,7 @@ export class World {
     this.hit = Math.max(0, this.hit - dt * 2.2)
     this.flash = Math.max(0, this.flash - dt * 2)
     this.bus.setLook(s.busLook ?? {}, !!s.ambo)
+    this.bus.setTrophies(s.ambo ? 0 : (s.trophies ?? 0))
     this.bus.update({
       t: this.t,
       speed: v,

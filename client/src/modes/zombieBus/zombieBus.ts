@@ -267,6 +267,7 @@ export function startBusRide(
       mood: (calm ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
       busLook: lk[l.host],
+      trophies: l.trophies,
       gunship: b.gunship,
       ...ui?.scene(m),
       riders: Object.entries(m.riders).map(([id, r]) => ({

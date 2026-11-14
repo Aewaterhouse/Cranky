@@ -193,3 +193,14 @@ def test_history_rows_name_the_crew_game_and_its_score(tmp_path):
     s.add_ride("kat", {"record": {"date": "2026-11-03T08:00:00Z", "secs": 60}})
     rows = s.ride_rows("kat")
     assert [(r["game"], r["score"]) for r in rows] == [(None, None), ("bus", 3000), ("ambo", 812)]
+
+
+def test_every_legend_sprint_on_the_bus_is_a_trophy(tmp_path):
+    from zombie_bus_server.store import Store
+
+    s = Store(tmp_path / "l.db")
+    rider = {"name": "Kat", "sprints": ["LEGEND", "HIT", "LEGEND"]}
+    s.add_result("Run", {"riders": [rider, {"name": "Daz", "sprints": ["LEGEND"]}], "game": "bus"})
+    s.add_result("Run", {"riders": [rider], "game": "ambo"})
+    s.add_result("Run", {"riders": [{"name": "Old", "sprints": ["LEGEND"]}]})  # from before games were stored
+    assert s.legends() == 4
