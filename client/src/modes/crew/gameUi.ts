@@ -92,12 +92,16 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
   hunt: {
     events: WORKOUT_EVENTS,
     panel: makeHuntPanel,
-    scene: () => ({
-      gap: null,
-      armour: null,
-      roadblock: null,
-      mad: { pts: {}, crown: null, lead: null, work: true },
-    }),
+    // The fox rides at the front of the pack, the hounds behind.
+    scene: (m) => {
+      const fox = (m.game as { fox?: string | null } | null)?.fox
+      return {
+        gap: null,
+        armour: null,
+        roadblock: null,
+        mad: { pts: fox ? { [fox]: 1 } : {}, crown: null, lead: null, work: true },
+      }
+    },
   },
   galley: {
     events: WORKOUT_EVENTS,

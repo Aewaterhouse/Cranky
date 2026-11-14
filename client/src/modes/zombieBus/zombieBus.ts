@@ -284,9 +284,10 @@ export function startBusRide(
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         me: id === profile.id,
-        name: r.name,
+        name: (m.game as { fox?: string } | null)?.fox === id ? `🦊 ${r.name}` : r.name,
         c: r.s,
-        st: r.st,
+        // Out of Last Rider Standing: drop back out of the bunch like a fallen rider.
+        st: (m.game as { out?: string[] } | null)?.out?.includes(id) ? 'fell' : r.st,
         cadence: r.cad,
         look: teamKit(m, id) ?? lk[id],
         hr: r.hr,
