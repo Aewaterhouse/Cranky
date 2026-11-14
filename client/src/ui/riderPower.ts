@@ -1,6 +1,6 @@
 import { CFG } from '../config'
 import { api } from '../core/api'
-import { mateLine, type CrewRider } from '../core/crewCurve'
+import { crownLine, mateLine, type CrewRider } from '../core/crewCurve'
 import { type Profile } from '../core/curve'
 import {
   curveLines,
@@ -213,8 +213,10 @@ export function curveChart(p: Profile, mates: CrewRider[] = []) {
 export function powerTab(p: Profile) {
   const chart = h('div', {}, curveChart(p))
   const board = h('div', {})
+  const crown = h('p', { class: 'crown-line' })
   api<CrewRider[]>('/api/crew/curves')
     .then((all) => {
+      crown.textContent = crownLine(all, p.id)
       const mates = all.filter((m) => m.id !== p.id && Object.keys(m.best).length)
       if (mates.length) chart.replaceChildren(curveChart(p, mates))
       board.replaceChildren(crewBoard(all, p.id))
@@ -234,6 +236,7 @@ export function powerTab(p: Profile) {
   return h(
     'div',
     {},
+    crown,
     h('section', { class: 'panel' }, h('h2', { class: 'label' }, 'Power curve'), chart),
     board,
     h(

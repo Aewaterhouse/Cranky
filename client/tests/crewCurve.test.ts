@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { leaderboard, mateLine, type CrewRider } from '../src/core/crewCurve'
+import { crownLine, leaderboard, mateLine, type CrewRider } from '../src/core/crewCurve'
 import { lineKg, yTop } from '../src/core/powerCurve'
 
 const rider = (id: string, kg: number | null, best: Record<number, number>): CrewRider => ({
@@ -35,5 +35,16 @@ describe('crew curves', () => {
     expect(lineKg(l, undefined)).toBeUndefined()
     expect(lineKg({ ...l, key: 'all' }, 75)).toBe(75)
     expect(yTop([l], 75)).toBe(15)
+  })
+})
+
+describe('crown line', () => {
+  it('names your crowns and who is closest, else the crown nearest your reach', () => {
+    expect(crownLine(crew, 'a')).toBe(
+      "👑 You hold the crew's 1 min crown. b is 10 W behind at 1 min.",
+    )
+    expect(crownLine(crew, 'b')).toBe('a holds the 1 min crown, 10 W ahead of you. Go and get it.')
+    expect(crownLine(crew, 'd')).toBe('')
+    expect(crownLine([crew[0]], 'a')).toBe('')
   })
 })
