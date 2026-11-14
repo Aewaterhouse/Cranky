@@ -17,7 +17,9 @@ import { flushEfforts } from './core/efforts'
 import { flushRides, onRideSaved } from './core/rideQueue'
 import { loadProfile, syncProfile } from './core/profile'
 import { runDrill } from './modes/drill/drill'
-import { keepAwake } from './ui/wakeLock'
+import { keepAwake as stayAwake } from './ui/wakeLock'
+import { lockZoom } from './ui/noZoom'
+import { diagOverlay } from './ui/diag'
 import { runFreeRide } from './modes/freeRide/freeRide'
 import { groupRide } from './modes/freeRide/group'
 import { crew } from './modes/zombieBus/crew'
@@ -29,6 +31,8 @@ import { openRiderSettings } from './ui/rider'
 import { autoStrava, stravaReturn } from './ui/strava'
 
 let profile: Profile
+/** A ride (or its lobby) keeps the screen on and stops the page zooming. */
+const keepAwake = (on: boolean) => (stayAwake(on), lockZoom(on))
 
 function home(p: Profile = profile) {
   keepAwake(false)
@@ -46,7 +50,7 @@ function home(p: Profile = profile) {
     resume: (s) => (keepAwake(true), runDrill(s.plan, profile, currentTrainer()!, home, s)),
     create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
     join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),
-    watch: (code) => spectate(code, () => home()),
+    watch: (code) => (lockZoom(true), spectate(code, () => home())),
     logout: () => {
       logout()
       showLogin(enter)
@@ -57,7 +61,7 @@ function home(p: Profile = profile) {
 async function enter(u: Me) {
   profile = loadProfile(u)
   const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
-  if (watch?.length === 4) return spectate(watch, () => home())
+  if (watch?.length === 4) return (lockZoom(true), spectate(watch, () => home()))
   if (stravaReturn()) openRiderSettings()
   onRideSaved<RideSummary>((s, n) => autoStrava(profile, s, n))
   home()
@@ -76,6 +80,7 @@ addEventListener(
 )
 
 applySettings()
+diagOverlay()
 me().then(enter, () => showLogin(enter))
 
 if (import.meta.env.PROD && 'serviceWorker' in navigator)

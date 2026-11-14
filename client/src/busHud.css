@@ -241,19 +241,28 @@
   bottom: 190px;
 }
 
-/* Phone landscape: bus status runs from beside the corner buttons to the right edge, and the Madness
-   board takes the top right corner (the crew list starts hidden there). */
+/* Phone landscape: bus status runs from beside the corner buttons (menu, Stats, camera: --corner-w) to the right
+   edge, inside the notch insets, and the Madness board takes the top right corner (the crew list starts hidden). */
+.bus-ride {
+  --corner-w: 196px;
+}
 @media (max-height: 500px) {
   .bus-ride .hud-left {
     left: auto;
-    right: 14px;
-    width: calc((100vw - 150px) / var(--gz, 1));
+    right: max(14px, env(safe-area-inset-right));
+    width: calc(
+      (
+          100vw - var(--corner-w) - env(safe-area-inset-left) -
+            max(14px, env(safe-area-inset-right))
+        ) /
+        var(--gz, 1)
+    );
     translate: none;
   }
   .bus-ride .hud-left.mad {
-    top: 12px;
+    top: max(12px, env(safe-area-inset-top));
     left: auto;
-    right: 14px;
+    right: max(14px, env(safe-area-inset-right));
     width: 262px;
   }
 }

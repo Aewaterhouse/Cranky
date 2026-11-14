@@ -120,6 +120,7 @@ Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (o
 - `?debug` shows the visual debug panel (colours, fog, camera). The backtick key toggles it too.
 - `?fast=N` speeds up the solo clock by N for dev (use `ZB_TIME_SCALE` for multiplayer).
 - `?join=CODE` prefills the room code when joining a bus.
+- `?diag=1` shows the window and visual-viewport size, page zoom, pixel ratio and safe-area insets in the middle of the screen (to read the real numbers off a phone).
 
 ## Scene dev harness
 

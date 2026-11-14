@@ -150,3 +150,9 @@ body {
     max-width: calc(100vw - 24px);
   }
 }
+
+/* Rides and TV views (see ui/noZoom.ts): panning only, so no pinch or double tap anywhere zooms the page. */
+html.no-zoom,
+html.no-zoom body {
+  touch-action: pan-x pan-y;
+}
