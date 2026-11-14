@@ -52,7 +52,7 @@ class Brain:
             sprint = band == "sprint" or (i >= 0 and blocks[i]["type"] == "sprint")
             w = r.ftp * (rng.uniform(*C.BOT_SPRINT_X) if sprint else C.BOT_IDLE_X)
             r.s = None
-        r.p = r.w = w
+        r.p = r.w = w = room.mode.bot(room, r, w, tgt, rng)
         want = min(1.0, C.BOT_HR_REST + (C.BOT_HR_AT_FTP - C.BOT_HR_REST) * w / r.ftp)
         was = r.hrp or C.BOT_HR_REST
         r.hrp = was + (want - was) * min(1.0, dt / C.BOT_HR_LAG_S)

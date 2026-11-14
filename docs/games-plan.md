@@ -43,7 +43,7 @@ Five games through `game === 'madness'` switches will not hold, and four files i
       in place of their madness switches. Tick carries a generic `game` object for new modes.
 - [x] Client: lobby game picker becomes cards (five games will not fit a segmented control); generic prompt bar
       (countdown, band, "you" vs "everyone") and a choice sheet (pick one of N, used by cards, fuels and votes).
-- [x] Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
+- [ ] (Strava and Discord text done for Kidney Stone Express; history labels still to do) Strava and Discord titles, history labels and the season ladder keyed by a per-game table, not `if` chains.
 
 ## Phase 1: Kidney Stone Express
 
@@ -74,7 +74,7 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
       siren-rider callout, ramping queue screen.
 - [ ] K4 Scene (skin, light bar and siren flash done; hospital arrival and the patient on the road still to do): ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
       road behind when they fall out, debug panel values.
-- [ ] K5 (results, TV view, Strava and Discord text and announcer done; bot characters still to do) Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
+- [x] K5 Results, TV view, Strava and Discord text, announcer lines, bot characters (Smooth, Twitchy, Lead Foot).
 - [ ] K6 Four-rider headless test through a 5 min script, the e2e ride, manual notes in `docs/testing.md`, tuning pass.
 
 ## Phase 2: Speed Dating

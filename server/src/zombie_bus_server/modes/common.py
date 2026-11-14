@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import random
 from collections.abc import Callable, Iterable
 from typing import TYPE_CHECKING, ClassVar, Self
 
@@ -62,6 +63,10 @@ class CrewGame:
         """Advances the game by `dt` seconds in block `i`. Returns fx since the last tick."""
         fx, self.fx = self.fx, []
         return fx
+
+    def bot(self, room: Room, r: Rider, w: float, tgt: float | None, rng: random.Random) -> float:
+        """A bot's power this tick, after the game has given it a character. `w` is what it would ride."""
+        return w
 
     def state(self, room: Room, i: int, bel: float) -> dict:
         """The tick's `bus` field. Games that are not the bus send a neutral one and use `game`."""

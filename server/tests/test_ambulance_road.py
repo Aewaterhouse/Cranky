@@ -177,3 +177,18 @@ def test_strava_and_discord_tell_the_shift():
     )
     assert title.startswith("🚑 Kidney Stone Express") and "1/1" in title
     assert "Fishing Hook in Thumb" in body and "Paramedic of the Week" in body
+
+
+def test_bot_characters_smooth_twitchy_and_lead_foot():
+    import random
+    from types import SimpleNamespace as NS
+
+    game, rng = Ambulance(), random.Random(1)
+    smooth, twitchy, lead = (NS(name=n, ftp=200) for n in C.BOT_NAMES[:3])
+    assert game.bot(None, smooth, 151.0, 160.0, rng) == 160.0
+    rode = [game.bot(None, twitchy, 100.0, 100.0, rng) for _ in range(2000)]
+    assert set(rode) == {100.0, 100.0 * G.AMBO_TWITCH_X} and 10 < rode.count(130.0) < 100
+    assert game.bot(None, lead, 100.0, 100.0, rng) == 100.0
+    game.cur = {"k": "roadworks"}
+    assert game.bot(None, lead, 100.0, 100.0, rng) == 200 * G.AMBO_LEADFOOT_X > 200 * G.AMBO_FINE_OVER
+    assert game.bot(None, NS(name="Alex", ftp=200), 100.0, 100.0, rng) == 100.0

@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import random
 from typing import TYPE_CHECKING
 
+from .. import config as C
 from .. import config_games as G
 from . import ambulance_text as T
 from .common import Band
@@ -142,3 +144,14 @@ class RoadEvents:
             "left": round(max(0.0, c["t"] + c["dur"] - room.el), 1),
             "who": c["who"],
         }
+
+    def bot(self, room: Room, r: Rider, w: float, tgt: float | None, rng: random.Random) -> float:
+        """Bot characters: Smooth sits dead on target, Twitchy spikes, Lead Foot speeds in the roadworks."""
+        kind = G.AMBO_BOTS[C.BOT_NAMES.index(r.name) % len(G.AMBO_BOTS)] if r.name in C.BOT_NAMES else ""
+        if kind == "smooth":
+            return tgt or w
+        if kind == "twitchy" and rng.random() < G.AMBO_TWITCH_PER_S / C.TICK_HZ:
+            return w * G.AMBO_TWITCH_X
+        if kind == "leadfoot" and self.cur and self.cur["k"] == "roadworks":
+            return r.ftp * G.AMBO_LEADFOOT_X
+        return w

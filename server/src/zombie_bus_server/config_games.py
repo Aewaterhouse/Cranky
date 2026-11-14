@@ -98,4 +98,10 @@ AMBO_HUMP = (0.0, 0.15)
 AMBO_HUMP_MAX = 0.20  # everyone must be under this at the same moment over the hump
 AMBO_HUMP_COMFORT = 15  # Comfort lost when the patient bounces
 AMBO_SIREN_NEED = 1.2  # the siren rider's mean share of FTP to clear the car
+# Bot characters, dealt by the bot's place in BOT_NAMES: smooth rides dead on its target, twitchy spikes
+# now and then, lead foot ignores the roadworks.
+AMBO_BOTS = ("smooth", "twitchy", "leadfoot")
+AMBO_TWITCH_PER_S = 0.04
+AMBO_TWITCH_X = 1.3
+AMBO_LEADFOOT_X = 0.75
 AMBO_SIREN_M = 150  # metres gained when the car pulls over, lost when it does not
