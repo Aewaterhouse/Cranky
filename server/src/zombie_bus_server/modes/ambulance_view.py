@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 from .. import config_games as G
 from . import ambulance_text as T
-from .common import compliance, rider_row
+from .common import award, compliance, rider_row
 
 if TYPE_CHECKING:
     from ..rider import Rider
@@ -82,4 +82,25 @@ class AmboView:
         return tot / n if n else 0.0
 
     def awards(self, rs: list[Rider]) -> list[dict]:
-        return []
+        """Paramedic of the Week (smoothest), Learner Driver (spikiest) and Lead Foot (most fines)."""
+        out: list[dict] = []
+        rode = [r for r in rs if self.rough.get(r.id, (0, 0))[1]]
+        if rode:
+            best = min(rode, key=lambda r: self.jerk(r.id))
+            why = f"power within {self.jerk(best.id):.1%} of FTP of dead smooth"
+            out.append({"award": "Paramedic of the Week", "id": best.id, "name": best.name, "why": why})
+        award(
+            out,
+            rs,
+            "Learner Driver",
+            lambda r: self.spikes.get(r.id, 0),
+            lambda r: f"{self.spikes[r.id]} spikes",
+        )
+        award(
+            out,
+            rs,
+            "Lead Foot",
+            lambda r: self.fines.get(r.id, 0),
+            lambda r: f"{self.fines[r.id]} speeding fines",
+        )
+        return out

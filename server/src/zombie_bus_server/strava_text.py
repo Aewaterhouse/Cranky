@@ -32,6 +32,16 @@ def describe(s: dict[str, Any], rider: str, link: str = "") -> tuple[str, str]:
             f"Crew: {names}",
             *awards,
         ]
+    elif g.get("mode") == "ambo":
+        runs = [r for r in g.get("reviews", []) if isinstance(r, dict)]
+        title = f"🚑 Kidney Stone Express · {g.get('delivered', 0)}/{len(runs)} patients delivered"
+        lines = [
+            f"Shift score {g.get('score', 0)} · {km(g.get('distance'))} · {power}",
+            *(f"{r.get('icon', '')} {r.get('patient', '?')}: {'★' * int(r.get('stars') or 0)}" for r in runs),
+            f"Me: {me.get('spread', 0)}% rough · {me.get('spikes', 0)} spikes · {me.get('fines', 0)} fines",
+            f"Crew: {names}",
+            *awards,
+        ]
     elif g:
         gap = g.get("gap")
         fate = "survived" if (g.get("armour") or 0) > 0 else "caught"

@@ -20,6 +20,18 @@ def format_summary(plan_name: str, s: dict) -> str:
                 f"Pack: {crew}",
             ]
         )
+    if s.get("mode") == "ambo":
+        return "\n".join(
+            [
+                f"🚑 **Kidney Stone Express** · {s['delivered']}/{len(s['reviews'])} patients"
+                f" · score **{s['score']}**",
+                *(
+                    f"{r['icon']} {'★' * r['stars']}{'☆' * (5 - r['stars'])} {r['text']}"
+                    for r in s["reviews"]
+                ),
+                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
+            ]
+        )
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",

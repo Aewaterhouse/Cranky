@@ -10,7 +10,7 @@ from zombie_bus_server import config as C
 from zombie_bus_server import config_games as G
 from zombie_bus_server.modes import ambulance_text as T
 from zombie_bus_server.modes import script
-from zombie_bus_server.modes.ambulance import V, Ambulance, mid, rx
+from zombie_bus_server.modes.ambulance import Ambulance, V, mid, rx
 from zombie_bus_server.plan import locate
 from zombie_bus_server.rider import Rider
 
@@ -250,11 +250,13 @@ def test_four_riders_play_a_five_minute_shift(monkeypatch):
     assert {t["ev"] for t in ticks} >= {"base", "run", "ramp", "cool"}
     assert all(t["ev"] == t["game"]["phase"] for t in ticks)
     for t in ticks:
-        for r in t["riders"].values():
-            assert not r["erg"] and (isinstance(r["band"], str) or r["band"][1] <= r["tgt"] * 2)
+        for rid, r in t["riders"].items():
+            cap = round(room.riders[rid].ftp * C.TARGET_CAP)
+            assert not r["erg"] and (
+                isinstance(r["band"], str) or r["band"][0] <= r["tgt"] <= r["band"][1] <= cap
+            )
     s = room.summary
     assert s["mode"] == "ambo" and len(s["reviews"]) == 5 and s["delivered"] >= 3 and s["score"] > 0
     assert len(s["riders"]) == 4 and all({"spread", "spikes", "fines"} <= set(r) for r in s["riders"])
-    assert room.store is None or True
     lobby = [m for m in ws.sent if m["t"] == "lobby"][-1]
     assert lobby["game"] == "ambo" and lobby["trainers"] == "gears"

@@ -39,6 +39,7 @@ def step(room: Room, dt: float) -> dict:
     bots.drive(room, dt, i, bel)
     update_states(room, dt)
     fx = room.mode.tick(room, dt, i, bel, ev) if i >= 0 else []
+    ev = room.mode.event(room, i) if i >= 0 else ev  # a game's phase can change within its tick
     stats = None
     if i >= 0:
         for r in room.riders.values():

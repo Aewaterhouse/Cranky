@@ -10,6 +10,7 @@ from .. import config as C
 from .. import config_games as G
 from . import ambulance_text as T
 from . import script
+from .ambulance_events import RoadEvents
 from .ambulance_view import PATIENTS, AmboView
 from .common import Band, CrewGame, tally
 from .script import Seg
@@ -42,11 +43,10 @@ def rx(pid: str, t: float) -> tuple[float, float]:
     return p["cycle"][-1][1:]
 
 
-class Ambulance(AmboView, CrewGame):
+class Ambulance(RoadEvents, AmboView, CrewGame):
     """One shift. The run in progress is `open` from pick-up until the patient is delivered or walks."""
 
     no_erg = True
-    run_events = staticmethod(lambda pid: ("say",))
 
     def __init__(self, level: str = "normal") -> None:
         super().__init__(level)
@@ -164,25 +164,6 @@ class Ambulance(AmboView, CrewGame):
             return G.AMBO_BRAKE
         return self.ev_band(room, r) or rx(b["patient"], bel / room.plan.get("scale", 1.0))
 
-    # --- road events: nothing on the road until the events mixin (ambulance_events.py) is in -----------
-
-    def ev_all(self, evs: list[dict], el: float) -> tuple[float, float] | None:
-        """The band a road event puts on the whole crew at ride time `el`, if one does."""
-        return None
-
-    def ev_band(self, room: Room, r: Rider) -> Band:
-        """The band the event in progress gives this rider, if any."""
-        return None
-
-    def ev_start(self, room: Room, e: dict) -> None:
-        """A road event from the script has come due."""
-
-    def ev_tick(self, room: Room, act: list[Rider], dt: float) -> None:
-        """Judges the road event in progress."""
-
-    def ev_view(self, room: Room) -> dict | None:
-        return None
-
     def say(self, room: Room, i: int) -> None:
         kind = room.plan["blocks"][i]["kind"]
         lines = {"base": T.BASE, "ramp": T.RAMP, "cool": T.COOL}.get(kind) or T.CALM[self.pid]
@@ -199,7 +180,8 @@ class Ambulance(AmboView, CrewGame):
         for r in act:
             was = self.sm.get(r.id, r.p)
             self.sm[r.id] = was + (r.p - was) * a
-        team = fmean(self.sm[r.id] / r.ftp for r in act) if act else 0.0
+        # nobody adds more than the cap to the speed, so the siren rider's sprint is a nudge, not a rocket
+        team = fmean(min(C.TARGET_CAP, self.sm[r.id] / r.ftp) for r in act) if act else 0.0
         self.speed = 0.0 if self.rev > 0 else team * V
         self.dist += self.speed * dt
         due, self.ev_n = script.due(self.events, self.ev_n, el)
@@ -298,7 +280,11 @@ class Ambulance(AmboView, CrewGame):
             "fell": self.fell,
             "pts": round(pts),
         }
+        stars = 1 + sum(pts >= need for need in G.AMBO_STARS)
+        entry["stars"] = 1 if walked else min(stars, G.AMBO_FELL_STARS) if self.fell else stars
+        entry["text"] = T.review(self.pid, entry["stars"], walked, self.fell, delta < -G.AMBO_BRAKE_S)
         self.reviews.append(entry)
+        self.emit("review", f"{'★' * entry['stars']}{'☆' * (5 - entry['stars'])} {entry['text']}")
         if not walked:
             self.emit("delivered", f"{p['name']} delivered. Comfort {round(self.comfort)}%.")
 

@@ -136,7 +136,9 @@ position, through `ErgController.setGrade`.
 ## Kidney Stone Express (`game: 'ambo'`)
 - A bus room, never on ERG. The plan is free blocks with `kind` (`base`, `run`, `ramp`, `cool`) and, on runs, `patient` (`hook`, `kidney`, `magpie`, `bin`, `trainer`). `tick.ev` is the phase: `base`, `run`, `ramp`, `reverse` or `cool` (a crew that arrives early is already in `ramp` while the run block finishes).
 - `tick.game`: `{g: 'ambo', phase, run, runs, patient: {id, name, icon, line} | null, comfort (0..100), dist (metres left), total, speed (km/h), par (seconds left in the run block), eta (seconds at this speed, or null when stopped), event, brake, perk: null | 'spike' | 'green', sweet (0..1), queue (seconds left in the hospital queue), reviews, score, siren}`. `patient` is null once they are delivered or have walked.
-- `reviews` (finished runs, also in the summary): `{id, patient, icon, comfort, delta (seconds early, negative late), walked, fell, pts}`.
-- fx kinds: `say` (radio banter and patient lines), `delivered`, `fellout`, `walked`, `perk`. All carry `text`.
+- `reviews` (finished runs, also in the summary): `{id, patient, icon, comfort, delta (seconds early, negative late), walked, fell, pts, stars (1..5), text}`.
+- `event` (the road event in progress, or null): `{k: 'green' | 'roadworks' | 'hump' | 'siren', name, text, left (seconds), who (the siren rider's id, else null)}`. `siren` repeats `who`. In the first half of a `hump` the text is the 3-2-1 and no band has changed yet. The siren rider's `band` is `"sprint"`.
+- fx kinds: `say` (radio banter, patient lines and how each road event ended; `id` is the siren rider on a siren result), `delivered`, `fellout`, `walked`, `perk`, `fine` (`id` is the rider) and `review` (stars and the review, right after `delivered` or `walked`). All carry `text`.
 - Summary: `mode: 'ambo'`, `score`, `distance`, `delivered`, `reviews`, `awards` and rider rows with `spread` (mean roughness, % of FTP), `spikes` and `fines`. Not on the season ladder.
-- No `act` keys yet.
+- No `act` keys: the game takes no input but power and cadence.
+- `tick.ev` is now read from the game after its tick (it was read before), so it always matches `game.phase`.

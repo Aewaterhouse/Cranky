@@ -69,7 +69,7 @@ Reuses the bus world: the bus becomes an ambulance (white, stripe, light bar), n
 **Checklist**
 - [x] K1 Server: `modes/ambulance.py`: script, five patients as interval sets, speed and distance, Comfort, braking
       zone, walk-off, ramping perk. Unit tests for each rule.
-- [ ] K2 Server: the four road events and scoring, reviews, awards. Tests.
+- [x] K2 Server: the four road events and scoring, reviews, awards. Tests.
 - [ ] K3 Client HUD: Comfort meter, patient card with speech bubbles, distance to hospital and ETA, event prompts,
       siren-rider callout, ramping queue screen.
 - [ ] K4 Scene: ambulance skin and light bar, siren flash on the siren event, hospital arrival, the patient on the
