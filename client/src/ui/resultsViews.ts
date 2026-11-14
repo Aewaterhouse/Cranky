@@ -18,6 +18,8 @@ export interface GroupSummary {
     /** VO2 Madness: effort points and seconds over 90% of max heart rate. */
     points?: number
     redSecs?: number
+    /** Last Rider Standing: the last step held, % FTP. */
+    reached?: number
     /** Kidney Stone Express: power spread (% FTP), spikes and fines. */
     spread?: number
     spikes?: number
@@ -102,6 +104,11 @@ export const VIEWS: Record<
     ],
     col: 'Falls',
     cell: (r) => String(r.falls),
+  },
+  last: {
+    tiles: (g) => [tile('Top step', `${g.score}% FTP`)],
+    col: 'Lasted to',
+    cell: (r) => `${r.reached ?? 0}%`,
   },
   madness: {
     tiles: () => [],

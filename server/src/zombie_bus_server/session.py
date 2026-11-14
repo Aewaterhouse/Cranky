@@ -14,6 +14,7 @@ from . import config as C
 from .modes.ambulance import Ambulance
 from .modes.climate import Climate
 from .modes.dating import Dating
+from .modes.last_standing import LastStanding
 from .modes.vo2_madness import Vo2Madness
 from .modes.watch import Watch
 from .modes.zombie_bus import ZombieBus, roll_weather, weekly_mutator
@@ -31,6 +32,7 @@ MODES = {
     "date": Dating,
     "climate": Climate,
     "watch": Watch,
+    "last": LastStanding,
 }
 
 

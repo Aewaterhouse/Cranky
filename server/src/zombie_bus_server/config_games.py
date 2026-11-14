@@ -264,3 +264,11 @@ GAME_MUTATORS = {
         {"id": "normal", "name": "Regular Night", "desc": "The usual handful of emoji.", "emoji": 1.0},
     ],
 }
+
+# Last Rider Standing: steps of LAST_STEP % FTP a minute from LAST_FROM to the 150% cap, LAST_HOLDS more
+# minutes there. Out after LAST_OUT_S under LAST_OUT_BAND compliance (or stopped), never in a step's first
+# LAST_GRACE_S while ERG ramps. Bots break somewhere in LAST_BOT_LIMIT (share of FTP).
+LAST_FROM, LAST_TO, LAST_STEP, LAST_HOLDS = 60, 150, 6, 4
+LAST_WARM_S, LAST_COOL_S = 300, 240
+LAST_OUT_S, LAST_OUT_BAND, LAST_GRACE_S = 10, 0.8, 8
+LAST_BOT_LIMIT = (1.0, 1.4)

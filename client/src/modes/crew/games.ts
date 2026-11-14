@@ -119,4 +119,20 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Crew score',
     plan: true,
   },
+  last: {
+    icon: '🏁',
+    name: 'Last Rider Standing',
+    how: [
+      'A ramp test for everyone: the target climbs every minute.',
+      'Fall off your step for 10 seconds and you are out.',
+      'The last one still holding wins. Everyone gets a victory lap.',
+    ],
+    tag: 'Elimination ramp test',
+    blurb:
+      'A shared ramp test as an elimination game. One-minute steps climb to 150% of FTP; drop off your step for 10 s and you are out. Last one standing wins.',
+    start: 'Start the ramp',
+    countdown: 'THE RAMP STARTS IN',
+    score: 'Highest step (% FTP)',
+    plan: false,
+  },
 }

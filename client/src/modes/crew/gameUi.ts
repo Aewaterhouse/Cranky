@@ -6,6 +6,7 @@ import { AMBO_EVENTS, makeAmboPanel } from '../../ui/hudAmbo'
 import { CLIMATE_EVENTS, makeClimatePanel } from '../../ui/hudClimate'
 import { DATE_EVENTS, makeDatePanel } from '../../ui/hudDate'
 import { makeWatchPanel } from '../../ui/hudWatch'
+import { LAST_EVENTS, makeLastPanel } from '../../ui/hudLast'
 import { videoStage } from '../../scene/videoStage'
 import type { EventStyle } from '../../ui/hudKit'
 
@@ -69,5 +70,19 @@ export const GAME_UI: Partial<Record<Game, GameUi>> = {
     scene: (m) => ({ game: m.game, el: m.el }) as Partial<SceneState>,
     world: (stage, say, act) =>
       videoStage(stage, say, (vid, t) => act('title', `${vid}\t${t}`.slice(0, 300))),
+  },
+  last: {
+    events: LAST_EVENTS,
+    panel: makeLastPanel,
+    // No bus: the riders ride as a pack, the winner wearing the crown.
+    scene: (m) => {
+      const winner = (m.game as { winner?: string | null } | null)?.winner ?? null
+      return {
+        gap: null,
+        armour: null,
+        roadblock: null,
+        mad: { pts: {}, crown: winner, lead: null, work: true },
+      }
+    },
   },
 }
