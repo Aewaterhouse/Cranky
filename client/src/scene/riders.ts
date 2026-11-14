@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
 import { TRAINER_SKIN } from '../core/cosmetics'
-import { bodyColour, defaultBody, type Body } from '../core/body'
+import { bodyColour, bodyOf, defaultBody, type Body } from '../core/body'
 import { SLOT } from './figure'
 import { makeHat } from './hats'
 import { buildBody, dimsOf, type Dims } from './riderBody'
@@ -153,10 +153,17 @@ export function makeRider(colour: string, id: string, road = false) {
   wearOn.add(helmet)
   head.add(wearOn)
   let bare = false
+  let bodyKey: string | undefined
   const setLook = (look: Look = {}) => {
-    const key = `${look.hat}|${look.outfit}|${look.bike}`
+    const key = `${look.hat}|${look.outfit}|${look.bike}|${look.body}`
     if (key === hatKey) return
     hatKey = key
+    // The rider's own body travels in the look; without one they keep the default from their id.
+    if (look.body !== bodyKey) {
+      bodyKey = look.body
+      body = bodyOf(id, look)
+      rebuild()
+    }
     jersey = cosmetic(look.outfit)?.colour ?? colour
     bike.skin(cosmetic(look.bike)?.colour, look.bike === TRAINER_SKIN)
     if (hat) wearOn.remove(hat)

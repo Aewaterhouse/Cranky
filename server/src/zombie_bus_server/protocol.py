@@ -2,7 +2,9 @@
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import BaseModel, Field, TypeAdapter, field_validator
+
+from .avatars import clean_look
 
 Tier = Literal["hard", "medium", "easy"]
 Grade = Literal["FAIL", "HIT", "GREAT", "MEGA", "LEGEND"]
@@ -14,6 +16,12 @@ class Join(BaseModel):
     ftp: int = Field(ge=50, le=600)
     tier: Tier
     look: dict[str, str] = Field(default_factory=dict)
+
+    @field_validator("look")
+    @classmethod
+    def checked_body(cls, look: dict[str, str]) -> dict[str, str]:
+        """A rider's body rides in the look; one that isn't valid is dropped (they show their default)."""
+        return clean_look(look)
 
 
 class Watch(BaseModel):

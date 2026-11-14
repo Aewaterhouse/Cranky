@@ -23,6 +23,7 @@ BACKUP_KEEP = 14
 FILE_MAX_BYTES = 8_000_000  # one download (.fit, JSON, postcard PNG) built by the client
 FILE_KEEP_S = 600  # how long a download link works
 FILE_PER_RIDER = 6  # downloads kept per rider; the oldest goes first
+BODY_MAX_CHARS = 200  # a rider body string (look.body) is about 80
 PUBLIC_URL = os.environ.get("PUBLIC_URL", "https://www.cranky.life").rstrip("/")  # links leaving the app
 STRAVA_CLIENT_ID = os.environ.get("STRAVA_CLIENT_ID", "")
 STRAVA_CLIENT_SECRET = os.environ.get("STRAVA_CLIENT_SECRET", "")  # stays on the server

@@ -13,6 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError
 
 from . import config, efforts, files, ladder, strava_api
+from .avatars import clean_look
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
 from .session import Room
@@ -169,6 +170,8 @@ def get_profile(rid: str, u: User) -> dict:
 def put_profile(rid: str, profile: dict, u: User) -> dict:
     if rid != u["id"]:
         raise HTTPException(403)
+    if isinstance(profile.get("look"), dict):
+        profile["look"] = clean_look(profile["look"])
     return {"saved": store.put_profile(rid, profile)}
 
 

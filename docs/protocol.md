@@ -42,7 +42,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 | t | Fields | Notes |
 | --- | --- | --- |
-| `join` | `name, ftp, tier, look` | First message. `look` is the cosmetics map (e.g. `{hat, outfit, paint, bullbar, spikes}`). Same `id` reconnecting reclaims the slot. |
+| `join` | `name, ftp, tier, look` | First message. `look` is the cosmetics map (e.g. `{hat, outfit, paint, bullbar, spikes}`). It may also carry `body`, the rider's body from the character creator as a string (`1-50-45-…`: a version, then one whole number per option of `content/avatar.json`); the server clamps each value to its range and drops a `body` it does not understand, and a look without one shows the rider's default body. Same `id` reconnecting reclaims the slot. |
 | `watch` | | First message instead of `join`: a TV / second-screen spectator. No seat, not counted in `MAX_RIDERS`, not in `/api/rooms`, never keeps a room alive. Gets the same `lobby`, `tick` and `end` messages (and `end` straight away if the ride is done). Every other message from a spectator socket is ignored. The same account may ride on one socket and watch on another. |
 | `setup` | `plan, minutes` | Host only, lobby only. `minutes` 0 = as written. |
 | `bots` | `n` | Host only, lobby only. Sets the number of bot riders (0..5), capped so humans + bots fit the 6 seats. A human joining a full bus takes a bot's seat. |
