@@ -7,8 +7,29 @@ export const FEEL = {
     /** 1 turns every extra below off, for a steady camera (the "Calm camera" setting). */
     calm: 0,
     /** The view widens by this many degrees by `fovKickAt`. */
-    fovKick: 6,
+    fovKick: 7,
     fovKickAt: 18,
+    /**
+     * Leading into corners: the bend `leadAt` m ahead (curvature times `lead`, capped at 1) moves the camera up to
+     * `leadSide` m to the outside and the aim `leadAim` m to the inside, eased at `leadRate` a second.
+     */
+    lead: 30,
+    leadAt: 30,
+    leadSide: 1.1,
+    leadAim: 2.2,
+    leadRate: 1.2,
+    /**
+     * Descents: from `descFrom` down to `descFull` and above `descMs` (full `descSpan` faster) the camera sinks
+     * `descDown` m, sits `descBack` of its distance further back and widens `descFov` degrees, eased at `descRate`.
+     */
+    descFrom: 0.03,
+    descFull: 0.07,
+    descMs: 9,
+    descSpan: 6,
+    descDown: 0.7,
+    descBack: 0.05,
+    descFov: 3,
+    descRate: 0.6,
     /** Shake on a fast descent: metres and roll at full, from `shakeFrom` to `shakeFull`, on at least `shakeGrade` down, at `shakeHz`. */
     shake: 0.05,
     shakeRoll: 0.008,

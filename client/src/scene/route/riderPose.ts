@@ -64,3 +64,10 @@ export const fovKick = (speed: number) => clamp(speed / C.fovKickAt) * C.fovKick
 
 /** The camera's roll for a rider leaning `lean`: a share of it, capped, and the same way. */
 export const camRoll = (lean: number) => clamp(lean * C.lean, -C.leanMax, C.leanMax)
+
+/** -1..1: how hard the camera leads into a bend of curvature `curv` (1/m) ahead; positive to the right. */
+export const bendLead = (curv: number) => clamp(curv * C.lead, -1, 1)
+
+/** 0..1: how low and wide the camera goes on a descent of `grade` at `speed`. */
+export const descent = (speed: number, grade: number) =>
+  clamp((-grade - C.descFrom) / (C.descFull - C.descFrom)) * clamp((speed - C.descMs) / C.descSpan)

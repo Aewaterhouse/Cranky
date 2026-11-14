@@ -4,6 +4,8 @@ import {
   bendLean,
   camRoll,
   fovKick,
+  bendLead,
+  descent,
   levelPhase,
   newRoadPose,
   poseWants,
@@ -88,6 +90,19 @@ describe('camera extras stay small', () => {
     expect(fovKick(0)).toBe(0)
     expect(fovKick(C.fovKickAt / 2)).toBeCloseTo(C.fovKick / 2)
     expect(fovKick(50)).toBe(C.fovKick)
+  })
+  it('leads into bends the same way, capped', () => {
+    expect(bendLead(0)).toBe(0)
+    expect(bendLead(0.01)).toBeGreaterThan(0)
+    expect(bendLead(-1)).toBe(-1)
+    expect(C.leadSide + C.leadAim).toBeLessThanOrEqual(4)
+  })
+  it('goes low and wide only on fast descents', () => {
+    expect(descent(20, 0)).toBe(0)
+    expect(descent(5, -0.1)).toBe(0)
+    expect(descent(12, -0.05)).toBeGreaterThan(0)
+    expect(descent(30, -0.2)).toBe(1)
+    expect(C.fovKick + C.descFov).toBeLessThanOrEqual(15)
   })
   it('rolls a share of the lean, the same way, capped', () => {
     expect(camRoll(0.1)).toBeCloseTo(0.1 * C.lean)

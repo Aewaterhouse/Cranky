@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { clamp } from '../math'
 import { VIS } from '../params'
 import type { HeightField } from './heightField'
-import { camRoll, fovKick, shakeAmount } from './riderPose'
+import { bendLead, camRoll, descent, fovKick, shakeAmount } from './riderPose'
 import { newPose, type Pose } from './roadPath'
 
 const R = VIS.route
@@ -45,9 +45,12 @@ export class RouteCam {
   private rise = 0
   private roll = 0
   private tuck = 0
+  private lead = 0
+  private low = 0
   private fov = R.fov
   private back = newPose()
   private ahead = newPose()
+  private bend = newPose()
 
   /** `t` is the scene clock; `ox, oy, oz` is the floating origin taken off before drawing. */
   update(
@@ -66,12 +69,17 @@ export class RouteCam {
     // On a circuit the road behind the start is the end of the lap, and the road past the end is the start.
     const len = field.path.length
     const on = (x: number) => (this.loop ? ((x % len) + len) % len : x)
+    // Into a bend the camera swings wide and looks in; down a fast descent it sinks and pulls back a little.
+    const bend = field.path.poseAt(on(d + C.leadAt), this.bend)
+    this.lead += (bendLead(bend.curv) * fancy - this.lead) * clamp(dt * C.leadRate)
+    this.low += (descent(speed, me.grade) * fancy - this.low) * clamp(dt * C.descRate)
     const b = field.path.poseAt(
-      on(d - R.camBack * R.camDist * (1 - C.tuckIn * this.tuck)),
+      on(d - R.camBack * R.camDist * (1 - C.tuckIn * this.tuck + C.descBack * this.low)),
       this.back,
     )
     const a = field.path.poseAt(on(d + R.camLook), this.ahead)
-    const side = offset * SIDE_FOLLOW + R.camSide
+    const side = offset * SIDE_FOLLOW + R.camSide - this.lead * C.leadSide
+    const inside = side + this.lead * (C.leadSide + C.leadAim)
     const rx = me.x + me.rx * offset
     const rz = me.z + me.rz * offset
     // Look less far up the road the more it doubles back, so a hairpin never swings the rider out of shot.
@@ -87,7 +95,8 @@ export class RouteCam {
     const tx = b.x + b.rx * side
     const tz = b.z + b.rz * side
     this.x += (tx - this.x) * k
-    this.y += (b.y + R.camHeight * R.camDist - C.tuckDown * this.tuck - this.y) * k
+    this.y +=
+      (b.y + R.camHeight * R.camDist - C.tuckDown * this.tuck - C.descDown * this.low - this.y) * k
     this.z += (tz - this.z) * k
     const lag = Math.hypot(tx - this.x, tz - this.z)
     if (lag > LAG_MAX_M) {
@@ -96,8 +105,8 @@ export class RouteCam {
     }
     // How far the aim rises or falls with the road ahead is eased on its own, so a ramp tips the view gently.
     this.rise += ((a.y - me.y) * m - this.rise) * (jumped || !fancy ? 1 : clamp(dt * C.pitchStiff))
-    const ax = rx + (a.x + a.rx * side - rx) * m
-    const az = rz + (a.z + a.rz * side - rz) * m
+    const ax = rx + (a.x + a.rx * inside - rx) * m
+    const az = rz + (a.z + a.rz * inside - rz) * m
     this.lx += (ax - this.lx) * k
     this.ly += (me.y + this.rise + AIM_UP - this.ly) * k
     this.lz += (az - this.lz) * k
@@ -120,7 +129,8 @@ export class RouteCam {
       cam.translateX(shake * C.shake * 0.6 * Math.sin(w * 1.3 + 1))
       cam.translateY(shake * C.shake * (Math.sin(w) + 0.5 * Math.sin(w * 1.9 + 0.5)))
     }
-    this.fov += (R.fov + fovKick(speed) * fancy - this.fov) * clamp(dt * 4)
+    const wide = fovKick(speed) * fancy + C.descFov * this.low
+    this.fov += (R.fov + wide - this.fov) * clamp(dt * 4)
     if (Math.abs(cam.fov - this.fov) > 0.01) {
       cam.fov = this.fov
       cam.updateProjectionMatrix()
