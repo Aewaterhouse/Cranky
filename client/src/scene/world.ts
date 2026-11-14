@@ -3,6 +3,7 @@ import type { Look } from '../core/cosmetics'
 import { makeAmboProps } from './ambulance'
 import { makeBus } from './bus'
 import { BusCam } from './busCam'
+import { BigThings } from './bigThings'
 import { Crew } from './crew'
 import { DateDress } from './dateDress'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
@@ -85,6 +86,7 @@ export class World {
   private boards = new Billboards(0)
   private servo = new Servo()
   private dateDress = new DateDress(0)
+  private bigThings = new BigThings()
   private mirror!: Mirror
   private bus = makeBus()
   private ambo = makeAmboProps()
@@ -142,6 +144,7 @@ export class World {
       this.boards.group,
       this.servo.group,
       this.dateDress.group,
+      this.bigThings.group,
       this.bus.group,
       this.ambo.group,
       this.horde.group,
@@ -245,6 +248,8 @@ export class World {
     this.boards.update(dz, this.dist)
     this.dateDress.group.visible = date
     if (date) this.dateDress.update(dz, this.dist)
+    this.bigThings.group.visible = !date
+    this.bigThings.update(dz, this.dist)
     this.servo.update(dz, s.mood === 'servo', dt)
     this.sky.update(env, this.t, this.camera.position)
 

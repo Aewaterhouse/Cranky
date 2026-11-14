@@ -146,12 +146,31 @@ function ruin() {
   return m.build()
 }
 
-function sign(kind: 'warn' | 'green' | 'stop') {
+function sign(kind: 'warn' | 'green' | 'stop' | 'roo' | 'wombat') {
   const m = new Mesher(0.05)
   m.add(cyl(0.06, 0.06, 3.2, 5), '#999', [0, 1.6, 0])
   if (kind === 'warn') {
     m.add(box(1.5, 1.5, 0.08), '#f0c820', [0, 3.5, 0.06], [0, 0, Math.PI / 4])
     m.add(box(0.2, 0.9, 0.1), '#222', [0, 3.5, 0.1])
+  } else if (kind === 'roo' || kind === 'wombat') {
+    m.add(box(1.5, 1.5, 0.08), '#f0c820', [0, 3.5, 0.06], [0, 0, Math.PI / 4])
+    const k = '#1b1b1b'
+    const parts: [number, number, number, number, number][] =
+      kind === 'roo'
+        ? [
+            [0.5, 0.28, 0.02, 3.45, 0.7],
+            [0.2, 0.14, 0.3, 3.78, 0.2],
+            [0.05, 0.14, 0.27, 3.9, 0.3],
+            [0.6, 0.07, -0.36, 3.15, -0.35],
+            [0.4, 0.08, 0.08, 3.12, 0],
+          ]
+        : [
+            [0.75, 0.36, -0.05, 3.42, 0],
+            [0.26, 0.24, 0.38, 3.4, -0.2],
+            [0.1, 0.18, -0.3, 3.18, 0],
+            [0.1, 0.18, 0.2, 3.18, 0],
+          ]
+    for (const [w, h, x, y, r] of parts) m.add(box(w, h, 0.1), k, [x, y, 0.1], [0, 0, r])
   } else if (kind === 'green') {
     m.add(box(2.6, 1.1, 0.08), '#1f7a4a', [0, 3.3, 0.06])
     m.add(box(2.2, 0.12, 0.1), '#eee', [0, 3.4, 0.1])
@@ -205,6 +224,8 @@ export const makeGeos = (poleSpacing: number) => ({
   warn: sign('warn'),
   green: sign('green'),
   stop: sign('stop'),
+  roo: sign('roo'),
+  wombat: sign('wombat'),
   fence: fence(),
   junk: junk(),
   sedan: vehicle('sedan'),

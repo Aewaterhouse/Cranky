@@ -101,6 +101,10 @@ export const VIS = {
   mirrorY: 0.03,
   mirrorHeight: 3.6,
   moodBlend: 1.6,
+  /** A zombified Big Thing or a dead servo comes past every `bigThingEvery` m, `bigThingX` m off the road, scaled by `bigThingScale`. */
+  bigThingEvery: 520,
+  bigThingX: 18,
+  bigThingScale: 1.5,
   /** Speed Dating's road dressing and its dusk (scene/dateVis.ts). */
   date: DATE,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */

@@ -48,7 +48,7 @@ say where you are, and free-ride places that don't look like where they are.
 14. [ ] (retried 2026-11-14: Great Ocean Road got streets, 855 buildings and land cover, kunanyi got land cover; Overpass refused the other seven again) Map features for the nine routes that have none (worlds 2; the fetch kept failing before, retry).
 15. [x] (dusk lifted, golden hour runs to 8 pm, Settings > Free ride sky has Always sunny and Golden hour; ground in straw and lush patches) Lift the dusk look and add a sunny default (worlds 3); break up the ground colour (worlds 4).
 16. [x] (roadside detail, the farm kit with vine rows on Willunga, and a road-life director that fills any 42 s gap with chalk, a sign or traffic) Close-up roadside detail for speed; a farm kit for open country; something every 30 to 45 s (worlds 5, 6, 7).
-16a. [ ] (Speed Dating has its own dusk world; the bus and the town still to do) Give the game scenes their own character: Speed Dating's date-night road, a more Australian bus road, life on the Climate town's water (worlds 12, 16, 17).
+16a. [ ] (Speed Dating has its own dusk world; the bus road has gums, roo and wombat signs, a zombie Big Banana and Big Prawn and a dead servo; the town still to do) Give the game scenes their own character: Speed Dating's date-night road, a more Australian bus road, life on the Climate town's water (worlds 12, 16, 17).
 
 **Bugs found along the way**
 17. [ ] ("1 rides" fixed; the missing History ride was almost surely under 30 s, which is never saved: results now

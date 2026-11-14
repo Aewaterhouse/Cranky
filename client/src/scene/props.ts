@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { groundH } from './ground'
 import { makeGeos } from './propGeo'
+import { plantGeo } from './route/plantGeo'
 import { VC, pick, rand, noise2 } from './util'
 
 export const LOOP = 420
@@ -110,7 +111,9 @@ export class Props {
     const g = makeGeos(40)
     const specs: Spec[] = [
       { geo: g.live, n: 70, xr: [12, 70], s: [0.8, 1.6], tint: GREENS },
-      { geo: g.pine, n: 60, xr: [14, 90], s: [0.9, 1.8], tint: GREENS },
+      { geo: g.pine, n: 16, xr: [14, 90], s: [0.9, 1.8], tint: GREENS },
+      { geo: plantGeo('gum'), n: 34, xr: [12, 90], s: [0.55, 1], tint: GREENS },
+      { geo: plantGeo('scribbly'), n: 24, xr: [10, 60], s: [0.8, 1.3], tint: GREENS },
       { geo: g.dead, n: 36, xr: [9, 50], s: [0.8, 1.4], grim: true },
       { geo: g.bush, n: 70, xr: [8.8, 40], s: [0.7, 1.5], tint: GREENS },
       { geo: g.rock, n: 50, xr: [8.5, 60], s: [0.6, 2.2], sink: 0.1 },
@@ -176,6 +179,8 @@ export class Props {
       { geo: g.warn, n: 8, xr: [8.6, 9.6], yaw: () => rand(-0.2, 0.2) },
       { geo: g.green, n: 4, xr: [8.8, 9.6], yaw: () => rand(-0.15, 0.15) },
       { geo: g.stop, n: 3, xr: [8.6, 9.4], yaw: () => rand(-0.3, 0.3) },
+      { geo: g.roo, n: 3, xr: [8.6, 9.4], yaw: () => rand(-0.2, 0.2) },
+      { geo: g.wombat, n: 2, xr: [8.6, 9.4], yaw: () => rand(-0.2, 0.2) },
     ]
     this.sets = specs.map((s) => new Scatter(s, dist))
     this.sets.forEach((s) => this.group.add(s.mesh))
