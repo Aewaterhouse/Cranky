@@ -206,9 +206,28 @@ knowledge of the code, given only the running site, and asked for a verdict, not
   top findings become items under the standing UI polish item below and are worked through in order. Re-run the
   review after a big round of fixes.
 
+## Phase 7: Races on the road (owner, 2026-11-14)
+
+Race games on the free-ride road layer (`docs/road-games.md`: a `Rules` subclass on `RoadSim`, positions owned by
+the server), with bots, results and history like the other games.
+
+- [ ] Normal race: everyone from the line, first across wins; a route and a number of laps picked by the host.
+- [ ] Points race: laps with a sprint at the end of each (points for the top places, more on the last lap); most
+      points wins, whoever crosses first.
+- [ ] Crit: a short loop, many laps, and a sprint prime rung at a random lap around halfway (a bell and a banner);
+      the prime winner is the hero of the results whatever the finish.
+- [ ] A podium scene at the end: the top three on the steps in the 3D world (champagne, confetti, silly poses with
+      the bonkers models), with the prime or points winner standing to the side on their own little box.
+- [ ] Each race in the e2e test with bots; owner checks for a real group race.
+
+## Always open: 3D worlds (owner, 2026-11-14)
+
+- [ ] More work on the 3D environments, free ride first, then the game scenes (bus road, the town, the dating road):
+      richer scenery and landmarks, better lighting and sky, more life at the roadside. Keep the models bonkers.
+
 ## Always open: UI polish (owner, 2026-11-14)
 
-- [ ] Continuous improvement of the UI once the three games are in. Never tick this: there is always more polish
+- [ ] Continuous improvement of the UI once the three games are in. Owner, 2026-11-14: make it fun but slick and polished. Never tick this: there is always more polish
       to do. Lower priority than anything above. Known rough edges to start from: the lobby still says "Bus lobby"
       and shows the effort tier and ERG switch for games that use neither; game panels are untested on phones and at
       Large display size; the question sheet can cover riders mid-screen; history lists do not name the game.
