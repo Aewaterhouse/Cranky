@@ -40,6 +40,21 @@ const LINES: Record<string, string[]> = {
   GREAT: ['Not bad at all.', 'Good sprint.'],
   MEGA: ['Now we are talking.', 'Ripper.'],
   LEGEND: ['Strewth. All-time best.', 'Legend. Bolt a trophy on the bus.'],
+  delivered: [
+    'Patient delivered. Mostly intact.',
+    'Signed for. Next.',
+    'Handed over. Lovely driving.',
+  ],
+  fellout: [
+    'The patient has left the vehicle. Reverse. Slowly.',
+    'Back doors. Somebody check the back doors.',
+  ],
+  walked: [
+    'The patient is walking. They will beat us there.',
+    'They have got out. That is a one star review.',
+  ],
+  fine: ['{name}, that is a speeding fine.', 'Roadworks, {name}. Sixty means sixty.'],
+  perk: ['Triage owes us a favour.'],
 }
 const MIN_GAP_MS = 3500
 let last = 0
@@ -57,7 +72,7 @@ function voice() {
 export function announce(kind: string, name = 'Someone') {
   const lines = LINES[kind]
   if (!lines || !settings.announcer || !settings.volume || !('speechSynthesis' in window)) return
-  const urgent = ['roadblock', 'fell', 'LEGEND', 'MEGA'].includes(kind)
+  const urgent = ['roadblock', 'fell', 'fellout', 'walked', 'LEGEND', 'MEGA'].includes(kind)
   const now = performance.now()
   if (!urgent && now - last < MIN_GAP_MS) return
   last = now
