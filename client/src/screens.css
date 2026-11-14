@@ -502,8 +502,12 @@ kbd {
     max-width: 150px;
   }
   .tiles {
+    display: grid;
     grid-template-columns: repeat(3, 1fr);
     width: 100%;
+  }
+  .tiles > .tile {
+    width: auto;
   }
   .options,
   .grid2 {

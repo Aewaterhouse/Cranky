@@ -250,11 +250,17 @@ a {
   letter-spacing: 0.14em;
   color: var(--dim);
 }
+/* Centred rows, so seven riders sit 4 + 3 or 6 + 1 in the middle instead of one orphan at the left. */
 .tiles {
-  display: grid;
-  grid-template-columns: repeat(6, 128px);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: calc(4 * 128px + 3 * 14px);
   gap: 14px;
-  margin: 8px 0 28px;
+  margin: 8px auto 28px;
+}
+.tiles > .tile {
+  width: 128px;
 }
 .tile {
   display: flex;
