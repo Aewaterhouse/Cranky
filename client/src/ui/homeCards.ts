@@ -1,4 +1,4 @@
-import type { Profile } from '../core/curve'
+import { liveStreak, type Profile } from '../core/curve'
 import { h } from './dom'
 import type { HomeActions } from './home'
 import { needTrainer } from './trainer'
@@ -34,7 +34,7 @@ export function hello(p: Profile, act: HomeActions) {
   return h(
     'section',
     { class: 'panel hello' },
-    h('span', { class: 'big-emoji' }, p.stats.streak > 1 ? '🔥' : '👋'),
+    h('span', { class: 'big-emoji' }, liveStreak(p) > 1 ? '🔥' : '👋'),
     h(
       'span',
       {},
@@ -43,7 +43,7 @@ export function hello(p: Profile, act: HomeActions) {
         'small',
         {},
         `${p.stats.rides} ride${p.stats.rides === 1 ? '' : 's'} · ${Math.round(p.stats.secs / 3600)} h · ${p.stats.kj.toLocaleString()} kJ` +
-          (p.stats.streak > 1 ? ` · ${p.stats.streak} week streak` : ''),
+          (liveStreak(p) > 1 ? ` · ${liveStreak(p)} week streak` : ''),
       ),
     ),
     p.scrap > 0 ? h('a', { class: 'arrow', href: '#garage' }, `⚙ ${p.scrap} to spend →`) : '',

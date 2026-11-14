@@ -64,6 +64,8 @@ export const CFG = {
   bestWindowDays: 90,
   ftpSuggestThreshold: 0.03,
   trends: { ctlDays: 42, atlDays: 7, fitnessDays: 90, weeks: 12, heatWeeks: 26 },
+  /** Weekly streak: a freeze forgives one missed week; one is earned every `freezeEvery` weeks, up to `freezeMax`. */
+  streak: { freezeEvery: 4, freezeMax: 2 },
   /** Training plans: a ride this share of a session's length on its day counts it done, whatever was ridden. */
   trainingPlan: { doneFrac: 0.8 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],

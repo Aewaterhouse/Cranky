@@ -47,6 +47,8 @@ export interface Profile {
     zones: number[]
     streak: number
     lastWeek: number
+    /** Missed weeks the streak can survive. */
+    freezes?: number
   }
   updated: number
   scrap: number
@@ -184,6 +186,12 @@ export function gradeSprint(
 
 export const isoWeek = (t: number) => Math.floor((t - 3 * DAY) / (7 * DAY))
 
+/** The weekly streak as of `now`: still alive through this week and last, or the week before when a freeze covers it. */
+export function liveStreak(p: Profile, now = Date.now()) {
+  const gap = isoWeek(now) - p.stats.lastWeek
+  return gap <= 1 || (gap === 2 && (p.stats.freezes ?? 0) > 0) ? p.stats.streak : 0
+}
+
 export function applyRide(p: Profile, r: RideRecord): Profile {
   const next: Profile = JSON.parse(JSON.stringify(p))
   for (const [d, w] of Object.entries(r.best)) {
@@ -194,8 +202,14 @@ export function applyRide(p: Profile, r: RideRecord): Profile {
   if (r.legend) next.badges = { ...next.badges, legend: next.badges?.legend ?? r.date }
   const s = next.stats
   const wk = isoWeek(Date.parse(r.date))
-  s.streak = wk === s.lastWeek ? s.streak : wk === s.lastWeek + 1 ? s.streak + 1 : 1
-  s.lastWeek = wk
+  if (wk > s.lastWeek) {
+    const freeze = wk === s.lastWeek + 2 && (s.freezes ?? 0) > 0
+    s.streak = wk === s.lastWeek + 1 || freeze ? s.streak + 1 : 1
+    s.freezes = Math.max(0, (s.freezes ?? 0) - (freeze ? 1 : 0))
+    if (s.streak % CFG.streak.freezeEvery === 0)
+      s.freezes = Math.min(CFG.streak.freezeMax, s.freezes + 1)
+    s.lastWeek = wk
+  }
   s.rides++
   s.secs += r.secs
   s.kj += r.kj

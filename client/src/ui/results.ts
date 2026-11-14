@@ -183,7 +183,10 @@ export function finishRide(
         ? h(
             'div',
             { class: 'card hl res-streak' },
-            `🔥 ${p.stats.streak} week streak. Ride again next week to keep it.`,
+            `🔥 ${p.stats.streak} week streak. Ride again next week to keep it.` +
+              (p.stats.freezes
+                ? ` 🧊 ${p.stats.freezes} freeze${p.stats.freezes > 1 ? 's' : ''} banked for a missed week.`
+                : ''),
           )
         : '',
       // The game's outcome is the story of a crew ride: it comes before the training numbers.

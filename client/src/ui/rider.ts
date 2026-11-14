@@ -1,5 +1,5 @@
 import { TIER_NAME } from '../types'
-import type { Profile } from '../core/curve'
+import { liveStreak, type Profile } from '../core/curve'
 import { stickBadges } from '../core/badges'
 import { saveProfile } from '../core/profile'
 import { wkgStr } from '../core/riderMetrics'
@@ -45,7 +45,7 @@ function overview(p: Profile) {
       stat(s.rides, 'rides'),
       stat(Math.round(s.secs / 360) / 10, 'hours'),
       stat(s.kj.toLocaleString('en-AU'), 'kJ'),
-      stat(s.streak, s.streak === 1 ? 'week streak' : 'weeks streak'),
+      stat(liveStreak(p), 'week streak'),
     ),
     h(
       'div',

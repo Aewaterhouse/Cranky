@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   applyRide,
+  liveStreak,
   bestEfforts,
   curves,
   defaultCurve,
@@ -61,6 +62,20 @@ describe('power curve and sprint grading', () => {
       p = applyRide(p, ride(d, {}))
     expect(p.stats.streak).toBe(3)
     p = applyRide(p, ride('2026-06-15', {}))
+    expect(p.stats.streak).toBe(1)
+  })
+  it('a freeze earned every four weeks forgives one missed week', () => {
+    let p = newProfile('a', 'A', 200)
+    for (const d of ['2026-05-04', '2026-05-11', '2026-05-18', '2026-05-25'])
+      p = applyRide(p, ride(d, {}))
+    expect(p.stats).toMatchObject({ streak: 4, freezes: 1 })
+    expect(liveStreak(p, Date.parse('2026-06-10'))).toBe(4) // missed a week, frozen
+    expect(liveStreak(p, Date.parse('2026-06-17'))).toBe(0) // two missed, gone
+    p = applyRide(p, ride('2026-06-10', {}))
+    expect(p.stats).toMatchObject({ streak: 5, freezes: 0 })
+    p = applyRide(p, ride('2026-05-01', {})) // an old ride imported late leaves it alone
+    expect(p.stats.streak).toBe(5)
+    p = applyRide(p, ride('2026-06-24', {}))
     expect(p.stats.streak).toBe(1)
   })
 })

@@ -1,13 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  dailyTss,
-  dayKey,
-  fitness,
-  heatmap,
-  rideTss,
-  streaks,
-  weeklyTss,
-} from '../src/core/fitness'
+import { dailyTss, dayKey, fitness, heatmap, rideTss, weeklyTss } from '../src/core/fitness'
 
 // Wednesday 10 June 2026, local time.
 const END = new Date(2026, 5, 10, 20)
@@ -73,14 +65,5 @@ describe('weeks, heatmap and streaks', () => {
     expect(g[1][2]).toMatchObject({ day: '2026-06-10', tss: 50 })
     expect(g[1][3].future).toBe(true)
     expect(g[0][0].day).toBe('2026-06-01')
-  })
-  it('counts the current and best day streaks', () => {
-    expect(streaks(d, END)).toEqual({ current: 2, best: 2 })
-    expect(streaks(dailyTss([ride(1, 5), ride(2, 5), ride(3, 5), ride(9, 5)]), END)).toEqual({
-      current: 3,
-      best: 3,
-    })
-    expect(streaks(dailyTss([ride(2, 5)]), END).current).toBe(0)
-    expect(streaks(new Map(), END)).toEqual({ current: 0, best: 0 })
   })
 })

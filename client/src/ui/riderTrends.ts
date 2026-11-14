@@ -1,6 +1,7 @@
 import { CFG } from '../config'
-import type { Profile } from '../core/curve'
-import { dailyTss, fitness, heatmap, streaks, weeklyTss, type FitnessDay } from '../core/fitness'
+import { liveStreak, type Profile } from '../core/curve'
+import { weekStreak } from '../core/badges'
+import { dailyTss, fitness, heatmap, weeklyTss, type FitnessDay } from '../core/fitness'
 import { h } from './dom'
 import { chartBox, niceTicks, svgEl } from './svg'
 
@@ -187,7 +188,6 @@ export function trendsTab(p: Profile, now = new Date()) {
   const daily = dailyTss(p.rides)
   const days = fitness(daily, now)
   const last = days[days.length - 1]
-  const st = streaks(daily, now)
   const t = CFG.trends
   const stat = (v: string | number, l: string) =>
     h('div', { class: 'stat' }, h('b', {}, String(v)), h('span', {}, l))
@@ -201,7 +201,10 @@ export function trendsTab(p: Profile, now = new Date()) {
       stat(Math.round(last.ctl), 'fitness (CTL)'),
       stat(Math.round(last.atl), 'fatigue (ATL)'),
       stat((last.tsb > 0 ? '+' : '') + Math.round(last.tsb), 'form (TSB)'),
-      stat(`${st.current} / ${st.best}`, 'day streak / best'),
+      stat(
+        `${liveStreak(p, +now)} / ${Math.max(weekStreak(p.rides).best, liveStreak(p, +now))}`,
+        'week streak / best',
+      ),
     ),
     panel(
       'Fitness, fatigue and form',

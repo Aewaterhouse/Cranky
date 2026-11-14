@@ -95,23 +95,3 @@ export function heatmap(daily: Map<string, number>, end: Date, weeks = CFG.trend
     }),
   )
 }
-
-/** Consecutive riding days: the run ending today (or yesterday, so the streak survives until tonight) and the best ever. */
-export function streaks(daily: Map<string, number>, end: Date) {
-  const days = [...daily.keys()].sort()
-  let best = 0
-  let run = 0
-  let prev = ''
-  for (const d of days) {
-    run = prev && dayKey(addDays(new Date(`${prev}T12:00`), 1)) === d ? run + 1 : 1
-    best = Math.max(best, run)
-    prev = d
-  }
-  let current = 0
-  let d = daily.has(dayKey(end)) ? end : addDays(end, -1)
-  while (daily.has(dayKey(d))) {
-    current++
-    d = addDays(d, -1)
-  }
-  return { current, best }
-}
