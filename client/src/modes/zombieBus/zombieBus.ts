@@ -1,3 +1,4 @@
+import { holdBack } from '../../ui/back'
 import { CFG } from '../../config'
 import { busScore } from '../../core/hud'
 import { saveSettings, settings } from '../../core/settings'
@@ -56,6 +57,7 @@ export function startBusRide(
 ) {
   const stage = h('div', { class: 'stage' })
   show(stage)
+  holdBack()
   if (location.search.includes('debug')) debugPanel()
   let l = lobby0
   const ui = GAME_UI[l.game ?? 'bus']

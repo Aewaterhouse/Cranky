@@ -1,3 +1,4 @@
+import { setBack } from './back'
 import { ladderTab } from './ladder'
 import { settingsTab } from './settings'
 import { me } from '../core/api'
@@ -58,6 +59,7 @@ function riderChip(p: Profile, act: HomeActions, admin: boolean) {
 
 /** Every non-ride screen: top bar plus the current tab. */
 export function showHome(p: Profile, act: HomeActions) {
+  setBack(null)
   setSimFtp(p.ftp)
   listen()
   let bar: HTMLElement | undefined

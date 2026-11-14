@@ -1,3 +1,4 @@
+import { setBack } from '../../ui/back'
 import type { Profile } from '../../core/curve'
 import { api } from '../../core/api'
 import { saveProfile } from '../../core/profile'
@@ -48,6 +49,7 @@ export async function crew(
     net.send({ t: 'erg', on: settings.busErg })
   }
   const leave = () => {
+    setBack(null)
     net.close()
     ride?.abort()
     sessionStorage.removeItem('zombiebus.code')
@@ -77,8 +79,12 @@ export async function crew(
   })
   const renderLobby = (l: Lobby) => {
     view.update(l)
-    if (!view.isConnected) show(view)
+    if (view.isConnected) return
+    show(view)
+    setBack(backOut)
   }
+  // Back in the lobby asks first, and keeps asking if the answer is no.
+  const backOut = () => (confirm('Leave the lobby?') ? leave() : setBack(backOut))
 
   net.onMsg = (m: ServerMsg) => {
     if (m.t === 'lobby') {

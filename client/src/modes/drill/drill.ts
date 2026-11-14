@@ -1,3 +1,4 @@
+import { holdBack } from '../../ui/back'
 import { loadGhost } from './ghost'
 import '../../solo.css'
 import type { Profile } from '../../core/curve'
@@ -94,6 +95,7 @@ export function runDrill(
   if (!plan.test) void loadGhost(plan.name).then((g) => view.setGhost(g))
   const slope = slopeGears(ride.erg, totalMass(profile.weightKg), view.root)
   show(view.root)
+  holdBack()
   view.root.addEventListener('click', (e) => (e.target as HTMLElement).closest('button')?.blur())
 
   ride.onSprint = (r) => {

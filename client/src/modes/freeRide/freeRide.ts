@@ -1,3 +1,4 @@
+import { holdBack } from '../../ui/back'
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
 import { shiftGear } from '../../core/gears'
@@ -84,6 +85,7 @@ export function runFreeRide(
   )
   const save = () => saveDifficulty(difficulty)
   show(view.root)
+  holdBack()
   view.toast(route.name)
   const me: RoadRider = {
     id: profile.id,

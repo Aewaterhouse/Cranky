@@ -1,3 +1,4 @@
+import { setBack } from './back'
 import type { GhostSpec } from '../core/ghost'
 import { CFG } from '../config'
 import { PLANS } from '../content'
@@ -186,10 +187,13 @@ export function rideTab(p: Profile, act: HomeActions) {
   const goWorkout = (id: string) => needTrainer(() => act.drill(planFor(id, 0)))()
   const today = h('div')
   const home = () => (
+    setBack(null),
     today.replaceChildren(todayCard(p, goWorkout, openPlan)),
     wrap.replaceChildren(main)
   )
-  const openPlan = () => wrap.replaceChildren(planScreen(p, goWorkout, home))
+  /** A screen inside the Ride tab; Back (or its own back button) returns to the tab. */
+  const open = (el: HTMLElement) => (wrap.replaceChildren(el), setBack(home))
+  const openPlan = () => open(planScreen(p, goWorkout, home))
   const main = h(
     'div',
     { class: 'ride' },
@@ -240,7 +244,7 @@ export function rideTab(p: Profile, act: HomeActions) {
       'button',
       {
         class: 'solo',
-        onclick: () => wrap.replaceChildren(soloSetup(p, act, () => wrap.replaceChildren(main))),
+        onclick: () => open(soloSetup(p, act, home)),
       },
       h('span', { class: 'big-emoji' }, '🚴'),
       h(
@@ -273,8 +277,7 @@ export function rideTab(p: Profile, act: HomeActions) {
       'button',
       {
         class: 'solo',
-        onclick: () =>
-          wrap.replaceChildren(freeRideSetup(p, act, () => wrap.replaceChildren(main))),
+        onclick: () => open(freeRideSetup(p, act, home)),
       },
       h('span', { class: 'big-emoji' }, '🏔️'),
       h(
