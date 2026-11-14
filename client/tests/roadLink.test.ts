@@ -254,3 +254,22 @@ describe('group ride link', () => {
     expect(src('modes/freeRide/freeRide.ts').match(/\.erg\.\w+/g)).toEqual(['.erg.setGrade'])
   })
 })
+
+describe('race standing', () => {
+  const race = (el: number, riders: Record<string, RoadRiderTick>) =>
+    ({ ...tick(el, riders), game: { kind: 'race', lap: 1, laps: 2 } }) as RoadTick
+  it('says your place and the gap to the rider ahead, or behind when you lead', () => {
+    const { link } = make(['me', 'kev', 'kat'])
+    link.tick(race(10, { me: at(500, 10), kev: at(540, 10), kat: at(300, 10) }))
+    expect(link.standing()).toBe('P2 of 3 · 4 s to Kev')
+    link.tick(race(11, { me: at(600, 10), kev: at(540, 10), kat: at(300, 10) }))
+    expect(link.standing()).toBe('P1 of 3 · 6 s on Kev')
+  })
+  it('says nothing on a social ride or once you have finished', () => {
+    const { link } = make()
+    link.tick(tick(10, { me: at(500), kev: at(540) }))
+    expect(link.standing()).toBeUndefined()
+    link.tick(race(10, { me: at(1190, 10, { st: 'finished' }), kev: at(540) }))
+    expect(link.standing()).toBeUndefined()
+  })
+})

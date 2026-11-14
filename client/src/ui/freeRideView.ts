@@ -52,6 +52,8 @@ export interface FreeState {
   me: string
   /** Lap rides only. */
   lap?: LapInfo
+  /** A race: your place and the gap to the next rider. */
+  standing?: string
   /** The climb or sprint segment being ridden or coming up, and the splits for the whole route or lap. */
   seg?: SegLive
   whole?: string[]

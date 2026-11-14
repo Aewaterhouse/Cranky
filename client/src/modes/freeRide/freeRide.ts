@@ -252,6 +252,7 @@ export function runFreeRide(
       wind: settings.wind === 'off' || link ? undefined : wind,
       group: link && { draftW: draftSaving(speed, draft), band },
       banner: link?.banner(),
+      standing: link?.standing(),
     })
     if (!pause.starting)
       scene.quip({

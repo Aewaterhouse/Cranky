@@ -34,7 +34,7 @@ say where you are, and free-ride places that don't look like where they are.
 6. [ ] Scores with context: crew best and last time (games 3, rider 14).
 
 **Races**
-7. [ ] Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).
+7. [ ] (live place and gap done: "P3 of 6 · 4 s to Kat" under the speed panel; sprint points still badges) Live place and gap to the next rider in the race HUD; readable sprint points (games 4, 5).
 8. [ ] Let the last rider finish instead of a DNF when the winner crosses; vary bot times and kit (games 6, 7).
 
 **Games**

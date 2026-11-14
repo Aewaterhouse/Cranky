@@ -31,6 +31,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   const el = h('span', {})
   const up = h('span', { class: 'up' })
   const lap = h('span', { class: 'lap' })
+  const place = h('div', { class: 'race-place' })
   const laps = !!route.lapOf
 
   const stats = {
@@ -130,6 +131,7 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         { class: 'glass speed' },
         spd.el,
         h('div', { class: 'totals' }, ...(laps ? [lap] : []), dist, el, up),
+        place,
       ),
     ),
     h('div', { class: 'hud-tr' }, h('div', { class: 'minimap' }, mapBox), list.el, crew.root),
@@ -177,6 +179,8 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
       stats.trainer.v.textContent = `${s.trainerGrade.toFixed(1)}%`
       if (stats.wind && s.wind !== undefined)
         stats.wind.v.textContent = windText(s.wind, settings.units)
+      place.textContent = s.standing ?? ''
+      place.hidden = !s.standing
       if (s.lap && stats.lastLap && stats.bestLap) {
         lap.textContent = `Lap ${s.lap.n} / ${s.lap.of}`
         stats.lastLap.v.textContent = s.lap.lastS === undefined ? '–' : clock(s.lap.lastS)

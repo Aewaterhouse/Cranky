@@ -164,6 +164,27 @@ export class RoadLink {
     return [isFinite(count) ? String(Math.ceil(count)) : 'Get ready', 'The ride starts together']
   }
 
+  /**
+   * In a race: your place and the gap to the rider just ahead ("P3 of 6 · 4 s to Kat"), or to the one behind when you
+   * lead. Undefined outside a race or once you have finished.
+   */
+  standing(): string | undefined {
+    const me = this.mine()
+    if (!this.race || this.race.kind === 'ride' || !me || me.st === 'finished') return undefined
+    const all = Object.entries(this.riders)
+    const ahead = all.filter(([id, r]) => id !== this.me && (r.st === 'finished' || r.d > me.d))
+    const place = `P${ahead.length + 1} of ${all.length}`
+    const near = (want: 1 | -1) =>
+      all
+        .filter(([id, r]) => id !== this.me && r.st !== 'finished' && (r.d - me.d) * want > 0)
+        .sort((a, b) => (a[1].d - b[1].d) * want)[0]
+    const [id, r] = near(1) ?? near(-1) ?? []
+    if (!id || !r) return place
+    const secs = Math.round(Math.abs(r.d - me.d) / Math.max(me.v, 3))
+    const who = this.info.get(id)?.name ?? 'Someone'
+    return `${place} · ${secs} s ${r.d > me.d ? 'to' : 'on'} ${who}`
+  }
+
   /** A race's tag for a rider's card: their points, or the crit's prime. */
   tag(id: string) {
     const pts = this.race?.pts

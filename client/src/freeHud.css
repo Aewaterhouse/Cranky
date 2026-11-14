@@ -46,3 +46,12 @@
 .fhud .gchip b {
   color: #5ec8f2;
 }
+.fhud .race-place {
+  margin-top: 4px;
+  font: 400 calc(2.2 * var(--u)) / 1.1 var(--display);
+  color: var(--acc);
+  text-align: center;
+}
+.fhud .race-place[hidden] {
+  display: none;
+}
