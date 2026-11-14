@@ -11,9 +11,11 @@ from typing import TYPE_CHECKING
 from .. import config as C
 from .. import config_games as G
 from ..plan import is_over
+from .bus_boost import Boosts
 from .bus_crew import CrewPlay
 from .bus_servo import Servo
-from .common import CrewGame, award, compliance, rider_row, tally
+from .bus_view import BusView
+from .common import CrewGame, tally
 
 if TYPE_CHECKING:
     from ..session import Rider, Room
@@ -32,7 +34,7 @@ def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
     return twists[week % len(twists)] if twists else None
 
 
-class ZombieBus(Servo, CrewPlay, CrewGame):
+class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
     """Bus state for one ride. `tick` runs at TICK_HZ; `on_sprint` applies sprint grades."""
 
     def __init__(self, level: str = "normal", mutator: dict | None = None) -> None:
@@ -170,80 +172,6 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
         fx, self.fx = self.fx, []
         return fx
 
-    def run_challenge(self, room: Room, active: list[Rider], ev: str) -> None:
-        """Hands one human rider a 20 s cadence drill now and then; pays scrap if they hold it."""
-        ch = self.challenge
-        if ch:
-            r = room.riders.get(ch["id"])
-            limit = C.CHALLENGES[ch["kind"]][0]
-            cad = r.cad if r and r.st == "riding" else 0
-            ch["ok"] += (cad >= limit) if ch["kind"] == "spin" else (0 < cad <= limit)
-            ch["n"] += 1
-            if room.el < ch["until"]:
-                return
-            self.challenge = None
-            self.next_challenge = room.el + random.randint(*C.CHALLENGE_EVERY_S)
-            name = r.name if r else "Someone"
-            if ch["ok"] / ch["n"] >= C.CHALLENGE_PASS:
-                self.scrap += C.CHALLENGE_SCRAP
-                self.emit("challenge_won", f"{name} nailed it! +{C.CHALLENGE_SCRAP} scrap", ch["id"])
-            else:
-                self.emit("challenge_lost", f"{name} fluffed the challenge.", ch["id"])
-            return
-        humans = [r for r in active if not r.bot and r.cad > 0]
-        if room.el < self.next_challenge or ev not in C.CHALLENGE_EVENTS or not humans:
-            return
-        r, kind = random.choice(humans), random.choice(list(C.CHALLENGES))
-        self.challenge = {"id": r.id, "kind": kind, "until": room.el + C.CHALLENGE_S, "ok": 0, "n": 0}
-        self.emit("challenge", f"{r.name}: {C.CHALLENGES[kind][1]} for {C.CHALLENGE_S} s", r.id)
-
-    def charge_nitro(self, room: Room, comp: float, ev: str, dt: float, riding: bool) -> bool:
-        """Charges or drains the nitro and fires it when full. Returns True while boosting."""
-        if room.el < self.nitro_until:
-            return True
-        if riding and ev in C.NITRO_EVENTS and comp >= C.NITRO_MIN:
-            self.nitro += dt / C.NITRO_CHARGE_S * self.mut.get("nitro", 1)
-        else:
-            self.nitro = max(0.0, self.nitro - dt / C.NITRO_DECAY_S)
-        if self.nitro >= 1:
-            self.nitro, self.nitro_until = 0.0, room.el + C.NITRO_S
-            self.scrap += C.NITRO_SCRAP
-            self.emit("nitro", f"NITRO! Perfect riding lit the afterburner. +{C.NITRO_SCRAP} scrap")
-            return True
-        return False
-
-    def run_streak(self, room: Room, comp: float, ev: str, dt: float, riding: bool) -> None:
-        """Counts unbroken clean riding and pays out air support. A fall or a lapse resets it."""
-        if room.el < self.gunship_until:
-            self.gap += C.GUNSHIP_GAP * dt if riding else 0
-            return
-        if any(r.st == "fell" for r in room.riders.values()):
-            self.streak, self.streak_n, self.streak_low = 0.0, 0, 0.0
-            return
-        if not riding or ev not in C.STREAK_EVENTS:
-            return
-        if comp < C.STREAK_MIN:
-            self.streak_low += dt
-            if self.streak_low >= C.STREAK_GRACE_S:
-                self.streak, self.streak_n = 0.0, 0
-            return
-        self.streak_low = 0.0
-        self.streak += dt
-        need, kind = C.STREAKS[self.streak_n]
-        if self.streak < need:
-            return
-        self.streak_n += 1
-        if kind == "drop":
-            self.scrap += C.DROP_SCRAP
-            self.emit("drop", f"{need} s streak: supply drop! +{C.DROP_SCRAP} scrap")
-        elif kind == "airstrike":
-            self.gap += C.AIRSTRIKE_GAP
-            self.emit("airstrike", f"{need} s streak: air strike on the horde! +{C.AIRSTRIKE_GAP} m")
-        else:
-            self.streak, self.streak_n = 0.0, 0
-            self.gunship_until = room.el + C.GUNSHIP_S
-            self.emit("gunship", f"{need} s streak: the crew is up in the gunship for {C.GUNSHIP_S} s!")
-
     def block_change(self, room: Room, i: int, b: dict, ev: str) -> None:
         if self.boss and self.last_i == self.boss["i"] and not self.boss.get("over"):
             self.end_boss()
@@ -370,119 +298,3 @@ class ZombieBus(Servo, CrewPlay, CrewGame):
         if tune and not self.tune:
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
-
-    def on_sprint(self, r: Rider, blk: int, grade: str, combo: int) -> None:
-        """Applies one rider's sprint grade to the current roadblock."""
-        r.sprints.append(grade)
-        rb = self.rb
-        if not rb or rb["blk"] != blk or r.id in rb["reported"]:
-            return
-        rb["reported"].add(r.id)
-        if grade != "FAIL":
-            rb["landed"].add(r.id)
-        mult = 1 + C.COMBO_STEP * max(0, combo - 1)
-        self.combo = max(self.combo, combo)
-        dmg = C.RB_DAMAGE[grade] * mult * (C.RAM_MULT if self.ram else 1)
-        rb["dmg"] += dmg
-        r.rb_dmg += dmg
-        self.scrap += C.RB_SCRAP[grade] * mult
-        combo_txt = f" (combo x{combo})" if combo > 1 else ""
-        if grade == "FAIL":
-            self.gap -= C.RB_FAIL_GAP
-            self.damage(C.RB_FAIL_ARMOUR, f"{r.name} FAILED the sprint. Zombies got a grab!")
-        elif grade in ("MEGA", "LEGEND"):
-            r.mega += 1
-            self.emit("slowmo", f"{r.name}: {grade}!{combo_txt}", r.id)
-        else:
-            self.emit("sprint", f"{r.name}: {grade}{combo_txt}", r.id)
-
-    def resolve_roadblock(self) -> None:
-        rb, self.rb, self.ram = self.rb, None, False
-        assert rb
-        if rb["dmg"] >= rb["hp"]:
-            self.scrap += C.RB_SMASH_SCRAP
-            self.gap += C.RB_SMASH_GAP
-            self.emit("smash", f"Roadblock SMASHED! +{C.RB_SMASH_SCRAP} scrap")
-            # A team move: every rider on the bus landed their sprint, so the harpoon drags the bus clear.
-            if len(rb["expect"]) > 1 and rb["expect"] <= rb["landed"]:
-                self.gap += C.HARPOON_GAP
-                self.emit("harpoon", f"Everyone sprinted together: HARPOON! +{C.HARPOON_GAP} m on the horde")
-        else:
-            self.damage(C.RB_CRASH_ARMOUR, "Ploughed through the roadblock. Ouch.")
-            self.emit("crash")
-
-    def rb_progress(self, room: Room, i: int, bel: float) -> float | None:
-        if not self.rb:
-            return None
-        return min(1.0, bel / self.rb["dur"]) if i == self.rb["blk"] else 1.0
-
-    def state(self, room: Room, i: int, bel: float) -> dict:
-        return {
-            "speed": round(self.speed, 2),
-            "dist": round(self.dist),
-            "armour": round(self.armour, 1),
-            "gap": round(self.gap, 1),
-            "scrap": int(self.scrap),
-            "sync": self.sync,
-            "tune": self.tune,
-            "rb": self.rb_progress(room, i, bel),
-            "combo": self.combo,
-            "nitro": round(self.nitro, 2),
-            "boost": room.el < self.nitro_until,
-            "shop": self.ev == "servo" and not self.mut.get("no_shop"),
-            "wares": self.wares,
-            "weather": self.weather,
-            "zed": C.ZED_TYPES[self.ev]["tip"] if self.ev in C.ZED_TYPES else None,
-            "roles": {
-                rid: {
-                    "role": st["role"],
-                    "tip": C.ROLES[st["role"]]["tip"],
-                    "cd": max(0, round(st["ready"] - room.el)),
-                }
-                for rid, st in self.roles.items()
-            },
-            "boss": (
-                {
-                    "name": C.BOSSES[self.boss["kind"]]["name"],
-                    "left": round(max(0.0, 1 - self.boss["done"] / self.boss["need"]), 3),
-                }
-                if self.boss and self.boss["i"] == i and not self.boss.get("over")
-                else None
-            ),
-            "repel": self.repel,
-            "syncw": self.syncw,
-            "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),
-            "next": C.STREAKS[self.streak_n][1],
-            "gunship": room.el < self.gunship_until,
-        }
-
-    def summary(self, room: Room) -> dict:
-        rs = list(room.riders.values())
-        comp, awards = compliance(rs), []
-
-        award(awards, rs, "Iron Lungs", lambda r: comp[r.id], lambda r: f"{comp[r.id]:.0%} compliance")
-        award(awards, rs, "Fell Off King", lambda r: r.falls, lambda r: f"fell off {r.falls}x")
-        award(awards, rs, "Roadblock MVP", lambda r: r.rb_dmg, lambda r: f"{int(r.rb_dmg)} roadblock damage")
-        award(
-            awards,
-            rs,
-            "Sync Master",
-            lambda r: r.sync_hits / r.sync_n if r.sync_n else 0,
-            lambda r: f"{r.sync_hits / r.sync_n:.0%} in sync",
-        )
-        award(awards, rs, "PR Hunter", lambda r: r.mega, lambda r: f"{r.mega} MEGA+ sprints")
-        score = round(
-            (self.dist / 10 * (0.5 + self.armour / 200) + self.scrap) * C.DIFFICULTY[self.level]["score"]
-        )
-        return {
-            "distance": round(self.dist),
-            "armour": round(self.armour),
-            "gap": round(self.gap),
-            "scrap": int(self.scrap),
-            "score": score,
-            "difficulty": self.level,
-            "syncPct": round(100 * self.sync_ticks / self.ticks) if self.ticks else 0,
-            "riders": [rider_row(r, comp, kj=round(r.rs_joules / 1000, 1)) for r in rs],
-            "awards": awards,
-            "highlights": self.highlights,
-        }
