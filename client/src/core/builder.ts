@@ -1,6 +1,6 @@
 import { CFG } from '../config'
 import type { Block, BuilderBlock, Plan } from '../types'
-import { blockTarget, parsePlan } from './plan'
+import { parsePlan, planStats } from './plan'
 
 export const KINDS: BuilderBlock['kind'][] = ['steady', 'ramp', 'intervals', 'sprint', 'free']
 const MAX_PCT = Math.round(CFG.erg.capPct * 100)
@@ -109,18 +109,8 @@ export function buildPlan(name: string, list: BuilderBlock[], id?: string): Plan
   return { ...parsePlan(plan), edit: plan.edit }
 }
 
-/** Seconds, intensity factor (normalised power over FTP) and TSS. Sprints count as 120%, free as 50%. */
+/** Seconds, intensity factor and TSS of the builder's blocks (see `planStats`). */
 export function stats(list: BuilderBlock[]) {
   if (!list.length) return { total: 0, intensity: 0, tss: 0 }
-  const flat = parsePlan({ id: 'x', name: 'x', blocks: toPlanBlocks(list) }).blocks
-  let secs = 0
-  let sum4 = 0
-  for (const b of flat)
-    for (let t = 0; t < b.dur; t++) {
-      const f = b.type === 'sprint' ? 1.2 : b.type === 'free' ? 0.5 : blockTarget(b, 'hard', t)!
-      sum4 += f ** 4
-      secs++
-    }
-  const intensity = (sum4 / secs) ** 0.25
-  return { total: secs, intensity, tss: (secs / 3600) * intensity ** 2 * 100 }
+  return planStats(parsePlan({ id: 'x', name: 'x', blocks: toPlanBlocks(list) }).blocks)
 }

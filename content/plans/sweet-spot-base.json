@@ -1,0 +1,16 @@
+{
+  "id": "sweet-spot-base",
+  "name": "Sweet spot base",
+  "emoji": "🍯",
+  "blurb": "Eight weeks of the good stuff: long sweet spot blocks and steady Zone 2, with an easy week every fourth. Builds a big engine without wrecking you.",
+  "weeks": [
+    ["ss-1x30", "z2-60", "ss-2x15"],
+    ["ss-3x12", "z2-60", "ss-2x20"],
+    ["ss-4x10", "z2-90", "ss-progressive"],
+    ["recovery-30", "z2-45", "ss-1x30"],
+    ["ss-2x20", "endurance-pyramid", "ss-over-unders"],
+    ["ss-3x15", "z2-90", "ss-4x10"],
+    ["ss-3x20", "z2-tempo-finish", "ss-progressive"],
+    ["recovery-30", "coffee-spin-45", "ftp-ramp-test"]
+  ]
+}

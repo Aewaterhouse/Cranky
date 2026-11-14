@@ -3,6 +3,7 @@ import type { WeekLog } from './weekly'
 import { CFG } from '../config'
 import type { Grade, Tier } from '../types'
 import type { Look } from './cosmetics'
+import type { PlanPick } from './trainingPlan'
 
 export interface RideRecord {
   date: string
@@ -32,6 +33,8 @@ export interface Profile {
   /** Free ride: what has been ridden on each route, and the last few weeks' climbing and weekly rewards. */
   passport?: Record<string, Stamp>
   weeks?: Record<number, WeekLog>
+  /** The training plan the rider is on, if any. */
+  plan?: PlanPick
   /** Every FTP change, oldest first. */
   ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */

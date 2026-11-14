@@ -1,4 +1,5 @@
 import type { Plan } from './types'
+import type { TrainingPlan } from './core/trainingPlan'
 
 const mods = import.meta.glob<Plan>('../../content/workouts/*.json', {
   eager: true,
@@ -37,3 +38,8 @@ function refresh() {
 }
 refresh()
 export const planById = (id: string) => PLANS.find((p) => p.id === id)
+
+/** Bundled multi-week training plans (content/plans). */
+export const TRAINING_PLANS: TrainingPlan[] = Object.values(
+  import.meta.glob<TrainingPlan>('../../content/plans/*.json', { eager: true, import: 'default' }),
+).sort((a, b) => a.weeks.length - b.weeks.length || a.name.localeCompare(b.name))

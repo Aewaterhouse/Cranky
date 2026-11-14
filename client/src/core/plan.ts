@@ -68,6 +68,20 @@ export const isOver = (b: Block, bel: number) =>
 
 export const planTotal = (blocks: Block[]) => blocks.reduce((s, b) => s + b.dur, 0)
 
+/** Seconds, intensity factor (normalised power over FTP) and TSS of flat blocks. Sprints count as 120%, free as 50%. */
+export function planStats(flat: Block[]) {
+  let secs = 0
+  let sum4 = 0
+  for (const b of flat)
+    for (let t = 0; t < b.dur; t++) {
+      const f = b.type === 'sprint' ? 1.2 : b.type === 'free' ? 0.5 : blockTarget(b, 'hard', t)!
+      sum4 += f ** 4
+      secs++
+    }
+  const intensity = (sum4 / secs) ** 0.25
+  return { total: secs, intensity, tss: (secs / 3600) * intensity ** 2 * 100 }
+}
+
 export function locate(blocks: Block[], el: number): { i: number; bel: number } | null {
   let t = 0
   for (let i = 0; i < blocks.length; i++) {

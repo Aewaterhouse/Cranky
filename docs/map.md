@@ -6,7 +6,7 @@
 - `scripts/routes/build_routes.py` builds bundled route packs from OpenStreetMap and SRTM; `terrain.py` SRTM tile reader and the height grid around a route; `features.py` land cover, side roads, buildings and landmarks from OpenStreetMap; `gpx.py` routes cut from a recorded ride; `fit.py` minimal FIT reader for course files; `net.py` cached fetch; `routes.json` route definitions (waypoints, published figures); `test_build_routes.py` its tests (`cd server && uv run pytest ../scripts/routes`).
 - `content/routes/index.json` route cards; `content/routes/<id>.json` one pack per bundled route.
 - `docs/protocol.md` wire protocol; `docs/road-games.md` how to add a game on top of the group ride; `content/tests/road-vectors.json` physics and route vectors both test suites run (generated, never read by hand); `docs/testing.md` manual tests; `docs/status.md` state; `docs/decisions.md` invented mechanics; `docs/freeride-plan.md` free ride 3D world plan; `docs/ride-notes-plan.md` checklist from the first real rides; `docs/games-plan.md` plan for the three new crew games (current priority); `docs/hud-notes.md` HUD conventions from Zwift, TrainerRoad and MyWhoosh and the layout spec drawn from them; `docs/map.md` this file.
-- `content/workouts/*.json` plans; `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
+- `content/workouts/*.json` plans; `content/plans/*.json` multi-week training plans (weeks of workout ids); `content/schema/workout.schema.json` plan schema; `content/cosmetics.json` shop catalogue.
 
 ## client/ (Vite, TS, Three.js)
 - `index.html` app entry; `spike.html` trainer check page; `scene-dev.html` scene harness (dev server only); `route-dev.html` route world harness (dev server only); `vite.config.ts` proxy (`ZB_API`), `@content` alias, entry pages.
@@ -39,7 +39,7 @@
 - `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears: gear offset and the trainer gradient (difficulty, shift strength); `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
-- `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, session generator.
+- `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, workout length/IF/TSS, session generator; `trainingPlan.ts` multi-week plans: laying weeks onto the rider's weekdays and matching sessions to rides (`tests/trainingPlan.test.ts`).
 - `profile.ts` local profile cache and server sync; `rideQueue.ts` finished rides kept on the device until the server has them; `offline.ts` which bundled routes this device has kept for riding with no network.
 - `fit.ts` FIT activity encoder (power, cadence, heart rate; position, altitude, distance, speed and laps for a ride with a track); `rideTrack.ts` the track for a saved ride from its route and per-second distances.
 - `ride.ts` per-ride recorder (JSON save and restore), summary, NP/IF/TSS; `snapshot.ts` crash-recovery snapshots in localStorage and the remembered bus code.

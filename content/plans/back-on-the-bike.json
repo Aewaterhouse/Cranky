@@ -1,0 +1,12 @@
+{
+  "id": "back-on-the-bike",
+  "name": "Get back on the bike",
+  "emoji": "🚲",
+  "blurb": "Four gentle weeks to shake the cobwebs off. Mostly easy spinning, a bit of tempo, and a ramp test at the end to see where you're at.",
+  "weeks": [
+    ["recovery-30", "cad-spin-ups", "z2-45"],
+    ["cad-pyramid", "z2-45", "coffee-spin-45"],
+    ["z2-surges", "tempo-1x45", "z2-60"],
+    ["cad-spin-ups", "tempo-2x20", "ftp-ramp-test"]
+  ]
+}

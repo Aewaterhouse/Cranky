@@ -1,0 +1,12 @@
+{
+  "id": "zombie-fit",
+  "name": "Zombie fit",
+  "emoji": "🧟",
+  "blurb": "Four weeks to get bus-ready. Two Zombie Bus plans a week (ride them with the crew or on your own) and a solo session to sharpen the legs.",
+  "weeks": [
+    ["bus-quick-30", "z2-45", "bus-easy-rider"],
+    ["bus-crew-45", "vo2-30-30", "bus-surge-city"],
+    ["bus-valley-climb", "sprint-4x30", "bus-vo2-raid"],
+    ["bus-sprint-fest", "recovery-30", "bus-long-haul-75"]
+  ]
+}

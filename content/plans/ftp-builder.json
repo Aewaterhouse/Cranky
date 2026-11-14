@@ -1,0 +1,14 @@
+{
+  "id": "ftp-builder",
+  "name": "FTP builder",
+  "emoji": "📈",
+  "blurb": "Six weeks of threshold work to lift your FTP. Test, build for three weeks, back off, build again, then test and grin.",
+  "weeks": [
+    ["ftp-ramp-test", "z2-60", "ss-2x15"],
+    ["thr-3x10", "z2-60", "ss-2x20"],
+    ["thr-4x8", "z2-surges", "over-under-2x16"],
+    ["recovery-30", "z2-45", "thr-5x6"],
+    ["thr-2x15", "z2-60", "over-under-3x12"],
+    ["openers", "coffee-spin-45", "ftp-ramp-test"]
+  ]
+}
