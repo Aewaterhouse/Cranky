@@ -89,7 +89,9 @@ export const VIEWS: Record<
 > = {
   bus: {
     tiles: (g) => [
-      tile('Armour', String(Math.round(g.armour))),
+      g.armour <= 0
+        ? tile('Armour', 'Wrecked, but home')
+        : tile('Armour', String(Math.round(g.armour))),
       tile('Sync', `${Math.round(g.syncPct)}%`),
     ],
     col: 'Falls',
