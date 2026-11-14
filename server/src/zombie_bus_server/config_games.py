@@ -286,3 +286,9 @@ GALLEY_BEATS = [85, 95, 80, 100, 90]
 GALLEY_BEAT_S, GALLEY_TOL, GALLEY_SMOOTH_S = 120, 4, 4
 GALLEY_V, GALLEY_PIRATES = (6.0, 10.0), 8.5
 GALLEY_GAP, GALLEY_GAP_MAX, GALLEY_HIT, GALLEY_KNOCK = 40, 120, 15, 25
+
+# The Hunt: rounds of HUNT_ROUND_S, the fox starting HUNT_START m ahead. Speed maps compliance 0..1 onto
+# HUNT_V for the fox and the hounds' mean; the hounds get HUNT_HOUND_EDGE m/s, so the fox must ride cleaner.
+# A catch is HUNT_CATCH points to every hound; an escape HUNT_ESCAPE to the fox.
+HUNT_ROUND_S, HUNT_START, HUNT_V, HUNT_HOUND_EDGE = 300, 60, (4.0, 10.0), 0.15
+HUNT_CATCH, HUNT_ESCAPE = 3, 10

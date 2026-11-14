@@ -183,4 +183,20 @@ export const GAMES: Record<Game, GameInfo> = {
     score: 'Voyage score',
     plan: true,
   },
+  hunt: {
+    icon: '🦊',
+    name: 'The Hunt',
+    how: [
+      'Each round one rider is the fox, the rest are hounds.',
+      'Speed comes from staying on target, not from watts.',
+      'Fox: ride clean to escape. Hounds: ride cleaner to catch them.',
+    ],
+    tag: 'One fox, many hounds',
+    blurb:
+      'A round each as the fox over the driver’s workout. Riding on target is speed, so the fox escapes by holding steadier than the whole pack, and the hounds run them down by doing better.',
+    start: 'Release the fox',
+    countdown: 'THE HUNT STARTS IN',
+    score: 'Top points',
+    plan: true,
+  },
 }

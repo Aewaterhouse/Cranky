@@ -15,6 +15,7 @@ from .modes.ambulance import Ambulance
 from .modes.climate import Climate
 from .modes.dating import Dating
 from .modes.galley import Galley
+from .modes.hunt import Hunt
 from .modes.last_standing import LastStanding
 from .modes.pub_quiz import PubQuiz
 from .modes.ttt import TeamTrial
@@ -39,6 +40,7 @@ MODES = {
     "ttt": TeamTrial,
     "quiz": PubQuiz,
     "galley": Galley,
+    "hunt": Hunt,
 }
 
 

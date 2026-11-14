@@ -111,6 +111,11 @@ export const VIEWS: Record<
     col: 'Falls',
     cell: (r) => String(r.falls),
   },
+  hunt: {
+    tiles: () => [],
+    col: 'Points',
+    cell: (r) => String(r.points ?? 0),
+  },
   galley: {
     tiles: (g) => [tile('Hull', String(Math.round(g.armour)))],
     col: 'On the beat',
