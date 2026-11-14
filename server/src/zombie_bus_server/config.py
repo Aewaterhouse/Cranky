@@ -231,6 +231,9 @@ COMBO_STEP = 0.25
 
 # Servo Stop session shop (costs in bus scrap)
 SHOP = {"plating": 40, "repellent": 60, "sync": 50}
+AUTO_PLATING_UNDER = (
+    70  # a stop where nobody buys: the servo bolts on plating under this armour, else repellent
+)
 PLATING_ARMOUR = 25
 SYNC_WIDEN_RPM = 3
 

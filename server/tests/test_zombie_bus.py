@@ -294,3 +294,20 @@ def test_nobody_falls_off_while_erg_ramps_at_the_start_a_new_block_or_the_warm_u
         secs = C.FELL_STEP_GRACE_S - 1 if bel0 == 0 else (C.FELL_GRACE_S - 1 if el0 == 0 else 40)
         run(room, bus, secs, ev=ev, bel0=bel0)
         assert all(r.st == "riding" for r in room.riders.values()), (el0, bel0, ev)
+
+
+def test_a_servo_stop_where_nobody_buys_picks_for_the_crew():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, ev="servo")
+    bus.scrap, bus.armour = 100, 50
+    fx = run(room, bus, 1, ev="longhaul")
+    assert bus.armour == 50 + C.PLATING_ARMOUR and bus.scrap < 100 - C.SHOP["plating"] + 5
+    assert any(f["k"] == "buy" and f["id"] is None and "servo" in f["text"] for f in fx)
+    run(room, bus, 1, ev="servo")
+    bus.buy(room.riders["r0"], "sync")
+    bus.scrap = 500
+    fx = run(room, bus, 1, ev="longhaul")
+    assert not [
+        f for f in fx if f["k"] == "buy" and f["id"] is None
+    ], "someone shopped, so the servo keeps out of it"

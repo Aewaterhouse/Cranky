@@ -169,3 +169,14 @@
     transform: translateX(40px);
   }
 }
+/* Touch screens: bigger cards, easy to hit with one hand off the bars. */
+@media (pointer: coarse) {
+  .sh {
+    width: min(720px, 80vw);
+  }
+  .sh-card {
+    min-height: 120px;
+    padding: 16px 10px 12px;
+    font-size: 1.15em;
+  }
+}

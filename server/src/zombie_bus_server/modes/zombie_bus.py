@@ -49,6 +49,7 @@ class ZombieBus(CrewGame):
         self.hauls: dict[str, dict] = {}
         self.fx: list[dict] = []
         self.ev = ""
+        self.shopped = False  # anyone bought at this servo stop
         self.repel = 0
         self.syncw = 0
         self.streak = 0.0
@@ -79,6 +80,8 @@ class ZombieBus(CrewGame):
     def tick(self, room: Room, dt: float, i: int, bel: float, ev: str) -> list[dict]:
         """Advances the bus by `dt` seconds in block `i` (event `ev`). Returns fx since the last tick."""
         b = room.plan["blocks"][i]
+        if self.ev == "servo" and ev != "servo":
+            self.auto_shop()
         self.ev = ev
         if i != self.last_i:
             self.block_change(room, i, b, ev)
@@ -214,6 +217,7 @@ class ZombieBus(CrewGame):
             }
             self.emit("roadblock", "ROADBLOCK! Sprint to smash it!")
         elif ev == "servo":
+            self.shopped = False
             self.emit("servo", f"Servo stop! {int(self.scrap)} scrap in the tin. Shop's open.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
@@ -303,22 +307,35 @@ class ZombieBus(CrewGame):
             self.emit("tune", f"Engine in tune! x{C.TUNE_MULT} speed")
         self.tune = tune
 
-    def buy(self, r: Rider, item: str) -> None:
-        """Servo Stop shop: session-only upgrades paid from the bus scrap tin."""
+    def auto_shop(self) -> None:
+        """Nobody bought at the stop: the tin buys what helps most, so nobody lets go of the bars."""
+        if self.shopped:
+            return
+        order = (
+            ["plating", "repellent", "sync"] if self.armour < C.AUTO_PLATING_UNDER else ["repellent", "sync"]
+        )
+        item = next((k for k in order if self.scrap >= C.SHOP[k]), None)
+        if item:
+            self.buy(None, item)
+
+    def buy(self, r: Rider | None, item: str) -> None:
+        """Servo Stop shop: session-only upgrades paid from the bus scrap tin (no rider: the servo picked)."""
         cost = C.SHOP[item]
         if self.ev != "servo" or self.scrap < cost or self.mut.get("no_shop"):
             return
         self.scrap -= cost
+        self.shopped = True
+        name = r.name if r else "Nobody let go of the bars, so the servo"
         if item == "plating":
             self.armour = min(100.0, self.armour + C.PLATING_ARMOUR)
-            text = f"{r.name} bolted on armour plating (+{C.PLATING_ARMOUR})"
+            text = f"{name} bolted on armour plating (+{C.PLATING_ARMOUR})"
         elif item == "repellent":
             self.repel += 1
-            text = f"{r.name} bought horde repellent (one free fail)"
+            text = f"{name} bought horde repellent (one free fail)"
         else:
             self.syncw += C.SYNC_WIDEN_RPM
-            text = f"{r.name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"
-        self.emit("buy", text, r.id)
+            text = f"{name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"
+        self.emit("buy", text, r.id if r else None)
 
     def on_sprint(self, r: Rider, blk: int, grade: str, combo: int) -> None:
         """Applies one rider's sprint grade to the current roadblock."""
