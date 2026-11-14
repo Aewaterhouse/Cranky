@@ -842,3 +842,7 @@ details.ftp-card > summary {
   border-radius: 14px;
   background: var(--card2);
 }
+.seat-title {
+  color: var(--acc);
+  font-weight: 700;
+}

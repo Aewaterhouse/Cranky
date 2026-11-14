@@ -67,6 +67,8 @@ export interface LobbyRider {
   bot?: boolean
   /** ERG holds this rider's target; false means they ride on virtual gears. */
   erg?: boolean
+  /** Held titles, from awards, until someone takes them ("🚑 Paramedic of the Week"). */
+  titles?: string[]
 }
 export interface Lobby {
   t: 'lobby'

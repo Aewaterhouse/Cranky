@@ -164,3 +164,18 @@ def test_the_crew_best_is_the_best_before_this_ride(tmp_path):
     assert s.crew_best("ambo", 700) == 900
     assert s.crew_best("ambo", 1200) == 900
     assert s.crew_best("ambo", 100) == 1200 and s.crew_best("date", 5) is None
+
+
+def test_titles_change_hands_and_show_on_the_holder(tmp_path):
+    from zombie_bus_server.store import Store
+
+    s = Store(tmp_path / "t.db")
+    medic = {"award": "Paramedic of the Week", "id": "kat", "name": "Kat", "why": ""}
+    assert s.take_titles([medic, {"award": "Smoothest", "id": "x", "name": "X"}]) == [
+        "Kat takes 🚑 Paramedic of the Week"
+    ]
+    assert s.take_titles([medic]) == ["Kat keeps 🚑 Paramedic of the Week"]
+    assert s.take_titles([{**medic, "id": "daz", "name": "Dazza"}]) == [
+        "Dazza takes 🚑 Paramedic of the Week from Kat"
+    ]
+    assert s.titles_of("daz") == ["🚑 Paramedic of the Week"] and s.titles_of("kat") == []

@@ -40,6 +40,7 @@ class Store:
             CREATE TABLE IF NOT EXISTS results (n INTEGER PRIMARY KEY, date TEXT, plan TEXT, json TEXT);
             CREATE TABLE IF NOT EXISTS sashes (id TEXT PRIMARY KEY, until REAL);
             CREATE TABLE IF NOT EXISTS bests (game TEXT PRIMARY KEY, score REAL, date TEXT);
+            CREATE TABLE IF NOT EXISTS titles (title TEXT PRIMARY KEY, holder TEXT, name TEXT);
             """)
 
     def sash_until(self, rid: str) -> float | None:
@@ -256,6 +257,27 @@ class Store:
                     (game, score, time.strftime("%Y-%m-%d")),
                 )
         return row[0] if row else None
+
+    def take_titles(self, awards: list[dict]) -> list[str]:
+        """Hands each held title (`config.TITLES`) to whoever won its award; says who took it from whom."""
+        said = []
+        with self.lock, self.db:
+            for a in awards:
+                title = config.TITLES.get(a.get("award", ""))
+                if not title or not a.get("id"):
+                    continue
+                row = self.db.execute("SELECT holder, name FROM titles WHERE title = ?", (title,)).fetchone()
+                if row and row[0] == a["id"]:
+                    said.append(f"{a['name']} keeps {title}")
+                else:
+                    said.append(f"{a['name']} takes {title}" + (f" from {row[1]}" if row else ""))
+                self.db.execute("INSERT OR REPLACE INTO titles VALUES (?, ?, ?)", (title, a["id"], a["name"]))
+        return said
+
+    def titles_of(self, rid: str) -> list[str]:
+        """The titles this rider holds right now."""
+        with self.lock:
+            return [t for (t,) in self.db.execute("SELECT title FROM titles WHERE holder = ?", (rid,))]
 
     def add_result(self, plan: str, summary: dict) -> None:
         """Records a finished bus ride for the season ladder."""

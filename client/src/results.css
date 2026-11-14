@@ -483,3 +483,7 @@ tr.me td {
   color: inherit;
   text-decoration: none;
 }
+.res-title {
+  margin: 8px 0 0;
+  font-weight: 700;
+}

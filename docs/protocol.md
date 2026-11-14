@@ -58,7 +58,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 | t | Fields |
 | --- | --- |
-| `lobby` | `code, host, difficulty, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot}]`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`) |
+| `lobby` | `code, host, difficulty, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot, erg, titles}], mutator`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`); `titles` are held titles (`config.TITLES`) such as "🚑 Paramedic of the Week"; `mutator` is this week's twist `{id, name, desc, ...}` or null. The crew game's `end` summary carries `titles`: lines like "Kat takes 🚑 Paramedic of the Week from Dazza". |
 | `tick` | `el, i, bel, ev, riders: {id: {name, tier, tgt, w, cad, s, st}}, bus, fx, load` |
 | `end` | `summary` (GroupSummary, see `client/src/ui/results.ts`) |
 | `error` | `msg` |

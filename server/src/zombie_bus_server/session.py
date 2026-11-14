@@ -155,10 +155,16 @@ class Room:
                     "look": r.look,
                     "bot": r.bot,
                     "erg": self.erg_of(r),
+                    "titles": self.titles(r.id),
                 }
                 for r in self.riders.values()
             ],
         }
+
+    def titles(self, rid: str) -> list[str]:
+        """The held titles a rider wears in the lobby (test stand-ins for the store may have none)."""
+        lookup = getattr(self.store, "titles_of", None)
+        return lookup(rid) if lookup else []
 
     def humans(self) -> list[Rider]:
         return [r for r in self.riders.values() if not r.bot]
@@ -254,6 +260,8 @@ class Room:
             self.store and self.summary.get("score") is not None
         ):  # the crew's best before this ride, for context
             self.summary["crewBest"] = self.store.crew_best(self.game, self.summary["score"])
+        if hasattr(self.store, "take_titles") and self.summary.get("awards"):
+            self.summary["titles"] = self.store.take_titles(self.summary["awards"])
         await self.broadcast({"t": "end", "summary": self.summary})
         if self.store and self.game == "bus":  # the season ladder ranks bus scores only
             self.store.add_result(self.plan["name"], self.summary)

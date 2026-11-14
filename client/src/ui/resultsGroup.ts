@@ -46,6 +46,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
           { class: 'card' },
           h('h2', {}, 'Awards'),
           h('div', { class: 'res-awards' }, ...g.awards.map(trophy)),
+          ...(g.titles ?? []).map((t) => h('p', { class: 'res-title' }, t)),
         )
       : '',
     h(

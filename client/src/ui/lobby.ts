@@ -153,6 +153,7 @@ export function lobbyView(c: LobbyCtx) {
           }),
           avatar(r.name, 'lg'),
           h('b', {}, r.name),
+          ...(r.titles ?? []).map((t) => h('small', { class: 'seat-title' }, t)),
           h('span', { class: `tier-badge ${r.tier}` }, TIER_NAME[r.tier]),
           h('small', {}, `${r.ftp} W`),
           r.bot ? h('span', { class: 'bot-badge', title: 'Bot rider' }, '🤖') : '',
