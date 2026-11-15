@@ -11,11 +11,13 @@ import { hudToast } from './hudParts'
 import type { ListRider } from '../core/hud'
 import type { LapInfo } from '../core/laps'
 import { routeStats, type Route } from '../core/route'
+import type { Warning } from '../core/segWarn'
 import type { SegBoard, SegLive } from '../modes/freeRide/segmentRun'
 import type { Live } from '../modes/rideController'
 import { h } from './dom'
 import { freeRideFlat } from './freeRideFlat'
 import { freeRideHud } from './freeRideHud'
+import { segCues } from './segCues'
 
 export interface FreeHandlers {
   pause: () => void
@@ -46,7 +48,7 @@ export interface FreeState {
   np: number
   ftp: number
   weightKg: number
-  /** Seconds to the finish at the average speed so far. */
+  /** Seconds to the finish through the road ahead at the recent power (`modes/freeRide/eta.ts`). */
   etaS: number
   /** Everyone on the road, me included. */
   riders: ListRider[]
@@ -66,6 +68,8 @@ export interface FreeState {
   group?: { draftW: number; band: number }
   /** Group rides: a big line and a small one over the view (the countdown, waiting at the finish). */
   banner?: [string, string]
+  /** The next sprint or KOM: a heads-up banner and the 3-2-1 to its line. */
+  warn?: Warning
 }
 
 /** HUD parts that can be switched on and off. */
@@ -137,6 +141,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     )
 
   const { el: toastBox, show: toast } = hudToast()
+  const cues = segCues()
 
   // Each part is a class on the root; a phone starts without the map and the rider list.
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
@@ -149,6 +154,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     stage,
     layout.el,
     toastBox,
+    cues.el,
   )
   if (world) root.append(ov)
   // Upright on a phone the ride is a letterbox (touch.css shows this only then); a tap puts the hint away.
@@ -182,6 +188,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     },
     frame(s: FreeState) {
       layout.frame(s)
+      cues.frame(s.intro ? undefined : s.warn)
       mapUpdate?.(
         s.dist,
         s.riders.filter((r) => r.id !== s.me).map((r) => r.d),

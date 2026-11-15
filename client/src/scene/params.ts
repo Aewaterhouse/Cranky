@@ -2,6 +2,7 @@ import { CAM } from './camVis'
 import { BOSS } from './bossVis'
 import { DATE } from './dateVis'
 import { FEEL } from './route/feelVis'
+import { WARN } from './route/warnVis'
 import { FLY, ORBIT, PARTY, PODIUM } from './route/shotVis'
 import { PLACE } from './route/placeVis'
 import { MOOD, ROUTE_MOOD_DEFS } from './route/routeMoods'
@@ -263,6 +264,7 @@ export const VIS = {
     mainStreet: '#96938c',
     place: PLACE,
     feel: FEEL,
+    warn: WARN,
     fly: FLY,
     orbit: ORBIT,
     party: PARTY,

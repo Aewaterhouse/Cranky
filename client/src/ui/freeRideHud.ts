@@ -5,6 +5,7 @@ import { gearCount } from '../core/gears'
 import { gradeColour, riderRows, windText } from '../core/hud'
 import { steadySpeed, totalMass } from '../core/physics'
 import { ascentFrom, routeAt } from '../core/route'
+import { rideMarks } from '../core/segWarn'
 import { settings } from '../core/settings'
 import { clock, h } from './dom'
 import { profileChart } from './freeRideChart'
@@ -49,8 +50,9 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
   }
 
   const board = segBoard()
-  const whole = profileChart(route, undefined, true)
-  const next = profileChart(route, { behind: C.climb.behindM, ahead: C.climb.aheadM }, true)
+  const marks = rideMarks(route)
+  const whole = profileChart(route, undefined, true, marks)
+  const next = profileChart(route, { behind: C.climb.behindM, ahead: C.climb.aheadM }, true, marks)
   const climbs = findClimbs(route)
   const grade = h('div', { class: 'glass grade off' })
   const climbHead = h('span', {})

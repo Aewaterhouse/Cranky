@@ -218,7 +218,12 @@ export function runFreeRide(
       view.toast(lapToast(now, clock))
       SFX.bell(now.n === now.of ? CFG.sound.bell.lastRings : 1)
     }
-    const { riders, ...seg } = extras.tick(dist, el, paused ? 0 : live.power, { paused, fast, dt })
+    const { riders, ...seg } = extras.tick(dist, el, paused ? 0 : live.power, {
+      paused,
+      fast,
+      dt,
+      speed: speed * band * fast,
+    })
     const others = [...(link?.others() ?? []), ...riders]
     scene.draw([me, ...others])
     ride.rec.distance = Math.round(dist)

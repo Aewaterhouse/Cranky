@@ -1,6 +1,49 @@
 import { gradeColour } from '../core/hud'
 import { routeAt, type Route } from '../core/route'
+import type { Mark } from '../core/segWarn'
+import { VIS } from '../scene/params'
 import { h } from './dom'
+
+const WV = VIS.route.warn
+
+/** A sprint (green, a bolt) or KOM (red with white polka dots) band across the chart, its icon at the top. */
+function band(
+  ctx: CanvasRenderingContext2D,
+  m: Mark,
+  x0: number,
+  x1: number,
+  top: number,
+  bot: number,
+) {
+  const w = Math.max(3, x1 - x0)
+  const kom = m.kind === 'climb'
+  ctx.globalAlpha = WV.bandAlpha
+  ctx.fillStyle = kom ? WV.kom : WV.sprint
+  ctx.fillRect(x0, top, w, bot - top)
+  if (kom) {
+    ctx.fillStyle = WV.dot
+    for (let y = top + 4; y < bot; y += 8)
+      for (let x = x0 + ((y / 8) % 2 ? 3 : 7); x < x0 + w; x += 8) {
+        ctx.beginPath()
+        ctx.arc(x, y, 1.6, 0, 7)
+        ctx.fill()
+      }
+  }
+  ctx.globalAlpha = 1
+  const r = Math.max(4, Math.min(8, (bot - top) / 4))
+  const cx = x0 + Math.min(w / 2, r + 1)
+  const cy = top + r + 1
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, 0, 7)
+  ctx.fillStyle = kom ? WV.dot : WV.sprint
+  ctx.fill()
+  ctx.font = `700 ${Math.round(r * 1.3)}px Inter, system-ui, sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillStyle = kom ? WV.kom : WV.dot
+  ctx.fillText(kom ? '●' : 'S', cx, cy + 0.5)
+  ctx.textBaseline = 'alphabetic'
+}
 
 const COL_W = 3
 const STEPS_KM = [0.5, 1, 2, 5, 10, 20, 50, 100]
@@ -9,9 +52,14 @@ const STEPS_KM = [0.5, 1, 2, 5, 10, 20, 50, 100]
  * Canvas elevation profile, filled column by column in the colour of the gradient.
  * Without `ahead` it shows the whole route and dims what has been ridden;
  * with `ahead` it shows `behind` m back to `ahead` m forward of the rider.
- * `slim` drops the axes and labels for the thin HUD strips.
+ * `slim` drops the axes and labels for the thin HUD strips. `marks` are the sprints and KOMs, drawn as bands.
  */
-export function profileChart(route: Route, win?: { behind: number; ahead: number }, slim = false) {
+export function profileChart(
+  route: Route,
+  win?: { behind: number; ahead: number },
+  slim = false,
+  marks: Mark[] = [],
+) {
   const cv = h('canvas', { class: 'frchart' })
   const el = h('div', { class: 'frchart-box' }, cv)
   let dist = 0
@@ -91,6 +139,9 @@ export function profileChart(route: Route, win?: { behind: number; ahead: number
       ctx.fillRect(px, y(s.ele), COL_W + 0.6, B - y(s.ele))
     }
     ctx.globalAlpha = 1
+    for (const m of marks)
+      if (m.end > d0 && m.start < d1)
+        band(ctx, m, x(Math.max(d0, m.start)), x(Math.min(d1, m.end)), T, B)
     ctx.beginPath()
     samples.forEach((s, c) => ctx[c ? 'lineTo' : 'moveTo'](L + (c + 0.5) * COL_W, y(s.ele)))
     ctx.strokeStyle = 'rgba(255,255,255,0.85)'

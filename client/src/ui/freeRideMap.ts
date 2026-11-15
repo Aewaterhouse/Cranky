@@ -1,6 +1,8 @@
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { routeAt, type Route } from '../core/route'
+import { rideMarks } from '../core/segWarn'
+import { VIS } from '../scene/params'
 
 /** Leaflet map with the route line and a moving rider dot. Throws when there is nothing to show. */
 export function routeMap(box: HTMLElement, route: Route) {
@@ -15,6 +17,28 @@ export function routeMap(box: HTMLElement, route: Route) {
   }).addTo(map)
   const whole = L.polyline(line, { color: '#9c998f', weight: 5, opacity: 0.9 }).addTo(map)
   const done = L.polyline([], { color: '#f2b705', weight: 5 }).addTo(map)
+  // Sprints green, KOMs red dots on white, each with its start marked (one lap's worth on a lap ride).
+  const W = VIS.route.warn
+  const lapM = (route.lapOf ?? route).distance
+  for (const m of rideMarks(route).filter((m) => m.start < lapM)) {
+    const part = route.points
+      .filter((p) => p.lat !== undefined && p.d >= m.start && p.d <= m.end)
+      .map((p): L.LatLngTuple => [p.lat!, p.lon!])
+    if (part.length < 2) continue
+    const kom = m.kind === 'climb'
+    L.polyline(part, { color: kom ? W.dot : W.sprint, weight: 7, opacity: 0.95 }).addTo(map)
+    if (kom)
+      L.polyline(part, { color: W.kom, weight: 6, dashArray: '1 9', lineCap: 'round' }).addTo(map)
+    L.circleMarker(part[0], {
+      radius: 6,
+      color: kom ? W.kom : W.sprint,
+      weight: 3,
+      fillColor: W.dot,
+      fillOpacity: 1,
+    })
+      .bindTooltip(`${kom ? '⛰ KOM' : '⚡ Sprint'}: ${m.name}`)
+      .addTo(map)
+  }
   const me = L.circleMarker(line[0], {
     radius: 8,
     color: '#f2b705',

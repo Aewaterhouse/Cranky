@@ -1,6 +1,7 @@
 import { keyHint } from '../core/keys'
 import { gradeColour, riderRows } from '../core/hud'
 import { ascentFrom } from '../core/route'
+import { rideMarks } from '../core/segWarn'
 import { clock, h } from './dom'
 import { profileChart } from './freeRideChart'
 import type { FreeLayout, FreeParts } from './freeRideView'
@@ -53,8 +54,9 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
   const np = num('NP', 'W', 'sm')
   const wkg = num('W/kg', '', 'sm')
 
-  const whole = profileChart(route)
-  const next = profileChart(route, { behind: 100, ahead: 900 })
+  const marks = rideMarks(route)
+  const whole = profileChart(route, undefined, false, marks)
+  const next = profileChart(route, { behind: 100, ahead: 900 }, false, marks)
   const gv = h('b', {}, '0.0')
   const gearT = gearTile()
   const gbox = h('div', { class: 'gradebox' }, h('span', {}, 'Gradient'), gv, h('small', {}, '%'))

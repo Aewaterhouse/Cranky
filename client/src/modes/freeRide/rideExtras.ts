@@ -5,6 +5,7 @@ import { totalMass } from '../../core/physics'
 import type { RideRecorder } from '../../core/ride'
 import type { Route } from '../../core/route'
 import { baseRoute } from '../../core/segments'
+import { rideMarks, SegWarnings } from '../../core/segWarn'
 import { VIS } from '../../scene/params'
 import type { RoadRider } from '../../scene/route/roadRiders'
 import { SFX } from '../../ui/audio'
@@ -40,6 +41,7 @@ export function rideExtras(
     // A test ride (simulator) times segments for the toasts but keeps no efforts.
     (e) => rec.sim || void saveEfforts(rider.id, [{ ...e, rideDate: rec.startedAt }]),
   )
+  const warnings = new SegWarnings(rideMarks(route))
   let was = { dist: 0, el: 0 }
   const G = VIS.route.ghost
   const riders = ghosts.map((g, i): RoadRider => ({
@@ -55,10 +57,15 @@ export function rideExtras(
     /** Segment results so far. */
     results: segs.results,
     /**
-     * Every tick: the segment panel's state, the whole-route splits and the riders that are not really there
-     * (ghosts and dev mates). `fast` is the dev speed-up, so the scene carries a ghost on at the right pace.
+     * Every tick: the segment panel's state, the whole-route splits, the heads-up for the next sprint or KOM
+     * (`speed` in m/s, for its countdown) and the riders that are not really there (ghosts and dev mates). `fast` is the dev speed-up, so the scene carries a ghost on at the right pace.
      */
-    tick(dist: number, el: number, power: number, { paused = false, fast = 1, dt = 0 } = {}) {
+    tick(
+      dist: number,
+      el: number,
+      power: number,
+      { paused = false, fast = 1, dt = 0, speed = 0 } = {},
+    ) {
       // In a group ride a jump up the road is a late join or a rejoin, not riding.
       const jumped = o.group && dist - was.dist > CFG.segments.jumpM
       const out = segs.tick(dist, el, power, Math.max(0, el - was.el), jumped)
@@ -72,6 +79,7 @@ export function rideExtras(
       stepGhosts(mates, route, totalMass(rider.kg), paused, fast, dt)
       return {
         ...out,
+        warn: warnings.step(dist, paused ? 0 : speed),
         riders: [...mates.map((g) => ({ ...g.rider, wkg: g.watts / rider.kg })), ...riders],
       }
     },
