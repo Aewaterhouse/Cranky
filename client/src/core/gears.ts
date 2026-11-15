@@ -11,6 +11,10 @@ export const gearText = (gear: number) => `Gear ${gear}/${gearCount}`
 export const busErgOn = (mode: TrainerMode | undefined, own: boolean) =>
   mode === 'erg' ? true : mode === 'gears' ? false : own
 
+/** The speed (m/s) a real bike in `gear` would be doing at `cadence`. */
+export const gearSpeed = (cadence: number, gear: number) =>
+  (cadence / 60) * G.wheelM * G.ratios[gear - 1]
+
 /** One gear up (d = 1) or down (d = -1), stopping at the first and last gear. */
 export const shiftGear = (gear: number, d: number) => Math.min(gearCount, Math.max(1, gear + d))
 
@@ -28,7 +32,7 @@ export function gearOffset(
 ) {
   if (cadence < G.minCadence) return 0
   const rev = (cadence / 60) * G.wheelM
-  const vVirt = rev * G.ratios[gear - 1]
+  const vVirt = gearSpeed(cadence, gear)
   const vReal = (rev * chainring) / G.cogTeeth
   const want = resistance(vVirt, roadPct, mass) * vVirt
   // Power at a fixed speed rises with gradient, so bisect for the gradient that matches.

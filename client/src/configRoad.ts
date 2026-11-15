@@ -76,7 +76,13 @@ export const ROAD_CFG = {
     maxDriveN: 600,
     difficulty: 0.5,
     /** Auto-pause after `stopS` s all but halted (under `haltMs` m/s); riding again after `goS` s of pedalling. */
-    autoPause: { stopS: 3, goS: 1.5, haltMs: 2 },
+    autoPause: { stopS: 3, goS: 0.2, haltMs: 2 },
+    /**
+     * Pulling away from a stop: the bike's mass has to be got going, so the trainer adds the push it takes to
+     * reach the speed the gear and cadence imply within `s` seconds, as gradient (at most `maxPct`), fading out
+     * over `fadeS` from the first pedal stroke. A stop is under `stopMs` with the cranks still.
+     */
+    pullAway: { s: 2.5, maxPct: 6, fadeS: 8, stopMs: 1 },
     /** Range sent to the trainer, in %. */
     grade: [-10, 20],
     sendEveryS: 1,

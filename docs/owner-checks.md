@@ -189,3 +189,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 ## Free-ride feedback, Strava post and passwords, 2026-11-15 (simulator only)
 - [ ] Birds: ride past a few cockatoo or galah flocks. On the ground they peck and hop; some flocks loop round overhead instead. Nothing hangs still in the air, and they burst away as you get close.
 - [ ] Shift strength: on a device that never touched the slider, Settings shows 100%. On one where you had picked something else (say 200%), it is still 200%.
+- [ ] Pulling away (real trainer): start a free ride and pedal off in gear 12. The first few strokes should feel heavy, like getting a real bike going, then ease over several seconds as you reach 20 km/h or so within about 5 s. Try in an easy gear too (lighter) and stopping and starting on a climb (the climb is there from the first stroke). If the first strokes are too heavy or too light, `CFG.freeRide.pullAway.maxPct` (6%) is the knob.

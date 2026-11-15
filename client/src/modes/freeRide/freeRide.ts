@@ -19,7 +19,7 @@ import { finishRide } from '../../ui/results'
 import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
-import { RoadFeel, trainerTarget } from './feel'
+import { PullAway, RoadFeel, trainerTarget } from './feel'
 import { freeKeys } from './keys'
 import { Moments, momentCard } from './moments'
 import { PauseState } from './pauseState'
@@ -106,6 +106,7 @@ export function runFreeRide(
     mates: link ? 0 : +(params.get('ghosts') ?? 0),
   })
   const feel = new RoadFeel(route)
+  const pullAway = new PullAway()
   const scene = rideWorld(route, view, me, params.get('intro') !== '0')
   let wind = 0
   const moments = new Moments(scene.topD, route.distance)
@@ -176,18 +177,22 @@ export function runFreeRide(
       link.takeNotes().forEach((n) => view.toast(n))
     }
     // Game speed comes from power and the real gradient; the trainer gets the road just ahead (see trainerTarget).
+    // Stopped (auto-paused) the trainer keeps the road under you, so the first pedal stroke already feels it;
+    // only a pause by hand, the finish and a group ride's countdown go flat.
+    const flat = link ? paused : pause.manual || finishing
     const want = trainerTarget(
       route,
       dist,
       speed,
       difficulty,
-      paused,
+      flat,
       live.cadence,
       gear,
       mass,
       settings.chainring,
       settings.shiftStrength,
       draftGrade(speed, draft, mass),
+      flat ? 0 : pullAway.step(speed, live.cadence, gear, dt),
     )
     if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want

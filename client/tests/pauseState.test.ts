@@ -7,9 +7,9 @@ describe('free-ride pause', () => {
     expect([p.paused, p.starting, p.why]).toEqual([true, true, 'auto'])
     p.toggle()
     expect(p.manual).toBe(false)
-    p.step(false, 0, 1)
+    p.step(true, 0, 1)
     expect(p.paused).toBe(true)
-    p.step(false, 1, 0.6)
+    p.step(false, 0, 0.2)
     expect([p.paused, p.starting, p.why]).toEqual([false, false, null])
   })
 
