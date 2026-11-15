@@ -8,10 +8,13 @@ import re
 from pathlib import Path
 
 import fit
+import lidar
 import terrain
 
 SPACING_M = 10
-LOOP_SEARCH_M = 400  # how far either side of the stated lap end to look for the true closure
+LOOP_SEARCH_M = (
+    400  # how far either side of the stated lap end to look for the true closure
+)
 SPARSE_M = 15  # tracks with points further apart than this are not position-smoothed
 OFFSET_EVERY = 10  # compare every 10th point with SRTM to remove the altimeter's offset
 
@@ -65,12 +68,18 @@ def cut(pts: list, from_km: float, to_km: float, loop: bool) -> list:
     start = min(range(len(pts)), key=lambda i: abs(dist[i] - from_km * 1000))
     end = min(range(len(pts)), key=lambda i: abs(dist[i] - to_km * 1000))
     if loop:
-        near = [i for i in range(start + 1, len(pts)) if abs(dist[i] - to_km * 1000) <= LOOP_SEARCH_M]
+        near = [
+            i
+            for i in range(start + 1, len(pts))
+            if abs(dist[i] - to_km * 1000) <= LOOP_SEARCH_M
+        ]
         end = min(near, key=lambda i: haversine(pts[i][:2], pts[start][:2]))
     return pts[start : end + 1]
 
 
-def resample(pts: list[tuple[float, float, float]], step: float) -> list[tuple[float, float, float]]:
+def resample(
+    pts: list[tuple[float, float, float]], step: float
+) -> list[tuple[float, float, float]]:
     """Returns (lat, lon, ele) every `step` metres along the track."""
     out = [pts[0]]
     carry = 0.0
@@ -94,24 +103,50 @@ def _average(section: list) -> list:
     return out
 
 
-def route(file: Path, from_km: float, to_km: float, loop: bool) -> tuple[list[Point], list[float]]:
-    """Returns the 10 m centreline and heights for a section of a recorded ride."""
+def route(
+    file: Path,
+    from_km: float,
+    to_km: float,
+    loop: bool,
+    start_at: Point | None = None,
+    dem: str | None = None,
+) -> tuple[list[Point], list[float]]:
+    """Returns the 10 m centreline and heights for a section of a recorded ride.
+
+    A loop can be turned to start at the track point nearest `start_at`. With `dem="qld"` the heights
+    come from Queensland LiDAR instead of the recording.
+    """
     raw = fit.track(file) if file.suffix.lower() == ".fit" else parse(file.read_text())
     ele = fill([p[2] for p in raw])
-    section = cut([(la, lo, e) for (la, lo, _), e in zip(raw, ele, strict=False)], from_km, to_km, loop)
+    section = cut(
+        [(la, lo, e) for (la, lo, _), e in zip(raw, ele, strict=False)],
+        from_km,
+        to_km,
+        loop,
+    )
     # A three-point average takes the GPS jitter out of a recording. A course file's points are already
     # clean and far apart, where averaging would only cut the corners.
-    spacing = sum(haversine(a[:2], b[:2]) for a, b in zip(section, section[1:], strict=False)) / len(section)
+    spacing = sum(
+        haversine(a[:2], b[:2]) for a, b in zip(section, section[1:], strict=False)
+    ) / len(section)
     smooth = section if spacing > SPARSE_M else _average(section)
     if loop:
         # Altimeters drift over a lap; spread the mismatch so the lap closes exactly.
         drift = smooth[-1][2] - smooth[0][2]
         n = len(smooth)
         smooth = [(p[0], p[1], p[2] - drift * i / n) for i, p in enumerate(smooth)]
+        if start_at:
+            i = min(range(n), key=lambda j: haversine(smooth[j][:2], start_at))
+            smooth = smooth[i:] + smooth[:i]
         smooth.append(smooth[0])
     fine = resample(smooth, SPACING_M)
     heights = [p[2] for p in fine]
     line = [(p[0], p[1]) for p in fine]
-    gaps = sorted(terrain.height(*line[i]) - heights[i] for i in range(0, len(line), OFFSET_EVERY))
+    if dem == "qld":
+        got = lidar.heights(line)
+        return line, [h if h is not None else heights[i] for i, h in enumerate(got)]
+    gaps = sorted(
+        terrain.height(*line[i]) - heights[i] for i in range(0, len(line), OFFSET_EVERY)
+    )
     offset = gaps[len(gaps) // 2]
     return line, [h + offset for h in heights]

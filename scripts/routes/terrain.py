@@ -12,10 +12,17 @@ import urllib.request
 from array import array
 from pathlib import Path
 
+import lidar
+
 TILES = "https://s3.amazonaws.com/elevation-tiles-prod/skadi"
 CACHE = Path(__file__).parent / ".cache"
 CELL_M = 60
 REACH_M = 900
+DEM_CELL_M = (
+    10  # a LiDAR grid: fine enough for a creek, small enough for a short circuit
+)
+DEM_REACH_M = 600
+DEM_SEA_M = 0.0  # tidal water in Brisbane's LiDAR reads about -0.6 m
 M_PER_DEG_LAT = 110540
 M_PER_DEG_LON = 111320
 SIDE = 3601  # samples per tile edge
@@ -35,7 +42,8 @@ def _tile(lat: float, lon: float) -> array:
         if not file.exists():
             CACHE.mkdir(exist_ok=True)
             req = urllib.request.Request(
-                f"{TILES}/{name[:3]}/{name}.hgt.gz", headers={"User-Agent": "route-pack-builder"}
+                f"{TILES}/{name[:3]}/{name}.hgt.gz",
+                headers={"User-Agent": "route-pack-builder"},
             )
             with urllib.request.urlopen(req, timeout=300) as r:
                 file.write_bytes(r.read())
@@ -93,24 +101,37 @@ def to_runs(cells: dict[tuple[int, int], int], rows: int) -> list:
     return out
 
 
-def grid(line: list[Point]) -> dict:
-    """Builds the terrain block of a pack for a route given as (lat, lon) points."""
-    pad_lat = (REACH_M + CELL_M) / M_PER_DEG_LAT
+def grid(line: list[Point], dem: str | None = None) -> dict:
+    """Builds the terrain block of a pack for a route given as (lat, lon) points.
+
+    With `dem="qld"` the grid is LiDAR at DEM_CELL_M out to DEM_REACH_M (SRTM wherever LiDAR has a gap).
+    """
+    cell, reach = (DEM_CELL_M, DEM_REACH_M) if dem else (CELL_M, REACH_M)
+    pad_lat = (reach + cell) / M_PER_DEG_LAT
     lat0 = min(p[0] for p in line) - pad_lat
     k = M_PER_DEG_LON * math.cos(math.radians(lat0))
-    lon0 = min(p[1] for p in line) - (REACH_M + CELL_M) / k
-    # Every fifth 10 m point is plenty to mark a 900 m corridor.
+    lon0 = min(p[1] for p in line) - (reach + cell) / k
+    # Every fifth 10 m point is plenty to mark the corridor.
     xy = [((lo - lon0) * k, (la - lat0) * M_PER_DEG_LAT) for la, lo in line[::5]]
-    cells = {
-        (r, c): round(height(lat0 + r * CELL_M / M_PER_DEG_LAT, lon0 + c * CELL_M / k))
-        for r, c in near_cells(xy, CELL_M, REACH_M)
-    }
-    rows = max(r for r, _ in cells) + 1
+    keys = near_cells(xy, cell, reach)
+    rows = max(r for r, _ in keys) + 1
+    cols = max(c for _, c in keys) + 1
+    dlat, dlon = cell / M_PER_DEG_LAT, cell / k
+    img = lidar.raster(lat0, lon0, dlat, dlon, rows, cols) if dem == "qld" else None
+    cells = {}
+    for r, c in keys:
+        h = img[r][c] if img else None
+        cells[(r, c)] = (
+            round(h, 1)
+            if h is not None
+            else round(height(lat0 + r * dlat, lon0 + c * dlon))
+        )
     return {
-        "cell": CELL_M,
+        "cell": cell,
         "lat0": round(lat0, 6),
         "lon0": round(lon0, 6),
-        "cols": max(c for _, c in cells) + 1,
+        "cols": cols,
         "rows": rows,
         "runs": to_runs(cells, rows),
+        **({"sea": DEM_SEA_M} if dem else {}),
     }

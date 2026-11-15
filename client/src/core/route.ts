@@ -26,6 +26,8 @@ export interface TerrainData {
    * u built-up, p park, a sand, r rock, w water.
    */
   cover?: (string[] | null)[]
+  /** Height of the sea and tidal creeks on a LiDAR grid; satellite grids use `VIS.route.seaLevel`. */
+  sea?: number
 }
 /** Map features near a route, in the terrain grid's local metres `[east, north]`. Every part is optional. */
 export interface RouteFeatures {

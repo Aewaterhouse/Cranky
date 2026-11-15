@@ -10,14 +10,15 @@ Data allowed (owner approved, 2026-11-15): OpenStreetMap (ODbL), Queensland and 
 ## Shared fixes (all routes)
 - [x] Loops are true circuits: the road smooths and curves through the start line, wraps round, and has no
       straight run-off past either end (client `roadPath.ts`, `chunks.ts`; server `road_route.py`).
-- [ ] Builder: a loop's lap starts at a given spot (`startAt`) and its join is blended.
+- [x] Builder: a loop's lap starts at a given spot (`startAt`); the client closes the join.
 - [ ] Buildings never cross the road: real outline checked against the road, roofs and canopies handled.
 - [ ] Builder test: no building over the road, no kink at a lap join.
 
 ## Nundah Crit Track (owner's notes, 2026-11-15)
 The crit track in Albert Bishop Park, home of the Hamilton Wheelers.
-- [ ] Start/finish on the long straight, about a quarter of the way along from the clubhouse end.
-- [ ] Heights from Queensland LiDAR: the clubhouse rise and the bump round the back in the S-bends.
+- [x] Start/finish on the long straight, about a quarter of the way along from the clubhouse end.
+- [x] Heights from Queensland LiDAR (`dem: "qld"`): line and a 10 m ground grid; the clubhouse rise shows.
+      The S-bend bump is under half a metre in the LiDAR, so it barely shows.
 - [ ] The mangrove creek beside the long straight (outside), from LiDAR water; sparse trees between it and the
       straight.
 - [ ] Hamilton Wheelers clubhouse (OSM "Criterium Clubhouse") up by the little hill; toilet block near the line.

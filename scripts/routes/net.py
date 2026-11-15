@@ -12,7 +12,9 @@ AGENT = "route-pack-builder"
 RETRIES = 3
 
 
-def fetch(url: str, data: dict[str, str] | None = None, pause: float = 1.0, check=None) -> dict:
+def fetch(
+    url: str, data: dict[str, str] | None = None, pause: float = 1.0, check=None
+) -> dict:
     """Fetches JSON, caching the reply on disk and pausing after a real request.
 
     A reply that fails `check` (the public servers send empty answers when busy) is retried.

@@ -38,6 +38,9 @@ DIST_TOL = 0.05
 GAIN_TOL = 0.10
 PROFILE_N = 60
 GPX_SMOOTH_M = 100
+LIDAR_SMOOTH_M = (
+    30  # LiDAR heights are true to a few cm; keep bumps of a few tens of metres
+)
 # SRTM is noisy on roads cut into hillsides, so heights are averaged along the road first.
 # 300 m removes most of it; wider windows are tried only when the climb is still over.
 SMOOTH_TRY_M = [300, 400, 600, 800]
@@ -227,15 +230,20 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
     if "gpx" in spec:
         nodes, snap = None, 0.0
         fine, ele = gpx.route(
-            ROOT / spec["gpx"], *spec["cutKm"], spec.get("loop", False)
+            ROOT / spec["gpx"],
+            *spec["cutKm"],
+            spec.get("loop", False),
+            spec.get("startAt"),
+            spec.get("dem"),
         )
     else:
         line, snap, nodes = trace([tuple(w) for w in spec["waypoints"]])
         fine, ele = road_heights(line)
     pub = spec["published"]
     # A recorded ride's altimeter is far smoother than SRTM, so it needs only a light pass.
+    gpx_window = LIDAR_SMOOTH_M if spec.get("dem") else GPX_SMOOTH_M
     ele, window = (
-        (smooth(ele, GPX_SMOOTH_M), GPX_SMOOTH_M)
+        (smooth(ele, gpx_window), gpx_window)
         if nodes is None
         else calibrate(ele, pub["gainM"])
     )
@@ -253,10 +261,12 @@ def build(spec: dict) -> tuple[dict, dict, list[str]]:
         for (la, lo), e in zip(fine, ele, strict=False)
     ]
     s.pop("smoothM")
-    grid = terrain.grid(fine)
+    grid = terrain.grid(fine, spec.get("dem"))
     pack = {**head, "published": pub, "pts": pts, "terrain": grid}
     try:
-        pack["features"] = features.build(fine, nodes, grid, fetch)
+        pack["features"] = features.build(
+            fine, nodes, grid, fetch, bool(spec.get("dem"))
+        )
     except OSError as err:
         # Keep what an earlier build fetched; a pack with none falls back to the scene's defaults.
         old_file = OUT / f"{spec['id']}.json"

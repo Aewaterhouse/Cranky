@@ -57,6 +57,33 @@ def test_runs_split_on_gaps() -> None:
 
 def test_short_spurs_are_dropped_and_long_ones_kept() -> None:
     pos = {n: (-27.0, 153.0 + n * 0.001) for n in range(1, 8)}  # about 99 m apart
-    assert br.drop_spurs([1, 2, 3, 4, 3, 2, 5], {**pos, 5: (-27.001, 153.002)}) == [1, 2, 5]
+    assert br.drop_spurs([1, 2, 3, 4, 3, 2, 5], {**pos, 5: (-27.001, 153.002)}) == [
+        1,
+        2,
+        5,
+    ]
     long = [1, 2, 3, 4, 5, 6, 7, 6, 5, 4, 3, 2, 1]
     assert br.drop_spurs(long, pos) == long
+
+
+def test_a_loop_starts_where_asked(tmp_path: Path, monkeypatch) -> None:
+    import math
+
+    import gpx
+
+    # A 1.2 km circle recorded twice round; the lap is cut from 0.1 km and turned to start due north.
+    pts = []
+    for i in range(240):
+        t = i / 120 * 2 * math.pi
+        pts.append((-27 + 0.0017 * math.cos(t), 153 + 0.0019 * math.sin(t)))
+    trk = "".join(
+        f'<trkpt lat="{la}" lon="{lo}"><ele>5</ele></trkpt>' for la, lo in pts
+    )
+    file = tmp_path / "ring.gpx"
+    file.write_text(f"<gpx><trk><trkseg>{trk}</trkseg></trk></gpx>")
+    monkeypatch.setattr(
+        terrain, "height", lambda lat, lon: 5.0
+    )  # no SRTM download in tests
+    line, _ = gpx.route(file, 0.1, 1.3, True, (-27 + 0.0017, 153.0))
+    assert br.haversine(line[0], (-27 + 0.0017, 153.0)) < 15
+    assert br.haversine(line[0], line[-1]) < 12

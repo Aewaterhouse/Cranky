@@ -5,18 +5,25 @@ Land cover is rasterised onto the terrain grid, one letter per known cell (see C
 """
 
 import math
+import re
 from collections.abc import Callable
 
 OVERPASS = "https://overpass-api.de/api/interpreter"
+MIRRORS = (OVERPASS, "https://overpass.kumi.systems/api/interpreter")
 M_PER_DEG_LAT = 110540
 M_PER_DEG_LON = 111320
 AREA_REACH_M = 900
 ROAD_REACH_M = 300
 BUILDING_REACH_M = 150
 POLY_STEP = 40  # every 40th 10 m point: a 400 m polyline is plenty for "around" queries
+POLY_MIN_PTS = 60  # but never fewer points than this
+SMALL_M = 3000  # routes smaller than this each way are asked for by bounding box
 CHUNK = 25  # polyline points per query (10 km): the public server refuses a whole long route at once
 MAX_BUILDINGS = 6000
 MIN_BUILDING_M2 = 20
+LIDAR_WATER_M = (
+    0.0  # tidal creeks read about -0.6 m (the water surface) in Brisbane's LiDAR
+)
 ROADS = "motorway|trunk|primary|secondary|tertiary|unclassified|residential|living_street|road"
 MAIN = {"motorway", "trunk", "primary", "secondary", "tertiary"}
 # Letter and priority per tag value; higher priorities paint over lower ones.
@@ -26,7 +33,7 @@ COVER = {
     "r": (7, {"bare_rock", "scree", "shingle"}),
     "u": (6, {"residential", "commercial", "retail", "industrial"}),
     "p": (
-        5,
+        3,
         {
             "park",
             "pitch",
@@ -40,7 +47,7 @@ COVER = {
     "f": (4, {"forest", "wood"}),
     "s": (4, {"scrub", "heath"}),
     "g": (
-        3,
+        2,
         {"farmland", "meadow", "grass", "farmyard", "orchard", "vineyard", "grassland"},
     ),
     "b": (1, {"national_park", "nature_reserve", "protected_area"}),
@@ -166,16 +173,25 @@ def side_roads(
 
 
 def build(
-    line: list[Point], route_nodes: set[int] | None, grid: dict, fetch: Fetch
+    line: list[Point],
+    route_nodes: set[int] | None,
+    grid: dict,
+    fetch: Fetch,
+    lidar: bool = False,
 ) -> dict:
-    """Adds `cover` to the terrain grid and returns the pack's `features` block."""
+    """Adds `cover` to the terrain grid and returns the pack's `features` block.
+
+    On a LiDAR grid, ground below LIDAR_WATER_M is water whatever the map says: creeks the map draws as lines.
+    """
     lat0, lon0, cell = grid["lat0"], grid["lon0"], grid["cell"]
     k = M_PER_DEG_LON * math.cos(math.radians(lat0))
 
     def local(lat: float, lon: float) -> Point:
         return ((lon - lon0) * k, (lat - lat0) * M_PER_DEG_LAT)
 
-    pts = [*line[::POLY_STEP], line[-1]]
+    # A short circuit needs a finer polyline than a long road, or "around" cuts its corners.
+    step = max(1, min(POLY_STEP, len(line) // POLY_MIN_PTS))
+    pts = [*line[::step], line[-1]]
     polys = [
         ",".join(f"{la:.5f},{lo:.5f}" for la, lo in pts[i : i + CHUNK + 1])
         for i in range(0, len(pts) - 1, CHUNK)
@@ -201,16 +217,40 @@ def build(
             (cx + i, cy + j) in coarse for i in range(-4, 5) for j in range(-4, 5)
         )
 
+    lats, lons = [p[0] for p in line], [p[1] for p in line]
+    small = (max(lats) - min(lats)) * M_PER_DEG_LAT < SMALL_M and (
+        max(lons) - min(lons)
+    ) * k < SMALL_M
+
+    def box(pad: float) -> str:
+        dla, dlo = pad / M_PER_DEG_LAT, pad / k
+        return f"({min(lats) - dla:.5f},{min(lons) - dlo:.5f},{max(lats) + dla:.5f},{max(lons) + dlo:.5f})"
+
     def ask(body: str) -> list[dict]:
         """Runs `body` (with POLY for the polyline) a piece of the route at a time, each element once."""
         seen: dict[tuple, dict] = {}
-        for poly in polys:
+        if small:
+            # A short circuit asks for a box round it, which is far cheaper for the server than "around".
+            q = re.sub(r"\(around:(\d+),POLY\)", lambda m: box(float(m[1])), body)
+            parts = [f"{q}way{box(60)};"]
+        else:
             # Anything at all beside the route rides along as a sentinel: a reply without it is a busy server.
-            q = body.replace("POLY", poly)
-            query = f"[out:json][timeout:300];({q}way(around:60,{poly});node(around:60,{poly});>;);out geom;"
-            for el in fetch(
-                OVERPASS, {"data": query}, pause=5, check=lambda d: d.get("elements")
-            )["elements"]:
+            parts = [
+                f"{body.replace('POLY', poly)}way(around:60,{poly});node(around:60,{poly});>;"
+                for poly in polys
+            ]
+        for q in parts:
+            query = f"[out:json][timeout:300];({q});out geom;"
+            for i, url in enumerate(MIRRORS):
+                try:
+                    reply = fetch(
+                        url, {"data": query}, pause=5, check=lambda d: d.get("elements")
+                    )
+                    break
+                except OSError:
+                    if i == len(MIRRORS) - 1:
+                        raise
+            for el in reply["elements"]:
                 seen[(el["type"], el["id"])] = el
         return list(seen.values())
 
@@ -237,6 +277,8 @@ def build(
                 letter,
                 cover,
             )
+    if lidar:
+        cover.update({rc: "w" for rc, h in heights.items() if h <= LIDAR_WATER_M})
     grid["cover"] = [
         (
             ["".join(cover[(r, run[0] + i)] for i in range(len(run[1]))) for run in row]

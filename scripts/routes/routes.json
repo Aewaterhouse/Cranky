@@ -466,6 +466,11 @@
    21.56
   ],
   "loop": true,
+  "startAt": [
+   -27.40861,
+   153.07005
+  ],
+  "dem": "qld",
   "published": {
    "km": null,
    "gainM": null,

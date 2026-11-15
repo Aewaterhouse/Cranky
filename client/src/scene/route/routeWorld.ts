@@ -38,6 +38,8 @@ import { TerrainGrid } from './terrainGrid'
 export type { RoadRider } from './roadRiders'
 
 const R = VIS.route
+/** The satellite-height sea level, restored for packs that do not set their own. */
+const SEA_LEVEL = R.seaLevel
 const AHEAD = {
   lowpower: 'aheadLowpower',
   potato: 'aheadPotato',
@@ -131,6 +133,8 @@ export class RouteWorld {
     host.prepend(this.renderer.domElement)
     this.cam = new PlayerCam(this.renderer.domElement)
     const terrain = route.points[0].lat === undefined ? undefined : route.terrain
+    // A LiDAR pack knows where its water stands; the default suits satellite heights.
+    R.seaLevel = terrain?.sea ?? SEA_LEVEL
     this.seed = seedOf(route.id)
     const path = new RoadPath(route, terrain)
     this.field = new HeightField(path, terrain && new TerrainGrid(terrain))

@@ -8,6 +8,9 @@ When CC0 packs (Kenney, Quaternius, KayKit) are added, record each here with sou
 
 - Road geometry: OpenStreetMap contributors, Open Database Licence (ODbL) 1.0. https://www.openstreetmap.org/copyright
 - Elevation: NASA Shuttle Radar Topography Mission (SRTM), public domain. https://www.earthdata.nasa.gov/data/instruments/srtm
+- LiDAR elevation (Queensland routes): includes material © State of Queensland and © Commonwealth of Australia (Geoscience Australia), Creative Commons Attribution 4.0. Resampled to a 10 m grid and cut to the route. Approved by the owner 2026-11-15. https://www.qld.gov.au/environment/land/title/maps/elevation
+- LiDAR elevation (other states): Geoscience Australia, Digital Elevation Model derived from LiDAR 5 m grid, Creative Commons Attribution 4.0, modified as above. Approved 2026-11-15.
+- Land cover (planned): ESA WorldCover 10 m, © ESA WorldCover project, contains modified Copernicus Sentinel data, Creative Commons Attribution 4.0. Approved 2026-11-15.
 
 ## Strava brand assets (not CC0)
 
