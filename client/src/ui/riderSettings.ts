@@ -16,6 +16,7 @@ import { h, seg } from './dom'
 import { toast } from './toast'
 import { ZONE_COLOURS } from './planGraph'
 import { chartBox, niceTicks, svgEl } from './svg'
+import { controlsPanel } from './controls'
 import { stravaPanel } from './strava'
 import { setSimFtp } from './trainer'
 
@@ -264,6 +265,7 @@ export function riderSettings(p: Profile, changed: () => void) {
       {},
       panel('Strava', stravaPanel()),
       panel('Power zones', zoneTables(p)),
+      panel('Controls', controlsPanel()),
       panel('FTP history', hist),
     ),
   )

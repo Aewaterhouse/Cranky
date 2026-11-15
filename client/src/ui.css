@@ -587,3 +587,43 @@ a.button.primary {
   font-size: 0.8em;
   font-style: normal;
 }
+
+/* Rider → Settings → Controls (ui/controls.ts). */
+.controls h3 {
+  margin: 12px 0 4px;
+  font-size: 13px;
+}
+.keys-row {
+  display: grid;
+  grid-template-columns: 1fr 92px 92px;
+  gap: 6px;
+  align-items: center;
+  padding: 2px 0;
+}
+.key-slot {
+  padding: 4px 6px;
+  font-size: 13px;
+}
+.key-slot.empty {
+  opacity: 0.5;
+}
+.key-slot.listening {
+  outline: 2px solid var(--acc);
+}
+.keys-warn {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin: 8px 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgb(255 210 122 / 0.15);
+  color: #ffd27a;
+}
+.controls > button {
+  margin-top: 12px;
+}
+.keys-warn[hidden] {
+  display: none;
+}
