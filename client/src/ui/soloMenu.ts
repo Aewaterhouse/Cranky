@@ -1,4 +1,6 @@
 import { keyHint } from '../core/keys'
+import { loadLines, type ChartLines } from '../core/chartLines'
+import { lineButton } from './chartLegend'
 import { TIER_NAME, TIERS, type Plan, type Tier } from '../types'
 import { CFG } from '../config'
 import { h } from './dom'
@@ -49,15 +51,8 @@ export function soloMenu(
   )
   tierSel.value = tier
   const pauseBtn = h('button', { onclick: () => (m.close(), on.pause()) })
-  const lines = { cadence: false, hr: false }
-  const line = (label: string, k: keyof typeof lines) => {
-    const b: HTMLElement = h(
-      'button',
-      { onclick: () => b.classList.toggle('on', (lines[k] = !lines[k])) },
-      label,
-    )
-    return b
-  }
+  const lines = loadLines()
+  const line = (label: string, k: keyof ChartLines) => lineButton(lines, k, label)
   m.el.append(
     h('h2', {}, plan.name),
     modes.root,

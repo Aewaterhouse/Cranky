@@ -83,6 +83,14 @@ export const CFG = {
   rideQueueMax: 5,
   /** Rides shorter than this are never saved, so never sent to Strava (the server checks too). */
   stravaMinSecs: 30,
+  /** The workout chart's cadence and heart-rate lines: colours (as everywhere else) and the scales they span. */
+  chartLines: {
+    cadColour: '#4cc9f0',
+    hrColour: '#ff6b81',
+    cad: [40, 140],
+    hr: [60, 200],
+    cadTicks: [60, 80, 100, 120],
+  },
   /** Seconds on the results screen before a ride posts to Strava by itself (leaving posts it sooner). */
   stravaPostDelayS: 60,
   /** History checks an upload still on its way this often. */

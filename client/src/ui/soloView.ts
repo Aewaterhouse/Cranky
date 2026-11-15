@@ -21,6 +21,9 @@ import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
 import { endButtons, warmStrava } from './keepBar'
+import { chartLegend } from './chartLegend'
+import { chartSeries } from '../core/chartLines'
+import { hrSource } from '../trainer/heartRate'
 
 export interface SoloHandlers {
   pause: () => void
@@ -120,10 +123,12 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     media: () => (media.panel.hidden = !media.panel.hidden),
   })
   const panel = soloPanel(plan, c.tier, ftp)
+  const legend = chartLegend(c.lines)
   const stage = h(
     'div',
     { class: 'solo-stage', onclick: () => root.classList.remove('hud-clean') },
     h('span', { class: 'ctag' }, 'Current interval ±60 s'),
+    legend.el,
     zoom.el,
   )
   // Upright on a phone (touch.css shows this only then); a tap puts it away.
@@ -284,12 +289,13 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
         cadence: s.cadence,
         hr: s.hr,
         now: f.el,
-        showCadence: c.lines.cadence,
-        showHr: c.lines.hr,
         ghost,
       }
+      // The whole-workout strip stays power only; the close-up has the lines the legend turns on.
+      const strap = !!hrSource()
+      legend.strap(strap)
       strip.set(data)
-      zoom.set(data)
+      zoom.set({ ...data, ...chartSeries(c.lines, strap), maxHr })
       panel.frame(f.i, s.intensity)
       panel.stats(s.stats)
     },

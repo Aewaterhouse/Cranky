@@ -168,3 +168,39 @@
   font-size: 1.1rem;
   pointer-events: auto;
 }
+/* The close-up chart's legend: power, then cadence and heart rate as on/off chips. */
+.solo-stage .wlegend {
+  position: absolute;
+  top: calc(-3.2 * var(--u));
+  right: 40px;
+  display: flex;
+  gap: calc(0.8 * var(--u));
+  font-size: 0.7rem;
+  z-index: 1;
+}
+.wlegend > * {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.15em 0.6em;
+  min-height: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: none;
+  color: var(--dim);
+  font: inherit;
+}
+.wlegend button {
+  cursor: pointer;
+  opacity: 0.55;
+}
+.wlegend button.on {
+  opacity: 1;
+  color: var(--fg, #fff);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+.wlegend i {
+  width: 1.2em;
+  height: 3px;
+  border-radius: 2px;
+}

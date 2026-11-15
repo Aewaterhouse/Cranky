@@ -200,3 +200,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Ride a short solo workout, End ride → Discard ride → Bin it: you land back home, and History, the crew feed, Trends and scrap show nothing new.
 - [ ] Finish a ride with Strava connected: the results screen says "Posting to Strava in 60 s" and counts down. Tap Don't post: History shows "Not posted", and its Upload button posts it. Finish another and wait out the minute: it appears on Strava, and Discard is gone.
 - [ ] On the bus with a mate: Discard ride on your results; their ride and the crew result are still there.
+
+## Workout chart lines, 2026-11-16 (unit tests only)
+- [ ] Start a solo workout with a strap paired: the close-up chart shows a cyan cadence line with rpm on the right and a pink heart-rate line with a coloured dot and bpm at the latest beat. Tap Cadence and Heart rate in the legend to hide them; reload and start again: they stay as you left them. Without a strap the Heart rate chip is gone. Do the watts and target look as before?

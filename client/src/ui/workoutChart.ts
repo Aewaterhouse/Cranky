@@ -1,4 +1,7 @@
+import { CFG } from '../config'
+import { hrZone } from '../core/curve'
 import { fmt, h } from './dom'
+import { ZONE_COLOURS } from './planGraph'
 import type { Seg } from './soloSegs'
 
 export interface ChartData {
@@ -10,6 +13,8 @@ export interface ChartData {
   cadence?: number[]
   hr?: (number | null)[]
   showHr?: boolean
+  /** With it, the latest heart rate is marked in its zone's colour. */
+  maxHr?: number
   /** Per-second power of an earlier attempt, drawn faintly behind this ride. */
   ghost?: number[] | null
   /** Now-cursor in plan seconds; omit for a finished ride. */
@@ -21,8 +26,7 @@ export interface ChartData {
 
 const PAD = { l: 46, r: 12, t: 10, b: 22 }
 const BARE = { l: 0, r: 0, t: 3, b: 0 }
-const CAD = [40, 140]
-const HR = [60, 200]
+const { cad: CAD, hr: HR, cadColour: CADC, hrColour: HRC, cadTicks } = CFG.chartLines
 const css = (n: string) => getComputedStyle(document.documentElement).getPropertyValue(n).trim()
 const niceStep = (span: number, max: number, steps: number[]) =>
   steps.find((s) => span / s <= max) ?? steps[steps.length - 1]
@@ -74,7 +78,8 @@ function paint(
   const now = d.now ?? d.total
   const v0 = zoom ? now - zoom : 0
   const v1 = zoom ? now + zoom : d.total
-  const P = bare ? BARE : PAD
+  // The cadence scale goes on the right.
+  const P = bare ? BARE : d.showCadence && d.cadence ? { ...PAD, r: 40 } : PAD
   const [L, R, T, B] = [P.l, w - P.r, P.t, hh - P.b]
   const x = (t: number) => L + ((t - v0) / (v1 - v0)) * (R - L)
   const maxTgt = Math.max(0, ...d.segs.map((s) => Math.max(s.w0, s.w1)))
@@ -235,30 +240,30 @@ function paint(
   }
   if (d.showCadence && d.cadence) {
     const cy = (v: number) => B - ((v - CAD[0]) / (CAD[1] - CAD[0])) * (B - T)
-    ctx.fillStyle = 'rgba(76,201,240,0.16)'
+    ctx.fillStyle = `${CADC}29`
     for (const s of d.segs) {
       if (!s.cad || s.t1 < v0 || s.t0 > v1) continue
       ctx.fillRect(x(s.t0), cy(s.cad[1]), x(s.t1) - x(s.t0), cy(s.cad[0]) - cy(s.cad[1]))
     }
     ctx.lineWidth = 1.5
-    ctx.strokeStyle = '#4cc9f0'
-    for (const run of runs(
-      d.cadence,
-      (v) => B - ((v - CAD[0]) / (CAD[1] - CAD[0])) * (B - T),
-      smooth * 2,
-    )) {
+    ctx.strokeStyle = CADC
+    for (const run of runs(d.cadence, cy, smooth * 2)) {
       trace(run)
       ctx.stroke()
     }
-    ctx.fillStyle = '#4cc9f0'
+    ctx.fillStyle = CADC
     ctx.textAlign = 'left'
+    ctx.textBaseline = 'middle'
+    if (!bare) for (const v of cadTicks) ctx.fillText(String(v), R + 6, cy(v))
+    if (!bare) ctx.fillText('rpm', R + 6, T + 4)
     ctx.textBaseline = 'top'
-    ctx.fillText('cadence 40-140 rpm', L + 6, T + 4)
+    if (!zoom) ctx.fillText(`cadence ${CAD[0]}-${CAD[1]} rpm`, L + 6, T + 4)
   }
 
   if (d.showHr && d.hr) {
+    let last: [number, number] | undefined
     ctx.lineWidth = 1.5
-    ctx.strokeStyle = '#ff6b81'
+    ctx.strokeStyle = HRC
     const have = d.hr.map((v, i) => (v === null ? -1 : i)).filter((i) => i >= 0)
     for (const run of runs(
       have.map((i) => d.hr![i]!),
@@ -268,12 +273,25 @@ function paint(
     )) {
       trace(run)
       ctx.stroke()
+      last = run[run.length - 1] ?? last
+    }
+    const bpm = have.length ? d.hr[have[have.length - 1]] : null
+    if (zoom && last && bpm) {
+      // The latest beat: a dot in its zone's colour (when max HR is known) and the bpm beside it.
+      ctx.beginPath()
+      ctx.arc(last[0], last[1], 4, 0, Math.PI * 2)
+      ctx.fillStyle = d.maxHr ? ZONE_COLOURS[hrZone(bpm, d.maxHr)] : HRC
+      ctx.fill()
+      ctx.fillStyle = HRC
+      ctx.textAlign = 'right'
+      ctx.textBaseline = 'bottom'
+      ctx.fillText(`${bpm} bpm`, last[0] - 8, last[1] - 4)
     }
     if (!zoom) {
-      ctx.fillStyle = '#ff6b81'
+      ctx.fillStyle = HRC
       ctx.textAlign = 'left'
       ctx.textBaseline = 'top'
-      ctx.fillText('heart rate 60-200 bpm', L + 6, T + (d.showCadence ? 18 : 4))
+      ctx.fillText(`heart rate ${HR[0]}-${HR[1]} bpm`, L + 6, T + (d.showCadence ? 18 : 4))
     }
   }
 
