@@ -11,7 +11,7 @@ export const CFG = {
   /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
   watch: { driftS: 2, duckS: 5, duckVolume: 25 },
   /** Shortest password a rider may set (the server's PASSWORD_MIN says the same). */
-  account: { passwordMin: 8 },
+  account: { passwordMin: 8, username: /^[A-Za-z0-9 _-]{3,24}$/ },
   /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */
   /** `dealOff`: the share off this week's deal (one rare-or-better item, the same for the whole crew). */
   garage: { confirmMs: 3000, lockMs: 800, dealOff: 0.3 },

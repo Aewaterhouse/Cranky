@@ -30,7 +30,7 @@ def auth(name="alex", pw="Alex"):
 
 
 def test_seeded_accounts_log_in_with_their_names():
-    names = {u["name"] for u in client.get("/api/riders").json()}
+    names = {u["name"] for u in client.get("/api/riders", headers=auth()[1]).json()}
     assert {"Alex", "Luke", "Steve", "Angus", "Ali", "Jack"} <= names
     for n in ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack"]:
         r, _ = auth(n.lower(), n)
@@ -46,7 +46,7 @@ def test_wrong_password_and_missing_token():
 def test_profile_only_writable_by_owner():
     _, h = auth()
     me = client.get("/api/me", headers=h).json()
-    assert me == {"id": "alex", "name": "Alex", "admin": True, "mustChange": False}
+    assert me == {"id": "alex", "name": "Alex", "admin": True, "mustChange": False, "username": "Alex"}
     assert client.put("/api/profile/alex", json={"id": "alex", "updated": 1}, headers=h).json()["saved"]
     assert client.put("/api/profile/luke", json={"id": "luke", "updated": 1}, headers=h).status_code == 403
     assert client.get("/api/profile/alex", headers=h).json()["id"] == "alex"

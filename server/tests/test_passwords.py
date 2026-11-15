@@ -101,7 +101,7 @@ def test_a_good_login_clears_the_count(monkeypatch):
     assert login("gwen", "Gwen")[0].status_code == 200
 
 
-@pytest.mark.parametrize("path", ["/api/riders", "/api/health", "/api/strava/callback?state=x&code=y"])
+@pytest.mark.parametrize("path", ["/api/health", "/api/strava/callback?state=x&code=y"])
 def test_these_need_no_login(path):
     r = client.get(path, follow_redirects=False)
     assert r.status_code in (200, 302, 303, 307)

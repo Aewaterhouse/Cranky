@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml)
 
-A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in from name tiles; the server seeds Alex, Luke, Steve, Angus, Ali, Jack and Kat (see First login). Security is light but real: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
+A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in with a username and password; the server seeds Alex, Luke, Steve, Angus, Ali, Jack and Kat (see First login). The login page lists nobody. Security is light but real: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
 
 See `PLAN.md` for the design, `docs/protocol.md` for the wire protocol, `docs/map.md` for a file-by-file map and `docs/testing.md` for manual test notes.
 
@@ -35,13 +35,13 @@ GitHub Actions runs the same checks (workflow "CI", `.github/workflows/ci.yml`) 
 
 ## First login and passwords
 
-Every rider starts with their name as the password (case-insensitive), so nobody is locked out. The first time they log in with it, Cranky asks them to set their own (at least 8 characters, typed twice, not their name) before anything else; until then the server refuses everything but setting it (a TV can still watch a bus). After that, **Settings → Account → Change password** asks for the current one and the new one twice.
+The login page is a plain Username and Password form (Enter logs in; Show reveals the password). Every rider starts with their name as both username and password (any case), so nobody is locked out. The first time they log in with it, Cranky asks them to set their own (at least 8 characters, typed twice, not their name) before anything else; until then the server refuses everything but setting it (a TV can still watch a bus). After that, **Settings → Account** has Change password (the current one, then the new one twice) and Change username (3 to 24 letters, numbers, spaces, - and _; any case logs in; no two riders share one). A new username changes only how you log in: your name on rides, history, the ladder, crew results, kudos and Strava all stay, because they hang off your rider id, which never changes.
 
 Five wrong passwords for one name in 10 minutes and that name has to wait out the 10 minutes ("Have a breather and try again in N mins"). Other names are not held up, and a good login clears the count. Limits are `LOGIN_FAILS`, `LOGIN_WINDOW_S` and `PASSWORD_MIN` in `server/src/zombie_bus_server/config.py`.
 
 ## Riders screen (admins)
 
-Admins are the rider ids in `ADMINS` in the server config (Luke and Alex). They see **Riders (admin)** in the menu under their name. There they can add a rider (their first password is their name, which they change on first login), reset a rider's password (back to their name, and they pick a new one when they next log in; it also clears their wrong-password count) and remove a rider (their profile and rides stay). The server checks every one of these: anyone else gets "Admins only". An admin can't reset or remove themselves; use Change password instead.
+Admins are the rider ids in `ADMINS` in the server config (Luke and Alex). They see **Riders (admin)** in the menu under their name. Each rider shows with their username. There they can add a rider (their first username and password are their name; they set a password on first login), change any rider's username, reset a rider's password (back to their username, and they pick a new one when they next log in; it also clears their wrong-password count) and remove a rider (their profile and rides stay). The server checks every one of these: anyone else gets "Admins only". An admin can't reset or remove themselves; use Change password instead.
 
 Forgot your password? Ask Luke or Alex to reset it.
 

@@ -1,19 +1,24 @@
 """Logging in and accounts: passwords, the first-login change, the login limit, the admins' Riders."""
 
 import math
+import re
 import time
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException
-from pydantic import BaseModel
+from pydantic import AliasChoices, BaseModel, Field
 
 from . import config
 from .store import Store
 
 
 class Login(BaseModel):
-    name: str
+    username: str = Field(validation_alias=AliasChoices("username", "name"))  # older clients send `name`
     password: str
+
+
+class Username(BaseModel):
+    username: str
 
 
 class NewRider(BaseModel):
@@ -67,12 +72,13 @@ def accounts(store: Store):
     api = APIRouter()
 
     @api.get("/api/riders")
-    def riders() -> list[dict]:
-        return store.users()
+    def riders(u: User) -> list[dict]:
+        """The crew, for logged-in riders only (the login page lists nobody). Only admins see usernames."""
+        return [x if u["admin"] else {"id": x["id"], "name": x["name"]} for x in store.users()]
 
     @api.post("/api/login")
     def login(body: Login) -> dict:
-        name = body.name.strip().lower()
+        name = body.username.strip().lower()
         t = time.time()
         wait = limiter.wait(name, t)
         if wait:
@@ -81,10 +87,10 @@ def accounts(store: Store):
                 429,
                 f"Too many wrong passwords. Have a breather and try again in {mins} min{'s' * (mins > 1)}.",
             )
-        res = store.login(body.name, body.password)
+        res = store.login(body.username, body.password)
         if not res:
             limiter.fail(name, t)
-            raise HTTPException(401, "Wrong name or password")
+            raise HTTPException(401, "Wrong username or password")
         limiter.clear(name)
         return res
 
@@ -100,7 +106,7 @@ def accounts(store: Store):
         pw = body.password
         if len(pw) < config.PASSWORD_MIN:
             raise HTTPException(400, f"At least {config.PASSWORD_MIN} characters")
-        if pw.strip().lower() == rid:
+        if pw.strip().lower() in (rid, (store.username(rid) or "").lower()):
             raise HTTPException(400, "Not your name: that's the one everyone knows")
         if not u["mustChange"] and not store.check_password(rid, body.current or ""):
             raise HTTPException(403, "Your current password isn't right")
@@ -110,6 +116,21 @@ def accounts(store: Store):
     def admin(u: dict) -> None:
         if not u["admin"]:
             raise HTTPException(403, "Admins only")
+
+    @api.post("/api/riders/{rid}/username")
+    def set_username(rid: str, body: Username, u: User) -> dict:
+        """What a rider logs in with, changed by them or an admin. Their id (which everything hangs off) and
+        their shown name stay as they are."""
+        if rid != u["id"]:
+            admin(u)
+        name = body.username.strip()
+        if not re.fullmatch(config.USERNAME_RE, name):
+            raise HTTPException(400, "3 to 24 characters: letters, numbers, spaces, - and _")
+        if store.username(rid) is None:
+            raise HTTPException(404)
+        if not store.set_username(rid, name):
+            raise HTTPException(409, "That username is taken")
+        return {"ok": True, "username": name}
 
     @api.post("/api/riders")
     def add_rider(body: NewRider, u: User) -> dict:
@@ -123,9 +144,9 @@ def accounts(store: Store):
 
     @api.post("/api/riders/{rid}/reset")
     def reset_password(rid: str, u: User) -> dict:
-        """Back to the default (the rider's name); they set their own when they next log in."""
+        """Back to the default (their username); they set their own when they next log in."""
         admin(u)
-        if not store.set_password(rid, rid, must_change=True):
+        if not store.set_password(rid, store.username(rid) or rid, must_change=True):
             raise HTTPException(404)
         limiter.clear(rid)
         return {"ok": True}

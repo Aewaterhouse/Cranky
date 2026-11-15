@@ -104,7 +104,7 @@ def test_efforts_table_is_added_to_an_existing_database_without_touching_it(tmp_
     store.add_ride("old", {"record": {"date": "2025-01-01T00:00:00Z"}})
     for _ in range(2):  # opening twice is harmless
         Efforts(store)
-    assert store.users() == [{"id": "old", "name": "Old"}] and len(store.rides("old")) == 1
+    assert store.users() == [{"id": "old", "name": "Old", "username": "Old"}] and len(store.rides("old")) == 1
 
 
 def test_the_crew_feed_lists_rides_and_takes_kudos_once():

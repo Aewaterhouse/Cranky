@@ -376,6 +376,7 @@ SYNC_WIDEN_RPM = 3
 SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack", "Kat"]
 ADMINS = ["alex", "luke"]  # rider ids who can add, remove and reset riders (Riders screen)
 PASSWORD_MIN = 8  # characters in a password a rider sets for themselves
+USERNAME_RE = r"[A-Za-z0-9 _-]{3,24}"  # what a rider logs in with (any case; unique)
 LOGIN_FAILS = 5  # wrong passwords for one name in LOGIN_WINDOW_S before it has to wait
 LOGIN_WINDOW_S = 600
 NAME_MAX = 20

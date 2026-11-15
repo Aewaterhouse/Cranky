@@ -1,7 +1,7 @@
 import { CFG } from '../config'
 import { api, type Me } from '../core/api'
 import { h, show } from './dom'
-import { logo } from './login'
+import { logo, secret } from './login'
 import { modal, toast } from './toast'
 
 /** Why a new password won't do, or '' when it will (the server checks the same). */
@@ -12,13 +12,16 @@ export function passwordProblem(pw: string, again: string, id: string) {
   return ''
 }
 
-/** New password typed twice (and the current one when changing it); `done` runs once the server takes it. */
-function passwordForm(id: string, current: boolean, button: string, done: () => void) {
-  const field = (placeholder: string, autocomplete: string) =>
-    h('input', { type: 'password', placeholder, autocomplete })
-  const now = field('Current password', 'current-password')
-  const pw = field(`New password (${CFG.account.passwordMin}+ characters)`, 'new-password')
-  const again = field('New password again', 'new-password')
+/** Why a username won't do, or '' (the server checks the same, and for clashes). */
+export const usernameProblem = (name: string) =>
+  CFG.account.username.test(name.trim())
+    ? ''
+    : '3 to 24 characters: letters, numbers, spaces, - and _.'
+
+/** Dialog to change what a rider logs in with (their own, or any rider's for an admin). */
+export function changeUsername(id: string, current: string, done: (name: string) => void) {
+  const input = h('input', { value: current, autocomplete: 'username', autocapitalize: 'off' })
+  input.setAttribute('aria-label', 'New username')
   const err = h('p', { class: 'err', role: 'alert' })
   const form = h(
     'form',
@@ -26,22 +29,55 @@ function passwordForm(id: string, current: boolean, button: string, done: () => 
       class: 'pw pw-set',
       onsubmit: (e) => {
         e.preventDefault()
-        err.textContent = passwordProblem(pw.value, again.value, id)
+        const name = input.value.trim()
+        err.textContent = usernameProblem(name)
         if (err.textContent) return
-        const body = { password: pw.value, ...(current ? { current: now.value } : {}) }
+        api<{ username: string }>(`/api/riders/${id}/username`, {
+          method: 'POST',
+          body: JSON.stringify({ username: name }),
+        }).then(
+          (r) => (close(), toast(`Username is now ${r.username}.`, 'good'), done(r.username)),
+          (x: Error) => (err.textContent = x.message),
+        )
+      },
+    },
+    h('p', { class: 'dim' }, 'Used to log in, in any case. Your name on rides stays the same.'),
+    input,
+    h('button', { class: 'primary' }, 'Save username'),
+    err,
+  )
+  const close = modal('Change username', form)
+  input.select()
+}
+
+/** New password typed twice (and the current one when changing it); `done` runs once the server takes it. */
+function passwordForm(id: string, current: boolean, button: string, done: () => void) {
+  const now = secret('Current password', 'current-password')
+  const pw = secret(`New password (${CFG.account.passwordMin}+ characters)`, 'new-password')
+  const again = secret('New password again', 'new-password')
+  const err = h('p', { class: 'err', role: 'alert' })
+  const form = h(
+    'form',
+    {
+      class: 'pw pw-set',
+      onsubmit: (e) => {
+        e.preventDefault()
+        err.textContent = passwordProblem(pw.input.value, again.input.value, id)
+        if (err.textContent) return
+        const body = { password: pw.input.value, ...(current ? { current: now.input.value } : {}) }
         api(`/api/riders/${id}/password`, { method: 'POST', body: JSON.stringify(body) }).then(
           done,
           (x: Error) => (err.textContent = x.message),
         )
       },
     },
-    current ? now : '',
-    pw,
-    again,
+    current ? now.box : '',
+    pw.box,
+    again.box,
     h('button', { class: 'primary' }, button),
     err,
   )
-  return { form, first: current ? now : pw }
+  return { form, first: current ? now.input : pw.input }
 }
 
 /** First login on the default password (their name): nothing else until they set their own. */

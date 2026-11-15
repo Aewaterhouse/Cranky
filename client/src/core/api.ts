@@ -25,12 +25,14 @@ export interface Me {
   admin?: boolean
   /** Still on the default password (their name): must set their own before riding. */
   mustChange?: boolean
+  /** What they log in with (any case). Only theirs, or every rider's for an admin. */
+  username?: string
 }
 
-export async function login(name: string, password: string): Promise<Me> {
+export async function login(username: string, password: string): Promise<Me> {
   const r = await api<Me & { token: string }>('/api/login', {
     method: 'POST',
-    body: JSON.stringify({ name, password }),
+    body: JSON.stringify({ username, password }),
   })
   localStorage.setItem(TOKEN, r.token)
   return { id: r.id, name: r.name, mustChange: r.mustChange }

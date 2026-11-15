@@ -47,12 +47,19 @@ class Store(CrewStore):
             CREATE TABLE IF NOT EXISTS kudos (ride INTEGER, giver TEXT, PRIMARY KEY (ride, giver));
             CREATE TABLE IF NOT EXISTS campaign (id INTEGER PRIMARY KEY CHECK (id = 1), json TEXT);
             """)
-        self._must_change_column()
+        self._account_columns()
 
-    def _must_change_column(self) -> None:
-        """Adds `must_change` to an older users table: 1 while a rider's password is still their name."""
+    def _account_columns(self) -> None:
+        """Adds to an older users table `username` (what a rider logs in with, starting as their name;
+        unique in any case) and `must_change` (1 while the password is still their name)."""
         cols = [c[1] for c in self.db.execute("PRAGMA table_info(users)").fetchall()]
         with self.lock, self.db:
+            if "username" not in cols:
+                self.db.execute("ALTER TABLE users ADD COLUMN username TEXT")
+            self.db.execute("UPDATE users SET username = name WHERE username IS NULL")
+            self.db.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS users_username ON users (username COLLATE NOCASE)"
+            )
             if "must_change" not in cols:
                 self.db.execute("ALTER TABLE users ADD COLUMN must_change INTEGER")
             rows = self.db.execute("SELECT id, salt, hash FROM users WHERE must_change IS NULL").fetchall()
@@ -196,15 +203,38 @@ class Store(CrewStore):
     def add_user(self, name: str, password: str) -> bool:
         """Creates the account if it doesn't exist. Ids are lower-case names. Returns True if created.
 
-        A rider whose password is their name (the default) must set their own when they first log in.
+        The username starts as the name. A rider whose password is their name (the default) must set their own
+        when they first log in.
         """
         salt = secrets.token_hex(8)
         with self.lock, self.db:
             cur = self.db.execute(
-                "INSERT OR IGNORE INTO users (id, name, salt, hash, must_change) VALUES (?, ?, ?, ?, ?)",
-                (name.lower(), name, salt, self._hash(password, salt), int(password.lower() == name.lower())),
+                "INSERT OR IGNORE INTO users (id, name, salt, hash, must_change, username)"
+                " VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    name.lower(),
+                    name,
+                    salt,
+                    self._hash(password, salt),
+                    int(password.lower() == name.lower()),
+                    name,
+                ),
             )
         return cur.rowcount > 0
+
+    def set_username(self, rid: str, username: str) -> bool:
+        """Changes what the rider logs in with; id and shown name stay. False if another rider has it."""
+        try:
+            with self.lock, self.db:
+                self.db.execute("UPDATE users SET username = ? WHERE id = ?", (username, rid))
+        except sqlite3.IntegrityError:
+            return False
+        return True
+
+    def username(self, rid: str) -> str | None:
+        with self.lock:
+            row = self.db.execute("SELECT username FROM users WHERE id = ?", (rid,)).fetchone()
+        return row[0] if row else None
 
     def set_password(self, rid: str, password: str, must_change: bool = False) -> bool:
         """Sets a new password (existing tokens stay valid). Returns False if there is no such rider."""
@@ -230,14 +260,15 @@ class Store(CrewStore):
 
     def users(self) -> list[dict]:
         with self.lock:
-            rows = self.db.execute("SELECT id, name FROM users ORDER BY name").fetchall()
-        return [{"id": i, "name": n} for i, n in rows]
+            rows = self.db.execute("SELECT id, name, username FROM users ORDER BY name").fetchall()
+        return [{"id": i, "name": n, "username": u} for i, n, u in rows]
 
-    def login(self, name: str, password: str) -> dict | None:
-        """Checks the password and returns {token, id, name}, or None."""
+    def login(self, username: str, password: str) -> dict | None:
+        """Checks the password for a username (any case): {token, id, name, mustChange}, or None."""
         with self.lock:
             row = self.db.execute(
-                "SELECT id, name, salt, hash, must_change FROM users WHERE id = ?", (name.strip().lower(),)
+                "SELECT id, name, salt, hash, must_change FROM users WHERE username = ? COLLATE NOCASE",
+                (username.strip(),),
             ).fetchone()
         if not row or not secrets.compare_digest(self._hash(password, row[2]), row[3]):
             return None
@@ -251,11 +282,11 @@ class Store(CrewStore):
             return None
         with self.lock:
             row = self.db.execute(
-                "SELECT u.id, u.name, u.must_change FROM tokens t JOIN users u ON u.id = t.id"
+                "SELECT u.id, u.name, u.must_change, u.username FROM tokens t JOIN users u ON u.id = t.id"
                 " WHERE t.token = ?",
                 (token,),
             ).fetchone()
-        return {"id": row[0], "name": row[1], "mustChange": bool(row[2])} if row else None
+        return {"id": row[0], "name": row[1], "mustChange": bool(row[2]), "username": row[3]} if row else None
 
     def save_room(self, code: str, snapshot: dict) -> None:
         with self.lock, self.db:

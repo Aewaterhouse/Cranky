@@ -5,12 +5,13 @@ import { controlsPanel } from './controls'
 import { h, seg } from './dom'
 import { strengthSlider } from './gearTile'
 import { hudSizeSeg } from './hudSize'
-import { changeMyPassword } from './password'
+import { api, type Me } from '../core/api'
+import { changeMyPassword, changeUsername } from './password'
 import { ZONE_COLOURS } from './planGraph'
 
 /** Per-device preferences (sound, graphics, HUD size, colours, ride keys) and the rider's password. */
 export function settingsTab(id: string) {
-  const row = (title: string, note: string, control: Node) =>
+  const row = (title: string, note: string | Node, control: Node) =>
     h(
       'div',
       { class: 'set-row' },
@@ -240,6 +241,7 @@ export function settingsTab(id: string) {
       'section',
       { class: 'card' },
       h('h2', {}, 'Account'),
+      usernameRow(id, row),
       row(
         'Password',
         'Change the password you log in with on every device.',
@@ -247,4 +249,20 @@ export function settingsTab(id: string) {
       ),
     ),
   )
+}
+
+/** Settings row for the rider's username: shows it, and changes it. */
+function usernameRow(id: string, row: (title: string, note: Node, control: Node) => HTMLElement) {
+  let name = ''
+  const note = h('span', {}, 'What you log in with.')
+  const show = (n: string) => (
+    (name = n),
+    (note.textContent = `${n}: what you log in with, in any case.`)
+  )
+  api<Me>('/api/me').then(
+    (m) => m.username && show(m.username),
+    () => {},
+  )
+  const change = () => changeUsername(id, name, show)
+  return row('Username', note, h('button', { class: 'ghost', onclick: change }, 'Change username'))
 }

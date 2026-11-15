@@ -1,6 +1,7 @@
 import '../admin.css'
 import { api, riders, type Me } from '../core/api'
 import { avatar, h } from './dom'
+import { changeUsername } from './password'
 import { modal, toast } from './toast'
 
 const post = (path: string, body: object, method = 'POST') =>
@@ -32,8 +33,16 @@ export function adminTab(self: string) {
             {},
             avatar(r.name),
             h('b', {}, r.name),
-            r.id === self ? h('span', { class: 'dim' }, 'you') : '',
+            h('span', { class: 'dim' }, `@${r.username ?? r.id}${r.id === self ? ' · you' : ''}`),
             h('span', { class: 'grow' }),
+            h(
+              'button',
+              {
+                class: 'ghost',
+                onclick: () => changeUsername(r.id, r.username ?? '', () => load()),
+              },
+              'Username',
+            ),
             h(
               'button',
               {
