@@ -1,4 +1,5 @@
 import { hash } from '../math'
+import { idleBird, loopBird, newBird } from './birdMotion'
 import { VIS } from '../params'
 import type { Level } from '../quality'
 import { FUN } from './funVis'
@@ -11,13 +12,14 @@ const L = FUN.life
 const BIRDS: readonly string[] = ['cockatoos', 'galahs', 'seagulls', 'magpie']
 const tmp = [0, 0, 0]
 const pose = newPose()
+const bird = newBird()
 
 /** A herd in view: its plan, when it was set off (-1 not yet, -2 over), and each member's [dx, dz, yaw, y]. */
 interface Live {
   h: Herd
   n: number
   t0: number
-  /** Traffic: metres along the road. Flocks: how high they perch. Crossings: how far short the rider was at the off. */
+  /** Traffic: metres along the road. Flocks: 1 when they loop in the air, 0 on the ground. Crossings: how far short the rider was at the off. */
   at: number
   /** Crossings: metres from the centreline so far, so it never backs up. */
   o: number
@@ -58,7 +60,7 @@ export class Life {
         let l = was.find((w) => w.h === h)
         if (!l) {
           const n = Math.round(h.n * (h.kind === 'roos' && this.dusk ? L.duskMobs : 1))
-          const at = hash(h.seed) < L.perchShare ? L.perch : 0
+          const at = hash(h.seed) < L.loopShare ? 1 : 0
           const road = this.path.poseAt(h.d, newPose())
           l = { h, n, t0: -1, at, o: Infinity, m: new Float32Array(n * 4), road }
           for (let i = 0; i < n; i++) l.m.set(member(h, i, tmp), i * 4)
@@ -142,10 +144,12 @@ export class Life {
       const watching = k !== 'sheep' && Math.hypot(me.x - x, me.z - z) < L.watch
       const yaw = watching ? Math.atan2(me.x - x, me.z - z) : m[i * 4 + 2]
       if (go < 0 || k === 'cows' || k === 'sheep') {
-        // Flocks peck at the ground, or sit tight up in the branches.
-        const peck = l.at ? 0 : Math.max(0, Math.sin(t * 3 + i * 2)) * 0.7
-        if (fly) this.pool.bird(k, x, y + l.at + 0.2, z, m[i * 4 + 2], peck, -1.35)
-        else this.pool.put(k, x, y, z, yaw)
+        // Flocks peck and hop about on the ground, or loop round in the air: never still up there.
+        if (!fly) this.pool.put(k, x, y, z, yaw)
+        else {
+          const b = idleBird(bird, !!l.at, x, y, z, m[i * 4 + 2], h.x, h.z, u, t)
+          this.pool.bird(k, b.x, b.y, b.z, b.yaw, b.pitch, b.beat)
+        }
         continue
       }
       // Roos make for the scrub; birds go up and over the road ahead, where they can be seen. Each on its own line.
@@ -159,10 +163,14 @@ export class Life {
       const dz = oz / len
       if (fly) {
         if (go > L.flyS) continue
+        // From where it was when it took off: its spot on the ground, or its place in the loop.
+        const from = l.at
+          ? loopBird(bird, h.x, y, h.z, u, t - go)
+          : ((bird.x = x), (bird.y = y + 0.2), (bird.z = z), bird)
         const s = go * L.flyMs * (0.8 + u * 0.5)
-        const up = y + l.at + 0.5 + go * L.riseMs * (0.8 + u * 0.6) + Math.sin(go * 3 + i) * 0.5
+        const up = from.y + 0.3 + go * L.riseMs * (0.8 + u * 0.6) + Math.sin(go * 3 + i) * 0.5
         const beat = Math.sin(go * 20 + i) * 0.9
-        this.pool.bird(k, x + dx * s, up, z + dz * s, Math.atan2(dx, dz), -0.25, beat)
+        this.pool.bird(k, from.x + dx * s, up, from.z + dz * s, Math.atan2(dx, dz), -0.25, beat)
         continue
       }
       const far = L.fleeM * (0.7 + u * 0.5)

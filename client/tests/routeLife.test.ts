@@ -9,6 +9,7 @@ import {
   member,
   type Herd,
 } from '../src/scene/route/lifePlan'
+import { idleBird, newBird } from '../src/scene/route/birdMotion'
 import { funWorld } from './funWorld'
 
 const R = VIS.route
@@ -137,5 +138,46 @@ describe('local colour', () => {
     expect(count(at('VIC', new Date(2026, 9, 1, 12)), 'magpie')).toBeGreaterThan(
       count(at('VIC', noon), 'magpie'),
     )
+  })
+})
+
+describe('a flock before the rider gets there', () => {
+  const at = (loop: boolean, u: number, t: number) => ({
+    ...idleBird(newBird(), loop, 10, 3, 20, 0.5, 12, 18, u, t),
+  })
+  it('is never still in mid-air: off the ground it is always moving and flapping', () => {
+    for (const loop of [false, true])
+      for (const u of [0.05, 0.3, 0.71, 0.97])
+        for (let t = 0; t < 30; t += 0.37) {
+          const a = at(loop, u, t)
+          const b = at(loop, u, t + 0.1)
+          const airborne = a.y > 3 + 0.2 + L.idleHopH + 0.01
+          expect(airborne).toBe(loop)
+          if (airborne) {
+            expect(Math.hypot(b.x - a.x, b.z - a.z)).toBeGreaterThan(0.1)
+            expect(a.beat).toBeGreaterThan(-1)
+          }
+        }
+  })
+  it('pecks, hops and turns on the ground, wings folded between hops', () => {
+    const ys = new Set<number>()
+    const yaws = new Set<number>()
+    let pecks = 0
+    for (let t = 0; t < 20; t += 0.05) {
+      const a = at(false, 0.4, t)
+      ys.add(+a.y.toFixed(2))
+      yaws.add(+a.yaw.toFixed(2))
+      if (a.pitch > 0.3) pecks++
+      expect([a.x, a.z]).toEqual([10, 20])
+    }
+    expect(Math.max(...ys)).toBeGreaterThan(3.3)
+    expect(yaws.size).toBeGreaterThan(3)
+    expect(pecks).toBeGreaterThan(20)
+  })
+  it('loops round the middle of the flock', () => {
+    for (let t = 0; t < 10; t += 0.5) {
+      const a = at(true, 0.5, t)
+      expect(Math.hypot(a.x - 12, a.z - 18)).toBeLessThanOrEqual(L.loopR * 1.4 + 1e-9)
+    }
   })
 })

@@ -44,9 +44,17 @@ export const LIFE = {
   flyMs: 7,
   riseMs: 1.3,
   flyS: 12,
-  /** Share of flocks that start up in the branches, and how high. */
-  perchShare: 0.35,
-  perch: 5,
+  /**
+   * Share of flocks that loop round in the air (at this radius, height and speed) rather than feed on the ground.
+   * On the ground each bird hops every `hopEveryS` or so, for `hopS`, this high, and pecks in between.
+   */
+  loopShare: 0.35,
+  loopR: 7,
+  loopH: 7,
+  loopMs: 6,
+  hopEveryS: 2.5,
+  hopS: 0.3,
+  idleHopH: 0.25,
   /** Gulls wheel at this radius, height and speed. */
   gullR: 9,
   gullH: 9,

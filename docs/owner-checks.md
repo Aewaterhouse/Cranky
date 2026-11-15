@@ -185,3 +185,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Last Rider Standing: the steps climb to 150% and stop there; going out after 10 s off your step feels fair.
 - [ ] Pub Quiz, Galley Ship, The Hunt and Team Time Trial each play through with a mate; the question card, the drum's beat, the fox and the Red/Blue bars read at a glance mid-effort.
 - [ ] Handicap race and chaingang on a route with mates of different FTPs: the handicap is close, and "TO THE FRONT" calls work.
+
+## Free-ride feedback, Strava post and passwords, 2026-11-15 (simulator only)
+- [ ] Birds: ride past a few cockatoo or galah flocks. On the ground they peck and hop; some flocks loop round overhead instead. Nothing hangs still in the air, and they burst away as you get close.
