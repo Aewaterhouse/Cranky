@@ -147,6 +147,8 @@ export class RideRecorder {
       segments: this.segments,
       /** Only on a test ride (simulator); a ride on a real trainer has no `test` at all. */
       test: this.sim || undefined,
+      /** The rider chose "Don't post to Strava" on the results screen: kept here, never uploaded by itself. */
+      noStrava: undefined as boolean | undefined,
     }
   }
 }

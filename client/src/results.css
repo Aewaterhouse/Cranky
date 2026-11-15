@@ -498,3 +498,18 @@ tr.me td {
   color: var(--acc);
   font-variant-numeric: tabular-nums;
 }
+
+/* Keep this ride? Discard, and the Strava countdown. */
+.res-keep {
+  align-items: center;
+  margin-top: 8px;
+}
+.res-keep .linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 0;
+  color: var(--acc);
+  text-decoration: underline;
+  cursor: pointer;
+}

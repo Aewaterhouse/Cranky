@@ -3,6 +3,7 @@ import { loadGhost } from './ghost'
 import '../../solo.css'
 import type { Profile } from '../../core/curve'
 import { recordFtp } from '../../core/curve'
+import { endChoice } from '../../core/keepRide'
 import { frameAt, planTotal, startOf } from '../../core/plan'
 import { shiftGear } from '../../core/gears'
 import { totalMass } from '../../core/physics'
@@ -317,7 +318,8 @@ export function runDrill(
     profile.tier = origTier
     tally.record(ride.rec, el, ride.live)
     // A test ride (simulator) never sets an FTP.
-    const r = ride.rec.sim ? null : ftpResult(plan, ride.rec.power, tally.xs)
+    const r =
+      ride.rec.sim || endChoice() === 'bin' ? null : ftpResult(plan, ride.rec.power, tally.xs)
     if (r) {
       const pick = await view.prompt(
         `Your new FTP: ${r} W`,

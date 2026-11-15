@@ -25,6 +25,7 @@ class Auto(BaseModel):
 class Upload(BaseModel):
     fit: str  # base64
     png: str | None = None  # the postcard, base64
+    auto: bool = False  # sent by itself after the ride was saved, not from the rider's Upload button
 
 
 def unpack(b64: str, what: str) -> bytes:
@@ -108,6 +109,8 @@ def router(strava: Strava, uploads: Uploads, user: Any) -> APIRouter:
             raise HTTPException(409, "Connect Strava first")
         if ride.get("test"):
             raise HTTPException(422, "Test rides (simulator) don't go to Strava")
+        if body.auto and ride.get("noStrava"):
+            raise HTTPException(409, "The rider chose not to post this ride")
         if (ride.get("record") or {}).get("secs", 0) < config.STRAVA_MIN_SECS:
             raise HTTPException(422, "That ride is too short for Strava")
         fit = unpack(body.fit, ".fit")

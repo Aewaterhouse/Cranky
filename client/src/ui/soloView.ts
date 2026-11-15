@@ -20,6 +20,7 @@ import { modeText, type ModeState, type RideMode } from './soloMode'
 import { soloPanel, type LiveStats } from './soloPanel'
 import { segsFromBlocks } from './soloSegs'
 import { workoutChart } from './workoutChart'
+import { endButtons, warmStrava } from './keepBar'
 
 export interface SoloHandlers {
   pause: () => void
@@ -59,6 +60,7 @@ export interface ViewState {
  * bottom, and the close-up chart where the other modes have the road.
  */
 export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, maxHr?: number) {
+  warmStrava()
   const power = powerPanel(true)
   const blockName = h('div', { class: 'blockname' })
   const left = h('b', {}, '–')
@@ -87,26 +89,29 @@ export function soloView(plan: Plan, ftp: number, tier: Tier, on: SoloHandlers, 
     ov.className = `overlay${html ? ` open ${cls}` : ''}`
     if (html) ov.replaceChildren(...html)
   }
-  const dlg = (title: string, lines: string[], ...buttons: Node[]) =>
+  const dlg = (title: string, lines: (string | Node)[], ...buttons: Node[]) =>
     say(
       [
         h(
           'div',
           { class: 'dlg' },
           h('h2', {}, title),
-          ...lines.map((l) => h('p', { class: 'dim' }, l)),
+          ...lines.map((l) => (typeof l === 'string' ? h('p', { class: 'dim' }, l) : l)),
           h('div', { class: 'row' }, ...buttons),
         ),
       ],
       'dialog',
     )
-  const confirmEnd = () =>
+  const confirmEnd = () => {
+    const x = endButtons(on.end)
     dlg(
       'End ride?',
-      ['Your ride so far will be saved.'],
+      ['Your ride so far will be saved.', x.ask],
       h('button', { onclick: () => say(null) }, 'Keep riding'),
+      ...x.buttons,
       h('button', { class: 'primary', onclick: on.end }, 'End ride'),
     )
+  }
   const phone = matchMedia(`(max-height: ${CFG.hud.phoneMaxH}px)`).matches
   const toggle = (part: SoloPart) => root.classList.toggle(`hud-${part}`)
   const c = soloMenu(plan, tier, on, {

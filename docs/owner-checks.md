@@ -195,3 +195,8 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Strava post: upload a ride after a good day and read it on Strava. The PR lines should show the old bests, the KOM and segment lines the crew placings, and it should read well on the phone app (emoji, line breaks, nothing cut off). Too long, too silly, not silly enough?
 - [ ] Passwords: after deploying, log in as yourself with your name: it should ask you to set a password, then let you ride. Check a TV watch link (`?watch=CODE`) still shows the bus, an old Strava postcard link still opens, and Strava connect still returns to Settings. Tell the crew they will be asked once. Reset someone's password from Riders (admin) and check they are asked again.
 - [ ] Usernames: after deploying, open the site logged out and check no names or faces show. Log in as `LUKE` / your password (any case works). Change your username in Settings → Account, log out, log back in with the new one, and check your History, the Ladder and your Strava connection are all still there and your name on the ride screen hasn't changed.
+
+## Don't keep this ride, 2026-11-16 (unit tests only)
+- [ ] Ride a short solo workout, End ride → Discard ride → Bin it: you land back home, and History, the crew feed, Trends and scrap show nothing new.
+- [ ] Finish a ride with Strava connected: the results screen says "Posting to Strava in 60 s" and counts down. Tap Don't post: History shows "Not posted", and its Upload button posts it. Finish another and wait out the minute: it appears on Strava, and Discard is gone.
+- [ ] On the bus with a mate: Discard ride on your results; their ride and the crew result are still there.

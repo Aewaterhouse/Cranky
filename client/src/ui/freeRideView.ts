@@ -1,4 +1,5 @@
 import { resumeHint } from '../core/keys'
+import { endButtons, warmStrava } from './keepBar'
 import '../solo.css'
 import '../freeride.css'
 import '../rideHud.css'
@@ -121,7 +122,9 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
     ov.className = `overlay${nodes ? ` open ${cls}` : ''}`
     if (nodes) ov.replaceChildren(...nodes)
   }
-  const confirmEnd = () =>
+  warmStrava()
+  const confirmEnd = () => {
+    const x = endButtons(on.end)
     say(
       [
         h(
@@ -129,16 +132,19 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
           { class: 'dlg' },
           h('h2', {}, 'End ride?'),
           h('p', { class: 'dim' }, 'Your ride so far will be saved.'),
+          x.ask,
           h(
             'div',
             { class: 'row' },
             h('button', { onclick: () => (delete ov.dataset.k, say(null)) }, 'Keep riding'),
+            ...x.buttons,
             h('button', { class: 'primary', onclick: on.end }, 'End ride'),
           ),
         ),
       ],
       'dialog',
     )
+  }
 
   const { el: toastBox, show: toast } = hudToast()
   const cues = segCues()

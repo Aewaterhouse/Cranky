@@ -1,5 +1,5 @@
 import { CFG } from '../../config'
-import { rideBests, saveEfforts } from '../../core/efforts'
+import { holdEfforts, rideBests, saveEfforts } from '../../core/efforts'
 import { ghostD, type GhostSpec } from '../../core/ghost'
 import { totalMass } from '../../core/physics'
 import type { RideRecorder } from '../../core/ride'
@@ -29,6 +29,8 @@ export function rideExtras(
   const ghosts = o.ghosts ?? []
   const mates = makeGhosts(o.me, rider.ftp, o.mates ?? 0)
   const base = baseRoute(route)
+  // Efforts wait on this device until the rider keeps the ride on the results screen.
+  if (!rec.sim) holdEfforts(rec.startedAt)
   const segs = segmentRun(
     route,
     rider,

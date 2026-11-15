@@ -2,6 +2,7 @@ import { CFG } from '../config'
 import { api } from '../core/api'
 import type { Profile } from '../core/curve'
 import type { RideSummary } from '../core/ride'
+import { autoPosts } from '../core/keepRide'
 import { postcardCanvas } from './historyDetail'
 import type { GroupSummary } from './results'
 import { fitBytes } from './rideExport'
@@ -19,8 +20,11 @@ export interface StravaStatus {
   auto: boolean
 }
 
+let known: StravaStatus | null = null
 /** The rider's Strava connection (never a token), fetched fresh each time. */
-export const stravaStatus = () => api<StravaStatus>('/api/strava')
+export const stravaStatus = () => api<StravaStatus>('/api/strava').then((s) => (known = s))
+/** The last answer, if any (the end-ride confirm, which can't wait for the network). */
+export const stravaKnown = () => known
 
 /** Strava's own artwork, unchanged (their API brand guidelines; see public/assets/CREDITS.md). */
 const ART = '/assets/strava'
@@ -143,21 +147,22 @@ export async function sendToStrava(
   p: Profile,
   s: RideSummary & { group?: GroupSummary },
   n: number,
+  auto = false,
 ) {
   const png = await postcardCanvas(p, s)
     .then(pngOf)
     .catch(() => undefined)
   return api<StravaJob>(`/api/strava/upload/${n}`, {
     method: 'POST',
-    body: JSON.stringify({ fit: base64(await fitBytes(s)), png }),
+    body: JSON.stringify({ fit: base64(await fitBytes(s)), png, auto }),
   })
 }
 
 /** After the server saves a ride: up to Strava by itself when the rider is connected with auto-upload on. */
 export async function autoStrava(p: Profile, s: RideSummary, n: number) {
-  if (s.test || s.record.secs < CFG.stravaMinSecs || !s.power?.length) return
+  if (!autoPosts({ connected: true, auto: true }, s)) return
   const st = await stravaStatus().catch(() => null)
-  if (st?.connected && st.auto) await sendToStrava(p, s, n).catch(() => {})
+  if (autoPosts(st, s)) await sendToStrava(p, s, n, true).catch(() => {})
 }
 
 /**
@@ -200,7 +205,8 @@ const activityLink = (id: string) =>
   )
 
 /** History list: a ride's Strava status in a word (the actions are in the ride itself). */
-export function stravaTag(j?: StravaJob) {
+export function stravaTag(j?: StravaJob, noStrava?: boolean) {
+  if ((!j || j.status === 'none') && noStrava) return h('em', { class: 'strava-tag' }, 'Not posted')
   if (!j || j.status === 'none') return ''
   const [cls, text] =
     j.status === 'done'

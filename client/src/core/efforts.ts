@@ -56,6 +56,8 @@ export function saveEfforts(rider: string, efforts: Effort[]) {
   const s = load(rider)
   for (const e of efforts) {
     const b = s.bests[e.segment]
+    const undo = e.rideDate ? held.get(e.rideDate) : undefined
+    if (undo && !(e.segment in undo)) undo[e.segment] = b
     if (!b || e.secs < b.secs)
       s.bests[e.segment] = {
         secs: e.secs,
@@ -71,8 +73,31 @@ export function saveEfforts(rider: string, efforts: Effort[]) {
 }
 
 /** Sends queued efforts; whatever fails stays queued for the next ride or login. The server ignores repeats. */
+/** Rides whose efforts stay on this device until the rider keeps the ride, with the bests from before them. */
+const held = new Map<string, Record<string, Best | undefined>>()
+
+/** Keeps a ride's efforts from the server until `releaseEfforts` (or `dropEfforts` if the ride is binned). */
+export const holdEfforts = (rideDate: string) => void (held.has(rideDate) || held.set(rideDate, {}))
+
+export function releaseEfforts(rider: string, rideDate: string) {
+  held.delete(rideDate)
+  return flushEfforts(rider)
+}
+
+/** Forgets a binned ride's efforts and puts back the bests it beat. */
+export function dropEfforts(rider: string, rideDate: string) {
+  const undo = held.get(rideDate) ?? {}
+  held.delete(rideDate)
+  const s = load(rider)
+  s.queue = s.queue.filter((e) => e.rideDate !== rideDate)
+  for (const [seg, b] of Object.entries(undo))
+    if (b) s.bests[seg] = b
+    else delete s.bests[seg]
+  save(rider, s)
+}
+
 export async function flushEfforts(rider: string) {
-  const sent = load(rider).queue
+  const sent = load(rider).queue.filter((e) => !e.rideDate || !held.has(e.rideDate))
   if (!sent.length) return
   try {
     await api('/api/efforts', { method: 'POST', body: JSON.stringify({ efforts: sent }) })

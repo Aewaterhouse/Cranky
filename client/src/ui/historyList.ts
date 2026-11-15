@@ -30,6 +30,8 @@ export interface RideRow {
   score?: number | null
   /** A test ride (simulated trainer): kept here, counted nowhere. */
   test?: boolean
+  /** "Don't post to Strava" was chosen: never uploaded by itself (Upload in the ride still works). */
+  noStrava?: boolean
 }
 
 const num = (v: number | null, unit = '') => (v == null ? '–' : `${Math.round(v)}${unit}`)
@@ -66,7 +68,7 @@ function list(rows: RideRow[], open: (n: number) => void, strava?: Record<string
             : r.crew
               ? h('em', { class: 'crew-tag' }, 'Crew')
               : '',
-          stravaTag(strava?.[r.id]),
+          stravaTag(strava?.[r.id], r.noStrava),
           r.test ? testTag() : '',
         ),
         h('span', {}, r.secs == null ? '–' : fmt(r.secs)),

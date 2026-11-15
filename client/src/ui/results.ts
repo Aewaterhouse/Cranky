@@ -8,6 +8,10 @@ import { ftpSuggestion, level, recordFtp, type Profile } from '../core/curve'
 import { rideRewards } from './resultsRewards'
 import { saveProfile } from '../core/profile'
 import { postRide } from '../core/rideQueue'
+import { dropEfforts } from '../core/efforts'
+import { takeEndChoice } from '../core/keepRide'
+import { keepBar } from './keepBar'
+import { toast } from './toast'
 import { settings } from '../core/settings'
 import type { RideSummary } from '../core/ride'
 import { fmt, h, pctStr, show } from './dom'
@@ -64,6 +68,13 @@ export function finishRide(
   /** A crew ride: a second way out, back to the home screen, beside the 'ride again' button. */
   menu?: (p: Profile) => void,
 ) {
+  const choice = takeEndChoice()
+  // Binned at the end-ride confirm: nothing is saved, queued, counted or posted.
+  if (choice === 'bin') {
+    dropEfforts(profile.id, s.record.date)
+    toast('Ride binned. Nothing was saved.')
+    return onDone(profile)
+  }
   const before = profile.allTime
   const { p: earned, unlocked, banked, myAwards, week } = rideRewards(profile, s, group)
   let p = earned
@@ -79,8 +90,18 @@ export function finishRide(
           ([d, w]) => d in DUR_LABEL && (!before[+d] || w > before[+d].w),
         )
   // The new bests ride along, so the crew feed can say so.
-  if (s.record.secs >= 30)
-    void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew, prs: prs.length })
+  // Held on this device until the rider leaves this screen (or bins it); see `keepBar`.
+  const queued = s.record.secs >= 30
+  if (queued)
+    void postRide(profile.id, { ...s, crew: !!group || !!road, group: crew, prs: prs.length }, true)
+  const keep = keepBar({
+    rider: profile.id,
+    s,
+    queued,
+    noPost: choice === 'noPost',
+    restore: () => saveProfile(profile),
+    leave: () => onDone(profile),
+  })
   const sug = s.test ? null : ftpSuggestion(p)
   const ftpBox = h('div')
   if (sug)
@@ -340,9 +361,10 @@ export function finishRide(
             )
           : '',
         s.test ? '' : stravaCardButton(p, s, group, still),
-        menu ? h('button', { onclick: () => menu(p) }, '⌂ Main menu') : '',
-        h('button', { class: 'primary', onclick: () => onDone(p) }, doneLabel),
+        menu ? h('button', { onclick: () => (keep.keep(), menu(p)) }, '⌂ Main menu') : '',
+        h('button', { class: 'primary', onclick: () => (keep.keep(), onDone(p)) }, doneLabel),
       ),
+      keep.el,
     ),
   )
 }

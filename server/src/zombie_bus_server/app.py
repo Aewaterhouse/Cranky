@@ -114,6 +114,11 @@ def post_ride(body: dict, u: User) -> dict:
     summary = body.get("summary") or {}
     if not isinstance(summary, dict) or not isinstance(summary.get("test", False), bool):
         raise HTTPException(422, "A ride's test flag is true or false")
+    # A binned ride never reaches the server; one that says it was binned is not kept either.
+    if summary.get("discard"):
+        return {"ok": True, "saved": False, "id": None}
+    if not isinstance(summary.get("noStrava", False), bool):
+        raise HTTPException(422, "A ride's noStrava flag is true or false")
     group = summary.get("group") if isinstance(summary.get("group"), dict) else {}
     mine = [r for r in group.get("riders") or [] if isinstance(r, dict) and r.get("id") == u["id"]]
     # A ride on the simulated trainer is a test ride; the room's own result says so too.

@@ -147,7 +147,7 @@ class Store(CrewStore):
                           json_extract(json, '$.crew'), json_extract(json, '$.route.id'),
                           json_extract(json, '$.distance'), json_extract(json, '$.group.mode'),
                           json_extract(json, '$.group.score'), json_extract(json, '$.group') IS NOT NULL,
-                          json_extract(json, '$.test')
+                          json_extract(json, '$.test'), json_extract(json, '$.noStrava')
                    FROM rides WHERE rider = ? ORDER BY date DESC, n DESC""",
                 (rid,),
             ).fetchall()
@@ -162,6 +162,7 @@ class Store(CrewStore):
                 "game": r[12] or ("bus" if r[14] else None),
                 "score": r[13],
                 **({"test": True} if r[15] else {}),
+                **({"noStrava": True} if r[16] else {}),
             }
             for r in rows
         ]

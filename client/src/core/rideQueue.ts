@@ -43,9 +43,35 @@ export const queuedList = <T extends Queued>(rider: string) => load(rider) as T[
  * Keeps a finished ride on this device until the server has it, then tries to send. A ride finished offline
  * goes up at the next login or when the network comes back (see `flushRides`).
  */
-export function postRide<T extends Queued>(rider: string, summary: T) {
+export function postRide<T extends Queued>(rider: string, summary: T, hold = false) {
+  if (hold) held.add(summary.record.date)
   save(rider, [...load(rider), summary].slice(-CFG.rideQueueMax))
   return flushRides(rider)
+}
+
+/**
+ * Rides kept on this device but not sent yet (the results screen, until the rider keeps or bins it). Held in memory
+ * only, so a ride whose page closed goes up at the next flush.
+ */
+const held = new Set<string>()
+
+/** Lets a held ride go to the server, with `patch` (such as `noStrava`) applied first. */
+export function releaseRide(rider: string, date: string, patch: object = {}) {
+  held.delete(date)
+  save(
+    rider,
+    load(rider).map((r) => (r.record.date === date ? { ...r, ...patch } : r)),
+  )
+  return flushRides(rider)
+}
+
+/** Forgets a held ride for good: it never reaches the server. */
+export function dropRide(rider: string, date: string) {
+  held.delete(date)
+  save(
+    rider,
+    load(rider).filter((r) => r.record.date !== date),
+  )
 }
 
 /**
@@ -54,6 +80,7 @@ export function postRide<T extends Queued>(rider: string, summary: T) {
  */
 export async function flushRides(rider: string) {
   for (const ride of load(rider)) {
+    if (held.has(ride.record.date)) continue
     try {
       const r = await api<{ id?: number }>('/api/rides', {
         method: 'POST',
