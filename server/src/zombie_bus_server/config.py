@@ -374,7 +374,10 @@ SYNC_WIDEN_RPM = 3
 
 # Accounts seeded at startup. Password is the name (case-insensitive) — friends-only hobby server.
 SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack", "Kat"]
-ADMINS = ["alex"]  # rider ids who can add, remove and reset riders
+ADMINS = ["alex", "luke"]  # rider ids who can add, remove and reset riders (Riders screen)
+PASSWORD_MIN = 8  # characters in a password a rider sets for themselves
+LOGIN_FAILS = 5  # wrong passwords for one name in LOGIN_WINDOW_S before it has to wait
+LOGIN_WINDOW_S = 600
 NAME_MAX = 20
 
 # Bots: NPC riders that fill empty seats. Seeded per bot from the room code and bot id.

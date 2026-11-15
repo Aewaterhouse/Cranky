@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Aewaterhouse/Cranky/actions/workflows/ci.yml)
 
-A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in from name tiles; the server seeds Alex, Luke, Steve, Angus, Ali and Jack, and the password is the name (case-insensitive). Security is deliberately light: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
+A browser multiplayer game for smart bike trainers. Up to six friends ride a bus down an endless road with a zombie horde behind. Everyone follows the same workout timeline at their own intensity (from their FTP and tier), and group compliance drives the bus. Also works solo as a TrainerRoad-style ERG workout player (no 3D). Riders log in from name tiles; the server seeds Alex, Luke, Steve, Angus, Ali, Jack and Kat (see First login). Security is light but real: friends only. Trainers connect over Web Bluetooth (FTMS); the game sets ERG for each block.
 
 See `PLAN.md` for the design, `docs/protocol.md` for the wire protocol, `docs/map.md` for a file-by-file map and `docs/testing.md` for manual test notes.
 
@@ -32,6 +32,18 @@ cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless 
 ```
 
 GitHub Actions runs the same checks (workflow "CI", `.github/workflows/ci.yml`) on every push to master and every pull request: a client job (Node 24 and pnpm 10, as the Dockerfile builds; tsc, lint, tests, build) and a server job (uv, Python 3.12; pytest) in parallel. It never deploys: Railway deploys by itself once CI passes. `scripts/e2e.sh` (headless browser ride) is run by hand, not in CI.
+
+## First login and passwords
+
+Every rider starts with their name as the password (case-insensitive), so nobody is locked out. The first time they log in with it, Cranky asks them to set their own (at least 8 characters, typed twice, not their name) before anything else; until then the server refuses everything but setting it (a TV can still watch a bus). After that, **Settings → Account → Change password** asks for the current one and the new one twice.
+
+Five wrong passwords for one name in 10 minutes and that name has to wait out the 10 minutes ("Have a breather and try again in N mins"). Other names are not held up, and a good login clears the count. Limits are `LOGIN_FAILS`, `LOGIN_WINDOW_S` and `PASSWORD_MIN` in `server/src/zombie_bus_server/config.py`.
+
+## Riders screen (admins)
+
+Admins are the rider ids in `ADMINS` in the server config (Luke and Alex). They see **Riders (admin)** in the menu under their name. There they can add a rider (their first password is their name, which they change on first login), reset a rider's password (back to their name, and they pick a new one when they next log in; it also clears their wrong-password count) and remove a rider (their profile and rides stay). The server checks every one of these: anyone else gets "Admins only". An admin can't reset or remove themselves; use Change password instead.
+
+Forgot your password? Ask Luke or Alex to reset it.
 
 ## Server environment variables
 

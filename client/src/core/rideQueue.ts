@@ -62,7 +62,8 @@ export async function flushRides(rider: string) {
       if (r.id) onSaved?.(ride, r.id)
     } catch (e) {
       const status = (e as { status?: number }).status ?? 0
-      if (status < 400 || status >= 500) return
+      // Not logged in, or still to set a password: keep it for after, never drop it.
+      if (status < 400 || status >= 500 || status === 401 || status === 403) return
     }
     save(
       rider,

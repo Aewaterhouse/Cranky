@@ -638,3 +638,8 @@ a.button.primary {
 .keys-warn[hidden] {
   display: none;
 }
+.pw.pw-set {
+  grid-template-columns: 1fr;
+  width: min(340px, 100%);
+  margin: 0 auto;
+}

@@ -79,7 +79,8 @@ export async function flushEfforts(rider: string) {
   } catch (e) {
     // A rejected batch (4xx) would never go through, so it is dropped; anything else waits.
     const status = (e as { status?: number }).status ?? 0
-    if (status < 400 || status >= 500) return
+    // Not logged in, or still to set a password: keep it for after, never drop it.
+    if (status < 400 || status >= 500 || status === 401 || status === 403) return
   }
   const s = load(rider)
   const gone = new Set(sent.map((e) => e.segment + e.date))

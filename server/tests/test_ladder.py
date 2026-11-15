@@ -38,12 +38,12 @@ def test_ladder_ranks_runs_and_riders_and_ignores_bots():
 
 def test_ladder_endpoint_and_store_round_trip():
     from fastapi.testclient import TestClient
+    from test_accounts import auth
 
     from zombie_bus_server.app import app, store
 
     c = TestClient(app)
-    token = c.post("/api/login", json={"name": "alex", "password": "alex"}).json()["token"]
-    h = {"Authorization": f"Bearer {token}"}
+    _, h = auth()
     store.add_result("Bus Quick 30", result(4321, [("Alex", 0.9)]))
     season = ladder.season_of(date.today())
     out = c.get("/api/ladder", headers=h).json()

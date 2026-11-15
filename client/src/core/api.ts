@@ -23,6 +23,8 @@ export interface Me {
   id: string
   name: string
   admin?: boolean
+  /** Still on the default password (their name): must set their own before riding. */
+  mustChange?: boolean
 }
 
 export async function login(name: string, password: string): Promise<Me> {
@@ -31,7 +33,7 @@ export async function login(name: string, password: string): Promise<Me> {
     body: JSON.stringify({ name, password }),
   })
   localStorage.setItem(TOKEN, r.token)
-  return { id: r.id, name: r.name }
+  return { id: r.id, name: r.name, mustChange: r.mustChange }
 }
 
 export const logout = () => localStorage.removeItem(TOKEN)

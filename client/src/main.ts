@@ -27,6 +27,7 @@ import { groupRide } from './modes/freeRide/group'
 import { crew } from './modes/zombieBus/crew'
 import { spectate } from './modes/zombieBus/spectate'
 import { showLogin } from './ui/login'
+import { setPasswordScreen } from './ui/password'
 import { showHome } from './ui/shell'
 import { currentTrainer, restoreTrainer } from './ui/trainer'
 import { openRiderSettings } from './ui/rider'
@@ -64,6 +65,7 @@ async function enter(u: Me) {
   profile = loadProfile(u)
   const watch = new URLSearchParams(location.search).get('watch')?.trim().toUpperCase()
   if (watch?.length === 4) return (lockZoom(true), spectate(watch, () => home()))
+  if (u.mustChange) return setPasswordScreen(u, () => enter({ ...u, mustChange: false }))
   if (stravaReturn()) openRiderSettings()
   onRideSaved<RideSummary>((s, n) => autoStrava(profile, s, n))
   home()

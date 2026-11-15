@@ -78,6 +78,10 @@ describe('rides waiting for the server', () => {
     status = 503
     await postRide('me', ride('a'))
     expect(queuedRides('me')).toBe(1)
+    for (status of [401, 403]) {
+      await flushRides('me') // logged out, or still to set a password: it waits
+      expect(queuedRides('me')).toBe(1)
+    }
     status = 422
     await flushRides('me')
     expect(queuedRides('me')).toBe(0)

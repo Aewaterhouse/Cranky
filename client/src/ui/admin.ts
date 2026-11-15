@@ -7,37 +7,6 @@ const post = (path: string, body: object, method = 'POST') =>
   api(path, { method, body: JSON.stringify(body) })
 const fail = (e: unknown) => toast((e as Error).message, 'bad')
 
-/** Small dialog asking for a new password; calls `done(password)` on submit. */
-function askPassword(title: string, done: (pw: string) => Promise<void>) {
-  const pw = h('input', {
-    type: 'password',
-    placeholder: 'New password',
-    autocomplete: 'new-password',
-  })
-  const form = h(
-    'form',
-    {
-      class: 'adm-form',
-      onsubmit: (e) => {
-        e.preventDefault()
-        if (!pw.value.trim()) return toast('Type a password first.', 'bad')
-        done(pw.value).then(close, fail)
-      },
-    },
-    pw,
-    h('button', { class: 'primary' }, 'Save'),
-  )
-  const close = modal(title, form)
-  pw.focus()
-}
-
-/** Dialog for any rider to change their own password. */
-export const changeMyPassword = (id: string) =>
-  askPassword('Change my password', async (pw) => {
-    await post(`/api/riders/${id}/password`, { password: pw })
-    toast('Password changed.', 'good')
-  })
-
 const confirmBox = (title: string, text: string, label: string, go: () => Promise<void>) => {
   const close = modal(
     title,
@@ -69,11 +38,17 @@ export function adminTab(self: string) {
               'button',
               {
                 class: 'ghost',
+                disabled: r.id === self,
                 onclick: () =>
-                  askPassword(`Reset password for ${r.name}`, async (pw) => {
-                    await post(`/api/riders/${r.id}/password`, { password: pw })
-                    toast(`${r.name}'s password is reset.`, 'good')
-                  }),
+                  confirmBox(
+                    `Reset ${r.name}'s password?`,
+                    `It goes back to their name. They pick a new one when they next log in.`,
+                    'Reset',
+                    async () => {
+                      await post(`/api/riders/${r.id}/reset`, {})
+                      toast(`${r.name}'s password is their name again.`, 'good')
+                    },
+                  ),
               },
               'Reset password',
             ),
@@ -111,7 +86,7 @@ export function adminTab(self: string) {
         if (!n) return toast('Type a name first.', 'bad')
         post('/api/riders', { name: n })
           .then(() => {
-            toast(`${n} added. Their password is their name.`, 'good')
+            toast(`${n} added. They log in with their name, then pick a password.`, 'good')
             name.value = ''
             return load()
           })

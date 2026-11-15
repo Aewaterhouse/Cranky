@@ -5,10 +5,11 @@ import { controlsPanel } from './controls'
 import { h, seg } from './dom'
 import { strengthSlider } from './gearTile'
 import { hudSizeSeg } from './hudSize'
+import { changeMyPassword } from './password'
 import { ZONE_COLOURS } from './planGraph'
 
-/** Per-device preferences: sound, graphics, HUD size, colours, ride keys. */
-export function settingsTab() {
+/** Per-device preferences (sound, graphics, HUD size, colours, ride keys) and the rider's password. */
+export function settingsTab(id: string) {
   const row = (title: string, note: string, control: Node) =>
     h(
       'div',
@@ -235,5 +236,15 @@ export function settingsTab() {
       ),
     ),
     h('section', { class: 'card' }, h('h2', {}, 'Controls'), controlsPanel()),
+    h(
+      'section',
+      { class: 'card' },
+      h('h2', {}, 'Account'),
+      row(
+        'Password',
+        'Change the password you log in with on every device.',
+        h('button', { class: 'ghost', onclick: () => changeMyPassword(id) }, 'Change password'),
+      ),
+    ),
   )
 }

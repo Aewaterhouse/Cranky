@@ -4,7 +4,8 @@ import { ladderTab } from './ladder'
 import { settingsTab } from './settings'
 import { me } from '../core/api'
 import type { Profile } from '../core/curve'
-import { adminTab, changeMyPassword } from './admin'
+import { adminTab } from './admin'
+import { changeMyPassword } from './password'
 import { avatar, h, show } from './dom'
 import { garageTab, scrapIcon } from './garage'
 import { rideTab, type HomeActions } from './home'
@@ -24,7 +25,7 @@ function riderChip(p: Profile, act: HomeActions, admin: boolean) {
     'div',
     { class: 'menu', hidden: true },
     h('a', { href: '#settings' }, 'App settings (sound, graphics, units, keys)'),
-    admin ? h('a', { href: '#admin' }, 'Admin') : '',
+    admin ? h('a', { href: '#admin' }, 'Riders (admin)') : '',
     h(
       'button',
       { onclick: () => ((menu.hidden = true), changeMyPassword(p.id)) },
@@ -69,7 +70,7 @@ export function showHome(p: Profile, act: HomeActions) {
     const tab = current()
     const body =
       tab === 'settings'
-        ? settingsTab()
+        ? settingsTab(p.id)
         : tab === 'admin' && admin
           ? adminTab(p.id)
           : tab === 'ladder'

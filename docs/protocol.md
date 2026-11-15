@@ -10,10 +10,11 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 | GET | `/api/ladder?season=2026-Q4` | Season ladder: top runs, rider standings and titles. Season defaults to the current quarter |
 | GET | `/api/health` | → `{ok: true}` (no auth) |
 | GET | `/api/riders` | → seeded riders `[{id, name}]` for the login tiles (no auth) |
-| POST | `/api/login` | `{name, password}` → `{token, id, name}`; 401 if wrong. Password is the name, case-insensitive. |
-| GET | `/api/me` | → `{id, name, admin}`; `admin` is true for ids in `config.ADMINS` |
+| POST | `/api/login` | `{name, password}` → `{token, id, name, mustChange}`; 401 if wrong, 429 with a wait message after 5 wrong for that name in 10 min. The first password is the name, case-insensitive; `mustChange` is true until the rider sets their own. |
+| GET | `/api/me` | → `{id, name, admin, mustChange}`; `admin` is true for ids in `config.ADMINS`. While `mustChange`, every other logged-in endpoint answers 403 "Set your password first" and the WebSocket only lets them watch. |
 | POST | `/api/riders` | `{name, password?}` → `{id, name}`; admin only. Password defaults to the name. 409 if the name exists. |
-| POST | `/api/riders/{id}/password` | `{password}`; admin, or the rider themselves |
+| POST | `/api/riders/{id}/password` | `{password, current?}`; the rider themselves only. 8+ characters, not their name; `current` is needed unless they are still on the default. |
+| POST | `/api/riders/{id}/reset` | Admin only: the password goes back to the name and the rider must set their own at next login. |
 | DELETE | `/api/riders/{id}` | Admin only; not yourself. Removes the login and tokens; the profile and rides stay. |
 | GET | `/api/profile/{id}` | Profile JSON, 404 if unknown |
 | PUT | `/api/profile/{id}` | Profile JSON (newer `updated` wins); 403 unless `id` is your own |

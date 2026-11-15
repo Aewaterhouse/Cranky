@@ -6,13 +6,14 @@ import re
 import time
 from contextlib import asynccontextmanager
 from datetime import date
-from typing import Annotated, Literal
+from typing import Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
 
 from . import config, discord, efforts, files, ladder, strava_api
+from .accounts import accounts
 from .avatars import clean_look
 from .plan import flatten, load_plans, total
 from .road_room import RoadRoom
@@ -73,89 +74,16 @@ rooms: dict[str, Room] = {
 LETTERS = "ABCDEFGHJKMNPQRSTUVWXYZ"
 
 
-def user(authorization: str = Header(default="")) -> dict:
-    """The logged-in rider from `Authorization: Bearer <token>`."""
-    me = store.whoami(authorization.removeprefix("Bearer ").strip())
-    if not me:
-        raise HTTPException(401, "Log in first")
-    return {**me, "admin": me["id"] in config.ADMINS}
-
-
-User = Annotated[dict, Depends(user)]
+accounts_api, User, SignedIn = accounts(store)
+app.include_router(accounts_api)
 app.include_router(efforts.router(store, User))
 app.include_router(files.router(User))
 app.include_router(strava_api.router(strava, uploads, User))
 
 
-class Login(BaseModel):
-    name: str
-    password: str
-
-
-class NewRider(BaseModel):
-    name: str
-    password: str | None = None
-
-
-class Password(BaseModel):
-    password: str
-
-
 @app.get("/api/health")
 def health() -> dict:
     return {"ok": True}
-
-
-@app.get("/api/riders")
-def riders() -> list[dict]:
-    return store.users()
-
-
-@app.post("/api/login")
-def login(body: Login) -> dict:
-    res = store.login(body.name, body.password)
-    if not res:
-        raise HTTPException(401, "Wrong name or password")
-    return res
-
-
-@app.post("/api/riders")
-def add_rider(body: NewRider, u: User) -> dict:
-    if not u["admin"]:
-        raise HTTPException(403, "Admins only")
-    name = body.name.strip()
-    if not name or len(name) > config.NAME_MAX or not name.isprintable():
-        raise HTTPException(400, f"Name must be 1 to {config.NAME_MAX} characters")
-    if not store.add_user(name, body.password or name):
-        raise HTTPException(409, f"{name} already exists")
-    return {"id": name.lower(), "name": name}
-
-
-@app.post("/api/riders/{rid}/password")
-def set_password(rid: str, body: Password, u: User) -> dict:
-    if rid != u["id"] and not u["admin"]:
-        raise HTTPException(403, "Admins only")
-    if not body.password.strip():
-        raise HTTPException(400, "Password can't be empty")
-    if not store.set_password(rid, body.password):
-        raise HTTPException(404)
-    return {"ok": True}
-
-
-@app.delete("/api/riders/{rid}")
-def delete_rider(rid: str, u: User) -> dict:
-    if not u["admin"]:
-        raise HTTPException(403, "Admins only")
-    if rid == u["id"]:
-        raise HTTPException(400, "You can't remove yourself")
-    if not store.delete_user(rid):
-        raise HTTPException(404)
-    return {"ok": True}
-
-
-@app.get("/api/me")
-def me(u: User) -> dict:
-    return u
 
 
 @app.get("/api/profile/{rid}")
@@ -345,6 +273,10 @@ async def ws_endpoint(ws: WebSocket, code: str, token: str = "") -> None:
     try:
         while True:
             raw = await ws.receive_json()
+            # A rider still on the default password can watch (the TV view) but not ride until they set one.
+            if me["mustChange"] and not (isinstance(raw, dict) and raw.get("t") == "watch"):
+                await ws.send_json({"t": "error", "msg": "Set your password first"})
+                continue
             try:
                 await room.handle(rid, ws, raw)
             except ValidationError as e:
