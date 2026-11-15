@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { migrate } from '../src/core/settings'
 import { nextLevel } from '../src/scene/quality'
 
 describe('graphics quality steps', () => {
@@ -28,5 +29,16 @@ describe('graphics quality steps', () => {
     for (let i = 0; i < 9; i++) s = nextLevel(s.level, 60, s.slow, s.fast) as typeof s
     expect(s.level).toBe('low')
     expect(nextLevel(s.level, 60, s.slow, s.fast).level).toBe('medium')
+  })
+})
+
+describe('the Graphics setting', () => {
+  it('moves a saved Low power choice to Potato and leaves the rest alone', () => {
+    expect(migrate({ gfx: 'lowpower' as 'potato', volume: 0.5 })).toEqual({
+      gfx: 'potato',
+      volume: 0.5,
+    })
+    expect(migrate({ gfx: 'high' })).toEqual({ gfx: 'high' })
+    expect(migrate({})).toEqual({})
   })
 })

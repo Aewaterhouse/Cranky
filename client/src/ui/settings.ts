@@ -98,11 +98,10 @@ export function settingsTab() {
       ),
       row(
         'Graphics',
-        'Auto drops the quality if the 3D scene runs slowly, and remembers where it settled. Low power is the floor: little scenery, a short view, for a struggling device.',
+        'Auto drops the quality if the 3D scene runs slowly, and remembers where it settled; on a struggling device it can go below Potato, with little scenery and a short view. Pick a level to keep it there.',
         seg<Settings['gfx']>(
           [
             ['auto', 'Auto'],
-            ['lowpower', 'Low power'],
             ['potato', 'Potato'],
             ['low', 'Low'],
             ['medium', 'Medium'],
@@ -110,6 +109,7 @@ export function settingsTab() {
           ],
           settings.gfx,
           (gfx) => saveSettings({ gfx }),
+          'gfx',
         ),
       ),
       row(

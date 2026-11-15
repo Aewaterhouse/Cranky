@@ -7,8 +7,8 @@ import type { Units } from './units'
 export interface Settings {
   /** Master volume 0..1 for effects and the mood drone. */
   volume: number
-  /** Graphics quality for the 3D scene. */
-  gfx: 'auto' | 'lowpower' | 'potato' | 'low' | 'medium' | 'high'
+  /** Graphics quality for the 3D scene. Low power is not a choice: only Auto drops to it. */
+  gfx: 'auto' | 'potato' | 'low' | 'medium' | 'high'
   /** In-ride HUD size multiplier; 0 means automatic (bigger on big screens). */
   hudScale: number
   /** Colour-blind-friendly zone and gradient colours. */
@@ -78,7 +78,7 @@ const DEFAULTS: Settings = {
   cardsOpen: [],
 }
 
-export const settings: Settings = { ...DEFAULTS, ...read() }
+export const settings: Settings = { ...DEFAULTS, ...migrate(read()) }
 
 function read(): Partial<Settings> {
   try {
@@ -86,6 +86,11 @@ function read(): Partial<Settings> {
   } catch {
     return {}
   }
+}
+
+/** Low power left the Graphics picker: a rider who had pinned it gets Potato, the lowest level they can pick. */
+export function migrate(saved: Partial<Settings>): Partial<Settings> {
+  return (saved.gfx as string) === 'lowpower' ? { ...saved, gfx: 'potato' } : saved
 }
 
 /** Whether to hold the motion back, from the setting and what the device asks for. */

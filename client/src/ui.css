@@ -402,6 +402,17 @@ a {
   width: 220px;
   accent-color: var(--acc);
 }
+/* Graphics: Auto and the four levels a rider can pick, on one row. */
+.seg.gfx {
+  grid-template-columns: repeat(5, auto);
+  max-width: 100%;
+}
+@media (max-width: 480px) {
+  .seg.gfx button {
+    padding-inline: 6px;
+    font-size: 14px;
+  }
+}
 .set-cb {
   display: flex;
   flex-direction: column;
