@@ -188,3 +188,4 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 
 ## Free-ride feedback, Strava post and passwords, 2026-11-15 (simulator only)
 - [ ] Birds: ride past a few cockatoo or galah flocks. On the ground they peck and hop; some flocks loop round overhead instead. Nothing hangs still in the air, and they burst away as you get close.
+- [ ] Shift strength: on a device that never touched the slider, Settings shows 100%. On one where you had picked something else (say 200%), it is still 200%.

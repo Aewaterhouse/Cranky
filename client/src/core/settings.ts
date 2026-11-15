@@ -49,6 +49,8 @@ export interface Settings {
   cinematics: boolean
   /** Crew cards opened to show every number (rider ids), kept on this device. */
   cardsOpen: string[]
+  /** Which migrations the saved settings have had (see `migrate`). */
+  version: number
 }
 
 const KEY = 'cranky.settings'
@@ -76,6 +78,7 @@ const DEFAULTS: Settings = {
   camView: 'chase',
   cinematics: true,
   cardsOpen: [],
+  version: 2,
 }
 
 export const settings: Settings = { ...DEFAULTS, ...migrate(read()) }
@@ -88,9 +91,17 @@ function read(): Partial<Settings> {
   }
 }
 
-/** Low power left the Graphics picker: a rider who had pinned it gets Potato, the lowest level they can pick. */
+/**
+ * Old saved settings brought up to date. Low power left the Graphics picker: a rider who had pinned it gets Potato,
+ * the lowest level they can pick. Shift strength went back to a 100% default: every save used to write the whole
+ * settings, so settings saved before `version` 2 holding exactly the old 150% default are taken as never changed
+ * and get the new default; any other value is the rider's own and stays.
+ */
 export function migrate(saved: Partial<Settings>): Partial<Settings> {
-  return (saved.gfx as string) === 'lowpower' ? { ...saved, gfx: 'potato' } : saved
+  const s = { ...saved }
+  if ((s.gfx as string) === 'lowpower') s.gfx = 'potato'
+  if (!s.version && Math.abs((s.shiftStrength ?? 0) - 1.5) < 1e-6) delete s.shiftStrength
+  return s
 }
 
 /** Whether to hold the motion back, from the setting and what the device asks for. */

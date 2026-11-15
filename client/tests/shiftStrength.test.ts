@@ -1,38 +1,39 @@
 import { describe, expect, it, vi } from 'vitest'
 import { CFG } from '../src/config'
-import { busErgOn, nextStrength } from '../src/core/gears'
-import { soloKeys, type KeyActions } from '../src/modes/drill/keys'
-import { freeKeys, type FreeKeyActions } from '../src/modes/freeRide/keys'
+import { migrate } from '../src/core/settings'
 
-const S = CFG.gears.strength
-const press = (key: string) =>
-  ({ key, target: null, preventDefault() {} }) as unknown as KeyboardEvent
-
-describe('shift strength', () => {
-  it('steps on the grid and stays in range', () => {
-    expect(nextStrength(1.5, 1)).toBe(1.6)
-    expect(nextStrength(1.5, -1)).toBe(1.4)
-    expect(nextStrength(1.53, 0)).toBe(1.5)
-    expect(nextStrength(S.max, 1)).toBe(S.max)
-    expect(nextStrength(S.min, -1)).toBe(S.min)
+/** The settings as a device with this saved would load them. */
+async function load(saved?: object) {
+  const data = new Map<string, string>()
+  if (saved) data.set('cranky.settings', JSON.stringify(saved))
+  vi.stubGlobal('localStorage', {
+    getItem: (k: string) => data.get(k) ?? null,
+    setItem: (k: string, v: string) => data.set(k, v),
   })
-  it("is on ; and ' in free ride and the solo player", () => {
-    const free = { strength: vi.fn() } as unknown as FreeKeyActions
-    freeKeys(free)(press("'"))
-    freeKeys(free)(press(';'))
-    expect(vi.mocked(free.strength).mock.calls).toEqual([[1], [-1]])
-    const solo = { strength: vi.fn() } as unknown as KeyActions
-    soloKeys(solo)(press("'"))
-    soloKeys(solo)(press(';'))
-    expect(vi.mocked(solo.strength).mock.calls).toEqual([[1], [-1]])
-  })
-})
+  vi.resetModules()
+  return (await import('../src/core/settings')).settings
+}
 
-describe('ERG or gears on the bus', () => {
-  it('follows the host when they set the ride, else the rider', () => {
-    expect(busErgOn('erg', false)).toBe(true)
-    expect(busErgOn('gears', true)).toBe(false)
-    expect(busErgOn('choose', false)).toBe(false)
-    expect(busErgOn(undefined, true)).toBe(true)
+describe('shift strength default', () => {
+  it('is 100%', async () => {
+    expect(CFG.gears.strength.start).toBe(1)
+    expect((await load()).shiftStrength).toBe(1)
+  })
+  it('gives a rider still on the old 150% default the new 100%', async () => {
+    expect((await load({ volume: 0.4, shiftStrength: 1.5 })).shiftStrength).toBe(1)
+    expect(migrate({ shiftStrength: 1.5000000001 })).toEqual({})
+  })
+  it('keeps a value the rider chose', async () => {
+    for (const v of [0.5, 1.2, 2, 3])
+      expect((await load({ shiftStrength: v })).shiftStrength).toBe(v)
+  })
+  it('keeps 150% chosen after the change, once the settings carry their version', async () => {
+    expect((await load({ shiftStrength: 1.5, version: 2 })).shiftStrength).toBe(1.5)
+  })
+  it('keeps everything else as saved', () => {
+    expect(migrate({ shiftStrength: 1.5, volume: 0.3, gfx: 'high' })).toEqual({
+      volume: 0.3,
+      gfx: 'high',
+    })
   })
 })
