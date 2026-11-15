@@ -1,3 +1,4 @@
+import { keyHint } from '../core/keys'
 import { FtmsTrainer } from '../trainer/ftms'
 import { BleHr, currentHr, hrSource, onHrChange, setHr, SimHr } from '../trainer/heartRate'
 import { bindKeys, SimTrainer } from '../trainer/simTrainer'
@@ -199,15 +200,16 @@ function hrSection() {
 }
 
 let ftpNow = 200
-/** Remembers the FTP the sim's S and A keys should use. */
+/** Remembers the FTP the sim's sprint and easy keys should use. */
 export const setSimFtp = (ftp: number) => (ftpNow = ftp)
 
-const KEYS: [string, string][] = [
-  ['↑ ↓', 'free-ride watts'],
-  ['← →', 'cadence'],
-  ['[ ]', 'ERG effort'],
-  ['S', 'sprint power'],
-  ['A', 'easy power'],
+/** The simulator's keys as the rider has them (Rider → Settings → Controls). */
+const simKeyList = (): [string, string][] => [
+  [`${keyHint('simUp', 1)} ${keyHint('simDown', 1)}`, 'free-ride watts'],
+  [`${keyHint('simCadUp', 1)} ${keyHint('simCadDown', 1)}`, 'cadence'],
+  [`${keyHint('simEffortUp', 1)} ${keyHint('simEffortDown', 1)}`, 'ERG effort'],
+  [keyHint('simSprint', 1), 'sprint power'],
+  [keyHint('simEasy', 1), 'easy power'],
 ]
 
 /** Trainer picker. With `then`, runs it once a trainer is ready (used by "start riding" buttons). */
@@ -253,7 +255,7 @@ export function openTrainer(then?: () => void) {
         h(
           'dl',
           { class: 'keys' },
-          ...KEYS.flatMap(([k, v]) => [h('dt', {}, h('kbd', {}, k)), h('dd', {}, v)]),
+          ...simKeyList().flatMap(([k, v]) => [h('dt', {}, h('kbd', {}, k)), h('dd', {}, v)]),
         ),
         h('button', { onclick: () => (useSim(ftpNow), done(true)) }, 'Use simulator'),
       ),

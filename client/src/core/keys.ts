@@ -119,6 +119,16 @@ export const keyLabel = (k: string) => NAMES[k] ?? (k.length === 1 ? k.toUpperCa
 export const keyHint = (id: ActionId, n = MAX_KEYS) =>
   keysOf(id).slice(0, n).map(keyLabel).join(' ')
 
+/** A button's title with the action's first key, e.g. "Camera view (C)", or the bare label when it has none. */
+export const withKey = (label: string, id: ActionId) => {
+  const k = keyHint(id, 1)
+  return k ? `${label} (${k})` : label
+}
+
+/** "Tap Resume or press Space", without the key if the rider has none for pausing. */
+export const resumeHint = () =>
+  `Tap Resume${keyHint('pause', 1) ? ` or press ${keyHint('pause', 1)}` : ''}`
+
 /** Whether two actions can fire in the same screen (the simulator's keys fire in all of them). */
 export const overlaps = (a: ActionId, b: ActionId) => {
   const x = ACTIONS[a].scope as Scope[]

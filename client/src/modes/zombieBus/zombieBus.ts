@@ -1,3 +1,4 @@
+import { keyHint } from '../../core/keys'
 import { holdBack } from '../../ui/back'
 import { CFG } from '../../config'
 import { busScore } from '../../core/hud'
@@ -119,7 +120,7 @@ export function startBusRide(
           hud.toast(
             settings.busErg
               ? 'ERG on: the trainer holds your target'
-              : 'ERG off: shift to hold the target. Z X or ↓ ↑ change gear',
+              : `ERG off: shift to hold the target. ${keyHint('gearUp')} harder, ${keyHint('gearDown')} easier`,
           )
         },
         shift: (d) => gears.shift(d, ride.live.cadence),

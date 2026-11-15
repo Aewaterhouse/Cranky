@@ -1,3 +1,4 @@
+import { keyHint } from '../core/keys'
 import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
@@ -64,8 +65,7 @@ export function lobbyView(c: LobbyCtx) {
     settings.busErg ? 'erg' : 'gears',
     (v) => c.erg(v === 'erg'),
   )
-  const ERG_WHAT =
-    'ERG holds your target for you. Gears: ERG off, you shift (Z X, the arrows or a Zwift Click) to hold it.'
+  const ERG_WHAT = `ERG holds your target for you. Gears: ERG off, you shift to hold it (${keyHint('gearUp')} harder, ${keyHint('gearDown')} easier, or a Zwift Click).`
   const ergNote = h('p', { class: 'dim' }, ERG_WHAT)
   const TRAINERS: [TrainerMode, string][] = [
     ['choose', 'Each rider'],

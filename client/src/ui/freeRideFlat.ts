@@ -1,3 +1,4 @@
+import { keyHint } from '../core/keys'
 import { gradeColour, riderRows } from '../core/hud'
 import { ascentFrom } from '../core/route'
 import { clock, h } from './dom'
@@ -164,7 +165,10 @@ export function freeRideFlat({ route, on, difficulty, mapBox, ov, confirmEnd }: 
       side.hidden = [...side.children].every((c) => (c as HTMLElement).hidden)
       whole.set(s.dist)
       next.set(s.dist)
-      pauseBtn.replaceChildren(s.paused === 'manual' ? 'Resume ' : 'Pause ', h('kbd', {}, 'Space'))
+      pauseBtn.replaceChildren(
+        s.paused === 'manual' ? 'Resume ' : 'Pause ',
+        h('kbd', {}, keyHint('pause', 1)),
+      )
     },
   }
   return layout

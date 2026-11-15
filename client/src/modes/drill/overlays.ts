@@ -1,3 +1,4 @@
+import { resumeHint } from '../../core/keys'
 import { fmt } from '../../ui/dom'
 import type { Frame } from '../../types'
 
@@ -34,7 +35,7 @@ export function pickOverlay(c: OverlayCtx): Overlay {
     return [
       'PAUSED',
       c.manual
-        ? `Tap Resume or press Space.${c.ergOn ? ' ERG is easing off.' : ''}`
+        ? `${resumeHint()}.${c.ergOn ? ' ERG is easing off.' : ''}`
         : 'Auto-paused. Start pedalling to carry on.',
       'pause',
     ]

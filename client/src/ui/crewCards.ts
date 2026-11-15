@@ -1,6 +1,6 @@
 import { CFG } from '../config'
 import { cardLines, type CardNumbers } from '../core/crewStats'
-import { isKey } from '../core/keys'
+import { isKey, withKey } from '../core/keys'
 import { saveSettings, settings } from '../core/settings'
 import { h } from './dom'
 import { compColour, hrColour, set } from './hudKit'
@@ -61,7 +61,7 @@ export function crewCards(cls = '') {
   const list = h('div', { class: 'cc-list' })
   const all = h('button', {
     class: 'cc-all',
-    title: 'Open or close every card (D)',
+    title: withKey('Open or close every card', 'cards'),
     onclick: () => toggleAll(),
   })
   const root = h('div', { class: `glass ccol ${cls}` }, all, list)

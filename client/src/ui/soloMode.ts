@@ -1,3 +1,4 @@
+import { type ActionId, withKey } from '../core/keys'
 import { CFG } from '../config'
 import { gearText } from '../core/gears'
 import { h } from './dom'
@@ -11,10 +12,10 @@ export interface ModeState {
   gear: number
 }
 
-const LABELS: [RideMode, string, string][] = [
-  ['erg', 'ERG', 'E'],
-  ['res', 'Resistance', 'R'],
-  ['slope', 'Slope', 'G'],
+const LABELS: [RideMode, string, ActionId][] = [
+  ['erg', 'ERG', 'erg'],
+  ['res', 'Resistance', 'modeRes'],
+  ['slope', 'Slope', 'modeSlope'],
 ]
 
 const signed = (g: number) => `${g > 0 ? '+' : ''}${g}%`
@@ -29,7 +30,7 @@ export const modeText = (m: ModeState) =>
 /** Header control: ERG / Resistance / Slope switch with a stepper for the level or gradient. */
 export function modeSwitch(on: { set: (k: RideMode) => void; nudge: (dir: number) => void }) {
   const btns = LABELS.map(([k, label, key]) =>
-    h('button', { 'data-mode': k, onclick: () => on.set(k), title: `${label} (${key})` }, label),
+    h('button', { 'data-mode': k, onclick: () => on.set(k), title: withKey(label, key) }, label),
   )
   const val = h('b', { class: 'pct' })
   const lab = h('span', {})
@@ -37,9 +38,9 @@ export function modeSwitch(on: { set: (k: RideMode) => void; nudge: (dir: number
     'div',
     { class: 'glass stepper' },
     lab,
-    h('button', { onclick: () => on.nudge(-1), title: 'Lower (,)' }, '−'),
+    h('button', { onclick: () => on.nudge(-1), title: withKey('Lower', 'levelDown') }, '−'),
     val,
-    h('button', { onclick: () => on.nudge(1), title: 'Higher (.)' }, '+'),
+    h('button', { onclick: () => on.nudge(1), title: withKey('Higher', 'levelUp') }, '+'),
   )
   const root = h('label', { class: 'modesw' }, 'Mode', h('div', { class: 'seg' }, ...btns))
   return {

@@ -1,4 +1,4 @@
-import { isKey } from '../core/keys'
+import { isKey, withKey } from '../core/keys'
 import { h } from './dom'
 
 /** The HUD's camera button: cycles the 3D views like the C key. */
@@ -7,7 +7,7 @@ export const camButton = (cycle: () => void) =>
     'button',
     {
       class: 'glass cam-btn',
-      title: 'Camera view (C)',
+      title: withKey('Camera view', 'camera'),
       'aria-label': 'Camera view',
       onclick: cycle,
     },

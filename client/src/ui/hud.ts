@@ -5,7 +5,7 @@ import '../rideHudDock.css'
 import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
-import { actionOf } from '../core/keys'
+import { actionOf, keyHint } from '../core/keys'
 import { busAim } from '../core/aim'
 import { hudCues } from './hudCues'
 import type { Live } from '../modes/rideController'
@@ -78,9 +78,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const ergLabel = h('span', {})
   const ergItems = o.erg
     ? [
-        m.item(ergLabel, 'E', () => (o.erg!.toggle(), paintErg())),
-        m.item('Gear down', 'Z', () => o.erg!.shift(-1)),
-        m.item('Gear up', 'X', () => o.erg!.shift(1)),
+        m.item(ergLabel, keyHint('erg', 1), () => (o.erg!.toggle(), paintErg())),
+        m.item('Gear easier', keyHint('gearDown'), () => o.erg!.shift(-1)),
+        m.item('Gear harder', keyHint('gearUp'), () => o.erg!.shift(1)),
         o.erg.slider,
       ]
     : []
@@ -95,9 +95,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
     h('h2', {}, o.plan?.name ?? 'Zombie Bus'),
     h('label', {}, 'Your tier', tier),
     m.grid(
-      m.item('Stats', 'S', () => toggle('stats')),
-      m.item('Crew', 'R', () => toggle('riders')),
-      m.item('Clean view', 'H', () => toggle('clean')),
+      m.item('Stats', keyHint('stats', 1), () => toggle('stats')),
+      m.item('Crew', keyHint('riders', 1), () => toggle('riders')),
+      m.item('Clean view', keyHint('clean', 1), () => toggle('clean')),
       ...ergItems,
       quit,
     ),

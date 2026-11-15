@@ -1,3 +1,4 @@
+import { keyHint } from '../core/keys'
 import { TIER_NAME, TIERS, type Plan, type Tier } from '../types'
 import { CFG } from '../config'
 import { h } from './dom'
@@ -63,11 +64,11 @@ export function soloMenu(
     h('label', { class: 'tier' }, 'Effort', tierSel),
     m.grid(
       pauseBtn,
-      m.item('Skip interval', 'N', on.skip),
-      m.item('End ride', 'Esc', ui.confirmEnd, 'danger'),
-      m.item('Stats', 'S', () => ui.toggle('stats')),
-      m.item('Intervals', 'I', () => ui.toggle('riders')),
-      m.item('Clean view', 'H', () => ui.toggle('clean')),
+      m.item('Skip interval', keyHint('skip', 1), on.skip),
+      m.item('End ride', keyHint('end', 1), ui.confirmEnd, 'danger'),
+      m.item('Stats', keyHint('stats', 1), () => ui.toggle('stats')),
+      m.item('Intervals', keyHint('intervals', 1), () => ui.toggle('riders')),
+      m.item('Clean view', keyHint('clean', 1), () => ui.toggle('clean')),
       m.item('Media', '', ui.media),
       line('Cadence line', 'cadence'),
       line('Heart rate line', 'hr'),
@@ -80,6 +81,7 @@ export function soloMenu(
     intens,
     lines,
     tier: () => tierSel.value as Tier,
-    paused: (p: boolean) => pauseBtn.replaceChildren(p ? 'Resume' : 'Pause', h('kbd', {}, 'Space')),
+    paused: (p: boolean) =>
+      pauseBtn.replaceChildren(p ? 'Resume' : 'Pause', h('kbd', {}, keyHint('pause', 1))),
   }
 }

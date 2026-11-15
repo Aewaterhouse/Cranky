@@ -1,3 +1,4 @@
+import { keyHint } from '../core/keys'
 import { CFG } from '../config'
 import { climbAt, findClimbs } from '../core/climbs'
 import { gearCount } from '../core/gears'
@@ -105,11 +106,11 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
     strengthSlider(),
     m.grid(
       pauseBtn,
-      item('End ride', 'Esc', confirmEnd, 'danger'),
-      item('Stats', 'S', () => toggle('stats')),
-      item('Map', 'M', () => toggle('map')),
-      item('Riders', 'R', () => toggle('riders')),
-      item('Clean view', 'H', () => toggle('clean')),
+      item('End ride', keyHint('end', 1), confirmEnd, 'danger'),
+      item('Stats', keyHint('stats', 1), () => toggle('stats')),
+      item('Map', keyHint('map', 1), () => toggle('map')),
+      item('Riders', keyHint('riders', 1), () => toggle('riders')),
+      item('Clean view', keyHint('clean', 1), () => toggle('clean')),
     ),
     m.size(),
   )
@@ -248,7 +249,10 @@ export function freeRideHud({ route, on, difficulty, mapBox, toggle, confirmEnd 
         pull ? h('span', {}, pull > 0 ? `Tow +${pull}%` : `Held ${pull}%`.replace('-', '−')) : '',
       )
       whole.set(s.dist)
-      pauseBtn.replaceChildren(s.paused === 'manual' ? 'Resume' : 'Pause', h('kbd', {}, 'Space'))
+      pauseBtn.replaceChildren(
+        s.paused === 'manual' ? 'Resume' : 'Pause',
+        h('kbd', {}, keyHint('pause', 1)),
+      )
     },
   }
   return layout

@@ -52,7 +52,7 @@ export function controlsPanel() {
     const k = keysOf(id)[i]
     const b = h(
       'button',
-      { class: `key-slot${k ? '' : ' empty'}`, 'data-slot': `${id}:${i}` },
+      { class: `key-slot${k ? '' : ' key-none'}`, 'data-slot': `${id}:${i}` },
       k ? keyLabel(k) : '+',
     )
     b.onclick = () => {

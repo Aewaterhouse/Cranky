@@ -1,3 +1,4 @@
+import { resumeHint } from '../core/keys'
 import '../solo.css'
 import '../freeride.css'
 import '../rideHud.css'
@@ -194,7 +195,7 @@ export function freeRideView(route: Route, on: FreeHandlers, difficulty: number,
           : s.starting
             ? ['Start pedalling', 'The clock starts when you do', 'count']
             : s.paused === 'manual'
-              ? ['Paused', 'Tap Resume or press Space', 'pause']
+              ? ['Paused', resumeHint(), 'pause']
               : s.paused === 'auto'
                 ? ['Auto-paused', 'Keep pedalling to carry on', 'pause']
                 : null

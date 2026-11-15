@@ -47,15 +47,19 @@ Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profi
 
 ## Simulated trainer
 
-On the home screen pick the simulated trainer (no hardware needed). A ride that uses the simulator at any point is a test ride: it is kept in History with a "Test ride (simulator)" badge but counts for nothing (no bests, streaks, scrap, badges, ladder, crew records, feed, segments or Strava), and lobbies and rides show "Simulator: this ride won't count" while it is connected. In a crew, only riders on real trainers count. Keys:
+On the home screen pick the simulated trainer (no hardware needed). A ride that uses the simulator at any point is a test ride: it is kept in History with a "Test ride (simulator)" badge but counts for nothing (no bests, streaks, scrap, badges, ladder, crew records, feed, segments or Strava), and lobbies and rides show "Simulator: this ride won't count" while it is connected. In a crew, only riders on real trainers count. Keys (defaults; change them under Simulator in Rider → Settings → Controls). None of them is a ride key, so the arrows shift gears with the simulator too:
 
 | Key | Effect |
 | --- | --- |
-| Up / Down | manual power +/- 10 W |
-| Right / Left | cadence +/- 2 rpm |
+| Page Up / Page Down | manual power +/- 10 W (fn + ↑ / ↓ on a Mac keyboard) |
+| End / Home | cadence +/- 2 rpm (fn + → / ← on a Mac keyboard) |
 | `]` / `[` | effort (how well the sim follows ERG) +/- 0.05 |
-| `S` | sprint: 300% FTP |
+| `Q` | sprint: 300% FTP |
 | `A` | ease: 60% FTP |
+
+## Controls
+
+Rider → Settings → Controls lists every ride key. Each action has up to two keys: click a slot and press the new key (Esc cancels, Backspace clears the slot), and a key another action already uses in the same screen asks to swap. Reset to defaults puts them all back. Saved on this device. Any key a keyboard or a Bluetooth page-turner remote sends works, Page Up and Page Down included. One press does one thing, ride screens never scroll on the arrows, and keys typed into a text box are never ride keys. The Zwift Click keeps its own buttons. The tables below are the defaults.
 
 ## Solo workout player
 
@@ -64,10 +68,13 @@ Pick a plan and length on the Ride tab, then the solo setup screen. Controls (bu
 | Key | Effect |
 | --- | --- |
 | Space or `P` | pause or resume (ERG drops to 40% FTP while paused) |
-| `N` or Right | skip to the next interval (Right is left to the simulated trainer) |
+| `N` or → | skip to the next interval |
 | `+` / `-` | intensity +/- 1% (50 to 150%, scales every ERG target) |
-| `Z` / `X` | virtual gear down / up (Slope mode only) |
+| `,` / `.` | resistance level or gradient down / up |
+| ↓ or `Z` / ↑ or `X` | virtual gear easier / harder (Slope mode only) |
 | `;` / `'` | shift strength down / up (Slope mode only) |
+| `E` / `R` / `G` | ERG, Resistance or Slope mode |
+| `S` (or Tab) / `I` / `H` | stats, interval list, clean view |
 | Esc | end the ride (asks first) |
 
 Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes after 1.5 s of pedalling. Sprints never auto-pause. The results screen shows NP, IF and TSS.
@@ -78,10 +85,14 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 | --- | --- |
 | Space or `P` | pause or resume |
 | `+` / `-` | trainer difficulty +/- 5% |
-| `Z` / `X` | virtual gear down / up |
+| ↓ or `Z` / ↑ or `X` | virtual gear easier / harder |
 | `;` / `'` | shift strength down / up |
 | `C` | camera view: Chase, High, Rear, Side |
+| `S` (or Tab) / `M` / `R` / `H` | stats, map, riders, clean view |
+| `D` | open or close every crew card (group rides) |
 | Esc | end the ride (asks first) |
+
+Crew games (Zombie Bus, VO2 Madness and the rest): `E` ERG on or off, with ERG off ↑ or `X` / ↓ or `Z` shift and `;` / `'` set the shift strength, `C` camera, `D` crew cards, `S` (or Tab) stats, `R` crew, `H` clean view, `1` to `9` answer a game's question card.
 
 ## Camera
 
@@ -117,7 +128,7 @@ Each rider connects once under Rider → Settings → Connect with Strava, appro
 
 ## Zwift Click and virtual gears
 
-Free ride, solo Slope mode and the Zombie Bus with ERG off (pick Gears in the bus lobby, or `E` mid-ride) have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 150%; slider in Settings, in free ride and in Slope mode, `;` and `'` while riding; the gear tile and chip show it, and tapping the chip opens the slider). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T). On the bus the gears sit on a flat 2% road: Z X, the arrows or a Zwift Click shift, and the target still scores.
+Free ride, solo Slope mode and the Zombie Bus with ERG off (pick Gears in the bus lobby, or `E` mid-ride) have 24 virtual gears (ratios 0.75 to 5.49, starting in gear 12). The gear changes the gradient sent to the trainer so that each gear feels like a real one; the game speed in free ride still comes from your power. The gear is shown as a big GEAR tile with the gradient sent to the trainer underneath. Trainer difficulty scales only the road; each gear always adds the same offset, scaled by Shift strength (50 to 300%, default 150%; slider in Settings, in free ride and in Slope mode, `;` and `'` while riding; the gear tile and chip show it, and tapping the chip opens the slider). Set your chainring under Settings (it assumes a 14T Zwift Cog; default 34T). On the bus the gears sit on a flat 2% road: ↑ or X harder, ↓ or Z easier (or your own keys), or a Zwift Click, and the target still scores.
 
 The Click needs firmware 1.1.0 or later: 1.0.0 ignores the RideOn handshake. Update it in Zwift Companion: More > Equipment > Zwift Click > Update Firmware. On 1.1.0 the handshake write with response fails, so the driver writes it without response; keep it that way.
 
