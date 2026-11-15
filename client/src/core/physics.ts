@@ -21,16 +21,19 @@ export function resistance(v: number, gradePct: number, mass: number, wind = 0, 
   )
 }
 
-/** Steady speed (m/s) at which `power` W balances the resistance. Bisection; 0 when the rider cannot move. */
-export function steadySpeed(power: number, gradePct: number, mass: number) {
+/**
+ * Steady speed (m/s) at which `power` W balances the resistance (`draft` scales the drag, as in `resistance`).
+ * Bisection; 0 when the rider cannot move.
+ */
+export function steadySpeed(power: number, gradePct: number, mass: number, draft = 1) {
   const w = power * P.drivetrain
   let lo = 0
   let hi = P.maxMs
-  if (w - resistance(hi, gradePct, mass) * hi >= 0) return hi
+  if (w - resistance(hi, gradePct, mass, 0, draft) * hi >= 0) return hi
   if (resistance(0, gradePct, mass) >= 0 && w <= 0) return 0
   for (let i = 0; i < 40; i++) {
     const mid = (lo + hi) / 2
-    if (w - resistance(mid, gradePct, mass) * mid > 0) lo = mid
+    if (w - resistance(mid, gradePct, mass, 0, draft) * mid > 0) lo = mid
     else hi = mid
   }
   return lo

@@ -20,6 +20,7 @@ import type { Plan, Trainer } from '../../types'
 import { RideController } from '../rideController'
 import { loadDifficulty, saveDifficulty } from './difficulty'
 import { PullAway, RoadFeel, trainerTarget } from './feel'
+import { FinishEstimate } from './eta'
 import { freeKeys } from './keys'
 import { Moments, momentCard } from './moments'
 import { PauseState } from './pauseState'
@@ -107,6 +108,7 @@ export function runFreeRide(
   })
   const feel = new RoadFeel(route)
   const pullAway = new PullAway()
+  const finishIn = new FinishEstimate(route, mass, profile.ftp * F.ftpFrac)
   const scene = rideWorld(route, view, me, params.get('intro') !== '0')
   let wind = 0
   const moments = new Moments(scene.topD, route.distance)
@@ -239,7 +241,7 @@ export function runFreeRide(
       np: normalisedPower(pw),
       ftp: profile.ftp,
       weightKg: kg,
-      etaS: el > 30 && dist > 50 ? (route.distance - dist) / (dist / el) : plan.blocks[0].dur,
+      etaS: finishIn.update(el, dist, pw, difficulty, draft, now / 1000),
       riders: [
         {
           ...me,

@@ -83,6 +83,13 @@ export const ROAD_CFG = {
      * over `fadeS` from the first pedal stroke. A stop is under `stopMs` with the cranks still.
      */
     pullAway: { s: 2.5, maxPct: 6, fadeS: 8, stopMs: 1 },
+    /**
+     * "Finish in" and "Arrive": the rest of the route ridden at the rider's average power over the last `windowS`
+     * (the free-ride estimate of FTP before that), worked out every `everyS` and eased over `smoothS`. Riders push
+     * `climbLift` harder up a 10% climb than on the flat at full difficulty (and ease off as much down one), never
+     * below `minShare` of their flat power; no bit of road is ridden slower than `minMs`.
+     */
+    eta: { windowS: 60, everyS: 1, smoothS: 15, climbLift: 0.25, minShare: 0.3, minMs: 1 },
     /** Range sent to the trainer, in %. */
     grade: [-10, 20],
     sendEveryS: 1,
