@@ -118,6 +118,29 @@ describe('keeping or binning a ride on the results screen', () => {
     expect(autoPosts(on, { record: { secs: 10 }, power: [1] })).toBe(false)
   })
 
+  it('a ride held when the page died is on the device and goes up (and on to Strava) at the next load', async () => {
+    holdEfforts('f')
+    saveEfforts('me', [effort(240, 'f')])
+    await postRide('me', ride('f'), true)
+    await flush()
+    expect(rides()).toEqual([])
+    // A reload or crash: the holds lived in memory only, the queue in storage.
+    vi.resetModules()
+    const q = await import('../src/core/rideQueue')
+    const ef = await import('../src/core/efforts')
+    const saved = vi.fn()
+    q.onRideSaved(saved)
+    expect(q.queuedList('me')).toHaveLength(1)
+    await ef.flushEfforts('me')
+    await q.flushRides('me')
+    expect(
+      rides().map((c) => (c.body.summary as { record: { date: string } }).record.date),
+    ).toEqual(['f'])
+    expect(efforts().flatMap((c) => c.body.efforts)).toHaveLength(1)
+    expect(saved).toHaveBeenCalledOnce() // what starts the Strava upload when it is due
+    expect(q.queuedList('me')).toEqual([])
+  })
+
   it('the end-ride choice is read once', () => {
     endWith('bin')
     expect(takeEndChoice()).toBe('bin')
