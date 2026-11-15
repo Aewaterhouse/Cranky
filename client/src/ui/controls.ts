@@ -15,7 +15,7 @@ import { h } from './dom'
 const MODS = new Set(['Shift', 'Control', 'Alt', 'Meta', 'CapsLock', 'Fn', 'Dead', 'Unidentified'])
 
 /**
- * Rider → Settings → Controls: every ride action with its two key slots. Click a slot and press a key (Esc
+ * Settings → Controls (the per-device Settings page): every ride action with its two key slots. Click a slot and press a key (Esc
  * cancels, Backspace clears it); a key another action already uses asks to swap.
  */
 export function controlsPanel() {

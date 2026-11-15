@@ -47,7 +47,7 @@ Docker sets `ZB_DB=/data/zombie_bus.db`; mount a volume at `/data` to keep profi
 
 ## Simulated trainer
 
-On the home screen pick the simulated trainer (no hardware needed). A ride that uses the simulator at any point is a test ride: it is kept in History with a "Test ride (simulator)" badge but counts for nothing (no bests, streaks, scrap, badges, ladder, crew records, feed, segments or Strava), and lobbies and rides show "Simulator: this ride won't count" while it is connected. In a crew, only riders on real trainers count. Keys (defaults; change them under Simulator in Rider → Settings → Controls). None of them is a ride key, so the arrows shift gears with the simulator too:
+On the home screen pick the simulated trainer (no hardware needed). A ride that uses the simulator at any point is a test ride: it is kept in History with a "Test ride (simulator)" badge but counts for nothing (no bests, streaks, scrap, badges, ladder, crew records, feed, segments or Strava), and lobbies and rides show "Simulator: this ride won't count" while it is connected. In a crew, only riders on real trainers count. Keys (defaults; change them under Simulator in Settings → Controls). None of them is a ride key, so the arrows shift gears with the simulator too:
 
 | Key | Effect |
 | --- | --- |
@@ -59,7 +59,7 @@ On the home screen pick the simulated trainer (no hardware needed). A ride that 
 
 ## Controls
 
-Rider → Settings → Controls lists every ride key. Each action has up to two keys: click a slot and press the new key (Esc cancels, Backspace clears the slot), and a key another action already uses in the same screen asks to swap. Reset to defaults puts them all back. Saved on this device. Any key a keyboard or a Bluetooth page-turner remote sends works, Page Up and Page Down included. One press does one thing, ride screens never scroll on the arrows, and keys typed into a text box are never ride keys. The Zwift Click keeps its own buttons. The tables below are the defaults.
+Settings → Controls (the avatar menu's App settings page, with the other per-device preferences) lists every ride key. Each action has up to two keys: click a slot and press the new key (Esc cancels, Backspace clears the slot), and a key another action already uses in the same screen asks to swap. Reset to defaults puts them all back. Saved on this device. Any key a keyboard or a Bluetooth page-turner remote sends works, Page Up and Page Down included. One press does one thing, ride screens never scroll on the arrows, and keys typed into a text box are never ride keys. The Zwift Click keeps its own buttons. The tables below are the defaults.
 
 ## Solo workout player
 

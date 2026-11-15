@@ -1,12 +1,13 @@
 import { gradeColour } from '../core/hud'
 import { saveSettings, settings, type Settings } from '../core/settings'
 import { SFX } from './audio'
+import { controlsPanel } from './controls'
 import { h, seg } from './dom'
 import { strengthSlider } from './gearTile'
 import { hudSizeSeg } from './hudSize'
 import { ZONE_COLOURS } from './planGraph'
 
-/** Per-device preferences: sound, graphics, HUD size, colours. */
+/** Per-device preferences: sound, graphics, HUD size, colours, ride keys. */
 export function settingsTab() {
   const row = (title: string, note: string, control: Node) =>
     h(
@@ -233,5 +234,6 @@ export function settingsTab() {
         ),
       ),
     ),
+    h('section', { class: 'card' }, h('h2', {}, 'Controls'), controlsPanel()),
   )
 }

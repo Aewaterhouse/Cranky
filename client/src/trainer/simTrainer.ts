@@ -122,7 +122,7 @@ export class SimTrainer implements Trainer {
   }
 }
 
-/** The simulator's keys (Rider → Settings → Controls, under Simulator): power, cadence, ERG effort, sprint, easy. */
+/** The simulator's keys (Settings → Controls, under Simulator): power, cadence, ERG effort, sprint, easy. */
 export const simKeys = (sim: SimTrainer, ftp: number) => (e: KeyboardEvent) => {
   const id = actionOf(e, 'sim')
   if (id === 'simUp') sim.manual += 10

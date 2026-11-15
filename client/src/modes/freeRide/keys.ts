@@ -15,7 +15,7 @@ export interface FreeKeyActions {
   camera(): void
 }
 
-/** The free-ride key handler, from the rider's keys (Rider → Settings → Controls). */
+/** The free-ride key handler, from the rider's keys (Settings → Controls). */
 export const freeKeys = (on: FreeKeyActions) => {
   const acts: Partial<Record<ActionId, () => void>> = {
     pause: on.pause,

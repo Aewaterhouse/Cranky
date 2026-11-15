@@ -588,7 +588,7 @@ a.button.primary {
   font-style: normal;
 }
 
-/* Rider → Settings → Controls (ui/controls.ts). */
+/* Settings → Controls (ui/controls.ts). */
 .controls h3 {
   margin: 12px 0 4px;
   font-size: 13px;

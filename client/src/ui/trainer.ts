@@ -203,7 +203,7 @@ let ftpNow = 200
 /** Remembers the FTP the sim's sprint and easy keys should use. */
 export const setSimFtp = (ftp: number) => (ftpNow = ftp)
 
-/** The simulator's keys as the rider has them (Rider → Settings → Controls). */
+/** The simulator's keys as the rider has them (Settings → Controls). */
 const simKeyList = (): [string, string][] => [
   [`${keyHint('simUp', 1)} ${keyHint('simDown', 1)}`, 'free-ride watts'],
   [`${keyHint('simCadUp', 1)} ${keyHint('simCadDown', 1)}`, 'cadence'],

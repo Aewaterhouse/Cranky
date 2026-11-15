@@ -20,7 +20,7 @@ export interface KeyActions {
   toggle: (part: SoloPart) => void
 }
 
-/** Keyboard handler for the solo player, from the rider's keys (Rider → Settings → Controls). */
+/** Keyboard handler for the solo player, from the rider's keys (Settings → Controls). */
 export function soloKeys(on: KeyActions) {
   const acts: Partial<Record<ActionId, () => void>> = {
     pause: on.pause,
