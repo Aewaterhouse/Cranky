@@ -7,7 +7,9 @@ const URL = process.env.E2E_URL ?? 'http://localhost:8199'
 const errors = []
 
 async function rider(browser, name) {
-  const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } })
+  // E2E_VIEWPORT=1180x820 rides at iPad size.
+  const [width, height] = (process.env.E2E_VIEWPORT ?? '1280x720').split('x').map(Number)
+  const ctx = await browser.newContext({ viewport: { width, height } })
   const page = await ctx.newPage()
   page.on('pageerror', (e) => errors.push(`${name}: ${e.message}`))
   await page.goto(`${URL}/?fast=60`)
@@ -52,6 +54,10 @@ async function crew(host, guest) {
   await host.click('.plan-card:has-text("Bus Quick 30")')
   await host.waitForTimeout(500)
   await host.click('text=Start the bus')
+  if (process.env.E2E_SHOTS) {
+    await host.waitForTimeout(40000)
+    await host.screenshot({ path: `${process.env.E2E_SHOTS}/Zombie-Bus.png`, timeout: 120000 })
+  }
   for (const p of [host, guest]) await p.waitForSelector('.res-hero', { timeout: 240000 })
   const text = await host.innerText('body')
   for (const want of ['Bus score', 'Awards', 'Crew', 'Luke']) if (!new RegExp(want, 'i').test(text)) throw new Error(`crew results missing "${want}"`)
@@ -150,7 +156,7 @@ async function workoutGame(page, name, start, panel, wants) {
   // E2E_SHOTS=<folder> keeps a mid-ride picture of each game, to look at its panel.
   if (process.env.E2E_SHOTS) {
     await page.waitForTimeout(15000)
-    await page.screenshot({ path: `${process.env.E2E_SHOTS}/${name.replace(/\W+/g, '-')}.png` })
+    await page.screenshot({ path: `${process.env.E2E_SHOTS}/${name.replace(/\W+/g, '-')}.png`, timeout: 120000 })
   }
   await page.waitForSelector('.res-hero', { timeout: 400000 })
   const text = await page.innerText('body')
