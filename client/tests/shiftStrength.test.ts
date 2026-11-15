@@ -22,8 +22,8 @@ describe('shift strength', () => {
     freeKeys(free)(press(';'))
     expect(vi.mocked(free.strength).mock.calls).toEqual([[1], [-1]])
     const solo = { strength: vi.fn() } as unknown as KeyActions
-    soloKeys(solo, true)(press("'"))
-    soloKeys(solo, true)(press(';'))
+    soloKeys(solo)(press("'"))
+    soloKeys(solo)(press(';'))
     expect(vi.mocked(solo.strength).mock.calls).toEqual([[1], [-1]])
   })
 })

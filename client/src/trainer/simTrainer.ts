@@ -1,4 +1,5 @@
 import { CFG } from '../config'
+import { actionOf } from '../core/keys'
 import type { Trainer, TrainerStatus } from '../types'
 
 export interface Bot {
@@ -121,20 +122,21 @@ export class SimTrainer implements Trainer {
   }
 }
 
-/** Keyboard control for manual testing: arrows = watts/cadence, [ ] = effort, S = sprint. */
-export function bindKeys(sim: SimTrainer, ftp: number) {
-  addEventListener('keydown', (e) => {
-    if ((e.target as HTMLElement)?.tagName === 'INPUT') return
-    const k = e.key
-    if (k === 'ArrowUp') sim.manual += 10
-    else if (k === 'ArrowDown') sim.manual = Math.max(0, sim.manual - 10)
-    else if (k === 'ArrowRight') sim.cadence += 2
-    else if (k === 'ArrowLeft') sim.cadence = Math.max(0, sim.cadence - 2)
-    else if (k === ']') sim.effort = Math.min(1.5, +(sim.effort + 0.05).toFixed(2))
-    else if (k === '[') sim.effort = Math.max(0.3, +(sim.effort - 0.05).toFixed(2))
-    else if (k === 's' || k === 'S') sim.manual = Math.round(ftp * 3)
-    else if (k === 'a' || k === 'A') sim.manual = Math.round(ftp * 0.6)
-    else return
-    e.preventDefault()
-  })
+/** The simulator's keys (Rider → Settings → Controls, under Simulator): power, cadence, ERG effort, sprint, easy. */
+export const simKeys = (sim: SimTrainer, ftp: number) => (e: KeyboardEvent) => {
+  const id = actionOf(e, 'sim')
+  if (id === 'simUp') sim.manual += 10
+  else if (id === 'simDown') sim.manual = Math.max(0, sim.manual - 10)
+  else if (id === 'simCadUp') sim.cadence += 2
+  else if (id === 'simCadDown') sim.cadence = Math.max(0, sim.cadence - 2)
+  else if (id === 'simEffortUp') sim.effort = Math.min(1.5, +(sim.effort + 0.05).toFixed(2))
+  else if (id === 'simEffortDown') sim.effort = Math.max(0.3, +(sim.effort - 0.05).toFixed(2))
+  else if (id === 'simSprint') sim.manual = Math.round(ftp * 3)
+  else if (id === 'simEasy') sim.manual = Math.round(ftp * 0.6)
+  else return
+  e.preventDefault()
 }
+
+/** Keyboard control for manual testing, on the whole page. */
+export const bindKeys = (sim: SimTrainer, ftp: number) =>
+  addEventListener('keydown', simKeys(sim, ftp))

@@ -3,6 +3,7 @@ import {
   ACTION_IDS,
   ACTIONS,
   actionOf,
+  overlaps,
   clashOf,
   keyHint,
   keyOf,
@@ -14,6 +15,7 @@ import {
 } from '../src/core/keys'
 import { soloKeys, type KeyActions } from '../src/modes/drill/keys'
 import { freeKeys, type FreeKeyActions } from '../src/modes/freeRide/keys'
+import { SimTrainer, simKeys } from '../src/trainer/simTrainer'
 
 const store = new Map<string, string>()
 vi.stubGlobal('localStorage', {
@@ -24,7 +26,15 @@ vi.stubGlobal('localStorage', {
 
 /** A key press as the handlers see one. */
 const press = (key: string, target: object | null = null, mods = {}) =>
-  ({ key, target, ctrlKey: false, metaKey: false, altKey: false, ...mods }) as KeyboardEvent
+  ({
+    key,
+    target,
+    ctrlKey: false,
+    metaKey: false,
+    altKey: false,
+    preventDefault() {},
+    ...mods,
+  }) as KeyboardEvent
 
 beforeEach(() => {
   store.clear()
@@ -36,8 +46,8 @@ describe('ride key bindings', () => {
     const free = { shift: vi.fn() } as unknown as FreeKeyActions
     const solo = { gear: vi.fn() } as unknown as KeyActions
     for (const k of ['ArrowUp', 'x', 'ArrowDown', 'Z']) {
-      freeKeys(free)({ ...press(k), preventDefault() {} } as KeyboardEvent)
-      soloKeys(solo, true)({ ...press(k), preventDefault() {} } as KeyboardEvent)
+      freeKeys(free)(press(k))
+      soloKeys(solo)(press(k))
     }
     expect(vi.mocked(free.shift).mock.calls).toEqual([[1], [1], [-1], [-1]])
     expect(vi.mocked(solo.gear).mock.calls).toEqual([[1], [1], [-1], [-1]])
@@ -46,8 +56,8 @@ describe('ride key bindings', () => {
   it('follows a rebound gear key', () => {
     setKey('gearUp', 0, 'PageDown')
     const free = { shift: vi.fn() } as unknown as FreeKeyActions
-    freeKeys(free)({ ...press('PageDown'), preventDefault() {} } as KeyboardEvent)
-    freeKeys(free)({ ...press('ArrowUp'), preventDefault() {} } as KeyboardEvent)
+    freeKeys(free)(press('PageDown'))
+    freeKeys(free)(press('ArrowUp'))
     expect(vi.mocked(free.shift).mock.calls).toEqual([[1]])
   })
 
@@ -123,5 +133,76 @@ describe('ride key bindings', () => {
     expect(actionOf(press('z', box('INPUT', 'range')), 'free')).toBe('gearDown')
     expect(actionOf(press('z', box('BUTTON')), 'free')).toBe('gearDown')
     expect(actionOf(press('z', null, { ctrlKey: true }), 'free')).toBeUndefined()
+  })
+})
+
+describe('one key press, one action', () => {
+  const ev = (key: string, target: object | null = null) => {
+    const e = { ...press(key, target), prevented: false } as KeyboardEvent & { prevented: boolean }
+    e.preventDefault = () => void (e.prevented = true)
+    return e
+  }
+
+  it('has no default key on two actions that can fire together', () => {
+    for (const a of ACTION_IDS)
+      for (const b of ACTION_IDS)
+        if (a < b && overlaps(a, b))
+          expect(ACTIONS[a].keys.filter((k) => (ACTIONS[b].keys as string[]).includes(k))).toEqual(
+            [],
+          )
+  })
+
+  it('arrows shift gears and leave the simulator alone', () => {
+    const sim = new SimTrainer()
+    const before = { p: sim.manual, c: sim.cadence }
+    const onSim = simKeys(sim, 200)
+    const free = { shift: vi.fn() } as unknown as FreeKeyActions
+    for (const k of ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight']) {
+      const e = ev(k)
+      freeKeys(free)(e)
+      onSim(e)
+      expect(e.prevented).toBe(true) // the page never scrolls in a ride
+    }
+    expect(vi.mocked(free.shift).mock.calls).toEqual([[1], [-1]])
+    expect({ p: sim.manual, c: sim.cadence }).toEqual(before)
+  })
+
+  it('moves the simulator on its own keys, which no ride key uses', () => {
+    const sim = new SimTrainer()
+    const onSim = simKeys(sim, 200)
+    const p0 = sim.manual
+    onSim(ev('PageUp'))
+    expect(sim.manual).toBe(p0 + 10)
+    onSim(ev('PageDown'))
+    expect(sim.manual).toBe(p0)
+    const c0 = sim.cadence
+    onSim(ev('End'))
+    expect(sim.cadence).toBe(c0 + 2)
+    onSim(ev('Q'))
+    expect(sim.manual).toBe(600)
+    onSim(ev('a'))
+    expect(sim.manual).toBe(120)
+    // S is Stats in every ride, not the simulator's sprint any more
+    onSim(ev('s'))
+    expect(sim.manual).toBe(120)
+    for (const k of ['PageUp', 'PageDown', 'Home', 'End', 'q', 'a', '[', ']'])
+      for (const scope of ['solo', 'free', 'bus'] as const)
+        expect(actionOf(ev(k), scope)).toBeUndefined()
+  })
+
+  it('ignores ride and simulator keys typed into a text box', () => {
+    const sim = new SimTrainer()
+    const p0 = sim.manual
+    const box = { tagName: 'INPUT', type: 'text' }
+    simKeys(sim, 200)(ev('PageUp', box))
+    simKeys(sim, 200)(ev('q', box))
+    expect(sim.manual).toBe(p0)
+    const free = { shift: vi.fn(), pause: vi.fn() } as unknown as FreeKeyActions
+    const e = ev('ArrowUp', box)
+    freeKeys(free)(e)
+    freeKeys(free)(ev(' ', { tagName: 'TEXTAREA' }))
+    expect(free.shift).not.toHaveBeenCalled()
+    expect(free.pause).not.toHaveBeenCalled()
+    expect(e.prevented).toBe(false) // the cursor still moves in the box
   })
 })

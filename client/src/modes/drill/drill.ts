@@ -58,7 +58,6 @@ export function runDrill(
     undefined,
     resume && RideRecorder.fromJSON(resume.rec),
   )
-  const isSim = trainer.name.toLowerCase().includes('sim')
   let el = resume?.el ?? 0
   let count = START_S
   let intensity = plan.test ? 1 : (resume?.intensity ?? 1)
@@ -175,7 +174,7 @@ export function runDrill(
       mode.kind === 'slope' && (stepStrength(d), slope.send(mode, ride.live.cadence, true)),
     toggle: view.toggle,
   }
-  const onKey = soloKeys(keyActs, !isSim)
+  const onKey = soloKeys(keyActs)
   addEventListener('keydown', onKey)
   const offClick = plan.test ? () => {} : soloClick(keyActs, () => mode.kind)
   ride.start()

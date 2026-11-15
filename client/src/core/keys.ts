@@ -52,13 +52,13 @@ export const ACTIONS = {
   modeRes: solo('Resistance mode', 'r'),
   modeSlope: solo('Slope mode', 'g'),
   intervals: solo('Interval list', 'i'),
-  simUp: sim('Power +10 W', 'ArrowUp'),
-  simDown: sim('Power −10 W', 'ArrowDown'),
-  simCadUp: sim('Cadence +2 rpm', 'ArrowRight'),
-  simCadDown: sim('Cadence −2 rpm', 'ArrowLeft'),
+  simUp: sim('Power +10 W', 'PageUp'),
+  simDown: sim('Power −10 W', 'PageDown'),
+  simCadUp: sim('Cadence +2 rpm', 'End'),
+  simCadDown: sim('Cadence −2 rpm', 'Home'),
   simEffortUp: sim('How well it follows ERG +0.05', ']'),
   simEffortDown: sim('How well it follows ERG −0.05', '['),
-  simSprint: sim('Sprint: 300% FTP', 's'),
+  simSprint: sim('Sprint: 300% FTP', 'q'),
   simEasy: sim('Easy: 60% FTP', 'a'),
 } satisfies Record<string, Def>
 
@@ -179,9 +179,25 @@ export function typing(e: { target: EventTarget | null }) {
   return el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || !!el.isContentEditable
 }
 
-/** Which of the screen's actions this key press is (none while typing or with Ctrl or Cmd held). */
+const SCROLL = new Set([
+  ' ',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
+  'PageUp',
+  'PageDown',
+  'Home',
+  'End',
+])
+
+/**
+ * Which of the screen's actions this key press is (none while typing or with Ctrl or Cmd held). In a ride screen
+ * the arrows, Space and Page Up and Down never scroll the page, bound or not.
+ */
 export function actionOf(e: KeyboardEvent, scope: Scope): ActionId | undefined {
   if (e.ctrlKey || e.metaKey || e.altKey || typing(e)) return
+  if (scope !== 'sim' && SCROLL.has(e.key)) e.preventDefault()
   const k = keyOf(e)
   return ACTION_IDS.find(
     (id) => (ACTIONS[id].scope as Scope[]).includes(scope) && keys()[id].includes(k),

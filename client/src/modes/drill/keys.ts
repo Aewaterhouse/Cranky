@@ -20,8 +20,8 @@ export interface KeyActions {
   toggle: (part: SoloPart) => void
 }
 
-/** Keyboard handler for the solo player, from the rider's keys. `skipOnArrow` is off with the simulator, whose arrows steer it. */
-export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
+/** Keyboard handler for the solo player, from the rider's keys (Rider → Settings → Controls). */
+export function soloKeys(on: KeyActions) {
   const acts: Partial<Record<ActionId, () => void>> = {
     pause: on.pause,
     skip: on.skip,
@@ -43,7 +43,7 @@ export function soloKeys(on: KeyActions, skipOnArrow: boolean) {
   }
   return (e: KeyboardEvent) => {
     const id = actionOf(e, 'solo')
-    const act = id && !(id === 'skip' && e.key === 'ArrowRight' && !skipOnArrow) && acts[id]
+    const act = id && acts[id]
     if (!act) return
     act()
     e.preventDefault()
