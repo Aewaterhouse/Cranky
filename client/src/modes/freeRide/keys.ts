@@ -1,6 +1,5 @@
+import { type ActionId, actionOf } from '../../core/keys'
 import type { FreePart } from '../../ui/freeRideView'
-
-const HUD_KEYS: Record<string, FreePart> = { h: 'clean', s: 'stats', m: 'map', r: 'riders' }
 
 export interface FreeKeyActions {
   pause(): void
@@ -16,30 +15,28 @@ export interface FreeKeyActions {
   camera(): void
 }
 
-/** The free-ride key map: Space or P pause, Esc end, + and - difficulty, Z and X gears, ; and ' shift strength, C the camera view, H S M R the HUD parts. */
-export const freeKeys = (on: FreeKeyActions) => (e: KeyboardEvent) => {
-  const tag = (e.target as HTMLElement)?.tagName
-  if (tag === 'INPUT' || e.ctrlKey || e.metaKey) return
-  const k = e.key.toLowerCase()
-  const act =
-    k === ' ' || k === 'p'
-      ? on.pause
-      : k === 'escape'
-        ? on.end
-        : k === '+' || k === '='
-          ? () => on.nudge(0.05)
-          : k === '-' || k === '_'
-            ? () => on.nudge(-0.05)
-            : k === 'z' || k === 'x'
-              ? () => on.shift(k === 'x' ? 1 : -1)
-              : k === ';' || k === "'"
-                ? () => on.strength(k === "'" ? 1 : -1)
-                : k === 'c'
-                  ? on.camera
-                  : k in HUD_KEYS
-                    ? () => on.toggle(HUD_KEYS[k])
-                    : null
-  if (!act) return
-  act()
-  e.preventDefault()
+/** The free-ride key handler, from the rider's keys (Rider → Settings → Controls). */
+export const freeKeys = (on: FreeKeyActions) => {
+  const acts: Partial<Record<ActionId, () => void>> = {
+    pause: on.pause,
+    end: on.end,
+    intensityUp: () => on.nudge(0.05),
+    intensityDown: () => on.nudge(-0.05),
+    gearUp: () => on.shift(1),
+    gearDown: () => on.shift(-1),
+    strengthUp: () => on.strength(1),
+    strengthDown: () => on.strength(-1),
+    camera: on.camera,
+    clean: () => on.toggle('clean'),
+    stats: () => on.toggle('stats'),
+    map: () => on.toggle('map'),
+    riders: () => on.toggle('riders'),
+  }
+  return (e: KeyboardEvent) => {
+    const id = actionOf(e, 'free')
+    const act = id && acts[id]
+    if (!act) return
+    act()
+    e.preventDefault()
+  }
 }

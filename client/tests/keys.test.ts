@@ -12,6 +12,8 @@ import {
   setKey,
   typing,
 } from '../src/core/keys'
+import { soloKeys, type KeyActions } from '../src/modes/drill/keys'
+import { freeKeys, type FreeKeyActions } from '../src/modes/freeRide/keys'
 
 const store = new Map<string, string>()
 vi.stubGlobal('localStorage', {
@@ -30,10 +32,29 @@ beforeEach(() => {
 })
 
 describe('ride key bindings', () => {
+  it('shifts gear on the arrows and on Z X in solo and free ride', () => {
+    const free = { shift: vi.fn() } as unknown as FreeKeyActions
+    const solo = { gear: vi.fn() } as unknown as KeyActions
+    for (const k of ['ArrowUp', 'x', 'ArrowDown', 'Z']) {
+      freeKeys(free)({ ...press(k), preventDefault() {} } as KeyboardEvent)
+      soloKeys(solo, true)({ ...press(k), preventDefault() {} } as KeyboardEvent)
+    }
+    expect(vi.mocked(free.shift).mock.calls).toEqual([[1], [1], [-1], [-1]])
+    expect(vi.mocked(solo.gear).mock.calls).toEqual([[1], [1], [-1], [-1]])
+  })
+
+  it('follows a rebound gear key', () => {
+    setKey('gearUp', 0, 'PageDown')
+    const free = { shift: vi.fn() } as unknown as FreeKeyActions
+    freeKeys(free)({ ...press('PageDown'), preventDefault() {} } as KeyboardEvent)
+    freeKeys(free)({ ...press('ArrowUp'), preventDefault() {} } as KeyboardEvent)
+    expect(vi.mocked(free.shift).mock.calls).toEqual([[1]])
+  })
+
   it('starts on the defaults', () => {
     for (const id of ACTION_IDS) expect(keysOf(id)).toEqual(ACTIONS[id].keys)
-    expect(keysOf('gearDown')).toContain('z')
-    expect(keysOf('gearUp')).toContain('x')
+    expect(keysOf('gearUp')).toEqual(['ArrowUp', 'x'])
+    expect(keysOf('gearDown')).toEqual(['ArrowDown', 'z'])
   })
 
   it('rebinds a slot and keeps two keys per action', () => {

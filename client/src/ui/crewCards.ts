@@ -1,5 +1,6 @@
 import { CFG } from '../config'
 import { cardLines, type CardNumbers } from '../core/crewStats'
+import { isKey } from '../core/keys'
 import { saveSettings, settings } from '../core/settings'
 import { h } from './dom'
 import { compColour, hrColour, set } from './hudKit'
@@ -89,8 +90,7 @@ export function crewCards(cls = '') {
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
-    const typing = e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT'
-    if (!typing && !e.repeat && e.key.toLowerCase() === 'd') toggleAll()
+    if (!e.repeat && isKey(e, 'cards')) toggleAll()
   }
   addEventListener('keydown', onKey)
   const build = (r: CardRider, me: boolean): Card => {

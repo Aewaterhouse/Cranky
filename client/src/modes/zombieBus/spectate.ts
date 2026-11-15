@@ -1,6 +1,7 @@
 import '../../hud.css'
 import '../../tv.css'
 import { CFG } from '../../config'
+import { isKey } from '../../core/keys'
 import { frameAt, planTotal } from '../../core/plan'
 import type { Lobby, ServerMsg, Tick } from '../../net/protocol'
 import { WsClient } from '../../net/wsClient'
@@ -94,7 +95,7 @@ export function spectate(code: string, leaveTo: () => void) {
     root.classList.toggle('narrow', innerWidth / innerHeight < 1.5)
   }
   const onKey = (e: KeyboardEvent) => {
-    if (e.key.toLowerCase() === 'c' && !e.repeat) world.cycleView()
+    if (isKey(e, 'camera') && !e.repeat) world.cycleView()
     if (e.key.toLowerCase() !== 'f') return
     if (document.fullscreenElement) void document.exitFullscreen()
     else void document.documentElement.requestFullscreen().catch(() => {})

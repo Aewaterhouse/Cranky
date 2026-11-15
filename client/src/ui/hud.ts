@@ -5,6 +5,7 @@ import '../rideHudDock.css'
 import '../rideHudAim.css'
 import '../busHud.css'
 import { CFG } from '../config'
+import { actionOf } from '../core/keys'
 import { busAim } from '../core/aim'
 import { hudCues } from './hudCues'
 import type { Live } from '../modes/rideController'
@@ -33,7 +34,6 @@ export type { GamePanel, HudOpts } from './hudOpts'
 
 /** Events whose title card replaces a feed line. */
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
-const KEYS: Record<string, string> = { h: 'clean', s: 'stats', tab: 'stats', r: 'riders' }
 
 /**
  * Bus ride overlay. The rider's own numbers sit where every mode has them (power top left, the block clock
@@ -166,20 +166,22 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
-    const part = KEYS[e.key.toLowerCase()]
-    const typing = e.ctrlKey || e.metaKey || (e.target as HTMLElement)?.tagName === 'INPUT'
-    if (o.erg && !typing) {
-      // E switches ERG; with it off Z X (or the arrows) shift gear and ; ' set the shift strength.
-      const k = e.key.toLowerCase()
-      const step = k === 'arrowup' || k === 'x' ? 1 : k === 'arrowdown' || k === 'z' ? -1 : 0
-      const str = k === "'" ? 1 : k === ';' ? -1 : 0
-      if (k === 'e') return (e.preventDefault(), o.erg.toggle(), paintErg())
-      if (step && !o.erg.on()) return (e.preventDefault(), o.erg.shift(step))
-      if (str && !o.erg.on()) return (e.preventDefault(), o.erg.strength(str))
-    }
-    if (!part || typing) return
+    const id = actionOf(e, 'bus')
+    // ERG switches with its key; with it off the gear and shift-strength keys work.
+    const gears = !!o.erg && !o.erg.on()
+    const act =
+      id === 'erg' && o.erg
+        ? () => (o.erg!.toggle(), paintErg())
+        : (id === 'gearUp' || id === 'gearDown') && gears
+          ? () => o.erg!.shift(id === 'gearUp' ? 1 : -1)
+          : (id === 'strengthUp' || id === 'strengthDown') && gears
+            ? () => o.erg!.strength(id === 'strengthUp' ? 1 : -1)
+            : id === 'stats' || id === 'riders' || id === 'clean'
+              ? () => toggle(id)
+              : null
+    if (!act) return
     e.preventDefault()
-    toggle(part)
+    act()
   }
   // In clean view a tap anywhere brings the HUD back (there is no H key on a phone).
   const onTap = () =>

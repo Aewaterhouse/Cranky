@@ -2,6 +2,7 @@ import '../../hud.css'
 import '../../tv.css'
 import '../../freeHud.css'
 import '../../road.css'
+import { isKey } from '../../core/keys'
 import { ROUTE_INDEX, loadRoute } from '../../core/routeLibrary'
 import type { RoadLobby, RoadMsg } from '../../net/protocol'
 import { VIS } from '../../scene/params'
@@ -48,7 +49,7 @@ export function roadSpectate(code: string, leaveTo: () => void) {
     if (k === 'f') {
       if (document.fullscreenElement) void document.exitFullscreen()
       else void document.documentElement.requestFullscreen().catch(() => {})
-    } else if (k === 'c' && !e.repeat) world?.cycleView()
+    } else if (isKey(e, 'camera') && !e.repeat) world?.cycleView()
     else if (k === 'l') pick = ''
     else if (k === 'arrowleft' || k === 'arrowright') {
       const ids = link

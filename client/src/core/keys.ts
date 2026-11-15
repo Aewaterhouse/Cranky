@@ -19,8 +19,8 @@ const solo = (label: string, ...keys: string[]) => def('Solo workout', ['solo'],
 const sim = (label: string, ...keys: string[]) => def('Simulator', ['sim'], label, ...keys)
 
 export const ACTIONS = {
-  gearUp: all('Gear harder', 'x'),
-  gearDown: all('Gear easier', 'z'),
+  gearUp: all('Gear harder', 'ArrowUp', 'x'),
+  gearDown: all('Gear easier', 'ArrowDown', 'z'),
   strengthUp: all('Shift strength up', "'"),
   strengthDown: all('Shift strength down', ';'),
   stats: all('Stats', 's', 'Tab'),
@@ -187,3 +187,7 @@ export function actionOf(e: KeyboardEvent, scope: Scope): ActionId | undefined {
     (id) => (ACTIONS[id].scope as Scope[]).includes(scope) && keys()[id].includes(k),
   )
 }
+
+/** Whether this key press is `id`, for a handler with one action (never while typing or with Ctrl or Cmd held). */
+export const isKey = (e: KeyboardEvent, id: ActionId) =>
+  !(e.ctrlKey || e.metaKey || e.altKey || typing(e)) && keys()[id].includes(keyOf(e))
