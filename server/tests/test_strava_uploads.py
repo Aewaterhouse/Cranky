@@ -207,11 +207,12 @@ def test_titles_and_descriptions_by_mode():
         "record": {"secs": 2400},
         "np": 200,
         "avgPower": 180,
-        "segments": [{"pr": True}],
+        "segments": [{"pr": True, "secs": 1500, "prevS": 1530, "name": "Coot-tha", "kind": "route"}],
     }
     title, about = describe(free, "luke")
     assert title == "Mount Coot-tha · Cranky free ride" and "12.3 km · 280 m climbed · 40:00" in about
-    assert "1 segment PR" in about and about.endswith("Ridden on Cranky · cranky.life")
+    assert "⏱️ Coot-tha: 25:00, 0 W · PR (was 25:30)" in about
+    assert about.endswith("Ridden on Cranky · cranky.life")
     solo = {
         "planName": "Sweet Spot 3x10",
         "record": {"secs": 3700},

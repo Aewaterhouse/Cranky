@@ -13,6 +13,7 @@ from pydantic import BaseModel
 
 from . import config
 from .strava import Busy, Strava
+from .strava_ctx import ride_context
 from .strava_text import describe
 from .strava_uploads import Uploads
 
@@ -112,7 +113,8 @@ def router(strava: Strava, uploads: Uploads, user: Any) -> APIRouter:
         fit = unpack(body.fit, ".fit")
         png = unpack(body.png, "postcard") if body.png else None
         card = uploads.card_for(u["id"], n) if png else None
-        name, about = describe(ride, u["id"], f"{config.PUBLIC_URL}/p/{card}" if card else "")
+        link = f"{config.PUBLIC_URL}/p/{card}" if card else ""
+        name, about = describe(ride, u["id"], link, ride_context(strava.store, u["id"], ride))
         return uploads.queue(u["id"], n, name, about, fit, card, png)
 
     @api.get("/p/{card}.png")
