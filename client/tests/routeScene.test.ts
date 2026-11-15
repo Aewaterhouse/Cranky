@@ -81,6 +81,35 @@ describe('road path', () => {
     expect(a.z).toBeCloseTo(path.z[0] + 50, 0)
     expect(a.y).toBeCloseTo(path.y[0], 6)
   })
+  it('goes round a circuit smoothly, with no straight run-off at the line', () => {
+    // A 1.2 km circle, its last point 4 m short of its first (as a resampled recording ends).
+    const raw: RawPoint[] = []
+    const rad = 1200 / (2 * Math.PI)
+    for (let i = 0; i <= 120; i++) {
+      const t = (Math.min(i * 10, 1196) / 1200) * 2 * Math.PI
+      raw.push({
+        d: i * 10,
+        lat: -27 + (rad * Math.sin(t)) / 110540,
+        lon: 153 + (rad * (1 - Math.cos(t))) / 99000,
+        ele: 3,
+      })
+    }
+    const lap = new RoadPath({ ...buildRoute('ring', 'Ring', raw), loop: true })
+    expect(lap.loop).toBe(true)
+    const p = newPose()
+    const q = newPose()
+    lap.poseAt(lap.length - 0.01, p)
+    lap.poseAt(0, q)
+    expect(Math.hypot(p.x - q.x, p.z - q.z)).toBeLessThan(0.1)
+    expect(p.fx * q.fx + p.fz * q.fz).toBeGreaterThan(0.99)
+    // Past the line it is the start of the lap again, not a straight carrying on.
+    lap.poseAt(-30, p)
+    lap.poseAt(lap.length - 30, q)
+    expect(Math.hypot(p.x - q.x, p.z - q.z)).toBeLessThan(0.01)
+    // Curvature is the same all the way round, the line included.
+    const curv = [0, 5, lap.length / 2, lap.length - 5].map((d) => lap.poseAt(d, p).curv)
+    for (const c of curv) expect(c).toBeCloseTo(curv[2], 3)
+  })
   it('gives routes without coordinates a wandering line with the real heights', () => {
     const r = buildRoute(
       'nopos',

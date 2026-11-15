@@ -72,6 +72,19 @@ function despur(x: Float64Array, z: Float64Array, space: number) {
   }
 }
 
+/** Points over which a circuit's closing gap is shared out. */
+const CLOSE_PTS = 10
+
+/** Moves a circuit's last few points so its last lands exactly on its first, spreading the gap. */
+function close(x: Float64Array, z: Float64Array, y: Float64Array) {
+  const n = x.length
+  const k = Math.min(CLOSE_PTS, n - 2)
+  for (const a of [x, z, y]) {
+    const gap = a[0] - a[n - 1]
+    for (let j = 1; j <= k; j++) a[n - 1 - k + j] += (gap * j) / k
+  }
+}
+
 /** Out-and-back legs closer than this are one road ridden both ways; shorter ones than the minimum are spurs. */
 const UTURN_GAP_M = 10
 const UTURN_MIN_M = 300
@@ -139,11 +152,14 @@ export class RoadPath {
   readonly y: Float64Array
   readonly z: Float64Array
   readonly curv: Float32Array
+  /** A circuit: the last point is the first, and the road goes round instead of running off its ends. */
+  readonly loop: boolean
 
   /** `origin` defaults to the route's first point; pass the terrain grid's origin when there is one. */
   constructor(route: Route, origin?: { lat0: number; lon0: number }) {
     const p = route.points
     const n = (this.n = p.length)
+    this.loop = !!route.loop && n > 8
     this.space = p[1].d - p[0].d
     this.length = route.distance
     const x = (this.x = new Float64Array(n))
@@ -158,14 +174,15 @@ export class RoadPath {
       })
       splitUturns(x, z, this.y, this.space)
       despur(x, z, this.space)
+      if (this.loop) close(x, z, this.y)
+      // A circuit smooths straight through its start line; an open road keeps its two ends where they are.
+      const m = this.loop ? n - 1 : n
       for (let k = 0; k < R.smoothPasses; k++)
         for (const a of [x, z]) {
-          let prev = a[0]
-          for (let i = 1; i < n - 1; i++) {
-            const cur = a[i]
-            a[i] = (prev + 2 * cur + a[i + 1]) / 4
-            prev = cur
-          }
+          const was = a.slice()
+          for (let i = this.loop ? 0 : 1; i < m - (this.loop ? 0 : 1); i++)
+            a[i] = (was[this.at(i - 1)] + 2 * was[i] + was[this.at(i + 1)]) / 4
+          if (this.loop) a[n - 1] = a[0]
         }
     } else {
       // No coordinates: a made-up line that wanders gently and keeps the real gradient.
@@ -178,24 +195,36 @@ export class RoadPath {
       }
     }
     const raw = new Float32Array(n)
-    for (let i = 1; i < n - 1; i++) {
-      const a = Math.atan2(x[i] - x[i - 1], z[i - 1] - z[i])
-      const b = Math.atan2(x[i + 1] - x[i], z[i] - z[i + 1])
+    const inner = (i: number) => this.loop || (i > 0 && i < n - 1)
+    for (let i = 0; i < n; i++) {
+      if (!inner(i)) continue
+      const [p, q] = [this.at(i - 1), this.at(i + 1)]
+      const a = Math.atan2(x[i] - x[p], z[p] - z[i])
+      const b = Math.atan2(x[q] - x[i], z[i] - z[q])
       const turn = Math.atan2(Math.sin(b - a), Math.cos(b - a))
-      raw[i] = turn / Math.max(1, Math.hypot(x[i + 1] - x[i - 1], z[i + 1] - z[i - 1]) / 2)
+      raw[i] = turn / Math.max(1, Math.hypot(x[q] - x[p], z[q] - z[p]) / 2)
     }
-    this.curv = raw.map((c, i) => (i && i < n - 1 ? (raw[i - 1] + 2 * c + raw[i + 1]) / 4 : c))
+    this.curv = raw.map((c, i) =>
+      inner(i) ? (raw[this.at(i - 1)] + 2 * c + raw[this.at(i + 1)]) / 4 : c,
+    )
   }
 
-  /** Pose at `d` metres along the route. Beyond either end the road carries straight on, level. */
+  /** Point index `i`, wrapped round a circuit (whose last point is its first) or clamped to an open road. */
+  at(i: number) {
+    const m = this.n - 1
+    return this.loop ? ((i % m) + m) % m : clamp(i, 0, m)
+  }
+
+  /** Pose at `d` metres along the route. A circuit goes round again; past an open road's ends it carries straight on, level. */
   poseAt(d: number, out: Pose): Pose {
     const { x, y, z, n } = this
+    if (this.loop) d = ((d % this.length) + this.length) % this.length
     const u = d / this.space
     const i = clamp(Math.floor(u), 0, n - 2)
     const t = clamp(u - i)
-    const a = Math.max(0, i - 1)
+    const a = this.at(i - 1)
     const c = i + 1
-    const e = Math.min(n - 1, i + 2)
+    const e = this.loop ? this.at(i + 2) : Math.min(n - 1, i + 2)
     const dx = crd(x[a], x[i], x[c], x[e], t)
     const dz = crd(z[a], z[i], z[c], z[e], t)
     const len = Math.hypot(dx, dz)

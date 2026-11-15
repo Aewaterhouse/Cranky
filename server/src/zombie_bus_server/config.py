@@ -446,6 +446,8 @@ ROAD_SMOOTH_M = 100
 ROAD_MAX_GRADE_PCT = 20
 ROAD_MAX_STORED = 4000
 ROAD_SMOOTH_PASSES = 2
+# Points over which a circuit's closing gap is shared out (roadPath.ts CLOSE_PTS).
+ROAD_CLOSE_PTS = 10
 ROAD_UTURN_SHIFT_M = 3.5
 ROAD_UTURN_BULB_M = 12
 ROAD_LAPS_MAX = 99

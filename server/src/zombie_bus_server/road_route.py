@@ -140,29 +140,46 @@ def _despur(x: list[float], z: list[float], space: float) -> None:
         i = b + 1
 
 
-def _curvature(lat: list[float], lon: list[float], space: float) -> list[float]:
-    """Signed curvature (1/m) at each sample of the drawn centreline."""
+def _curvature(lat: list[float], lon: list[float], space: float, loop: bool = False) -> list[float]:
+    """Signed curvature (1/m) at each sample of the drawn centreline; a circuit wraps through its line."""
     n = len(lat)
+    loop = loop and n > 8
     lat0, lon0 = round(lat[0], 5), round(lon[0], 5)
     east = 111320 * math.cos(lat0 * math.pi / 180)
     x = [(round(v, 5) - lon0) * east for v in lon]
     z = [-(round(v, 5) - lat0) * 110540 for v in lat]
     _split_uturns(x, z, space)
     _despur(x, z, space)
+    m = n - 1
+
+    def at(i: int) -> int:
+        return i % m if loop else max(0, min(m, i))
+
+    if loop:
+        k = min(C.ROAD_CLOSE_PTS, n - 2)
+        for a in (x, z):
+            gap = a[0] - a[-1]
+            for j in range(1, k + 1):
+                a[n - 1 - k + j] += gap * j / k
+    inner = range(0, m) if loop else range(1, n - 1)
     for _ in range(C.ROAD_SMOOTH_PASSES):
         for a in (x, z):
-            prev = a[0]
-            for i in range(1, n - 1):
-                cur = a[i]
-                a[i] = (prev + 2 * cur + a[i + 1]) / 4
-                prev = cur
+            was = a[:]
+            for i in inner:
+                a[i] = (was[at(i - 1)] + 2 * was[i] + was[at(i + 1)]) / 4
+            if loop:
+                a[-1] = a[0]
     raw = [0.0] * n
-    for i in range(1, n - 1):
-        a = math.atan2(x[i] - x[i - 1], z[i - 1] - z[i])
-        b = math.atan2(x[i + 1] - x[i], z[i] - z[i + 1])
+    for i in range(n) if loop else inner:
+        p, q = at(i - 1), at(i + 1)
+        a = math.atan2(x[i] - x[p], z[p] - z[i])
+        b = math.atan2(x[q] - x[i], z[i] - z[q])
         turn = math.atan2(math.sin(b - a), math.cos(b - a))
-        raw[i] = turn / max(1.0, math.hypot(x[i + 1] - x[i - 1], z[i + 1] - z[i - 1]) / 2)
-    return [(raw[i - 1] + 2 * c + raw[i + 1]) / 4 if 0 < i < n - 1 else c for i, c in enumerate(raw)]
+        raw[i] = turn / max(1.0, math.hypot(x[q] - x[p], z[q] - z[p]) / 2)
+    return [
+        (raw[at(i - 1)] + 2 * c + raw[at(i + 1)]) / 4 if loop or 0 < i < n - 1 else c
+        for i, c in enumerate(raw)
+    ]
 
 
 @dataclass(frozen=True)
@@ -201,7 +218,7 @@ def load_lap(route_id: str) -> Lap:
         bool(pack.get("loop")),
         space,
         tuple(_grades(el, space)),
-        tuple(_curvature(lat, lon, space)),
+        tuple(_curvature(lat, lon, space, bool(pack.get("loop")))),
     )
 
 

@@ -79,13 +79,16 @@ export class Chunks {
   update(d: number, ahead: number, level: Level, all = false) {
     const L = R.chunk
     const { path } = this.place.field
-    const here = Math.floor(d / L)
+    // A circuit has a chunk for each stretch of the lap and wraps round; an open road carries on a little past
+    // both ends so the world never just stops.
+    const count = Math.ceil(path.length / L - 1e-6)
+    const wrap = (k: number) => (path.loop ? ((k % count) + count) % count : k)
+    const here = wrap(Math.floor(d / L))
     if (here === this.at && ahead === this.span && !this.pending) return
     this.at = here
     this.span = ahead
-    // The road carries on a little past both ends so the world never just stops.
-    const first = -1
-    const last = Math.floor(path.length / L) + 2
+    const first = path.loop ? 0 : -1
+    const last = path.loop ? count - 1 : Math.floor(path.length / L) + 2
     const lo = Math.floor((d - R.behind) / L)
     const hi = Math.floor((d + ahead) / L)
     const me = path.poseAt(d, pose)
@@ -93,14 +96,14 @@ export class Chunks {
     // Wanted: the stretch being ridden, plus any road close by as the crow flies (the other legs of a switchback).
     const wanted = (k: number) => {
       if (k < first || k > last) return false
-      if (k >= lo && k <= hi) return true
+      if (path.loop ? wrap(k - lo) <= hi - lo : k >= lo && k <= hi) return true
       const c = path.poseAt((k + 0.5) * L, pose)
       return Math.hypot(c.x - x, c.z - z) < R.nearby * R.nearbyShare[level]
     }
     for (const [k, g] of this.live) if (!wanted(k)) this.drop(k, g)
     this.pending = false
     for (let i = 0; i <= last - first; i++)
-      for (const k of i ? [here + i, here - i] : [here]) {
+      for (const k of (i ? [here + i, here - i] : [here]).map(wrap)) {
         if (this.live.has(k) || !wanted(k)) continue
         if (this.pending && !all) return
         this.build(k, level)
@@ -113,7 +116,8 @@ export class Chunks {
     const t0 = performance.now()
     const { field, cover, features, signs, furniture, landmarks, odd } = this.place
     const d0 = k * R.chunk
-    const d1 = d0 + R.chunk
+    // A circuit's last chunk stops at the line; the first chunk carries on from there.
+    const d1 = field.path.loop ? Math.min(d0 + R.chunk, field.path.length) : d0 + R.chunk
     field.path.poseAt(d0, pose)
     const g = new THREE.Group()
     g.position.set(pose.x, pose.y, pose.z)
