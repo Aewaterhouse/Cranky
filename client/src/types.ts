@@ -27,8 +27,8 @@ export interface Plan {
   name: string
   desc?: string
   goal?: string
-  /** Marks an FTP test: the player works out a new FTP at the end. */
-  test?: 'ramp' | 'ftp20'
+  /** Marks a test: an FTP test works out a new FTP at the end; the fatigue test keeps fixed watts. */
+  test?: 'ramp' | 'ftp20' | 'fatigue'
   blocks: Block[]
   /** Workout builder source blocks, kept so the workout can be edited again. */
   edit?: BuilderBlock[]

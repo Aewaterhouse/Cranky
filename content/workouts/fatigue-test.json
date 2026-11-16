@@ -1,0 +1,32 @@
+{
+ "id": "fatigue-test",
+ "name": "Submaximal Fatigue Test",
+ "goal": "test",
+ "test": "fatigue",
+ "desc": "The same steady effort every time, then a minute sitting still. Heart rate during the effort and how fast it falls afterwards show how fresh you are. Chest strap on.",
+ "blocks": [
+  {
+   "type": "ramp",
+   "dur": 360,
+   "pct": [50, 75],
+   "label": "Warm-up",
+   "cues": [{ "at": 0, "text": "Chest strap on? This test is all about heart rate." }]
+  },
+  {
+   "type": "steady",
+   "dur": 180,
+   "pct": 105,
+   "label": "Test effort",
+   "cues": [
+    { "at": 0, "text": "Three minutes, seated the whole way. Same as last time." },
+    { "at": 170, "text": "Ten seconds, then stop pedalling and sit still." }
+   ]
+  },
+  {
+   "type": "free",
+   "dur": 60,
+   "label": "Sit still",
+   "cues": [{ "at": 0, "text": "Stop pedalling. Stay on the bike, sit still and breathe." }]
+  }
+ ]
+}

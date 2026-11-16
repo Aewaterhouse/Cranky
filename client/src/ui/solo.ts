@@ -7,6 +7,7 @@ import { planFor, type HomeActions } from './home'
 import { planGraph } from './planGraph'
 import { mainWatts, minsLabel, planPicker, tagEls } from './planPicker'
 import { needTrainer } from './trainer'
+import { fatigueWatts } from '../modes/drill/fatigueTest'
 import { TIER_NAME } from '../types'
 
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1)
@@ -107,6 +108,39 @@ function ftpCard(p: Profile, act: HomeActions) {
   )
 }
 
+/** The fatigue test: the same watts every run, set by the first real one. */
+function fatigueCard(p: Profile, act: HomeActions) {
+  const lock = p.fatigueTest
+  const w = lock?.w ?? fatigueWatts(planFor('fatigue-test', 0), p.ftp)
+  return h(
+    'details',
+    { class: 'panel ftp-card' },
+    h('summary', { class: 'label' }, `Fatigue test · ${w} W`),
+    h(
+      'div',
+      { class: 'ftp-opts' },
+      h(
+        'div',
+        { class: 'ftp-opt' },
+        h('b', {}, 'Submaximal fatigue test'),
+        h(
+          'span',
+          { class: 'dim' },
+          `10 min. 6 min warm-up, 3 min seated at ${w} W, then 1 min sitting still. Chest strap on. ` +
+            (lock
+              ? `Locked at ${w} W since ${new Date(lock.date).toLocaleDateString('en-AU')}, so runs compare.`
+              : `Your first real run locks ${w} W (105% of FTP) for good, so runs compare.`),
+        ),
+        h(
+          'button',
+          { class: 'primary', onclick: needTrainer(() => act.drill(planFor('fatigue-test', 0))) },
+          'Start',
+        ),
+      ),
+    ),
+  )
+}
+
 /** Solo workout setup: pick a plan, pick a tier, see what you are in for, go. */
 export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
   let id = 'ss-2x15'
@@ -177,6 +211,7 @@ export function soloSetup(p: Profile, act: HomeActions, back: () => void) {
       'Just you and the plan, no bus. Good for training or testing a trainer.',
     ),
     ftpCard(p, act),
+    fatigueCard(p, act),
     h(
       'div',
       { class: 'setup-cols' },

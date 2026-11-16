@@ -28,6 +28,7 @@ import { LiveTally } from './liveTally'
 import { pickOverlay, type Overlay } from './overlays'
 import { stepStrength } from '../../ui/gearTile'
 import { coolStart, ftpResult, testSpec } from './ftpTest'
+import { fatiguePlan, holdsStill, lockFatigue } from './fatigueTest'
 
 const START_S = 5
 const PAUSE_ERG = 0.4
@@ -42,7 +43,8 @@ export function runDrill(
   done: (p: Profile) => void,
   resume?: SoloSnap,
 ) {
-  const plan = ownPlan(rawPlan)
+  // A resumed ride's plan was saved already scaled.
+  const plan = resume ? ownPlan(rawPlan) : fatiguePlan(ownPlan(rawPlan), profile)
   let total = planTotal(plan.blocks)
   let completing = false
   let grace = 0
@@ -209,7 +211,14 @@ export function runDrill(
       if (below >= CFG.ftpTest.failS) rampDone()
       idleFor = stopped ? idleFor + dt : 0
       activeFor = stopped ? 0 : activeFor + dt
-      if (!manual && !auto && !sprinting() && idleFor >= STOP_S) auto = true
+      if (
+        !manual &&
+        !auto &&
+        !sprinting() &&
+        !holdsStill(plan, ride.frame?.type) &&
+        idleFor >= STOP_S
+      )
+        auto = true
       else if (auto && activeFor >= GO_S) auto = false
       if (!manual && !auto && !completing) el += dt * fast
       if (!completing && el >= total) {
@@ -317,6 +326,7 @@ export function runDrill(
     await ride.stop()
     profile.tier = origTier
     tally.record(ride.rec, el, ride.live)
+    lockFatigue(plan, profile, el, ride.rec.sim)
     // A test ride (simulator) never sets an FTP.
     const r =
       ride.rec.sim || endChoice() === 'bin' ? null : ftpResult(plan, ride.rec.power, tally.xs)

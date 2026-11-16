@@ -11,7 +11,7 @@ export interface TestSpec {
 
 /** Which blocks of a test plan are measured, or null for an ordinary plan. */
 export function testSpec(plan: Plan): TestSpec | null {
-  if (!plan.test) return null
+  if (!plan.test || plan.test === 'fatigue') return null
   const bl = plan.blocks
   if (plan.test === 'ramp') {
     const from = bl.findIndex((b) => b.label?.startsWith('Ramp'))

@@ -39,6 +39,8 @@ export interface Profile {
   dailyPaid?: number
   /** The training plan the rider is on, if any. */
   plan?: PlanPick
+  /** The fatigue test's locked FTP and effort watts, set by the first real run. */
+  fatigueTest?: { ftp: number; w: number; date: string }
   /** Every FTP change, oldest first. */
   ftpHistory: { date: string; ftp: number }[]
   /** All-time real bests by duration. */

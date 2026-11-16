@@ -370,3 +370,7 @@ Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
 - `e2e/ride.cjs` runs all three with three bots (1, 2 and 2 laps; about 3 min at ZB_TIME_SCALE=10) and checks the
   results; the podium itself needs eyes.
 
+
+## Fatigue test
+- Solo setup → Fatigue test card → Start with the simulator (`?fast=10` speeds it up). Warm-up ramps, effort holds 105% of FTP, the last minute shows "free ride" with no target; stop pedalling and it must not auto-pause. A sim run must not lock the watts (card still says "Your first real run locks…").
+- On the real trainer with a chest strap: after the first run the card says "Locked at N W"; change FTP in Settings and the effort stays at N W. Check the .fit on Intervals.icu for the HR during the effort and the drop in the still minute.
