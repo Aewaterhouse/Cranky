@@ -60,7 +60,7 @@ changes are skipped, (c) the trainer eases into a new gradient by itself.
       report; a shift still applies in full straight away. Smoothing time in config.
 - [x] 2.3 A "Gear log" on the trainer check page: time of each press, the gradient sent, the trainer's
       acknowledgement and the time until power moves by a set amount, so lag is measured, not guessed.
-- [ ] 2.4 Research only, no trainer writes in the app: from public sources (QZ / qdomyos-zwift and similar
+- [x] 2.4 Research only, no trainer writes in the app: from public sources (QZ / qdomyos-zwift and similar
       open projects), write docs/zwift-gear-protocol.md describing how apps send a gear ratio straight to
       Zwift-protocol trainers (Zwift Hub, JetBlack Victory): service, characteristics, handshake, message
       bytes, how to return the trainer to normal. State what is confirmed and what is a guess.
