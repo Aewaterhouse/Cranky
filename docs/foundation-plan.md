@@ -64,7 +64,7 @@ changes are skipped, (c) the trainer eases into a new gradient by itself.
       open projects), write docs/zwift-gear-protocol.md describing how apps send a gear ratio straight to
       Zwift-protocol trainers (Zwift Hub, JetBlack Victory): service, characteristics, handshake, message
       bytes, how to return the trainer to normal. State what is confirmed and what is a guess.
-- [ ] 2.5 On the trainer check page only: a "Direct gears (experimental)" panel that tries 2.4 on the
+- [x] 2.5 On the trainer check page only: a "Direct gears (experimental)" panel that tries 2.4 on the
       connected trainer and logs every byte both ways. Off unless clicked. Not used by any ride.
 - [ ] 2.6 STOP. Luke tests 2.3 and 2.5 on his JetBlack and reports. Direct gears go into rides only after that.
 - [ ] 2.7 Zombie Bus in gears mode and free ride share one gear path (same code, same feel).

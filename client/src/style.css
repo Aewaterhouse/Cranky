@@ -155,3 +155,10 @@ td {
   border-radius: 6px;
   background: rgb(255 255 255 / 0.04);
 }
+/* Trainer check page: the direct gears byte log. */
+.direct-log {
+  max-height: 320px;
+  overflow: auto;
+  font-size: 0.75rem;
+  white-space: pre-wrap;
+}

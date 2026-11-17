@@ -5,6 +5,7 @@ import { SimTrainer } from './trainer/simTrainer'
 import { BleClick } from './trainer/zwiftClick'
 import type { Trainer } from './types'
 import { h, show } from './ui/dom'
+import { directGearsPanel } from './ui/directGearsPanel'
 import { gearLogPanel } from './ui/gearLogPanel'
 
 /** Phase 0 trainer check: connect, read power/cadence, set ERG. */
@@ -120,6 +121,7 @@ show(
       h('button', { onclick: () => void pairClick() }, 'Pair Zwift Click'),
     ),
     gearLog.el,
+    directGearsPanel(),
     h('p', { class: 'dim' }, 'Record results per device in docs/testing.md (iPad: try Bluefy).'),
   ),
 )
