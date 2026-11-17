@@ -30,6 +30,32 @@ The Click needs firmware 1.1.0 or later (1.0.0 ignores the RideOn handshake). Up
 - [ ] Solo Slope mode: same check. ERG mode: Click changes intensity by 1%. Resistance mode: Click steps the level.
 - [ ] Set your real chainring under Settings if it is not 34T.
 
+## Foundation plan 2.6: gear lag and direct gears (JetBlack Victory + Zwift Click)
+Stage 2 stops here until this is done. Use Chrome on the computer you ride with, the latest build, and the trainer on its usual firmware (note the version in the JetBlack app). Close Zwift, MyWhoosh and the JetBlack app first so nothing else holds the trainer. Paste everything you copy below into `docs/testing.md` under a dated "2.6" heading.
+
+**A. Gear log (today's gears, measured)**
+1. Open `/spike.html`. Press **Connect FTMS** and pick the Victory. The top line should read "Connected" and show your power and cadence while you pedal.
+2. Press **Pair Zwift Click** and pick the Click. Press each button once; the Click test should show UP or DOWN.
+3. In the **Gear log**, pedal steadily at about 85–90 rpm on the small ring you normally use. Hold the cadence still for the whole test.
+4. Shift up once with the Click every 5 s, ten times, then down ten times. Wait for each row's "Power moved" to show a time before the next shift.
+5. Do the same ten up and ten down with the keyboard (↑ / ↓) to compare.
+6. Write down the two medians at the top: "median ack" (how long the trainer took to accept each gradient) and "median until power moves 15 W" (how long until you would feel it). Note any row that says "no move".
+7. Press **Copy log** and paste it into `docs/testing.md`.
+8. Say how it felt: does a shift arrive about when you press, or still late? Does the resistance wander between shifts at a steady cadence (it should not now)?
+
+**B. Direct gears (experimental; can upset ERG until you reset)**
+9. Reload `/spike.html` so the gear log starts clean. Don't connect FTMS this time.
+10. In **Direct gears (experimental)** press **Start direct gears** and pick the Victory. If Chrome lists two entries, pick the one called Victory. The byte log should show "Zwift service …", the RideOn write and a reply line starting `52 69 64 65 4f 6e`. If it says "No Zwift service on this trainer", stop here: copy the bytes and report that.
+11. Pedal at about 85 rpm. The panel should show power and cadence from the trainer (`riding` lines in the log).
+12. Press **Harder ▲** five times, about 5 s apart, then **Easier ▼** ten times, then **Harder ▲** five times. After each press, note whether the resistance changes and roughly how quickly (instant, about 1 s, several seconds, never). Each press should log a `gear N` line and a `reply: 3c …` line.
+13. Press **Check FTMS still answers**. Note whether an `ftms: 80 00 01` line comes back (it still works) or nothing does (Zwift mode has locked FTMS out).
+14. Press **Back to normal**. The log should say "Disconnected".
+15. Press **Connect FTMS**, then **Set ERG** at 150 W, and pedal. The Victory must hold 150 W. If it doesn't, power-cycle the trainer and say so in your report.
+16. Press **Copy bytes** (the log keeps everything from step 10 on) and paste it into `docs/testing.md`.
+
+**C. Report back**
+17. In a few lines: the two medians from step 6; whether direct gears changed resistance at all, and how fast compared with the gear log; whether FTMS still answered in step 13; whether ERG came back in step 15 without a power cycle. Direct gears go into rides (2.7) only after this.
+
 ## Crash recovery
 - [ ] Refresh the page mid solo workout. The home screen should offer "Resume your workout?"; resuming should pick up at the same point with the earlier minutes still in the results.
 - [ ] Refresh mid bus ride with at least one other rider aboard. "Rejoin bus" should put you back on with your stats intact.
