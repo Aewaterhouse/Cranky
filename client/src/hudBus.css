@@ -136,30 +136,8 @@
 .bs-sync-t[data-s='tune'] .bs-win {
   background: rgb(127 209 59 / 0.45);
 }
-.bs-sync-t[data-s='tune'] + .bs-pips,
 .bs:has([data-s='tune']) .bs-sync-s {
   color: var(--tox);
-}
-.bs-pips {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 4px 10px;
-  align-items: center;
-  margin-top: 10px;
-}
-.bs-pips span {
-  display: flex;
-  gap: 4px;
-}
-.bs-pips i {
-  font-style: normal;
-  font-size: 0.85rem;
-  opacity: 0.22;
-  filter: grayscale(1);
-}
-.bs-pips i.on {
-  opacity: 1;
-  filter: none;
 }
 @keyframes bs-pulse {
   to {

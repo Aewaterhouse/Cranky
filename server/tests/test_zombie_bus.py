@@ -102,29 +102,6 @@ def test_summary_awards():
     assert s["distance"] > 0 and len(s["riders"]) == 4
 
 
-def test_servo_shop_upgrades():
-    room, bus = FakeRoom(STEADY), ZombieBus()
-    set_all(room, 1.0)
-    r0 = room.riders["r0"]
-    run(room, bus, 1, ev="longhaul")
-    bus.armour = 50
-    bus.buy(r0, "plating")
-    assert bus.armour == 50, "shop is closed outside servo stops"
-    run(room, bus, 1, ev="servo")
-    bus.wares = list(C.SHOP)
-    assert bus.state(room, 1, 0)["shop"]
-    bus.buy(r0, "plating")
-    assert bus.armour == 75 and not bus.state(room, 1, 0)["shop"], "one free pick a stop"
-    bus.buy(r0, "repellent")
-    assert bus.repel == 0
-    run(room, bus, 1, i=0)
-    run(room, bus, 1, ev="servo")
-    bus.wares = list(C.SHOP)
-    bus.buy(r0, "repellent")
-    bus.damage(10, "x")
-    assert bus.armour == 75 and bus.repel == 0
-
-
 def test_bus_is_full_at_six():
     import asyncio
 
@@ -215,13 +192,6 @@ def test_weekly_mutators_apply_above_easy():
     assert weeks == {m["id"] for m in C.MUTATORS}
     bolts = next(m for m in C.MUTATORS if m["id"] == "bolts")
     assert ZombieBus("normal", bolts).armour == 70 and ZombieBus("easy", bolts).armour == 100
-    closed = next(m for m in C.MUTATORS if m["id"] == "closed")
-    room, bus = FakeRoom(STEADY), ZombieBus("normal", closed)
-    set_all(room, 1.0)
-    run(room, bus, 1, ev="servo")
-    bus.armour = 50
-    bus.buy(room.riders["r0"], "plating")
-    assert bus.armour == 50 and not bus.state(room, 1, 0)["shop"]
 
 
 def kinds(fx):
@@ -298,22 +268,6 @@ def test_nobody_falls_off_while_erg_ramps_at_the_start_a_new_block_or_the_warm_u
         assert all(r.st == "riding" for r in room.riders.values()), (el0, bel0, ev)
 
 
-def test_a_servo_stop_where_nobody_buys_picks_for_the_crew():
-    room, bus = FakeRoom(STEADY), ZombieBus()
-    set_all(room, 1.0)
-    run(room, bus, 1, ev="servo")
-    bus.armour, bus.wares = 50, list(C.SHOP)
-    fx = run(room, bus, 1, ev="longhaul")
-    assert bus.armour == 50 + C.PLATING_ARMOUR
-    assert any(f["k"] == "buy" and f["id"] is None and "servo" in f["text"] for f in fx)
-    run(room, bus, 1, ev="servo")
-    bus.buy(room.riders["r0"], "sync")
-    fx = run(room, bus, 1, ev="longhaul")
-    assert not [
-        f for f in fx if f["k"] == "buy" and f["id"] is None
-    ], "someone shopped, so the servo keeps out of it"
-
-
 def test_the_crew_votes_the_next_leg_at_the_servo():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0)
@@ -328,7 +282,7 @@ def test_the_crew_votes_the_next_leg_at_the_servo():
     fx = run(room, bus, 1, ev="longhaul")
     assert bus.leg == C.LEGS["easy"] and any(f["k"] == "leg" for f in fx)
     assert bus.ask(room, room.riders["r0"]) is None
-    armour, bus.repel = bus.armour, 0  # the servo's free pick may have been repellent
+    armour = bus.armour
     bus.damage(10, "ouch")
     assert armour - bus.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 0.5
 
@@ -344,19 +298,27 @@ def test_the_shortcut_moves_the_horde_one_way_or_the_other():
     assert abs(abs(bus.gap - gap) - C.SHORTCUT_GAP) < 3
 
 
-def test_each_stop_offers_three_upgrades_and_only_those_sell():
+def test_a_servo_stop_is_just_the_road_vote_and_takes_nothing_off_the_bus():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0)
     run(room, bus, 1, i=0)
-    run(room, bus, 1, ev="servo")
-    assert len(bus.wares) == C.SHOP_OFFER and set(bus.wares) <= set(C.SHOP)
-    assert bus.state(room, 1, 0)["wares"] == bus.wares
-    off = next(k for k in C.SHOP if k not in bus.wares)
-    bus.buy(room.riders["r0"], off)
-    assert not bus.shopped
-    bus.wares = ["nitro", "ram", "sync"]
-    bus.buy(room.riders["r0"], "nitro")
-    assert bus.nitro == 1.0 and bus.shopped
+    fx = run(room, bus, 1, ev="servo")
+    assert [f["text"] for f in fx if f["k"] == "servo"] == ["Servo stop! Vote which way next."]
+    assert not {"shop", "wares", "repel", "syncw"} & set(bus.state(room, 1, 0))
+    armour = bus.armour
+    bus.damage(10, "ouch")
+    assert armour - bus.armour == 10 * C.DIFFICULTY["normal"]["damage"], "no repellent, no plating"
+
+
+def test_a_bus_saved_mid_shop_restores_without_its_upgrades():
+    room, bus = FakeRoom(STEADY), ZombieBus()
+    set_all(room, 1.0)
+    run(room, bus, 1, i=0)
+    old = {**bus.to_dict(), "ev": "servo", "shopped": False, "wares": ["plating", "ram"], "ram": True}
+    back = ZombieBus.from_dict({**old, "repel": 2, "syncw": 6})
+    assert not {"shopped", "wares", "ram", "repel", "syncw"} & set(vars(back))
+    run(room, back, 1, ev="longhaul")
+    assert back.ev == "longhaul" and back.state(room, 1, 0)["armour"] == bus.armour
 
 
 def test_riders_and_the_fallen_can_honk_and_heckle():

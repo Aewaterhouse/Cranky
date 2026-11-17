@@ -3,9 +3,6 @@
   z-index: 5;
   zoom: 1; /* the shared HUD zooms big screens itself; the TV scales .tv-ui instead */
 }
-.tv .bs-pips {
-  display: grid;
-}
 .tv-ui {
   position: absolute;
   top: 0;

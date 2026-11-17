@@ -1,8 +1,8 @@
 @import './hudBus.css';
 @import './hudPanels.css';
 @import './hudSplash.css';
-/* The game layer of the bus ride and the TV view: event header, bus status, shop, splashes, feed. Every class is
-   prefixed (hud-, eh-, bs-, sh-, sp-, fd-) to stay clear of the rest of the app. The rider's own numbers, the
+/* The game layer of the bus ride and the TV view: event header, bus status, splashes, feed. Every class is
+   prefixed (hud-, eh-, bs-, sp-, fd-) to stay clear of the rest of the app. The rider's own numbers, the
    crew list and the layout of the bus ride are the shared ride HUD (rideHud.css, busHud.css). */
 .stage {
   position: fixed;

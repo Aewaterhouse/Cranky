@@ -1,5 +1,5 @@
 /* Zombie Bus ride screen: the shared ride HUD (rideHud.css, rideHudAim.css) for the rider's own numbers, the
-   clock, the crew and the plan strip, with the game's own panels (bus status, shop,
+   clock, the crew and the plan strip, with the game's own panels (bus status,
    feed, splashes) kept in the older `.hud` layer, which is zoomed to match (--gz, set in ui/hud.ts). */
 .bus-ride {
   position: absolute;
@@ -193,17 +193,6 @@
   grid-area: 1 / 3 / 3 / 4;
   padding: 0;
   border: 0;
-}
-.bus-ride .bs-pips {
-  grid-area: 5 / 1 / 6 / -1;
-  display: flex;
-  gap: 4px 12px;
-  margin-top: 4px;
-}
-@media (max-height: 740px) {
-  .bus-ride .bs-pips {
-    display: none;
-  }
 }
 .bus-ride .hud-right {
   top: auto;

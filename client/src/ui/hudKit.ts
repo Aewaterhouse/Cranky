@@ -32,8 +32,6 @@ export const FX_ICON: Record<string, string> = {
   challenge: '🎯',
   challenge_won: '🎯',
   challenge_lost: '🎯',
-  buy: '🛒',
-  repel: '🛡️',
   drop: '📦',
   airstrike: '✈️',
   gunship: '🛩️',

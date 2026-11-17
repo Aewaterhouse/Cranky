@@ -128,11 +128,6 @@ class Ready(BaseModel):
     on: bool
 
 
-class Buy(BaseModel):
-    t: Literal["buy"]
-    item: Literal["plating", "repellent", "sync", "nitro", "ram"]
-
-
 class Act(BaseModel):
     """A rider's input to the crew game: an emoji, a card, a choice, a vote. The game reads `k`."""
 
@@ -160,7 +155,6 @@ ClientMsg = TypeAdapter(
         | Sprint
         | Erg
         | TrainerMode
-        | Buy
         | Ready
         | Act,
         Field(discriminator="t"),
@@ -191,9 +185,6 @@ class Bus(BaseModel):
     tune: bool
     rb: float | None
     combo: int
-    shop: bool
-    repel: int
-    syncw: int
     nitro: float = 0
     boost: bool = False
     streak: float = 0

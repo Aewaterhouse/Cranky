@@ -1,5 +1,4 @@
 import type { RideRecorder } from '../core/ride'
-import type { ShopItem } from '../net/protocol'
 import type { Plan, Tier } from '../types'
 
 export interface HudOpts {
@@ -10,7 +9,6 @@ export interface HudOpts {
   weightKg?: number
   /** What the End button says: the host ends the ride for everyone, anyone else leaves the bus. */
   quitLabel?: () => string
-  onBuy?: (item: ShopItem) => void
   /** A rider's input to a crew game: an answer to its question, an emoji, a card. */
   onAct?: (k: string, v: string) => void
   /** The Garage horn a rider has on, for their 📯. */

@@ -79,10 +79,6 @@ export const VIS = {
   trainerColour: '#ff6a1a',
   trainerSize: 1,
   trainerOnRoad: 1,
-  /** Servo stop: where the servo sits beside the parked bus (z), the braking distance in metres, and how fast the bus pulls away. */
-  servoStop: -12,
-  servoBrake: 40,
-  servoPullAway: 0.6,
   /** Trainer power cables into the bus: cable colour, glow colour and the glow at full effort. */
   cableColour: '#1d1f24',
   cableGlow: '#7dff4a',

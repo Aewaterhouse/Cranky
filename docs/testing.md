@@ -54,7 +54,7 @@ Close MyWhoosh/Wahoo apps first.
 - Horde surge: unders let zombies grab, clean overs shake them off.
 - Engine in tune: all riders within 5 rpm of each other for 8 s gives the x1.25 speed bonus and indicator.
 - Long haul: staying out of zone lets the horde close in; armour at zero means limp.
-- Servo Stop: the shop appears in the HUD; take one free upgrade (plating, repellent or sync) and check the bus numbers change and the shop closes.
+- Servo stop: the bus rolls on without parking, no shop appears, and the "Which way next?" vote shows; the picked leg is announced as the stop ends.
 - Awards at the end: Iron Lungs, Fell Off King, Roadblock MVP, Sync Master, PR Hunter.
 
 ## Results log
@@ -130,7 +130,7 @@ Simulated trainer throughout. `?fast=20` speeds a solo workout up; `[` and `]` c
 
 16. Two riders, Bus Quick 30. Top left: your power big with zone and W/kg, the tolerance bar, "Target 111 W on target", cadence. Top centre: the event, time left big, "Next: …". Right edge: both riders with watts and compliance, yours highlighted. Bottom centre: bus status in one block. Bottom: the plan strip with elapsed and total.
 17. Roadblock (sprint): "SPRINT · all out" chip under the clock, the panel says "Sprint · ERG off" and "All out · best … W", the bar fills as you push. No target power on screen, in the header's "Next" line beforehand either.
-18. Servo Stop: the shop opens above the bus status block and buying still works; the feed lines show bottom left, above the bus status block and clear of it.
+18. Servo stop: no shop; the route vote card shows; the feed lines show bottom left, above the bus status block and clear of it.
 19. A rider who stops pedalling falls off: their row says "fell · 20 s" counting down in red.
 20. ☰: tier, Stats, Crew, Clean view, End ride (Leave the bus for a guest), display size. S or Tab opens my stats under the power panel; R hides the crew; H hides the HUD and the game panels, splashes still show.
 22. TV (`?watch=CODE`): the board is laid out as before; numbers do not jiggle as they change.
@@ -300,7 +300,6 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Postcards in History: open a free ride and a solo workout in History and tap Save postcard. Each gives a PNG on the sky with the ride's power as hills; the free ride shows distance and climbing, the workout NP and TSS.
 - Bus postcard in History: ride a short bus ride with bots, then open it in History and tap Save postcard. The Zombie Bus card shows the score, distance, armour, sync, crew and awards on the sky background.
 - Bus countdown: a sped-up bus ride with bots (`ZB_TIME_SCALE`). Before each change of target the top centre shows "Next: 250 W" and a big 5, 4, 3, 2, 1 with a beep each; before a sprint only the SPRINT INCOMING splash shows.
-- Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with "Open shop", which brings the cards back. At the next servo stop it opens in full.
 - Rear-view mirror: `/scene-dev.html?riders=3&gap=60` shows a framed strip top centre with the horde in it; `gap=none` hides it; `mad=1` has none. Debug panel (`g`), Rear-view mirror folder, changes its size and place.
 - Difficulty: in the bus lobby, each Horde level shows a line saying what it means. A sped-up Normal ride with bots should see the horde catch the bus several times; Easy should rarely see it close.
 - Fallen riders: a bus ride with three bots. The crew list shows `212 W 31%` per rider. When a bot falls off, a red banner "X is off the bus: everyone else +5% …" shows under the event header, the top rider gets 💪, and both go when they are hauled back.

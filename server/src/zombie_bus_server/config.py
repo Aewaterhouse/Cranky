@@ -137,7 +137,7 @@ CHALLENGES = {"spin": (105, "spin it up! 105+ rpm"), "grind": (65, "big gear! 65
 CHALLENGE_EVENTS = ("longhaul", "rampup")
 
 # Weekly mutator: one twist per ISO week, applied to every bus ride above easy difficulty.
-# Keys: damage (x), armour (starting armour), nitro (x charge rate), no_shop.
+# Keys: damage (x), armour (starting armour), nitro (x charge rate).
 MUTATORS = [
     {
         "id": "hungry",
@@ -145,7 +145,6 @@ MUTATORS = [
         "desc": "Every hit takes half as much armour again.",
         "damage": 1.5,
     },
-    {"id": "closed", "name": "Closed Servos", "desc": "The servo shop stays shut all ride.", "no_shop": True},
     {"id": "bolts", "name": "Loose Bolts", "desc": "The bus starts on 70 armour.", "armour": 70},
     {"id": "tailwind", "name": "Tailwind", "desc": "Nitro charges twice as fast.", "nitro": 2.0},
 ]
@@ -253,10 +252,6 @@ RB_CRASH_ARMOUR = 10
 RB_GRACE_S = 4
 COMBO_STEP = 0.25
 
-# Servo Stop session shop: each stop offers SHOP_OFFER of SHOP, drawn at random, and the crew takes one free.
-SHOP = ["plating", "repellent", "sync", "nitro", "ram"]
-SHOP_OFFER = 3
-RAM_MULT = 1.5  # bull-bar ram: the next roadblock takes this much more damage
 # Route vote at each servo stop: the crew picks the next leg; damage scales until the next stop. The
 # shortcut is a coin flip worth SHORTCUT_GAP metres either way.
 LEGS = {
@@ -275,11 +270,6 @@ LEGS = {
 SHORTCUT_LUCK = 0.5
 BUS_EMOJI = ["📯", "😂", "🔥", "💀", "👏", "🧟"]  # the bus HUD's reaction tray, horn first
 SHORTCUT_GAP = 30
-AUTO_PLATING_UNDER = (
-    70  # a stop where nobody buys: the servo bolts on plating under this armour, else repellent
-)
-PLATING_ARMOUR = 25
-SYNC_WIDEN_RPM = 3
 
 # Accounts seeded at startup. Password is the name (case-insensitive) — friends-only hobby server.
 SEED_USERS = ["Alex", "Luke", "Steve", "Angus", "Ali", "Jack", "Kat"]

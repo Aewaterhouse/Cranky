@@ -28,8 +28,6 @@ import { totalMass } from '../../core/physics'
 import { onClickShift } from '../../trainer/zwiftClick'
 
 const FX_SOUND: Record<string, () => void> = {
-  buy: SFX.clink,
-  repel: SFX.shake,
   hit: SFX.hit,
   grab: SFX.grab,
   shake: SFX.shake,
@@ -114,7 +112,6 @@ export function startBusRide(
       meId: profile.id,
       weightKg: profile.weightKg,
       quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
-      onBuy: (item) => net.send({ t: 'buy', item }),
       onAct: (k, v) => net.send({ t: 'act', k, v }),
       hornOf: (id) => lk[id]?.horn,
     },

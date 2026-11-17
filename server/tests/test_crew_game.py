@@ -83,6 +83,17 @@ def test_a_stale_client_picking_a_game_that_has_gone_is_told_and_the_bus_stays(g
     ]
 
 
+def test_a_stale_client_shopping_at_the_servo_is_refused_and_the_ride_rolls_on(monkeypatch):
+    async def main():
+        room, ws = await riding(monkeypatch, "SHOP")
+        with pytest.raises(ValidationError):  # the socket loop answers "Bad message" and carries on
+            await room.handle("h0", ws, {"t": "buy", "item": "plating"})
+        return room
+
+    room = asyncio.run(main())
+    assert room.state == "running" and room.mode.armour == 100
+
+
 def test_a_saved_room_of_a_game_that_has_gone_comes_back_as_an_empty_bus_lobby():
     snap = {"code": "OLDC", "game": "climate", "state": "running", "host": "h0", "riders": [{"id": "h0"}]}
     room = session.Room.from_dict({**snap, "plan_id": "x", "minutes": 0, "plan": {}, "el": 9, "mode": {}})

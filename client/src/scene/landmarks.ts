@@ -1,8 +1,7 @@
 import * as THREE from 'three'
 import { groundH } from './ground'
 import { LOOP } from './props'
-import { VIS } from './params'
-import { Mesher, VC, box, canvasTex, clamp, cyl, pick, rand } from './util'
+import { Mesher, VC, box, canvasTex, cyl, pick, rand } from './util'
 
 const SLOGANS: [string, string, string, string][] = [
   ['SERVO', '5 km', '#d8302a', '#fff'],
@@ -84,71 +83,5 @@ export class Billboards {
     const mat = it.face.material as THREE.MeshBasicMaterial
     mat.map?.dispose()
     mat.map = boardTexture(pick(SLOGANS))
-  }
-}
-
-/** The servo (petrol station): building, pump canopy and a glowing price sign. */
-export class Servo {
-  group = new THREE.Group()
-  private z = -400
-
-  constructor() {
-    const m = new Mesher(0.08)
-    m.add(box(12, 4.2, 7), '#e8e4d6', [-6, 2.1, 0])
-    m.add(box(13, 0.4, 8), '#c8302a', [-6, 4.4, 0])
-    m.add(box(6, 0.12, 0.3), '#2f8a7a', [-6, 3.5, 3.6])
-    m.add(box(8, 0.3, 7), '#2f8a7a', [-9, 4.8, 8.5])
-    m.add(box(8.5, 0.35, 7.5), '#f0f0e8', [-9, 5.1, 8.5])
-    for (const [x, z] of [
-      [-12.4, 5.4],
-      [-12.4, 11.6],
-      [-5.6, 5.4],
-      [-5.6, 11.6],
-    ])
-      m.add(box(0.4, 4.8, 0.4), '#d8d8d0', [x, 2.4, z])
-    for (const z of [6.8, 10.2]) {
-      m.add(box(0.7, 1.5, 0.5), '#c8302a', [-9, 0.75, z])
-      m.add(box(0.6, 0.4, 0.1), '#222', [-9, 1.25, z + 0.28])
-    }
-    m.add(box(3.6, 0.2, 5), '#555', [-9, 0.1, 8.5])
-    m.add(cyl(0.25, 0.25, 12, 6), '#777', [-4, 6, 12])
-    for (const z of [-1.5, 1.5]) m.add(box(2.2, 2.4, 0.1), '#2a3a48', [-6 + z * 2.2, 2, 3.52])
-    m.add(box(1.4, 2.3, 0.1), '#2a3a48', [-6, 1.2, 3.52])
-    this.group.add(new THREE.Mesh(m.build(), VC))
-    const sign = new THREE.MeshBasicMaterial({
-      map: canvasTex(256, 256, (c) => {
-        c.fillStyle = '#d8302a'
-        c.fillRect(0, 0, 256, 256)
-        c.fillStyle = '#fff'
-        c.fillRect(14, 14, 228, 228)
-        c.fillStyle = '#d8302a'
-        c.font = '900 72px system-ui, sans-serif'
-        c.textAlign = 'center'
-        c.fillText('SERVO', 128, 100)
-        c.fillStyle = '#222'
-        c.font = '800 36px system-ui, sans-serif'
-        c.fillText('PIES · FUEL', 128, 150)
-        c.fillText('BAIT · ICE', 128, 196)
-      }),
-    })
-    const face = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), sign)
-    face.position.set(-4, 11.2, 12.15)
-    this.group.add(face)
-    this.group.visible = false
-  }
-
-  /** How fast the world goes by (0..1): the bus brakes into the servo, waits out the stop, then pulls away. */
-  flow = 1
-
-  /** Sits still on the roadside: comes up when the servo mood starts, the bus parks beside it and leaves it behind. */
-  update(dz: number, servo: boolean, dt: number) {
-    const stop = VIS.servoStop
-    if (servo && this.z < -300) this.z = -260
-    this.z = servo ? Math.min(stop, this.z + dz) : this.z + dz
-    if (servo && this.z > -300) this.flow = Math.sqrt(clamp((stop - this.z) / VIS.servoBrake))
-    else this.flow = Math.min(1, this.flow + (1.02 - this.flow) * clamp(dt * VIS.servoPullAway))
-    if (this.z > 40) this.z = -400
-    this.group.visible = this.z > -300
-    this.group.position.set(-12, 0, this.z)
   }
 }

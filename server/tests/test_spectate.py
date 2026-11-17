@@ -13,7 +13,6 @@ ACTIONS = [
     {"t": "data", "p": 400, "w": 400, "cad": 90, "s": 1},
     {"t": "sprint", "blk": 2, "dur": 10, "avg": 300, "pct": 1, "grade": "MEGA", "combo": 1},
     {"t": "tier", "tier": "easy"},
-    {"t": "buy", "item": "plating"},
     {"t": "start"},
     {"t": "setup", "plan": "bus-crew-45", "minutes": 30},
     {"t": "bots", "n": 3},

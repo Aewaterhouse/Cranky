@@ -37,7 +37,6 @@ export type ClientMsg =
       /** The simulator was used at some point this ride: a test rider. */
       sim?: boolean
     }
-  | { t: 'buy'; item: ShopItem }
   | { t: 'ready'; on: boolean }
   | { t: 'campaign'; on: boolean }
   | { t: 'erg'; on: boolean }
@@ -45,7 +44,6 @@ export type ClientMsg =
   | { t: 'trainers'; mode: TrainerMode }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
-export type ShopItem = 'plating' | 'repellent' | 'sync' | 'nitro' | 'ram'
 export interface LobbyRider {
   id: string
   name: string
@@ -123,9 +121,6 @@ export interface BusState {
   tune: boolean
   rb: number | null
   combo: number
-  shop: boolean
-  /** The three upgrades this servo stop offers. */
-  wares?: ShopItem[]
   /** The ride's weather: rain hurts more, dust hides the gap, a night run is dark. */
   weather?: 'clear' | 'rain' | 'dust' | 'night'
   /** The boss fight while it is on: its name and the share of its health left. */
@@ -134,8 +129,6 @@ export interface BusState {
   zed?: string | null
   /** Crew roles: each rider's role, what fires it and seconds until it is ready again. */
   roles?: Record<string, { role: string; tip: string; cd: number }>
-  repel: number
-  syncw: number
   nitro: number
   boost: boolean
   /** 0..1 progress of the clean-riding streak towards `next`. */

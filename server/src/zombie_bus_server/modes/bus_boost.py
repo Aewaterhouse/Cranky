@@ -96,7 +96,7 @@ class Boosts:
             rb["landed"].add(r.id)
         mult = 1 + C.COMBO_STEP * max(0, combo - 1)
         self.combo = max(self.combo, combo)
-        dmg = C.RB_DAMAGE[grade] * mult * (C.RAM_MULT if self.ram else 1)
+        dmg = C.RB_DAMAGE[grade] * mult
         rb["dmg"] += dmg
         r.rb_dmg += dmg
         combo_txt = f" (combo x{combo})" if combo > 1 else ""
@@ -110,7 +110,7 @@ class Boosts:
             self.emit("sprint", f"{r.name}: {grade}{combo_txt}", r.id)
 
     def resolve_roadblock(self) -> None:
-        rb, self.rb, self.ram = self.rb, None, False
+        rb, self.rb = self.rb, None
         assert rb
         if rb["dmg"] >= rb["hp"]:
             self.gap += C.RB_SMASH_GAP

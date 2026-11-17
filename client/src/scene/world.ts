@@ -7,7 +7,7 @@ import { Crew } from './crew'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
 import { Ground, ROAD_HALF, groundH } from './ground'
-import { Billboards, Servo } from './landmarks'
+import { Billboards } from './landmarks'
 import { Mirror } from './mirror'
 import { MoodBlend, weatherEnv, type Env, type Weather } from './moods'
 import { Rain } from './route/rain'
@@ -83,7 +83,6 @@ export class World {
   private ground = new Ground()
   private props = new Props(0)
   private boards = new Billboards(0)
-  private servo = new Servo()
   private bigThings = new BigThings()
   private mirror!: Mirror
   private wenv = {} as Env
@@ -141,7 +140,6 @@ export class World {
       this.ground.group,
       this.props.group,
       this.boards.group,
-      this.servo.group,
       this.bigThings.group,
       this.bus.group,
       this.horde.group,
@@ -240,15 +238,13 @@ export class World {
     this.key.position.set(-14 - env.sunElev * 0.1, 14 + env.sunElev * 0.85, 22)
     this.key.target.position.set(0, 0, 4)
 
-    // the bus parks at the servo, so the world (and the bus) slow with it while the riders keep pedalling
-    const v = s.speed * this.servo.flow
+    const v = s.speed
     const dz = v * dt
     this.dist += dz
     this.ground.update(this.dist, env)
     this.props.update(dz, this.dist)
     this.boards.update(dz, this.dist)
     this.bigThings.update(dz, this.dist)
-    this.servo.update(dz, s.mood === 'servo', dt)
     this.sky.update(env, this.t, this.camera.position)
 
     // bus

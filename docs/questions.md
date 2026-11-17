@@ -19,4 +19,9 @@ Items from `docs/ride-notes-plan.md` that need a decision or a real trainer. Eac
 ## Zombie Bus bits that only paid scrap (foundation plan 1.4)
 **Question:** the lookout crew role, the "Short and brutal" leg at the servo vote and the Scrap Rush weekly twist only ever paid scrap, so they went with it. Should any come back with a different reward?
 **Options:** leave them out; bring back the lookout with a gap or armour reward; bring back the brutal leg with a gap reward.
-**Recommendation:** leave them out. The vote may go with the Servo Stop in 1.5 anyway, and three roles still deal round the bus.
+**Recommendation:** leave them out. The servo vote keeps its two legs, and three roles still deal round the bus.
+
+## The servo stop's name now the bus doesn't pull in (foundation plan 1.5)
+**Question:** the bus no longer parks at a servo, but the easy block is still called "Servo stop" (event card, announcer, workout block labels, the route vote). Rename it?
+**Options:** keep "Servo stop"; rename the event and the bus workouts' block labels (for example "Easy stretch").
+**Recommendation:** keep it until the owner rides it; a rename touches ten workout files for a label.

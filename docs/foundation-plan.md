@@ -41,7 +41,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
       and chaingang only.
 - [x] 1.4 Remove scrap everywhere: earning, balances, displays, results rewards, daily and weekly scrap, the
       week's deal.
-- [ ] 1.5 Remove the Servo Stop shop and its upgrades from Zombie Bus. The bus no longer stops to shop; keep the
+- [x] 1.5 Remove the Servo Stop shop and its upgrades from Zombie Bus. The bus no longer stops to shop; keep the
       roadside servo as scenery only if it costs nothing to keep.
 - [ ] 1.6 Remove the Garage tab, the cosmetics catalogue, hats, outfits and trainer skins. Every rider gets the
       same helmet. If jersey colour only came from outfits, add a free jersey colour choice to the body creator.

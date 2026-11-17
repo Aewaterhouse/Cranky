@@ -244,11 +244,6 @@
     zoom: var(--hud-scale, 1.3);
   }
 }
-@media (max-height: 740px) {
-  .bs-pips {
-    display: none;
-  }
-}
 .howto {
   position: absolute;
   left: 50%;

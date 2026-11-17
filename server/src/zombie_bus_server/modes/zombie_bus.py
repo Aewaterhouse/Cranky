@@ -57,7 +57,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.hauls: dict[str, dict] = {}
         self.fx: list[dict] = []
         self.ev = ""
-        self.shopped = False  # the crew took its free pick at this servo stop
         self.boss: dict | None = None  # the final fight: {i, kind, need (s on target), done}
         self.roles: dict[str, dict] = {}  # rider -> {role, held (s on the cue), ready (ride time)}
         self.highlights: list[dict] = []  # the ride's best moments for the results: {t (ride s), text}
@@ -65,12 +64,8 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.whisker = False  # the horde got within a whisker and has not been shaken off yet
         self.weather = "clear"  # rolled by the room as the ride starts (`roll_weather`)
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
-        self.wares: list[str] = []  # what this stop's shop offers
-        self.ram = False
         self.road_votes: dict[str, str] = {}  # the next leg, voted at the servo
         self.leg: dict = {}  # the leg the crew picked: its damage multiplier until the next stop
-        self.repel = 0
-        self.syncw = 0
         self.streak = 0.0
         self.streak_n = 0
         self.streak_low = 0.0
@@ -87,7 +82,8 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
     @classmethod
     def from_dict(cls, d: dict) -> ZombieBus:
         bus = cls()
-        vars(bus).update(copy.deepcopy(d))
+        # Keys from removed features (the servo shop's upgrades) are left out, unread.
+        vars(bus).update({k: v for k, v in copy.deepcopy(d).items() if k in vars(bus)})
         for k in ("expect", "reported", "landed"):
             if bus.rb:
                 bus.rb[k] = set(bus.rb.get(k, []))
@@ -103,7 +99,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         b = room.plan["blocks"][i]
         self.clock = room.el
         if self.ev == "servo" and ev != "servo":
-            self.auto_shop()
             self.pick_leg(room)
         self.ev = ev
         if i != self.last_i:
@@ -183,11 +178,9 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             }
             self.emit("roadblock", "ROADBLOCK! Sprint to smash it!")
         elif ev == "servo":
-            self.shopped = False
             rng = random.Random(f"{room.code}:{i}")
             self.road_votes = {r.id: rng.choice(list(C.LEGS)) for r in room.riders.values() if r.bot}
-            self.wares = sorted(rng.sample(C.SHOP, C.SHOP_OFFER), key=C.SHOP.index)
-            self.emit("servo", "Servo stop! Shop's open: one free pick.")
+            self.emit("servo", "Servo stop! Vote which way next.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
         elif ev == "longhaul":
@@ -196,10 +189,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             self.emit("rampup", "Ramp-up! Climb out of the valley, it only gets harder.")
 
     def damage(self, n: float, text: str) -> None:
-        if self.repel > 0:
-            self.repel -= 1
-            self.emit("repel", "Horde repellent! Zombies sprayed off, no damage.")
-            return
         self.armour = max(
             0.0,
             self.armour
@@ -271,8 +260,8 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             med = statistics.median(cads)
             for r in active:
                 r.sync_n += 1
-                r.sync_hits += abs(r.cad - med) <= C.SYNC_RPM + self.syncw
-            self.sync = all(abs(c - med) <= C.SYNC_RPM + self.syncw for c in cads)
+                r.sync_hits += abs(r.cad - med) <= C.SYNC_RPM
+            self.sync = all(abs(c - med) <= C.SYNC_RPM for c in cads)
         self.sync_ticks += self.sync
         self.sync_s = self.sync_s + dt if self.sync else 0.0
         tune = self.sync_s >= C.SYNC_HOLD_S

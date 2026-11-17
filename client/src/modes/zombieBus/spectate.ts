@@ -22,8 +22,6 @@ import type { Grade } from '../../types'
 import { roadSpectate } from '../freeRide/roadSpectate'
 
 const FX_SOUND: Record<string, () => void> = {
-  buy: SFX.clink,
-  repel: SFX.shake,
   hit: SFX.hit,
   grab: SFX.grab,
   shake: SFX.shake,

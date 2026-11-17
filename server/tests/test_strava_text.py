@@ -125,3 +125,11 @@ def test_an_old_bus_ride_with_scrap_still_posts_and_never_mentions_it():
     title, about = describe(old, "luke")
     assert title.startswith("🧟 Zombie Bus · ") and "Score 1234" in about
     assert "scrap" not in (title + about).lower()
+
+
+def test_an_old_bus_ride_with_servo_shop_fields_still_posts_and_never_mentions_the_shop():
+    old = copy.deepcopy(BUS)
+    old["group"] |= {"shop": True, "wares": ["plating", "ram"], "repel": 1, "syncw": 3}
+    title, about = describe(old, "luke")
+    assert title.startswith("🧟 Zombie Bus · ") and "Score 1234" in about
+    assert not {"shop", "upgrade", "repellent"} & set((title + about).lower().split())

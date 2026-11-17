@@ -17,7 +17,7 @@ const median = (a: number[]) => {
   return s.length ? (s[s.length >> 1] + s[(s.length - 1) >> 1]) / 2 : 0
 }
 
-/** Top-left bus status: armour, horde gap, speed/distance, engine sync and upgrade pips. */
+/** Top-left bus status: armour, horde gap, speed/distance, engine sync, nitro and streak. */
 export function makeBusPanel() {
   const t = (cls: string, v = '') => h('b', { class: cls }, v)
   const armourN = t('bs-n'),
@@ -43,7 +43,6 @@ export function makeBusPanel() {
   const syncState = h('span', { class: 'bs-sync-s' })
   const syncTrack = h('div', { class: 'bs-sync-t' }, h('i', { class: 'bs-win' }))
   const win = syncTrack.firstElementChild as HTMLElement
-  const pipsEl = h('div', { class: 'bs-pips' })
   const nitroFill = h('i', {})
   const nitroState = h('span', { class: 'bs-sync-s' })
   const streakFill = h('i', {})
@@ -64,20 +63,11 @@ export function makeBusPanel() {
     h('div', { class: 'bs-nitro' }, nitroFill),
     h('div', { class: 'bs-head' }, h('label', {}, 'STREAK'), streakState),
     h('div', { class: 'bs-nitro bs-streak' }, streakFill),
-    pipsEl,
     // Last, so the strip's places for everything above stay put: the boss, this event's zombies, your role.
     h('div', { class: 'bs-extra' }, boss, zed, role),
   )
   const dots = new Map<string, HTMLElement>()
   let lastArmour = -1
-  const pips = (icon: string, n: number, slots: number) =>
-    h(
-      'span',
-      {},
-      ...Array.from({ length: Math.max(slots, n) }, (_, i) =>
-        h('i', { class: i < n ? 'on' : '' }, icon),
-      ),
-    )
   return {
     root,
     update(b: BusState, riders: Record<string, RiderTick>, me = '') {
@@ -115,7 +105,7 @@ export function makeBusPanel() {
         ([, r]) => r.st === 'riding' && r.cad >= SYNC_MIN_CADENCE,
       )
       const med = median(ridersOn.map(([, r]) => r.cad))
-      const w = SYNC_RPM + b.syncw
+      const w = SYNC_RPM
       const half = w * 2.5
       win.style.width = `${(w / half) * 50}%`
       for (const [id, d] of dots) if (!riders[id] || !ridersOn.some(([i]) => i === id)) d.remove()
@@ -146,16 +136,6 @@ export function makeBusPanel() {
       streakFill.style.width = `${(b.gunship ? 1 : (b.streak ?? 0)) * 100}%`
       streakFill.parentElement!.dataset.s = b.gunship ? 'boost' : ''
       set(streakState, b.gunship ? 'GUNSHIP UP!' : `NEXT: ${STREAK_NAME[b.next] ?? ''}`)
-      const key = `${b.repel}/${b.syncw}`
-      if (pipsEl.dataset.k !== key) {
-        pipsEl.dataset.k = key
-        pipsEl.replaceChildren(
-          h('label', {}, 'REPELLENT'),
-          pips('🛡', b.repel, 3),
-          h('label', {}, 'SYNC UPGRADES'),
-          pips('🔧', Math.round(b.syncw / 3), 3),
-        )
-      }
     },
   }
 }

@@ -26,8 +26,6 @@ class BusView:
             "combo": self.combo,
             "nitro": round(self.nitro, 2),
             "boost": room.el < self.nitro_until,
-            "shop": self.ev == "servo" and not self.shopped and not self.mut.get("no_shop"),
-            "wares": self.wares,
             "weather": self.weather,
             "zed": C.ZED_TYPES[self.ev]["tip"] if self.ev in C.ZED_TYPES else None,
             "roles": {
@@ -46,8 +44,6 @@ class BusView:
                 if self.boss and self.boss["i"] == i and not self.boss.get("over")
                 else None
             ),
-            "repel": self.repel,
-            "syncw": self.syncw,
             "streak": round(min(1.0, self.streak / C.STREAKS[self.streak_n][0]), 2),
             "next": C.STREAKS[self.streak_n][1],
             "gunship": room.el < self.gunship_until,

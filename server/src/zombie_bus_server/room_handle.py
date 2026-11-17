@@ -14,7 +14,6 @@ from .plan import load_plans
 from .protocol import (
     Act,
     Bots,
-    Buy,
     Campaign,
     ClientMsg,
     Data,
@@ -81,8 +80,6 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         await room.lobby()
     elif isinstance(msg, Sprint):
         room.mode.on_sprint(r, msg.blk, msg.grade, msg.combo)
-    elif isinstance(msg, Buy) and room.state == "running":
-        room.mode.buy(r, msg.item)
     elif isinstance(msg, Act):
         now, (most, window) = time.monotonic(), C.ACT_LIMIT
         recent = room.acts[rid] = [t for t in room.acts.get(rid, []) if now - t < window]

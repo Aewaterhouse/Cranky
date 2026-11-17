@@ -121,7 +121,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Old bus rides on Railway: after the next deploy, open a bus ride from before 2026-11-14 in History and tap Save postcard. It should be the Zombie Bus card with that ride's score; a plain card means the ladder had no matching row.
 - [ ] Backups on Railway: a day after deploying, `ls /data/backups` in a Railway shell shows a new `cranky-*.db` from about 17:00 UTC. Optionally try the restore steps in the README on a copy.
 - [ ] Bus countdown: on a bus ride, the "Next: … W" chip and 5-4-3-2-1 with a beep show before each target change, and 5 s is enough to get onto the new watts in ERG and without.
-- [ ] Servo Shop close button: easy to hit mid-ride on the big screen and the iPad.
 - [ ] Horde and mirror: on a bus ride in ERG, the horde is in the rear-view mirror all ride and comes into the main view when the crew slips; the mirror does not cover the event header, the Next chip or the countdown on the big screen or the iPad, and the frame rate holds up.
 - [ ] Difficulty: ride Normal in ERG and say whether the crew was close to failing by the end; then Hard, and whether the air strikes and gunships felt like the only way through.
 - [ ] Fallen riders: on a bus ride, when someone falls off, the red banner shows, everyone else's target goes up 5% (ERG follows), the crew list shows each share % and the 💪 carrier, and the extra feels fair. Answer in `docs/questions.md`.
@@ -173,7 +172,7 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] A mate on an old tab (not reloaded) still joins and rides; they just see default bodies.
 
 ## New games and bus rules, 2026-11-15 (only bots have ridden them)
-- [ ] Zombie Bus with a mate: the servo stop shows three upgrades and a "Which way next?" card; the most votes wins as the stop closes. If nobody buys, the servo picks.
+- [ ] Zombie Bus with a mate: the servo stop shows a "Which way next?" card; the most votes wins as the stop closes.
 - [ ] Your crew role shows in the bus panel (driver, gunner, mechanic, lookout) and fires when you hold its cue; a role call-out every 90 s or so is fun, not noise.
 - [ ] Rolling turns: "take the front" every minute feels right, or is it too chatty?
 - [ ] The weather: rain, dust (the gap reads "?? m" and the mirror goes) and a night run all look right on the iPad.

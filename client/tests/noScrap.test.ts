@@ -36,3 +36,12 @@ describe('rides saved with scrap', () => {
     expect(JSON.stringify(r)).not.toMatch(/banked|myAwards/)
   })
 })
+
+describe('bus rides saved with servo shop upgrades', () => {
+  it('still make a postcard line, without the shop', () => {
+    const shop = { ...old, shop: true, wares: ['plating', 'ram'], repel: 1, syncw: 3 }
+    expect(cardLine(shop, 'Lunch Break Quickie')).toBe(
+      'Lunch Break Quickie · 15.3 km · armour 64 · sync 71%',
+    )
+  })
+})

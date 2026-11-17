@@ -23,7 +23,6 @@ import { GAMES } from '../modes/crew/games'
 import { hudMenu, hudToast, hudUnit } from './hudParts'
 import { powerPanel } from './hudPower'
 import { makeRoster } from './hudRoster'
-import { makeShop } from './hudShop'
 import { makeSplash } from './hudSplash'
 import { VIS } from '../scene/params'
 import { makeStats } from './hudStats'
@@ -36,7 +35,7 @@ const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 
 /**
  * Bus ride overlay. The rider's own numbers sit where every mode has them (power top left, the block clock
- * top centre, the crew on the right edge, the plan along the bottom); the game's panels (bus status, shop,
+ * top centre, the crew on the right edge, the plan along the bottom); the game's panels (bus status,
  * feed, splashes) are grouped in the layer underneath.
  */
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {
@@ -45,7 +44,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const header = makeHeader(o.plan, o.tier ?? 'hard')
   header.root.classList.add('glass', 'speed')
   const bus = makeBusPanel()
-  const shop = makeShop((i) => o.onBuy?.(i))
   const sheet = choiceSheet((k, v) => o.onAct?.(k, v))
   // The bus: quick reactions and the horn, for riders and anyone who has fallen off to heckle with.
   const emoji = emojiFloat(
@@ -141,7 +139,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       { class: 'hud' },
       h('div', { class: 'hud-left' }, bus.root),
       h('div', { class: 'hud-right' }, sp.feed, o.onAct ? emoji.tray : ''),
-      shop.root,
       sheet.root,
       sp.flash,
       sp.layer,
@@ -245,7 +242,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       setPower(null, live)
       sp.splash('sp-count sp-pre', `${n}`, GAMES.bus.countdown, 1100, 0)
     },
-    /** Everything that comes from the server tick: bus, roster, shop, fx. */
+    /** Everything that comes from the server tick: bus, roster, fx. */
     tick(m: Tick) {
       const meId = o.meId ?? ''
       rbProg = m.bus.rb
@@ -255,7 +252,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       root.classList.toggle('asking', !!m.riders[meId]?.ask)
       roster.update(m, meId)
       cues.tick(m)
-      shop.update(m.bus.shop, m.bus.wares)
       for (const fx of m.fx) {
         if (fx.id !== meId || fx.k === 'fell')
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
@@ -286,7 +282,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         else if (fx.k === 'bosswin') sp.splash('sp-smash', '🏆 BOSS BEATEN', text, 3600, 3)
         else if (fx.k === 'harpoon') sp.splash('sp-smash', '🔱 HARPOON!', text, 3200, 2)
         else if (fx.k === 'leg') sp.splash('sp-smash', '🗺️ NEXT LEG', text, 3200, 2)
-        if (fx.k === 'buy') shop.bought(text)
         if (text && !((fx.k === 'sprint' || fx.k === 'slowmo') && fx.id === meId))
           sp.line(
             fx.k,

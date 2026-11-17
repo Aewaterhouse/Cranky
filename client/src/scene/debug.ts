@@ -40,10 +40,6 @@ export async function debugPanel(onRoute?: () => void) {
   mir.add(VIS, 'mirrorY', 0, 0.8)
   mir.add(VIS, 'mirrorHeight', 1, 10)
   addAll(gui.addFolder('Bosses and zombie types').close(), VIS.boss)
-  const sv = gui.addFolder('Servo stop').close()
-  sv.add(VIS, 'servoStop', -30, 10)
-  sv.add(VIS, 'servoBrake', 5, 120)
-  sv.add(VIS, 'servoPullAway', 0.1, 3)
   for (const [k, m] of Object.entries(VIS.moods)) {
     const f = gui.addFolder(`Mood: ${k}`).close()
     for (const c of ['sky', 'fog', 'light', 'hemi', 'ground', 'hill'] as const) f.addColor(m, c)
