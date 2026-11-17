@@ -46,7 +46,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
 - [x] 1.6 Remove the Garage tab, the cosmetics catalogue, hats, outfits and trainer skins. Every rider gets the
       same helmet. If jersey colour only came from outfits, add a free jersey colour choice to the body creator.
       Nothing else in the body creator changes.
-- [ ] 1.7 Ladder tab: keep only what is about Zombie Bus results and ride stats. If nothing is left, remove it.
+- [x] 1.7 Ladder tab: keep only what is about Zombie Bus results and ride stats. If nothing is left, remove it.
 - [ ] 1.8 Sweep: unused config, CSS, assets (update CREDITS.md), docs for removed features (delete the games
       and UI review docs that no longer apply), dead protocol messages. Report lines removed, client and server.
 

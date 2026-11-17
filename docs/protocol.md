@@ -7,7 +7,7 @@ TypeScript: `client/src/net/protocol.ts`. Keep all three in step.
 
 | Method | Path | Body / result |
 | --- | --- | --- |
-| GET | `/api/ladder?season=2026-Q4` | Season ladder: top runs, rider standings and titles. Season defaults to the current quarter |
+| GET | `/api/ladder?season=2026-Q4` | Season ladder from Zombie Bus results only: top runs, rider standings and titles. Season defaults to the current quarter |
 | GET | `/api/health` | → `{ok: true}` (no auth) |
 | GET | `/api/riders` | → `[{id, name}]` (admins also get `username`); logged-in riders only, the login page lists nobody |
 | POST | `/api/login` | `{username, password}` (`name` still accepted for `username`) → `{token, id, name, mustChange}`; username in any case; 401 "Wrong username or password" if either is wrong, 429 with a wait message after 5 wrong for that name in 10 min. The first password is the name, case-insensitive; `mustChange` is true until the rider sets their own. |
