@@ -13,8 +13,8 @@ export function busGears(erg: ErgController, mass: number, ergOn: () => boolean)
   let sent = NaN
   const tile = gearTile()
   const slider = strengthSlider()
-  /** Sends the gear-adjusted gradient when it has moved enough (always when `force`). */
-  const send = (cadence: number, force = false) => {
+  /** Sends the gear-adjusted gradient when it has moved enough (always when `force`; at once when `now`). */
+  const send = (cadence: number, force = false, now = false) => {
     if (ergOn()) return
     const { chainring, shiftStrength } = settings
     const g = gearGrade(
@@ -27,7 +27,8 @@ export function busGears(erg: ErgController, mass: number, ergOn: () => boolean)
       1,
       shiftStrength,
     )
-    if (force || !(Math.abs(g - sent) <= CFG.freeRide.sendDeltaPct)) erg.setGrade((sent = g))
+    if (force || !(Math.abs(g - sent) <= CFG.freeRide.sendDeltaPct))
+      void erg.setGrade((sent = g), CFG.ride.grade, now)
     tile.set(gear, sent)
   }
   return {
@@ -36,7 +37,7 @@ export function busGears(erg: ErgController, mass: number, ergOn: () => boolean)
     send,
     shift(d: number, cadence: number) {
       gear = shiftGear(gear, d)
-      send(cadence, true)
+      send(cadence, true, true)
       return gear
     },
     strength(d: number, cadence: number) {

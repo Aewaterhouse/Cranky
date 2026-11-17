@@ -120,7 +120,8 @@ export function runDrill(
   }
   const gear = (d: number) =>
     mode.kind === 'slope' &&
-    ((mode = { ...mode, gear: shiftGear(mode.gear, d) }), slope.send(mode, ride.live.cadence, true))
+    ((mode = { ...mode, gear: shiftGear(mode.gear, d) }),
+    slope.send(mode, ride.live.cadence, true, true))
   const inRamp = (i: number | undefined) =>
     spec?.kind === 'ramp' && i !== undefined && i >= spec.from && i < spec.to
   function rampDone() {

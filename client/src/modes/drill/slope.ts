@@ -17,10 +17,11 @@ export function slopeGears(erg: ErgController, mass: number, root: HTMLElement) 
   const sw = root.querySelector('.modesw')
   sw?.after(slider)
   ;(root.querySelector('.bigrow')?.children[2] ?? sw)?.after(tile.el)
-  const send = (m: ModeState, cadence: number, force = false) => {
+  const send = (m: ModeState, cadence: number, force = false, now = false) => {
     const { chainring, shiftStrength } = settings
     const g = gearGrade(m.grade, cadence, m.gear, mass, CFG.ride.grade, chainring, 1, shiftStrength)
-    if (force || Math.abs(g - sent) > CFG.freeRide.sendDeltaPct) erg.setGrade((sent = g))
+    if (force || Math.abs(g - sent) > CFG.freeRide.sendDeltaPct)
+      void erg.setGrade((sent = g), CFG.ride.grade, now)
   }
   return {
     send,

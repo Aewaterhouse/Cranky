@@ -72,6 +72,8 @@ export function runFreeRide(
   let sentAt = -Infinity
   let gear = CFG.gears.start
   let shifted = false
+  /** A shift since the last frame: its gradient goes out this frame, without waiting for the next ERG tick. */
+  let shiftNow = false
 
   const view = freeRideView(
     route,
@@ -127,7 +129,7 @@ export function runFreeRide(
   const shift = (d: number) => {
     const to = shiftGear(gear, d)
     if (to !== gear) scene.clunk()
-    shifted = true
+    shifted = shiftNow = true
     gear = to
   }
   const onKey = freeKeys({
@@ -196,10 +198,11 @@ export function runFreeRide(
       draftGrade(speed, draft, mass),
       flat ? 0 : pullAway.step(speed, live.cadence, gear, dt),
     )
-    if (Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
+    if (shiftNow || Math.abs(want - sent) > F.sendDeltaPct || now / 1000 - sentAt >= F.sendEveryS) {
       sent = want
       sentAt = now / 1000
-      ride.erg.setGrade(sent, F.grade)
+      void ride.erg.setGrade(sent, F.grade, shiftNow)
+      shiftNow = false
     }
     scene.sound({ speed, coasting: live.power === 0, paused, headwind: wind, ele: p.ele })
     ride.setFrame({ el, i: 0, bel: el, type: 'free', label: route.name, dur: el + 1, tgt: null })

@@ -13,6 +13,8 @@ export class ErgController {
   private dead = false
   private fails = 0
   private away = false
+  private busy: Promise<void> | null = null
+  private again = false
 
   constructor(
     private trainer: Trainer,
@@ -43,10 +45,14 @@ export class ErgController {
     this.manual = { kind: 'res', v: Math.min(100, Math.max(0, Math.round(pct))) }
   }
 
-  /** ERG off: simulated gradient in % (to 0.1), within `range` (the solo slope mode's by default). */
-  setGrade(pct: number, range: readonly number[] = CFG.ride.grade) {
+  /**
+   * ERG off: simulated gradient in % (to 0.1), within `range` (the solo slope mode's by default). `now` (a gear
+   * shift) writes it at once instead of at the next tick, still one write at a time.
+   */
+  setGrade(pct: number, range: readonly number[] = CFG.ride.grade, now = false) {
     const [lo, hi] = range
     this.manual = { kind: 'slope', v: Math.min(hi, Math.max(lo, Math.round(pct * 10) / 10)) }
+    return now ? this.tick() : Promise.resolve()
   }
 
   /** Back to ERG: control is re-requested and the current target written again. */
@@ -69,8 +75,22 @@ export class ErgController {
     this.fails = 0
   }
 
-  /** Call at about erg.writeHz. */
-  async tick() {
+  /** Call at about erg.writeHz. Writes never overlap: a call during a write runs once more straight after it. */
+  tick(): Promise<void> {
+    if (this.busy) {
+      this.again = true
+      return this.busy
+    }
+    return (this.busy = (async () => {
+      do {
+        this.again = false
+        await this.write()
+      } while (this.again)
+      this.busy = null
+    })())
+  }
+
+  private async write() {
     if (this.dead || this.away) return
     try {
       const m = this.manual

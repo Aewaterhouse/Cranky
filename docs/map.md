@@ -58,7 +58,7 @@
 - `modes/drill/drill.ts` solo ERG workout player (pause, skip, intensity, auto-pause, keys).
 - `modes/zombieBus/crew.ts` bus lobby and room flow; `zombieBus.ts` in-ride bus mode (ticks to scene and HUD); `busGears.ts` virtual gears on the bus with ERG off; `spectate.ts` TV spectator view (`watch`, no trainer).
 - `net/protocol.ts` message types mirroring docs/protocol.md; `wsClient.ts` WebSocket with reconnect (token in URL); `clockSync.ts` server session clock estimate for ERG pre-scheduling.
-- `trainer/ftms.ts` Web Bluetooth FTMS driver; `heartRate.ts` HR strap driver, simulated HR and the `currentHr()` singleton; `ergController.ts` only module writing to the trainer; `zwiftClick.ts` Zwift Click v1 driver (presses only, never writes to the trainer); `simTrainer.ts` simulated trainer and keys.
+- `trainer/ftms.ts` Web Bluetooth FTMS driver; `heartRate.ts` HR strap driver, simulated HR and the `currentHr()` singleton; `ergController.ts` only module writing to the trainer (writes never overlap; `setGrade(…, now)` sends a shift's gradient at once); `zwiftClick.ts` Zwift Click v1 driver (presses only, never writes to the trainer); `simTrainer.ts` simulated trainer and keys.
 
 ### scene/ (no UI, three.js)
 - `world.ts` scene owner, render loop, `SceneState`, fx entry; `debug.ts` debug panel; `params.ts` tunable visuals (`VIS`); `util.ts` clamp, lerp, smooth.
@@ -104,6 +104,7 @@
 
 ### tests/ and assets
 - `tests/compliance|curve|erg|load|plan|gears|zwiftClick.test.ts` and others: vitest unit tests.
+- `tests/shiftWrite.test.ts` shifts write at once, never in ERG, never overlapping a tick.
 - `tests/noScrap.test.ts` rides and profiles saved with scrap still open, earn and make a postcard line without it.
 - `tests/builder.test.ts` builder core; `tests/compliance|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.

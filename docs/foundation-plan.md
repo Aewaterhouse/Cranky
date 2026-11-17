@@ -54,7 +54,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
 Background: gears are faked by sending the trainer a gradient. A shift feels late because (a) the gradient is
 recalculated from live cadence, which the trainer reports late, (b) writes happen 4 times a second and small
 changes are skipped, (c) the trainer eases into a new gradient by itself.
-- [ ] 2.1 Shifts go out at once: a shift writes to the trainer immediately instead of waiting for the next
+- [x] 2.1 Shifts go out at once: a shift writes to the trainer immediately instead of waiting for the next
       tick, still only through ergController.ts and still serialised with other writes.
 - [ ] 2.2 Steady gears: the gear's gradient uses a smoothed cadence so it does not wander with every cadence
       report; a shift still applies in full straight away. Smoothing time in config.
