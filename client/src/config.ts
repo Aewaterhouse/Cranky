@@ -104,7 +104,6 @@ export const CFG = {
   cueS: 8,
   extend: { minuteS: 60, easyS: 300, easyPct: 50, graceS: 20 },
   ride: { grade: [-5, 15], gradeStart: 2, resStart: 40, resStep: 5, gradeStep: 1 },
-  scene: { speedMax: 22 },
   /** Synthesised sounds (ui/audio.ts, ui/rideSound.ts). Gains are 0..1 before the volume setting. */
   sound: {
     /** Lap bell: base pitch, bell-like overtones as [multiple, gain], ring time, rings on the last lap and their gap. */

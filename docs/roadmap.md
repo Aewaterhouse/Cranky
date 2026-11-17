@@ -1,5 +1,7 @@
 # Cranky roadmap
 
+**Note, 17/11/2026:** `docs/foundation-plan.md` overrides this file. Every crew game except Zombie Bus, the points and chaingang road games, scrap, the Servo Stop shop and upgrades, the Garage and its cosmetics, and the Ladder's every-game table have been removed; mentions of them below are history.
+
 **Current priority (2026-11-14):** the checklist from the first real rides, `docs/ride-notes-plan.md`. Work through it before anything below.
 
 **Cranky** is the app. **Zombie Bus** is its first game; solo workouts, watch parties and later games sit alongside it.

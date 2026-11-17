@@ -62,10 +62,6 @@ export function blockTarget(b: Block, tier: Tier, bel: number): number | null {
   }
 }
 
-/** 1-based over-under step index parity: true while on the over (first) half. */
-export const isOver = (b: Block, bel: number) =>
-  b.type === 'over-under' && Math.floor(bel / b.step!) % 2 === 0
-
 export const planTotal = (blocks: Block[]) => blocks.reduce((s, b) => s + b.dur, 0)
 
 /** Seconds, intensity factor (normalised power over FTP) and TSS of flat blocks. Sprints count as 120%, free as 50%. */

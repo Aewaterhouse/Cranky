@@ -94,7 +94,7 @@ client sends what the trainer measures and draws what the server says. Same sock
 | t | Fields | Notes |
 | --- | --- | --- |
 | `join` | `name, ftp, tier, look` | As the bus (`tier` is ignored). The rider's weight comes from their stored profile (`weightKg`, default 75). Joining a ride that is already running puts the rider on the back of the group; the same id joining again takes its old place on the road back. |
-| `road` | `route, laps, style, together?, draft?, game?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race, and is always off in a race game; `game` is the rule set (`ride`, `race`, `points`, `crit`; left out keeps the room's). |
+| `road` | `route, laps, style, together?, draft?, game?` | Host only, not while running. `route` is a pack id from `content/routes`; `laps` is clamped to 1 unless the route is a circuit; `style` is `social` or `race`; `together` (the keep-together band) defaults to on for social and off for race, and is always off in a race game; `game` is the rule set (`ride`, `race`, `crit`, `handicap`; left out keeps the room's). |
 | `bots` | `n` | Host only, not while running. 0..5 road bots; humans + bots fit the 8 places. |
 | `data` | `p, w, cad, hr?` | About 2 Hz. Instant power, 3 s power, cadence, heart rate. No data for 3 s reads as zero power: the rider coasts to a stop and the ride goes on. |
 | `start` / `end` | | Host only. `start` begins a 10 s countdown; `end` finishes the ride now. |

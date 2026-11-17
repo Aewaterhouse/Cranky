@@ -178,11 +178,6 @@
   font-size: 1.4rem;
   color: var(--dim);
 }
-.grid2 {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 12px;
-}
 
 /* Trainer modal */
 .readout {
@@ -415,8 +410,7 @@ kbd {
   .tiles > .tile {
     width: auto;
   }
-  .options,
-  .grid2 {
+  .options {
     grid-template-columns: 1fr;
   }
   .stats {

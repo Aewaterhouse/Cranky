@@ -297,4 +297,3 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   }
   return api
 }
-export type Hud = ReturnType<typeof makeHud>

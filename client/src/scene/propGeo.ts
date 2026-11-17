@@ -232,4 +232,3 @@ export const makeGeos = (poleSpacing: number) => ({
   ute: vehicle('ute'),
   van: vehicle('van'),
 })
-export type Geos = ReturnType<typeof makeGeos>

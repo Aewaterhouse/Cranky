@@ -12,7 +12,7 @@ Items from `docs/ride-notes-plan.md` that need a decision or a real trainer. Eac
 **Options:**
 1. Keep the flat 5% per rider, tune the number after a ride.
 2. Split the fallen rider's missing watts across the crew, in proportion to each rider's FTP (so a 250 W rider falling off adds 250 W shared out, not a flat 5%).
-3. The crew chooses who takes the extra: a "Carry them" button gives one rider the whole load for double scrap.
+3. The crew chooses who takes the extra: a "Carry them" button gives one rider the whole load.
 4. Haul-back as a team job: the fallen rider comes back sooner the harder the rest ride over target.
 **Recommendation:** 2 then 4. Splitting the real watts is the fairest and reads well with the share % now in the crew list; a team haul-back gives the crew something to do about it. Option 3 needs a new control mid-ride and is the least clear on a trainer.
 

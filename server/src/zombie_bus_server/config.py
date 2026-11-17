@@ -52,7 +52,6 @@ TIER_FACTOR = {"hard": 1.0, "medium": 0.9, "easy": 0.8}
 TIERS = ["hard", "medium", "easy"]
 
 # Rider states
-FELL_COMPLIANCE = 0.6  # bots aim under this to fall off; riders use their level's `fell` (DIFFICULTY)
 FELL_AFTER_S = 30
 FELL_COOLDOWN_S = 60
 FELL_GRACE_S = 30  # nobody falls off in the ride's first seconds
@@ -286,7 +285,7 @@ BOT_FTP = (200, 260)
 BOT_COMP = (0.85, 1.0)  # compliance wanders slowly inside this band
 BOT_COMP_WALK = 0.01  # std dev of the random walk per tick
 BOT_BAD_PER_S = 1 / 600  # chance per second of starting a bad patch
-BOT_BAD_COMP = (0.4, 0.58)  # compliance in a bad patch (under FELL_COMPLIANCE, so they can fall off)
+BOT_BAD_COMP = (0.4, 0.58)  # compliance in a bad patch (low enough that they can fall off)
 BOT_BAD_S = (30, 50)  # bad patch length in session seconds
 BOT_POWER_JITTER = 0.03  # power is target x (1 +/- this)
 BOT_CAD_DEFAULT = 88

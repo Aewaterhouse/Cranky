@@ -8,7 +8,6 @@ import { planGraph, zoneColour } from './planGraph'
 import { openBuilder } from './builder'
 import { toast } from './toast'
 
-export const isBusRun = (id: string) => id.startsWith('bus-')
 const mid = (b: Block, tier: Tier = 'hard') => blockTarget(b, tier, b.dur / 2)
 export const minsLabel = (blocks: Block[]) => `${Math.round(planTotal(blocks) / 60)} min`
 

@@ -1,5 +1,6 @@
 Zombie Bus: Indoor Trainer Game Plan
 12 Nov 2026 · @Alex
+**Note, 17/11/2026:** `docs/foundation-plan.md` overrides this plan. Every crew game except Zombie Bus, the points and chaingang road games, scrap, the Servo Stop shop and upgrades, the Garage and its cosmetics, and the Ladder's every-game table have been removed; mentions of them below are history.
 Overview
 A browser-based multiplayer game for smart trainers. Up to six friends ride together in co-op modes where each rider works to their own intensity. The first mode is Zombie Bus. The app also works solo as a structured workout runner.
 Players and hardware

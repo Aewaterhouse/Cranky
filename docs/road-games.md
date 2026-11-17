@@ -38,8 +38,3 @@ the trainer: the client sets its own gradient from its own position.
    world, minimap and rider list already draw whatever positions the server sends.
 5. Tests: drive `RoadSim` directly, as `server/tests/test_road.py` does. No sockets needed for rules.
 
-## What each planned game needs
-
-- **Handicap race:** `place` (start gaps) or `tune` (`band` by FTP), `results` by finish order.
-- **Team time trial:** teams on `RoadRoom`, `place` (two groups), `over` and `results` on the fourth rider.
-- **Kart racing:** `tune` (lanes from input), `after` (item boxes and hits), one input message.
