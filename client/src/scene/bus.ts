@@ -1,18 +1,12 @@
 import * as THREE from 'three'
-import { cosmetic, type Look } from '../core/cosmetics'
 import {
   EXHAUST,
   HOOD,
   WHEELS,
-  bullbarGeo,
-  eskyGeo,
-  flagsGeo,
-  ploughGeo,
   damageGroups,
   glassGeo,
   paintGeo,
   plateGroups,
-  spikesGeo,
   trimGeo,
   trophyGeo,
   ROOF_Y,
@@ -84,11 +78,6 @@ export function makeBus() {
     g.add(w)
     return { g: w, m }
   })
-  const bullbar = add(bullbarGeo(), VC)
-  const spikes = add(spikesGeo(), VC)
-  const plough = add(ploughGeo(), VC)
-  const flags = add(flagsGeo(), VC)
-  const esky = add(eskyGeo(), VC)
   const plates = plateGroups(TIERS).map((geo) => add(geo, VC))
   const soot = damageGroups(SOOT).map((geo) => add(geo, VC))
 
@@ -175,20 +164,6 @@ export function makeBus() {
   }
   cups.count = 0
   shell.add(cups)
-  let lookKey = ''
-  let baseCol = new THREE.Color(VIS.busColour)
-  const setLook = (look: Look = {}) => {
-    const key = `${look.paint}|${look.bullbar}|${look.spikes}`
-    if (key === lookKey) return
-    lookKey = key
-    baseCol = new THREE.Color(cosmetic(look.paint)?.colour ?? VIS.busColour)
-    bullbar.visible = look.bullbar === 'bullbar'
-    plough.visible = look.bullbar === 'bullbar-plough'
-    spikes.visible = look.spikes === 'spikes'
-    flags.visible = look.spikes === 'roof-flags'
-    esky.visible = look.spikes === 'roof-esky'
-  }
-  setLook({})
 
   const tmp = new THREE.Color()
   const update = (p: {
@@ -219,7 +194,7 @@ export function makeBus() {
     plates.forEach((m, i) => (m.visible = i < count))
     soot.forEach((m, i) => (m.visible = a < [75, 50, 25][i]))
     paint.color
-      .copy(baseCol)
+      .set(VIS.busColour)
       .lerp(tmp.set('#5a4a3c'), (1 - a / 100) * 0.3)
       .lerp(tmp.set('#ff2a1a'), p.hit * 0.5)
     const on = p.head
@@ -241,7 +216,6 @@ export function makeBus() {
   const setTrophies = (n: number) => (cups.count = Math.min(TROPHY_MAX, Math.max(0, n)))
   return {
     group: g,
-    setLook,
     setTrophies,
     update,
     hood,

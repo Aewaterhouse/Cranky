@@ -5,7 +5,7 @@ import { addHair, FACE_DROP, type Headwear } from './riderHair'
 import { lerp } from './util'
 
 const R = 0.23
-/** The face sits this far below the middle of the skull, leaving the forehead to helmets and hats. */
+/** The face sits this far below the middle of the skull, leaving the forehead to the helmet. */
 const DROP = FACE_DROP
 const ico = (r: number, d = 0) => new THREE.IcosahedronGeometry(r, d)
 const box = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d)

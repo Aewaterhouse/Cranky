@@ -187,7 +187,6 @@ export function spectate(code: string, leaveTo: () => void) {
       zed: b.zed,
       mood: (m.i < 0 || m.ev === 'warmup' || m.ev === 'cooldown' ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
-      busLook: lk[l.host],
       trophies: l.trophies,
       gunship: b.gunship,
       riders: Object.entries(m.riders).map(([id, r]) => ({
@@ -226,7 +225,6 @@ export function spectate(code: string, leaveTo: () => void) {
           armour: 100,
           mood: 'drill',
           roadblock: null,
-          busLook: looks()[m.host],
           trophies: m.trophies,
           riders: m.riders.map((r) => ({
             id: r.id,

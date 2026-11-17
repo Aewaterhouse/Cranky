@@ -1,10 +1,7 @@
 import * as THREE from 'three'
-import { cosmetic, type Look } from '../core/cosmetics'
 import { BB, CRANK, makeBike } from './bike'
-import { TRAINER_SKIN } from '../core/cosmetics'
-import { bodyColour, bodyOf, defaultBody, type Body } from '../core/body'
+import { bodyColour, bodyOf, defaultBody, type Body, type Look } from '../core/body'
 import { SLOT } from './figure'
-import { makeHat } from './hats'
 import { buildBody, dimsOf, type Dims } from './riderBody'
 import { buildHead } from './riderHead'
 import type { Headwear } from './riderHair'
@@ -77,11 +74,10 @@ export function makeRider(colour: string, id: string, road = false) {
   let fig = buildBody(body)
   let face = buildHead(body, 'helmet')
   let wear: Headwear = 'helmet'
-  let jersey = colour
   let hot = 0
   let painted = -1
   const pal = Array.from({ length: 10 }, () => new THREE.Color())
-  /** Works the palette out (skin, tan, heat, outfit) and recolours both meshes. */
+  /** Works the palette out (skin, tan, heat, jersey) and recolours both meshes. */
   const paint = () => {
     const skin = pal[SLOT.skin].set(bodyColour(body, 'skin'))
     pal[SLOT.pale].copy(skin)
@@ -91,7 +87,7 @@ export function makeRider(colour: string, id: string, road = false) {
     }
     skin.lerp(HOT, hot * 0.8)
     pal[SLOT.pale].lerp(HOT, hot * 0.8)
-    pal[SLOT.jersey].set(jersey)
+    pal[SLOT.jersey].set(colour)
     pal[SLOT.shorts].set(SHORTS)
     pal[SLOT.shoe].set('#f2f2f2')
     pal[SLOT.hair].set(bodyColour(body, 'hairColour'))
@@ -141,13 +137,11 @@ export function makeRider(colour: string, id: string, road = false) {
     })
   }
 
-  let hatKey = ''
-  let hat: THREE.Object3D | null = null
   const helmet = new THREE.Mesh(
     new THREE.SphereGeometry(0.255, 8, 5, 0, Math.PI * 2, 0, Math.PI / 2),
     new THREE.MeshLambertMaterial({ color: colour, flatShading: true }),
   )
-  // Helmets and hats sit a little up and tipped back, clear of the eyebrows.
+  // The helmet sits a little up and tipped back, clear of the eyebrows.
   const wearOn = new THREE.Group()
   wearOn.position.y = HEADWEAR.up
   wearOn.rotation.x = HEADWEAR.tilt
@@ -155,35 +149,20 @@ export function makeRider(colour: string, id: string, road = false) {
   head.add(wearOn)
   let bare = false
   let bodyKey: string | undefined
+  /** The rider's own body travels in the look; without one they keep the default from their id. */
   const setLook = (look: Look = {}) => {
-    const key = `${look.hat}|${look.outfit}|${look.bike}|${look.body}`
-    if (key === hatKey) return
-    hatKey = key
-    // The rider's own body travels in the look; without one they keep the default from their id.
-    if (look.body !== bodyKey) {
-      bodyKey = look.body
-      body = bodyOf(id, look)
-      rebuild()
-    }
-    jersey = cosmetic(look.outfit)?.colour ?? colour
-    bike.skin(cosmetic(look.bike)?.colour, look.bike === TRAINER_SKIN)
-    if (hat) wearOn.remove(hat)
-    hat = makeHat(look.hat)
-    if (hat) wearOn.add(hat)
-    dress()
+    if (look.body === bodyKey) return
+    bodyKey = look.body
+    body = bodyOf(id, look)
+    rebuild()
   }
-  /** Hat, helmet or (in the creator) neither, and the hair that goes with it. */
-  const dress = () => {
-    helmet.visible = !hat && !bare
-    wear = hat ? 'hat' : bare ? 'none' : 'helmet'
-    rebuild(true)
-  }
-  /** Gives the rider this body. `noHelmet` (the creator) shows the hair when no hat is worn. */
+  /** Gives the rider this body. `noHelmet` (the creator) takes the helmet off to show the hair. */
   const setBody = (b: Body, noHelmet = bare) => {
     body = b
     bare = noHelmet
+    helmet.visible = !bare
+    wear = bare ? 'none' : 'helmet'
     rebuild()
-    dress()
   }
 
   const fade = (o: number) => {
@@ -191,7 +170,6 @@ export function makeRider(colour: string, id: string, road = false) {
       m.transparent = o < 1
       m.opacity = o
     }
-    if (hat) hat.visible = o > 0.5
   }
 
   /**

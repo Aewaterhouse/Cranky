@@ -7,17 +7,16 @@ import { runCamCheck } from './scene/camCheck'
  * Scene dev harness. Open /scene-dev.html with optional params:
  *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  trophies=N  weather=clear|rain|dust|night  armour=0..100 (or none)
  *   boss=roadtrain|giant|bridge  left=0..1 (its health)  zed=runners|brutes
- *   speed=m/s  roadblock=0..1  paint=paint-rust  bullbar=1  spikes=1  riders=1..6  debug=1  hud=0
+ *   speed=m/s  roadblock=0..1  riders=1..6  debug=1  hud=0
  *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
  * Keys: 1-6 mood, [ ] gap, - = armour, , . speed, r roadblock (hold to approach), h hit, j shake,
- *       k slowmo, m smash, d supply drop, a air strike, u gunship, b bull bar, n spikes, p paint cycle, g toggle debug panel,
+ *       k slowmo, m smash, d supply drop, a air strike, u gunship, g toggle debug panel,
  *       c camera view (a, d and u also play the cinematics).
  */
 const q = new URLSearchParams(location.search)
 const num = (k: string, d: number | null) =>
   q.has(k) ? (q.get(k) === 'none' ? null : Number(q.get(k))) : d
 const MOODS = ['drill', 'longhaul', 'surge', 'roadblock', 'servo', 'finish']
-const PAINTS = ['', 'paint-rust', 'paint-teal', 'paint-camo', 'paint-black', 'paint-pink']
 
 // vis.camHeight=4 style params override any numeric VIS tunable
 for (const [k, v] of q)
@@ -32,9 +31,6 @@ const st = {
   armour: num('armour', 100) as number | null,
   speed: num('speed', 12) as number,
   roadblock: num('roadblock', null) as number | null,
-  bullbar: q.get('bullbar') === '1',
-  spikes: q.get('spikes') === '1',
-  paint: q.get('paint') ?? '',
   riders: Number(q.get('riders') ?? 5),
   gunship: q.get('gunship') === '1',
 }
@@ -49,7 +45,6 @@ const CREW: SceneRider[] = [
     cadence: 90,
     hr: 171,
     hrp: 0.95,
-    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis' },
   },
   {
     id: 'b',
@@ -59,9 +54,8 @@ const CREW: SceneRider[] = [
     cadence: 82,
     hr: 128,
     hrp: 0.68,
-    look: { hat: q.get('hat2') ?? 'hat-viking', outfit: 'outfit-purple' },
   },
-  { id: 'c', name: 'Dazza', c: 0.35, st: 'fell', cadence: 0, look: { hat: 'hat-cone' } },
+  { id: 'c', name: 'Dazza', c: 0.35, st: 'fell', cadence: 0 },
   {
     id: 'd',
     name: 'Mo',
@@ -70,18 +64,12 @@ const CREW: SceneRider[] = [
     cadence: 100,
     hr: 158,
     hrp: 0.86,
-    look: { hat: q.get('hat3') ?? 'hat-crown', outfit: 'outfit-gold' },
   },
-  { id: 'e', name: 'Spec', c: null, st: 'spectator', cadence: 0, look: { outfit: 'outfit-black' } },
+  { id: 'e', name: 'Spec', c: null, st: 'spectator', cadence: 0 },
   { id: 'f', name: 'Kaz', c: 0.8, st: 'riding', cadence: 76 },
 ]
 
 function apply() {
-  const look = {
-    paint: st.paint || undefined,
-    bullbar: q.get('bullbarId') ?? (st.bullbar ? 'bullbar' : undefined),
-    spikes: q.get('roofId') ?? (st.spikes ? 'spikes' : undefined),
-  }
   world.state = {
     speed: st.speed,
     gap: st.gap,
@@ -89,7 +77,6 @@ function apply() {
     mood: st.mood,
     riders: CREW.slice(0, st.riders),
     roadblock: st.roadblock,
-    busLook: look,
     trophies: num('trophies', 0) as number,
     weather: (q.get('weather') ?? 'clear') as 'clear' | 'rain' | 'dust' | 'night',
     boss: q.has('boss')
@@ -135,9 +122,6 @@ addEventListener('keydown', (e) => {
   else if (e.key === 'd') fire('drop')
   else if (e.key === 'a') fire('airstrike')
   else if (e.key === 'u') st.gunship = !st.gunship
-  else if (e.key === 'b') st.bullbar = !st.bullbar
-  else if (e.key === 'n') st.spikes = !st.spikes
-  else if (e.key === 'p') st.paint = PAINTS[(PAINTS.indexOf(st.paint) + 1) % PAINTS.length]
   else if (e.key === 'g') void debugPanel()
   else if (e.key === 'c') world.cycleView()
   else return
@@ -152,5 +136,5 @@ setInterval(() => {
   }
 }, 100)
 setInterval(() => {
-  help.textContent = `mood ${st.mood} | gap ${st.gap ?? 'none'} | armour ${st.armour ?? 'none'} | speed ${st.speed} | roadblock ${st.roadblock?.toFixed(2) ?? 'none'} | keys: 1-6 mood [ ] gap \\ horde - = armour , . speed r roadblock h hit j shake k slowmo m smash d drop a airstrike u gunship b bullbar n spikes p paint g panel (fog ${VIS.fogNear})`
+  help.textContent = `mood ${st.mood} | gap ${st.gap ?? 'none'} | armour ${st.armour ?? 'none'} | speed ${st.speed} | roadblock ${st.roadblock?.toFixed(2) ?? 'none'} | keys: 1-6 mood [ ] gap \\ horde - = armour , . speed r roadblock h hit j shake k slowmo m smash d drop a airstrike u gunship g panel (fog ${VIS.fogNear})`
 }, 300)

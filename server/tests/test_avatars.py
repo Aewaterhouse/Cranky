@@ -48,9 +48,9 @@ def test_look_keeps_item_ids_and_only_a_valid_body():
 def test_join_message_carries_a_checked_body_and_old_clients_still_join():
     join = {"t": "join", "name": "Luke", "ftp": 250, "tier": "hard"}
     assert Join(**join).look == {}
-    assert Join(**join, look={"hat": "hat-cap"}).look == {"hat": "hat-cap"}
+    assert Join(**join, look={"hat": "hat-cap", "horn": "horn-cow", "bike": 3}).look == {}
     assert Join(**join, look={"body": GOOD}).look == {"body": GOOD}
-    assert Join(**join, look={"body": "nonsense", "outfit": "outfit-gold"}).look == {"outfit": "outfit-gold"}
+    assert Join(**join, look={"body": "nonsense", "outfit": "outfit-gold"}).look == {}
 
 
 def test_body_round_trips_through_the_profile_and_a_bad_one_is_not_stored():
@@ -78,4 +78,4 @@ def test_a_body_reaches_the_other_riders_in_the_lobby():
         while lobby.get("t") != "lobby":
             lobby = ws.receive_json()
         me = next(r for r in lobby["riders"] if r["id"] == "luke")
-        assert me["look"] == {"body": GOOD, "hat": "x"}
+        assert me["look"] == {"body": GOOD}  # an old client's hat never reaches the crew

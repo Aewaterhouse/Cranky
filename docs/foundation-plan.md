@@ -43,7 +43,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
       week's deal.
 - [x] 1.5 Remove the Servo Stop shop and its upgrades from Zombie Bus. The bus no longer stops to shop; keep the
       roadside servo as scenery only if it costs nothing to keep.
-- [ ] 1.6 Remove the Garage tab, the cosmetics catalogue, hats, outfits and trainer skins. Every rider gets the
+- [x] 1.6 Remove the Garage tab, the cosmetics catalogue, hats, outfits and trainer skins. Every rider gets the
       same helmet. If jersey colour only came from outfits, add a free jersey colour choice to the body creator.
       Nothing else in the body creator changes.
 - [ ] 1.7 Ladder tab: keep only what is about Zombie Bus results and ride stats. If nothing is left, remove it.

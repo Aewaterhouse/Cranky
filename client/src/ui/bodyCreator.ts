@@ -185,12 +185,7 @@ export function bodyCreator(p: Profile) {
       { class: 'bc-stage panel' },
       view.canvas,
       h('p', { class: 'dim bc-hint' }, 'Drag to turn. Pinch or scroll to zoom.'),
-      h(
-        'label',
-        { class: 'bc-tick' },
-        helmet,
-        ' Helmet on (riders always wear one, or a Garage hat)',
-      ),
+      h('label', { class: 'bc-tick' }, helmet, ' Helmet on (riders always wear one)'),
     ),
     h(
       'div',

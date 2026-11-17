@@ -20,7 +20,6 @@ export const SLOTS: [number, number][] = [
 export const EXHAUST: [number, number, number] = [-1.0, 0.55, 5.4]
 export const HOOD: [number, number, number] = [0, 2.1, -4.7]
 const PAINT = '#ffffff'
-const STEEL = '#8b9099'
 
 /** Painted shell: body, roof, pillars, hood. Tinted by the paint material. */
 export function paintGeo() {
@@ -91,37 +90,6 @@ export function trimGeo() {
   return m.build()
 }
 
-export function bullbarGeo() {
-  const m = new Mesher(0.08)
-  const t = (r: number, len: number, p: [number, number, number], rot: [number, number, number]) =>
-    m.add(cyl(r, r, len, 6), STEEL, p, rot)
-  t(0.08, 2.6, [0, 1.95, -5.95], [0, 0, Math.PI / 2])
-  t(0.08, 2.6, [0, 1.0, -5.95], [0, 0, Math.PI / 2])
-  for (const x of [-1.25, -0.5, 0.5, 1.25]) t(0.07, 0.95, [x, 1.48, -5.95], [0, 0, 0])
-  for (const x of [-1.25, 1.25]) t(0.07, 1.0, [x, 1.0, -5.5], [Math.PI / 2, 0, 0])
-  for (const x of [-1.25, 1.25]) t(0.06, 1.1, [x, 1.9, -5.45], [Math.PI / 2 - 0.4, 0, 0])
-  m.add(box(2.6, 0.5, 0.08), '#5a5f68', [0, 0.78, -5.8], [0.25, 0, 0])
-  for (const x of [-0.9, 0.9])
-    m.add(cyl(0.16, 0.16, 0.1, 8), '#fff2b8', [x, 2.15, -5.95], [Math.PI / 2, 0, 0])
-  return m.build()
-}
-
-export function spikesGeo() {
-  const m = new Mesher(0.08)
-  const spike = (p: [number, number, number], rot: [number, number, number], s = 1) => {
-    m.add(cone(0.1 * s, 0.8 * s, 5), '#7b7f88', p, rot)
-  }
-  for (const x of [-1.3, 1.3])
-    for (let z = -3.0; z <= 4.8; z += 0.65) spike([x, ROOF_Y + 0.85, z], [0, 0, 0])
-  for (let x = -1.1; x <= 1.1; x += 0.55) spike([x, ROOF_Y + 0.85, -2.6], [0, 0, 0], 0.9)
-  for (const x of [-1.2, -0.6, 0.6, 1.2]) spike([x, 0.8, -5.9], [-Math.PI / 2, 0, 0], 1.2)
-  for (const x of [-1.5, 1.5])
-    spike([x, 0.9, -5.5], [0, 0, x > 0 ? -Math.PI / 2 : Math.PI / 2], 1.1)
-  for (const x of [-0.6, 0, 0.6])
-    m.add(cone(0.12, 0.7, 5), '#7b7f88', [x, 1.0, 5.6], [Math.PI / 2, 0, 0])
-  return m.build()
-}
-
 /** Bolted-on armour plates, grouped into `n` tiers that peel off as armour drops. */
 export function plateGroups(n: number) {
   const ms = Array.from({ length: n }, () => new Mesher(0.14))
@@ -189,48 +157,6 @@ export function damageGroups(n: number) {
       [0, 0, rand(-1, 1)],
     )
   return ms.map((x) => x.build())
-}
-
-/** A wedge plough in place of the bull bar. */
-export function ploughGeo() {
-  const m = new Mesher(0.06)
-  for (const s of [-1, 1]) {
-    m.add(box(1.75, 1.3, 0.1), '#c9a227', [s * 0.8, 1.05, -6.15], [0.25, s * 0.55, 0])
-    m.add(box(1.75, 0.16, 0.12), '#26262b', [s * 0.8, 1.72, -6.2], [0.25, s * 0.55, 0])
-  }
-  for (const x of [-1.1, 1.1])
-    m.add(cyl(0.07, 0.07, 1.1, 6), STEEL, [x, 1.2, -5.5], [Math.PI / 2, 0, 0])
-  return m.build()
-}
-
-/** Two tattered pirate flags on poles at the back of the roof. */
-export function flagsGeo() {
-  const m = new Mesher(0.05)
-  for (const x of [-1.25, 1.25]) {
-    m.add(cyl(0.04, 0.04, 2.4, 5), '#4a3a2a', [x, ROOF_Y + 1.5, 4.4])
-    m.add(box(0.03, 0.7, 1.1), '#15151a', [x, ROOF_Y + 2.3, 5.0])
-    m.add(
-      new THREE.IcosahedronGeometry(0.16, 0),
-      '#e8e6df',
-      [x, ROOF_Y + 2.38, 5.0],
-      [0, 0, 0],
-      [0.3, 1, 1],
-    )
-    m.add(box(0.035, 0.07, 0.5), '#e8e6df', [x, ROOF_Y + 2.12, 5.0], [0.5, 0, 0])
-    m.add(box(0.035, 0.07, 0.5), '#e8e6df', [x, ROOF_Y + 2.12, 5.0], [-0.5, 0, 0])
-  }
-  return m.build()
-}
-
-/** A roof esky and a surfboard strapped on the back half of the roof. */
-export function eskyGeo() {
-  const m = new Mesher(0.05)
-  m.add(box(0.9, 0.5, 0.6), '#2f7fd1', [0.7, ROOF_Y + 0.45, 4.2])
-  m.add(box(0.94, 0.12, 0.64), '#f4f4f0', [0.7, ROOF_Y + 0.74, 4.2])
-  m.add(box(0.55, 0.09, 2.9), '#f2e3b0', [-0.75, ROOF_Y + 0.32, 3.4], [0, 0.04, 0])
-  m.add(box(0.12, 0.1, 2.9), '#e94f37', [-0.75, ROOF_Y + 0.33, 3.4], [0, 0.04, 0])
-  m.add(cone(0.12, 0.3, 4), '#f2e3b0', [-0.75, ROOF_Y + 0.5, 4.6], [0.4, 0, 0])
-  return m.build()
 }
 
 /** LEGEND trophies the bus can carry on its roof rails. */

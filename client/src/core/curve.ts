@@ -2,7 +2,7 @@ import type { Stamp } from './passport'
 import type { WeekLog } from './weekly'
 import { CFG } from '../config'
 import type { Grade, Tier } from '../types'
-import type { Look } from './cosmetics'
+import type { Look } from './body'
 import type { PlanPick } from './trainingPlan'
 
 export interface RideRecord {

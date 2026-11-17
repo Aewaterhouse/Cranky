@@ -4,6 +4,7 @@ import asyncio
 import json
 import sqlite3
 
+from test_avatars import GOOD
 from test_multiplayer import PLAN
 
 from zombie_bus_server import config
@@ -21,7 +22,7 @@ class FakeWS:
 
 
 def join(name, ftp=250):
-    return {"t": "join", "name": name, "ftp": ftp, "tier": "hard", "look": {"hat": "cap"}}
+    return {"t": "join", "name": name, "ftp": ftp, "tier": "hard", "look": {"body": GOOD}}
 
 
 async def ride(room, ws, rid, secs):
@@ -66,7 +67,7 @@ def test_room_resumes_after_restart(tmp_path):
         assert new.mode.to_dict() == room.mode.to_dict()
         for rid, r in room.riders.items():
             old = r.to_dict()
-            assert new.riders[rid].to_dict() == old and old["look"] == {"hat": "cap"}
+            assert new.riders[rid].to_dict() == old and old["look"] == {"body": GOOD}
         assert new.riders["alex"].comp_n > 0 and new.riders["alex"].sprints == ["MEGA"]
 
         el = new.el

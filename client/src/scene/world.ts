@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import type { Look } from '../core/cosmetics'
+import type { Look } from '../core/body'
 import { makeBus } from './bus'
 import { BusCam } from './busCam'
 import { BigThings } from './bigThings'
@@ -47,8 +47,6 @@ export interface SceneState {
   riders: SceneRider[]
   /** 0..1 progress towards a roadblock, or null. */
   roadblock: number | null
-  /** The driver's bus cosmetics. */
-  busLook?: Look
   /** LEGEND sprints the crew has ever ridden: trophies on the roof. */
   trophies?: number
   /** The bus ride's weather. Dust hides the mirror. */
@@ -254,7 +252,6 @@ export class World {
     this.brake += ((acc < -0.6 ? 1 : 0) - this.brake) * clamp(dt * 8)
     this.hit = Math.max(0, this.hit - dt * 2.2)
     this.flash = Math.max(0, this.flash - dt * 2)
-    this.bus.setLook(s.busLook ?? {})
     this.bus.setTrophies(s.trophies ?? 0)
     this.bus.update({
       t: this.t,

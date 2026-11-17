@@ -1,7 +1,7 @@
 import type { DraftLevel } from '../core/physics'
 // Mirrors docs/protocol.md and server/src/zombie_bus_server/protocol.py.
 import type { GroupSummary } from '../ui/results'
-import type { Look } from '../core/cosmetics'
+import type { Look } from '../core/body'
 import type { Grade, Plan, Tier } from '../types'
 
 export type TrainerMode = 'erg' | 'gears' | 'choose'

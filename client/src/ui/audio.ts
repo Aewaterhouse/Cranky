@@ -48,21 +48,9 @@ export const SFX = {
   LEGEND: () => seq([523, 659, 784, 1047, 784, 1047, 1319, 1568], 0.1, 'sawtooth'),
   cue: () => (beep(784, 0.5, 'sine', 0.05), beep(1047, 0.7, 'sine', 0.05, 0.15)),
   clink: () => seq([1200, 1600], 0.05, 'triangle'),
-  /** A rider's 📯: the stock bus horn (two notes, twice), or the Garage horn they bought. */
-  horn: (kind?: string) => {
-    if (kind === 'horn-cow') return seq([196, 185, 175, 165, 147], 0.14, 'sawtooth')
-    if (kind === 'horn-didge')
-      return [0, 0.25, 0.5].forEach(
-        (at) => (beep(73, 0.3, 'sawtooth', 0.12, at), beep(146, 0.3, 'square', 0.03, at)),
-      )
-    if (kind === 'horn-cucaracha')
-      return seq([392, 392, 392, 523, 659, 392, 392, 392, 523, 659], 0.11)
-    if (kind === 'horn-roadtrain')
-      return [0, 0.55, 1.1].forEach((at) =>
-        [233, 294, 349].forEach((hz) => beep(hz, 0.45, 'sawtooth', 0.05, at)),
-      )
-    ;[0, 0.32].forEach((at) => [311, 370].forEach((hz) => beep(hz, 0.26, 'sawtooth', 0.05, at)))
-  },
+  /** A rider's 📯: the bus horn, two notes, twice. */
+  horn: () =>
+    [0, 0.32].forEach((at) => [311, 370].forEach((hz) => beep(hz, 0.26, 'sawtooth', 0.05, at))),
   /** A boss turns up: a low growl under a falling siren. */
   boss: () => (beep(48, 1.2, 'sawtooth', 0.12), seq([660, 520, 400, 300], 0.18, 'square')),
   /** The harpoon: a rising whoosh and a clank. */

@@ -1,4 +1,4 @@
-import { portrait } from './shopPreview'
+import { portrait } from './portrait'
 import { monthWrap } from '../core/wrap'
 import { CFG } from '../config'
 import { TIER_NAME } from '../types'
@@ -101,7 +101,7 @@ function levelBar(p: Profile) {
   )
 }
 
-/** Initials straight away, swapped for the rider in their Garage look once it is drawn. */
+/** Initials straight away, swapped for the rider in their own body once it is drawn. */
 function face(p: Profile) {
   let el: HTMLElement = avatar(p.name, 'xl')
   // A cached portrait comes back straight away, before the initials are on the page.

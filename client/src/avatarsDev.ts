@@ -7,12 +7,11 @@ import {
   randomBody,
   type Body,
 } from './core/body'
-import { COSMETICS } from './core/cosmetics'
 import { makeRider, type RiderMode } from './scene/riders'
 
 /**
- * Dev page: a grid of rider bodies to look over for broken limbs, floating hats and clipping.
- * `set=random|extreme|hair|face|presets|default`, `wear=helmet|none|hats` (hats cycles every Garage hat),
+ * Dev page: a grid of rider bodies to look over for broken limbs, floating helmets and clipping.
+ * `set=random|extreme|hair|face|presets|default`, `wear=helmet|none`,
  * `pose=ride|run|slump`, `view=front|side|back|face`, `seed=n`, `still=1` (no pedalling, for screenshots),
  * `from=i&n=k` (part of a set), `cols=n`, `tags=1`.
  */
@@ -75,8 +74,6 @@ const bodies = (SETS[set] ?? SETS.random)()
   .map((b) => fullBody(b))
 const COLS = Number(q.get('cols') ?? (view === 'face' ? 8 : 6))
 const GAP = view === 'face' ? [0.66, 0.74] : [1.9, 2.7]
-const HATS = COSMETICS.filter((c) => c.slot === 'hat')
-const OUTFITS = COSMETICS.filter((c) => c.slot === 'outfit')
 
 const stage = document.getElementById('stage')!
 const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
@@ -92,10 +89,6 @@ const rows = Math.ceil(bodies.length / COLS)
 const riders = bodies.map((b, i) => {
   const r = makeRider(['#e94f37', '#3d7bd9', '#44bba4', '#f2b705'][i % 4], `dev${i}`)
   r.setBody(b, wear === 'none')
-  r.setLook({
-    hat: wear === 'hats' ? HATS[i % HATS.length].id : undefined,
-    outfit: i % 3 ? OUTFITS[i % OUTFITS.length]?.id : undefined,
-  })
   r.label(`${i}`, null, 'riding')
   r.tag.visible = q.get('tags') === '1'
   const col = i % COLS

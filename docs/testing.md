@@ -1,11 +1,11 @@
 # Manual testing
 
-Log in first: tap your name tile and type your name as the password (Alex, Luke, Steve, Angus, Ali, Jack; case-insensitive). The app has Ride, Garage and Rider tabs; connect a trainer (or the simulated one) from the trainer pill at the top.
+Log in first: tap your name tile and type your name as the password (Alex, Luke, Steve, Angus, Ali, Jack; case-insensitive). The app has Ride, Ladder and Rider tabs; connect a trainer (or the simulated one) from the trainer pill at the top.
 
 Headless first (no hardware):
 
 ```sh
-cd client && pnpm test       # plan parsing, compliance, ERG caps, curve, cosmetics, load
+cd client && pnpm test       # plan parsing, compliance, ERG caps, curve, load
 cd server && uv run pytest   # plan, accounts, Zombie Bus rules, 4-bot headless multiplayer
 cd client && pnpm build      # type check + build
 ```
@@ -307,14 +307,19 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Trainer mode per ride: as driver pick 🚲 Trainers "All gears"; a second rider's ERG / Gears switch hides and their seat shows "⚙ Gears". In the ride `E` only shows a toast. Back to "Each rider" and their own pick returns.
 - Drafting: in a group-ride lobby the host sees Drafting Off / Realistic / Strong; a guest sees the level and what it means. In the ride on Strong behind bots, the HUD's drafting watts climb as more riders are close ahead.
 - Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.
-- Bike skins: equip Indoor Escapee (free) in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
-- Rarity: the Garage shows a Common / Rare / Epic / Legendary badge on every item, epic and legendary cards have a coloured frame, and the four new silly items have 3D previews.
 
 ## Crew games cut to Zombie Bus (17/11/2026, foundation plan 1.2)
 
 - Home: "Crew games" shows one Zombie Bus card; it opens a bus lobby. The lobby shows the bus card with no Switch game button.
 - A ride, solo and crew, plays exactly as before: lobby, workout and difficulty, ERG or gears, bots, roadblocks, falling off, bosses, streak air support and cinematics, crew cards, TV view (`/?watch=CODE`), results.
 - History: an old ride from VO2 Madness, Kidney Stone Express or another game that has gone still lists with the game's name, opens, shows the plain crew numbers and saves a postcard.
+- Not checked yet: any of it in a browser.
+
+## Garage and cosmetics cut (17/11/2026, foundation plan 1.6)
+
+- The top bar has Ride, Ladder and Rider; `#garage` opens the Ride tab.
+- Every rider wears the plain helmet and a jersey in their crew colour (bus roof, free ride, group rides, the podium, TV views); an old profile with a hat or outfit on shows neither. The bus is its own colour with no bull bar or roof parts, and every 📯 is the stock horn.
+- Rider → Body is unchanged; the Rider header portrait still draws your body.
 - Not checked yet: any of it in a browser.
 
 ## Training plans (2026-11-14)

@@ -20,9 +20,9 @@ class Join(BaseModel):
 
     @field_validator("look", mode="before")
     @classmethod
-    def no_sash(cls, look: object) -> object:
-        """An old client's sash (Climate Lawsuit, now gone) is dropped before the look is checked."""
-        return {k: v for k, v in look.items() if k != "sash"} if isinstance(look, dict) else look
+    def body_only(cls, look: object) -> object:
+        """Only the body travels: an old client's sash, hat, outfit, bike, horn or bus parts are dropped."""
+        return {k: v for k, v in look.items() if k == "body"} if isinstance(look, dict) else look
 
     @field_validator("look")
     @classmethod

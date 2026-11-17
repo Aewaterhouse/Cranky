@@ -76,12 +76,6 @@ async function start() {
     power: q.has('power') ? num('power', 0) : undefined,
     effort: q.has('effort') ? num('effort', 0) : undefined,
     cheer: q.get('cheer') === '1',
-    look:
-      i === 1
-        ? { hat: 'hat-viking', outfit: 'outfit-purple' }
-        : i
-          ? {}
-          : { outfit: 'outfit-hivis' },
   }))
   world.state = { me: 'r0', riders }
   Object.assign(window, { world, st, jump, VIS })

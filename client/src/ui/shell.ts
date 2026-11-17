@@ -6,13 +6,12 @@ import type { Profile } from '../core/curve'
 import { adminTab } from './admin'
 import { changeMyPassword } from './password'
 import { avatar, h, show } from './dom'
-import { garageTab } from './garage'
 import { rideTab, type HomeActions } from './home'
 import { logo } from './login'
 import { riderTab } from './rider'
 import { listen, setSimFtp, trainerPill } from './trainer'
 
-const TABS = { ride: 'Ride', ladder: 'Ladder', garage: 'Garage', rider: 'Rider' }
+const TABS = { ride: 'Ride', ladder: 'Ladder', rider: 'Rider' }
 type Tab = keyof typeof TABS
 const current = (): Tab | 'admin' | 'settings' => {
   const t = location.hash.slice(1)
@@ -69,11 +68,9 @@ export function showHome(p: Profile, act: HomeActions) {
           ? adminTab(p.id)
           : tab === 'ladder'
             ? ladderTab()
-            : tab === 'garage'
-              ? garageTab(p, render)
-              : tab === 'rider'
-                ? riderTab(p)
-                : rideTab(p, act)
+            : tab === 'rider'
+              ? riderTab(p)
+              : rideTab(p, act)
     bar = h(
       'header',
       { class: 'top' },

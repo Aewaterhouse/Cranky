@@ -129,7 +129,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Wind noise: ride a free-ride descent over 50 km/h with sound on; the wind should be a steady rush, not overpowering, and not keep rising.
 - [ ] Descent camera: on a fast free-ride descent the camera should shake and lean into bends noticeably but not make you seasick (iPad and big screen).
 - [ ] Drafting on the trainer: in a group ride with bots on Strong, sit on a wheel at speed; the trainer should get noticeably easier (and harder again when you pull out). Try Realistic and Off too.
-- [ ] Shop previews on the iPad: open the Garage; every item should fill in with a 3D picture within a second or two, and the page should stay smooth.
 
 ## Camera on an iPad
 - [ ] One-finger drag on the 3D picture turns the camera round the bus (and the rider in free ride); dragging on a HUD panel, the map or a slider does not.
@@ -165,7 +164,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Skin, Hair and Face move the preview in on the head; Body moves it back out. "Helmet on" off shows the hair.
 - [ ] Randomise and a preset change everything at once; Undo steps back; Reset gives your original rider; nothing sticks until Save.
 - [ ] Save, then start a bus with a mate: each of you sees the other's body on the roof, and the TV view shows both. The same in a group free ride.
-- [ ] Your Garage hat sits on your head whatever its size (try Bobblehead with the Akubra and the Viking Helmet), and the outfit colours the jersey.
 - [ ] Huge calves, a keg belly and a giraffe neck still pedal properly, and fall off and run properly, on the bus.
 - [ ] With six riders on the bus the ride is as smooth as before on the iPad.
 - [ ] On a phone the Rider tabs scroll sideways to reach Body and Settings, and the preview stays at the top while you scroll the options.

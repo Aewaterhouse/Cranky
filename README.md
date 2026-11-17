@@ -27,7 +27,7 @@ Production: `cd client && pnpm build`, then the server serves `client/dist` itse
 ## Tests
 
 ```sh
-cd client && pnpm test      # vitest: plan, compliance, curve, ERG caps, cosmetics, load (NP/IF/TSS)
+cd client && pnpm test      # vitest: plan, compliance, curve, ERG caps, load (NP/IF/TSS)
 cd server && uv run pytest  # accounts, plans, bus rules and the 4-bot headless multiplayer test
 ```
 
@@ -132,7 +132,7 @@ On the bus, the TV view and group free rides, the crew is a column of cards down
 
 ## Rider bodies
 
-Rider → Body is a free character creator: height, build, belly, calves, head size, skin, hair, facial hair and a face, from normal to ridiculous, with presets and a Randomise button. Drag the preview to turn it, pinch or scroll to zoom. Save and that is you on the bus, in free and group rides and on the TV views. Hats, outfits and bikes are still the Garage's. The options live in `content/avatar.json`; `docs/avatars.md` has the design.
+Rider → Body is a free character creator: height, build, belly, calves, head size, skin, hair, facial hair and a face, from normal to ridiculous, with presets and a Randomise button. Drag the preview to turn it, pinch or scroll to zoom. Save and that is you on the bus, in free and group rides and on the TV views. Everyone wears the same helmet, and a jersey in their crew colour. The options live in `content/avatar.json`; `docs/avatars.md` has the design.
 
 ## Strava
 

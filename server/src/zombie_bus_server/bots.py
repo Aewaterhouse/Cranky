@@ -88,7 +88,6 @@ def set_bots(room: Room, n: int) -> None:
         if rid in room.riders:
             continue
         rng = random.Random(f"{room.code}:{rid}:make")
-        look = {slot: rng.choice(ids) for slot, ids in C.BOT_LOOKS.items()}
         ftp, tier = rng.randint(*C.BOT_FTP), rng.choice(C.TIERS)
-        room.riders[rid] = Rider(rid, name, ftp, tier, connected=True, look=look, bot=True)
+        room.riders[rid] = Rider(rid, name, ftp, tier, connected=True, bot=True)
         count += 1

@@ -1,4 +1,4 @@
-/* Ride, Garage and Rider tabs, plus the trainer modal. */
+/* Ride and Rider tabs, plus the trainer modal. */
 .hero h1 {
   font-size: clamp(1.8rem, 4.5vw, 2.8rem);
   margin: 12px 0 8px;
@@ -269,66 +269,6 @@ kbd {
   font: 600 0.8rem var(--ui);
 }
 
-/* Garage */
-.bank {
-  display: flex;
-  justify-content: space-between;
-  align-items: end;
-  gap: 24px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-.slot {
-  margin-bottom: 28px;
-}
-.slot h2 small {
-  margin-left: 10px;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 500;
-}
-.shopgrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-}
-.item {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 12px;
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-}
-.item .sw {
-  --sw: var(--card2);
-  display: grid;
-  place-items: center;
-  height: 64px;
-  margin-bottom: 4px;
-  border-radius: 10px;
-  background: linear-gradient(160deg, rgb(255 255 255 / 0.18), transparent 60%), var(--sw);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
-  font-size: 1.8rem;
-}
-.item .meta {
-  color: var(--dim);
-  font-size: 0.875rem;
-}
-.item button {
-  margin-top: 4px;
-  padding: 8px;
-}
-.item.on {
-  border-color: var(--tox);
-  box-shadow: 0 0 0 3px rgb(127 209 59 / 0.15);
-}
-.item.on .meta {
-  color: var(--tox);
-  font-weight: 700;
-}
-
 /* Rider */
 .cols {
   display: grid;
@@ -512,45 +452,6 @@ kbd {
 .resume small {
   color: var(--dim);
 }
-/* 3D previews drawn by ui/shopPreview.ts over the flat swatch */
-.item .sw:has(img) {
-  height: 96px;
-  overflow: hidden;
-}
-.item .sw img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-/* Rarity: a badge, and a coloured frame for the rarer items */
-.item .rarity {
-  align-self: flex-start;
-  padding: 0 7px;
-  border-radius: 99px;
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--dim);
-  box-shadow: inset 0 0 0 1px currentColor;
-}
-.item .rarity.rare {
-  color: #4aa8ff;
-}
-.item .rarity.epic {
-  color: #c06bff;
-}
-.item .rarity.legendary {
-  color: #ffb020;
-}
-.item.epic:not(.on) {
-  box-shadow: inset 0 0 0 1px rgb(192 107 255 / 0.5);
-}
-.item.legendary:not(.on) {
-  box-shadow:
-    inset 0 0 0 1px rgb(255 176 32 / 0.7),
-    0 0 18px rgb(255 176 32 / 0.15);
-}
 .home-games {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -632,7 +533,7 @@ kbd {
   color: var(--acc);
   white-space: nowrap;
 }
-/* Garage: how close you are to an item you cannot afford yet. */
+/* How far along a bar is (results, rider level). */
 .need-bar {
   position: relative;
   height: 32px;
@@ -657,21 +558,6 @@ kbd {
 .crown-line {
   margin: 0 0 12px;
   font-weight: 600;
-}
-.sw.try {
-  cursor: zoom-in;
-}
-.try-on {
-  display: block;
-  width: min(100%, 480px);
-  border-radius: 12px;
-}
-.garage-shelves {
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  padding: 8px 0;
-  background: var(--bg);
 }
 .feed-row {
   display: grid;
@@ -702,19 +588,4 @@ kbd {
 .feed-pr {
   color: var(--acc);
   font-weight: 700;
-}
-.sw.try {
-  position: relative;
-}
-.sw.try::after {
-  content: 'Try on';
-  position: absolute;
-  right: 6px;
-  bottom: 6px;
-  padding: 1px 6px;
-  border-radius: 6px;
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: #111;
-  background: var(--acc);
 }

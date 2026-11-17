@@ -1,5 +1,5 @@
 import * as THREE from 'three'
-import type { Look } from '../../core/cosmetics'
+import type { Look } from '../../core/body'
 import { clamp } from '../math'
 import { makeRider } from '../riders'
 import { VIS } from '../params'

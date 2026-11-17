@@ -19,6 +19,8 @@ export interface BodyField {
 }
 /** A rider's body: a whole number per option key. See docs/avatars.md. */
 export type Body = Record<string, number>
+/** What other riders see of you: your body as a `look.body` string. Old profiles may carry Garage keys, unread. */
+export type Look = { body?: string }
 
 export const BODY_FIELDS = AVATAR.fields as BodyField[]
 export const BODY_TABS = [...new Set(BODY_FIELDS.map((f) => f.tab))]

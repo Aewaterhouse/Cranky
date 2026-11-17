@@ -113,7 +113,6 @@ export function startBusRide(
       weightKg: profile.weightKg,
       quitLabel: () => (isHost() ? 'End ride' : 'Leave the bus'),
       onAct: (k, v) => net.send({ t: 'act', k, v }),
-      hornOf: (id) => lk[id]?.horn,
     },
   )
   hud.setTier(profile.tier)
@@ -227,7 +226,6 @@ export function startBusRide(
       zed: b.zed,
       mood: (calm ? 'drill' : m.ev) as Mood,
       roadblock: b.rb,
-      busLook: lk[l.host],
       trophies: l.trophies,
       gunship: b.gunship,
       riders: Object.entries(m.riders).map(([id, r]) => ({

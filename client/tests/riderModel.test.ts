@@ -21,7 +21,7 @@ describe('rider model', () => {
   it('stays inside the triangle budget for any body and headwear', () => {
     let most = 0
     for (const b of bodies)
-      for (const wear of ['none', 'helmet', 'hat'] as const)
+      for (const wear of ['none', 'helmet'] as const)
         most = Math.max(most, buildBody(b).triangles + buildHead(b, wear).triangles)
     expect(most).toBeLessThanOrEqual(3000)
     expect(most).toBeGreaterThan(500)

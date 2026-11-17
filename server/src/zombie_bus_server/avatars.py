@@ -30,9 +30,9 @@ def clean_body(s: object) -> str | None:
 
 
 def clean_look(look: dict) -> dict:
-    """The look with its `body` kept (clamped) if it is a body and dropped if not. Item ids pass through.
+    """The look with its `body` kept (clamped) if it is a body and dropped if not.
 
-    A `sash` (from Climate Lawsuit, now gone) is always dropped.
+    Old Garage item ids on a stored profile pass through, unread. A `sash` (Climate Lawsuit) is dropped.
     """
     look = {k: v for k, v in look.items() if k != "sash"}
     if "body" not in look:

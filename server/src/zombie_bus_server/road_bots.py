@@ -30,9 +30,7 @@ def set_bots(room: RoadRoom, n: int) -> None:
         if sum(r.bot for r in room.riders.values()) >= want:
             break
         if rid not in room.riders:
-            rng = random.Random(f"{room.code}:{rid}:make")
-            look = {slot: rng.choice(ids) for slot, ids in C.BOT_LOOKS.items()}
-            room.riders[rid] = Rider(rid, name, 0, "hard", connected=True, look=look, bot=True)
+            room.riders[rid] = Rider(rid, name, 0, "hard", connected=True, bot=True)
     assume_ftps(room)
 
 

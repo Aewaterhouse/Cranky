@@ -11,7 +11,6 @@ import {
   randomBody,
   withBody,
 } from '../src/core/body'
-import { equip } from '../src/core/cosmetics'
 import { newProfile } from '../src/core/curve'
 
 const inRange = (b: Record<string, number>) =>
@@ -79,12 +78,13 @@ describe('rider body data', () => {
     for (const p of BODY_PRESETS) expect(inRange(presetBody(p.name)), p.name).toBe(true)
   })
 
-  it('rides in the profile beside the Garage items without disturbing them', () => {
+  it('rides in the profile beside old Garage keys, which stay unread', () => {
     let p = newProfile('luke', 'Luke')
-    p = { ...p, look: withBody(p.look, presetBody('Sprinter')) }
-    p = equip(p, 'hat-cap')
-    expect(p.look.hat).toBe('hat-cap')
+    p = {
+      ...p,
+      look: { ...withBody(p.look, presetBody('Sprinter')), hat: 'hat-cap' } as typeof p.look,
+    }
     expect(bodyOf('luke', p.look)).toEqual(presetBody('Sprinter'))
-    expect(bodyOf('luke', JSON.parse(JSON.stringify(equip(p, 'hat-cap'))).look).calves).toBe(100)
+    expect(bodyOf('luke', JSON.parse(JSON.stringify(p)).look).calves).toBe(100)
   })
 })

@@ -2,8 +2,8 @@ import * as THREE from 'three'
 import type { Body } from '../core/body'
 import { type Figure, SLOT, type V3 } from './figure'
 
-/** What is on the head: nothing (the creator), the helmet, or a Garage hat. */
-export type Headwear = 'none' | 'helmet' | 'hat'
+/** What is on the head: nothing (the creator) or the helmet. */
+export type Headwear = 'none' | 'helmet'
 
 const R = 0.23
 export const FACE_DROP = 0.03
@@ -33,19 +33,18 @@ function shell(out: number, back: number, front: number, top = 1) {
 }
 
 /**
- * Head hair and facial hair. Hair is built for what is worn: bare-headed styles are whole; under a helmet or hat
- * only what hangs below the rim shows, and under the helmet the tall styles (mohawk, spikes, man bun) poke through.
+ * Head hair and facial hair. Hair is built for what is worn: bare-headed styles are whole; under the helmet only
+ * what hangs below the rim shows, and the tall styles (mohawk, spikes, man bun) poke through.
  */
 export function addHair(f: Figure, b: Body, wear: Headwear) {
   const bare = wear === 'none'
-  const through = wear !== 'hat'
   const add = (
     g: THREE.BufferGeometry,
     pos: V3 = [0, 0, 0],
     rot: V3 = [0, 0, 0],
     scale: V3 | number = 1,
   ) => f.add(g, H, pos, rot, scale)
-  /** Hair round the back and sides below the rim of a helmet or hat, down to `low`. */
+  /** Hair round the back and sides below the rim of the helmet, down to `low`. */
   const sides = (low = -0.1) => add(shell(0.012, low, 9, 0.07))
   switch (b.hair) {
     case 1: // buzz
@@ -63,14 +62,13 @@ export function addHair(f: Figure, b: Body, wear: Headwear) {
       add(box(0.22, 0.14, 0.06), [0, -0.4, 0.29], [0.5, 0, 0])
       break
     case 4: // mohawk
-      if (through)
-        for (let i = 0; i < 5; i++)
-          add(
-            cone(0.055, 0.3, 4),
-            [0, Math.cos((i - 1.6) * 0.5) * 0.33, Math.sin((i - 1.6) * 0.5) * 0.33],
-            [(i - 1.6) * 0.5, 0, 0],
-            [0.6, 1, 1],
-          )
+      for (let i = 0; i < 5; i++)
+        add(
+          cone(0.055, 0.3, 4),
+          [0, Math.cos((i - 1.6) * 0.5) * 0.33, Math.sin((i - 1.6) * 0.5) * 0.33],
+          [(i - 1.6) * 0.5, 0, 0],
+          [0.6, 1, 1],
+        )
       break
     case 5: // afro
       if (bare) add(ico(0.36, 1), [0, 0.09, 0.04])
@@ -87,7 +85,7 @@ export function addHair(f: Figure, b: Body, wear: Headwear) {
     case 6: // man bun
       if (bare) add(shell(0.014, -0.08, 0.11))
       else sides(-0.07)
-      if (through) add(ico(0.085, 0), [0, 0.2, 0.22])
+      add(ico(0.085, 0), [0, 0.2, 0.22])
       break
     case 7: // ponytail
       if (bare) add(shell(0.016, -0.08, 0.1))
@@ -118,21 +116,20 @@ export function addHair(f: Figure, b: Body, wear: Headwear) {
           )
       break
     case 11: // spikes
-      if (through)
-        for (let i = 0; i < 9; i++) {
-          const a = i * 2.4
-          const t = 0.25 + (i % 3) * 0.3
-          const dir: V3 = [
-            Math.sin(t) * Math.sin(a),
-            Math.cos(t),
-            Math.sin(t) * Math.cos(a) * 0.9 + 0.05,
-          ]
-          add(
-            cone(0.05, 0.26, 4),
-            [dir[0] * 0.33, dir[1] * 0.33, dir[2] * 0.33],
-            [dir[2] * 1.1, 0, -dir[0] * 1.1],
-          )
-        }
+      for (let i = 0; i < 9; i++) {
+        const a = i * 2.4
+        const t = 0.25 + (i % 3) * 0.3
+        const dir: V3 = [
+          Math.sin(t) * Math.sin(a),
+          Math.cos(t),
+          Math.sin(t) * Math.cos(a) * 0.9 + 0.05,
+        ]
+        add(
+          cone(0.05, 0.26, 4),
+          [dir[0] * 0.33, dir[1] * 0.33, dir[2] * 0.33],
+          [dir[2] * 1.1, 0, -dir[0] * 1.1],
+        )
+      }
       if (!bare) sides(-0.05)
       break
     case 12: // big perm

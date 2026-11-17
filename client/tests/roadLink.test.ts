@@ -169,9 +169,9 @@ describe('group ride link', () => {
         row('bob', 'Bob', 4),
       ],
     }
-    const p = podiumOf(g, [{ id: 'kev', look: { hat: 'hat-viking' } }])
+    const p = podiumOf(g, [{ id: 'kev', look: { body: 'b' } }])
     expect(p.top.map((r) => r.name)).toEqual(['Kev', 'Me', 'Shaz'])
-    expect(p.top[0].look).toEqual({ hat: 'hat-viking' })
+    expect(p.top[0].look).toEqual({ body: 'b' })
     expect(p.award).toEqual({ who: { id: 'bob', name: 'Bob', look: undefined }, sign: 'PRIME' })
     expect(p.title).toBe('CRIT · Nundah')
     expect(p.rest).toEqual([])
