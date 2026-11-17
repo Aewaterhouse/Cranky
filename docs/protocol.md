@@ -114,13 +114,13 @@ drag multiplier (1 is clean air, 0.73 is a 27% saving), `band` the keep-together
 (1 when off), `st` one of `riding`, `stopped`, `away` (socket gone) or `finished`, `fin` the rider's time in
 seconds once finished. `game` is the rule set's own state (null for a plain ride). `fx` is a list of
 `{k, id, text}`: `finish` (`text` the finishing place) and, in races, `bell` (`text` the banner, e.g. `LAST LAP`;
-`id` null) and `points` (`id` scored `text`, e.g. `+5`).
+`id` null).
 
-Races (`game` other than `ride`): the tick's `game` is `{kind, lap, laps}` (`lap` the leader's lap); a points
-race adds `pts: {id: points}`. The summary adds `podium` (ids of the first three across the line) and each row's
-`gap` (seconds behind the winner, null for a rider who did not finish). A points race's rows are by points (ties
-to the better finish) with `pts` and `line` (place across the line), and the summary has
-`award: {kind: 'points', id}` for the points winner (null if nobody scored). A crit's tick `game` adds
+The games are `ride`, `race`, `crit` and `handicap`. A `road` message naming any other game (an old client's
+`points` or `chaingang`, both gone) keeps the room's game; a room saved mid-way through one restores as a plain
+ride. Races (`game` other than `ride`): the tick's `game` is `{kind, lap, laps}` (`lap` the leader's lap). The
+summary adds `podium` (ids of the first three across the line) and each row's `gap` (seconds behind the winner,
+null for a rider who did not finish). A crit's tick `game` adds
 `prime` (the lap whose line is the prime) and `primeBy` (who took it, null before); its bells are `PRIME NEXT LAP`
 as the leader starts the prime lap and `PRIME!` (with `id` the winner) at the line; its rows carry `prime` (true
 for the winner) and the summary `award: {kind: 'prime', id}`. A race ends once every human present is home and three riders (or everyone)

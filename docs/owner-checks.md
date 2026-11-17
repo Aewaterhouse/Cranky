@@ -181,7 +181,7 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] A boss at the end: the road train, giant or bridge shows behind the bus and the health bar empties as you ride on target.
 - [ ] The 📯 horn honks, and the emoji float up for everyone; a rider who has fallen off can still heckle.
 - [ ] A campaign ride: tick Campaign in the lobby, finish, then the next ride starts on the carried armour at the next town.
-- [ ] Handicap race and chaingang on a route with mates of different FTPs: the handicap is close, and "TO THE FRONT" calls work.
+- [ ] Handicap race on a route with mates of different FTPs: the handicap is close.
 
 ## Free-ride feedback, Strava post and passwords, 2026-11-15 (simulator only)
 - [ ] Birds: ride past a few cockatoo or galah flocks. On the ground they peck and hop; some flocks loop round overhead instead. Nothing hangs still in the air, and they burst away as you get close.

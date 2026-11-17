@@ -222,9 +222,11 @@ class RoadSim:
 
     @classmethod
     def from_dict(cls, d: dict) -> RoadSim:
-        sim = cls(d["route"], d["laps"], d["together"], d["game"], d.get("drafting", C.DRAFT_DEFAULT))
+        game = d["game"] if d["game"] in RULES else "ride"  # saved mid-way through a game that has gone
+        sim = cls(d["route"], d["laps"], d["together"], game, d.get("drafting", C.DRAFT_DEFAULT))
         sim.el, sim.first_fin = d["el"], d["first_fin"]
         sim.movers = {m["id"]: Mover(**m) for m in d["movers"]}
-        vars(sim.rules).update(d.get("rules", {}))
+        if game == d["game"]:
+            vars(sim.rules).update(d.get("rules", {}))
         sim.order = sorted(sim.movers, key=lambda i: -sim.movers[i].d)
         return sim

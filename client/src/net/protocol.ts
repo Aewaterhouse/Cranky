@@ -179,13 +179,12 @@ export interface RideStats {
 /** Road rooms (group free ride): see "Road rooms" in docs/protocol.md. */
 export type RoadStyle = 'social' | 'race'
 /** The road layer's rule sets (the server's `RULES`). */
-export type RoadGame = 'ride' | 'race' | 'points' | 'crit' | 'handicap' | 'chaingang'
-/** A race's tick `game`: the leader's lap and, in a points race, everyone's points. */
+export type RoadGame = 'ride' | 'race' | 'crit' | 'handicap'
+/** A race's tick `game`: the leader's lap. */
 export interface RaceState {
   kind: RoadGame
   lap: number
   laps: number
-  pts?: Record<string, number>
   /** Crit: the lap whose line is the prime, and who took it. */
   prime?: number
   primeBy?: string | null
@@ -255,12 +254,11 @@ export interface RoadSummary {
   secs: number
   style: RoadStyle
   together: boolean
-  game?: RoadGame
-  /** Races: the first three across the line, in order, and the points winner. */
+  /** A `RoadGame`, or the name of one that has gone (points, chaingang) on an old summary. */
+  game?: string
+  /** Races: the first three across the line, in order, and the crit's prime winner. */
   podium?: string[]
-  award?: { kind: 'points' | 'prime'; id: string } | null
-  /** A chaingang: the crew's time (the last rider home) and its turns on the front. */
-  team?: { time: number | null; smooth: number; turns: number }
+  award?: { kind: string; id: string } | null
   riders: {
     id: string
     name: string
@@ -277,9 +275,6 @@ export interface RoadSummary {
     saved: number
     /** Races: seconds behind the winner (null for a rider who did not finish). */
     gap?: number | null
-    /** Points race: the rider's points and their place across the line. */
-    pts?: number
-    line?: number
     /** Crit: this rider won the prime. */
     prime?: boolean
   }[]

@@ -428,7 +428,6 @@ ROAD_STOPPED_MS = 0.5  # slower than this reads as stopped
 ROAD_BOT_WKG = 3.0  # assumed W/kg when no human has a weight and FTP to copy
 ROAD_BOT_JITTER = 0.04
 ROAD_BOT_CAD = 88
-CHAIN_TURN_S = 30  # chaingang: seconds each rider is called to the front
 HANDICAP_WKG = 3.5  # a handicap race scales every rider to this FTP in W/kg: the share of FTP decides it
 ROAD_BOTS = [
     ("Diesel Dave", "diesel", 84, 1.0, "Sits on the same watts all day. Has never once looked back."),
@@ -448,9 +447,6 @@ ROAD_BOT_X = {
 # long after the first rider home.
 RACE_GRACE_S = 180
 RACE_PODIUM = 3
-POINTS = (5, 3, 2, 1)  # points race: the first four across each lap's line
-POINTS_LAST_X = 2  # the last lap's sprint is worth this many times as much
-POINTS_WARN_M = 400  # the bell and banner go this far before each sprint line
 CRIT_PRIME_AT = (0.4, 0.6)  # a crit's prime is the line at the end of a random lap in this share of the laps
 # Segment efforts (free ride): the longest time and trace accepted, efforts per post, rows per leaderboard.
 EFFORT_MAX_S = 24 * 3600

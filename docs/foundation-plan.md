@@ -37,7 +37,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
       Lawsuit, Watch Party, Last Standing, TTT, Pub Quiz, Galley Ship and Hunt. Server modes, config, protocol,
       HUD panels, scenes (the town, ambulance, date dressing, the pack), dev pages, bots, Strava and Discord
       text, tests. The home screen's "Crew games" picker becomes a single Zombie Bus card.
-- [ ] 1.3 Group rides on routes keep the plain ride, race, crit and handicap, with the podium. Remove points
+- [x] 1.3 Group rides on routes keep the plain ride, race, crit and handicap, with the podium. Remove points
       and chaingang only.
 - [ ] 1.4 Remove scrap everywhere: earning, balances, displays, results rewards, daily and weekly scrap, the
       week's deal.

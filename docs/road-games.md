@@ -16,11 +16,11 @@ a game is a small rule set on top. The races are built (`modes/race.py`); this i
 
 - `place(sim, m)`: where a rider starts. Handicap start gaps and "team two starts a minute back" go here.
 - `tune(sim, live)`: each tick before the physics, set every rider's `draft`, `band` and `lane`. A handicap
-  scales `band` by FTP; a chaingang decides who is the front rider; kart lanes pick `lane` from the rider's input.
+  scales `band` by FTP; kart lanes pick `lane` from the rider's input.
 - `after(sim, dt)`: each tick after the riders have moved. Scoring, eliminations, item boxes. Returns `fx`
   (`{k, id, text}`) for the clients to toast or animate.
-- `state(sim)`: anything the clients need each tick, sent as the tick's `game` field (points, who is on the
-  front, time gaps between teams).
+- `state(sim)`: anything the clients need each tick, sent as the tick's `game` field (the lap, a crit's prime,
+  time gaps between teams).
 - `over(sim)`: when the ride ends (fourth rider home, last rider eliminated).
 - `results(sim)`: the rows of the results screen, in order.
 
@@ -40,7 +40,6 @@ the trainer: the client sets its own gradient from its own position.
 
 ## What each planned game needs
 
-- **Chaingang:** `tune` (only the front rider is in the wind; a rotation prompt in `state`), `after` (score time on the front).
 - **Handicap race:** `place` (start gaps) or `tune` (`band` by FTP), `results` by finish order.
 - **Team time trial:** teams on `RoadRoom`, `place` (two groups), `over` and `results` on the fourth rider.
 - **Kart racing:** `tune` (lanes from input), `after` (item boxes and hits), one input message.

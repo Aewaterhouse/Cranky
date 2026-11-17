@@ -107,7 +107,6 @@ async function race(page, game, laps, want) {
     console.log('crew ride: ok')
     const racer = await rider(browser, 'Kat')
     await race(racer, 'Race', 1, ['Nundah', 'race'])
-    await race(racer, 'Points', 2, ['points race', 'won on points'])
     await race(racer, 'Crit', 2, ['crit', 'won the prime'])
     console.log('road races: ok')
     if (errors.length) throw new Error(`page errors:\n${errors.join('\n')}`)

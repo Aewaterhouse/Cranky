@@ -16,18 +16,16 @@ const R = CFG.road
 const ORD = ['', '1st', '2nd', '3rd']
 export const ordinal = (n: number) => ORD[n] ?? `${n}th`
 
-const TITLES = {
+const TITLES: Record<string, string> = {
   ride: 'RIDE',
   race: 'RACE',
-  points: 'POINTS RACE',
   crit: 'CRIT',
   handicap: 'HANDICAP',
-  chaingang: 'CHAINGANG',
 }
 
 /**
- * Who stands where at the end of a race: the first three across the line, the points or prime winner on the
- * side box with its sign, and the words over the top. Looks come from the riders as last drawn.
+ * Who stands where at the end of a race: the first three across the line, the prime winner on the side box
+ * with its sign, and the words over the top. Looks come from the riders as last drawn.
  */
 export function podiumOf(g: RoadSummary, drawn: { id: string; look?: RoadRider['look'] }[]) {
   const who = (id: string): PodiumRider => ({
@@ -35,17 +33,15 @@ export function podiumOf(g: RoadSummary, drawn: { id: string; look?: RoadRider['
     name: g.riders.find((r) => r.id === id)?.name ?? id,
     look: drawn.find((r) => r.id === id)?.look,
   })
-  const award = g.award && {
-    who: who(g.award.id),
-    sign: g.award.kind === 'prime' ? 'PRIME' : 'POINTS',
-  }
-  const up = new Set([...(g.podium ?? []), g.award?.id])
+  const game = g.game ?? 'race'
+  const prime = g.award?.kind === 'prime' ? g.award.id : undefined
+  const up = new Set([...(g.podium ?? []), prime])
   return {
     top: (g.podium ?? []).map(who),
-    award: award || undefined,
+    award: prime ? { who: who(prime), sign: 'PRIME' } : undefined,
     /** Everyone else, clapping beside the steps in finishing order; the last holds the wooden spoon. */
     rest: g.riders.filter((r) => !up.has(r.id)).map((r) => who(r.id)),
-    title: `${TITLES[g.game ?? 'race']} · ${g.name}`,
+    title: `${TITLES[game] ?? game.toUpperCase()} · ${g.name}`,
   }
 }
 
@@ -112,11 +108,6 @@ export class RoadLink {
       if (fx.k === 'finish' && fx.id) {
         const place = ordinal(+(fx.text ?? 0))
         this.notes.push(fx.id === this.me ? `Finished: ${place}` : `${name} finished ${place}`)
-      } else if (fx.k === 'points' && fx.id) {
-        this.notes.push(`${fx.id === this.me ? 'You' : name} ${fx.text} points`)
-        this.flash = ['SPRINT POINTS', this.table(), this.got + R.bannerS]
-      } else if (fx.k === 'turn' && fx.id) {
-        this.notes.push(`${fx.id === this.me ? 'You' : name}: ${fx.text}`)
       } else if (fx.k === 'bell') {
         this.flash = [fx.text ?? '', fx.id ? name : '', this.got + R.bannerS]
         this.onBell(fx.text ?? '')
@@ -198,27 +189,14 @@ export class RoadLink {
     return `${place} · ${secs} s ${r.d > me.d ? 'to' : 'on'} ${who}`
   }
 
-  /** The points table after a sprint: the top three and me ("Shaz 9 · Dave 6 · Kat 4 · You 1"). */
-  private table() {
-    const pts = this.race?.pts ?? {}
-    const rows = [...this.info.keys()]
-      .map((id) => [id, pts[id] ?? 0] as const)
-      .sort((a, b) => b[1] - a[1])
-    const top = rows.filter(([id], i) => i < 3 || id === this.me)
-    return top
-      .map(([id, p]) => `${id === this.me ? 'You' : (this.info.get(id)?.name ?? 'Someone')} ${p}`)
-      .join(' · ')
-  }
-
   /** My power as the race's physics sees it: in a handicap race, scaled to the same FTP per kilo. */
   even(p: number, ftp: number, kg: number) {
     return this.race?.kind === 'handicap' ? (p * CFG.road.handicapWkg * kg) / Math.max(1, ftp) : p
   }
 
-  /** A race's tag for a rider's card: their points, or the crit's prime. */
+  /** A race's tag for a rider's card: the crit's prime. */
   tag(id: string) {
-    const pts = this.race?.pts
-    return pts ? `${pts[id] ?? 0} pts` : this.race?.primeBy === id ? '★ prime' : undefined
+    return this.race?.primeBy === id ? '★ prime' : undefined
   }
 
   /** Everyone else, carried on from the last tick at their speed. */

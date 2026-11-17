@@ -3,6 +3,8 @@
 import asyncio
 import time
 
+from test_resume import FakeWS
+
 from zombie_bus_server import config as C
 from zombie_bus_server import road_bots
 from zombie_bus_server.modes.road import RoadSim
@@ -101,56 +103,6 @@ def spread(sim: RoadSim) -> RoadSim:
     return sim
 
 
-def test_points_on_every_lap_double_on_the_last():
-    sim = spread(racers("points"))
-    fx = race_out(sim)
-    pts = sim.rules.pts
-    assert sorted(pts.values(), reverse=True) == [20, 12, 8, 4]  # 5+5+10, 3+3+6, 2+2+4, 1+1+2
-    got = sorted(f["text"] for f in fx if f["k"] == "points")
-    assert got == sorted(["+5", "+3", "+2", "+1"] * 2 + ["+10", "+6", "+4", "+2"])
-    bells = [f["text"] for f in fx if f["k"] == "bell"]
-    assert bells == ["SPRINT 1 · POINTS", "SPRINT 2 · POINTS", "LAST LAP", "FINAL SPRINT · DOUBLE POINTS"]
-    rows = sim.rules.results(sim)
-    assert [r["pts"] for r in rows] == [20, 12, 8, 4] and rows[0]["line"] == 1
-    assert sim.rules.state(sim)["pts"] == pts
-    extra = sim.rules.extra(sim, rows)
-    assert extra["award"] == {"kind": "points", "id": rows[0]["id"]} and extra["podium"][0] == rows[0]["id"]
-
-
-def test_points_ties_go_to_the_better_finish():
-    sim = spread(racers("points", 2))
-    race_out(sim)
-    line = [r["id"] for r in by_line(sim)]
-    sim.rules.pts = {line[3]: 9, line[1]: 9, line[0]: 1}
-    rows = sim.rules.results(sim)
-    assert [r["id"] for r in rows] == [line[1], line[3], line[0], line[2]]
-    assert sim.rules.extra(sim, rows)["podium"] == line[:3]  # the podium is still the line
-
-
-def by_line(sim: RoadSim) -> list[dict]:
-    return sorted(sim.rules.results(sim), key=lambda r: r["line"])
-
-
-def test_points_survive_a_snapshot_and_a_late_joiner_scores_only_what_they_ride():
-    sim = racers("points", 4)
-    while sim.rules.lead < 1:
-        sim.step(DT)
-    late = sim.add("late", 70, 250)
-    late.p, late.d = 400, max(m.d for m in sim.movers.values())
-    back = RoadSim.from_dict(sim.to_dict())
-    assert back.rules.pts == sim.rules.pts and back.rules.seen == sim.rules.seen
-    race_out(back)
-    assert back.rules.n == {"1": 4, "2": 5, "3": 5, "4": 5}  # the late joiner missed the first line
-
-
-def test_four_riders_points_race_with_bots():
-    room = bot_room("points", 3)
-    run_room(room)
-    s = room.summary
-    assert s["game"] == "points" and s["award"]["kind"] == "points"
-    assert sum(r["pts"] for r in s["riders"]) >= 11 * 2 + 20  # the fourth may still be out at the end
-
-
 def test_the_crit_prime_is_one_lap_around_halfway():
     for laps in (1, 2, 5, 10, 20):
         primes = {racers("crit", laps, seed=s).rules.prime for s in range(200)}
@@ -230,18 +182,24 @@ def test_a_handicap_race_is_won_by_the_share_of_ftp_not_the_watts():
     assert room.summary["riders"][0]["id"] == "small"
 
 
-def test_a_chaingang_calls_each_rider_to_the_front_and_scores_smooth_turns():
-    sim = racers("chaingang", 2)
-    sim.drafting = "off"
-    fx = []
-    while sim.rules.turns < 3:
-        # whoever is called rides hard, so they come through to the front
-        for m in sim.movers.values():
-            m.p = 450 if m.id == sim.rules.called else 200
-        fx += sim.step(DT)
-    calls = [f["id"] for f in fx if f["k"] == "bell" and f["text"] == "TO THE FRONT"]
-    assert calls[:4] == ["r0", "r1", "r2", "r3"]
-    assert sim.rules.turns == 3 and sim.rules.smooth >= 1
-    race_out(sim)
-    extra = sim.rules.extra(sim, sim.rules.results(sim))
-    assert extra["team"]["time"] == max(r["time"] for r in sim.rules.results(sim))
+def test_a_removed_road_game_falls_back_to_the_plain_ride():
+    async def go():
+        room, ws = RoadRoom("GONE"), FakeWS()
+        room.riders["h"] = Rider("h", "H", 250, "hard", connected=True)
+        room.host = "h"
+        for game in ("points", "chaingang"):  # a stale client asks for a game that has gone
+            await room.handle(
+                "h", ws, {"t": "road", "route": "nundah-crit", "laps": 2, "style": "race", "game": game}
+            )
+            assert room.game == "ride" and ws.sent == []
+        room.start()
+        room.task.cancel()
+        return room
+
+    room = asyncio.run(go())
+    saved = room.to_dict()
+    saved["game"] = saved["sim"]["game"] = "points"  # saved mid-way through an old points race
+    saved["sim"]["rules"] = {"pts": {"h": 5}, "seen": {}, "n": {}, "warned": 1}
+    back = RoadRoom.from_dict(saved)
+    assert back.game == "ride" and back.sim.game == "ride" and not hasattr(back.sim.rules, "pts")
+    assert back.sim.rules.state(back.sim) is None

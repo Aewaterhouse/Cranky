@@ -38,19 +38,9 @@ const GAMES: [RoadGame, string, string][] = [
   ['ride', 'Ride', 'Ride together. No winner, just a crew on the road.'],
   ['race', 'Race', 'Everyone from the line. First across it after the last lap wins.'],
   [
-    'points',
-    'Points',
-    'A sprint every lap: 5, 3, 2 and 1 points, double on the last. Most points wins.',
-  ],
-  [
     'crit',
     'Crit',
     'Lap after lap of a short loop, and a prime on one lap around halfway. First home wins.',
-  ],
-  [
-    'chaingang',
-    'Chaingang',
-    'A team ride in turns: every 30 s the next rider is called to the front. Smooth turns, and the crew is timed to the last one home.',
   ],
   [
     'handicap',

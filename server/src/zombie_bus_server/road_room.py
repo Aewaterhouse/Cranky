@@ -101,6 +101,7 @@ class RoadRoom(Room):
         room.host, room.state, room.route, room.laps = d["host"], d["state"], d["route"], d["laps"]
         room.style, room.together = d["style"], d["together"]
         room.drafting, room.game = d.get("draft", C.DRAFT_DEFAULT), d.get("game", "ride")
+        room.game = room.game if room.game in RULES else "ride"  # a saved room of a game that has gone
         room.plan = {"name": load_lap(room.route).name}
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
         room.sim = RoadSim.from_dict(d["sim"]) if d["sim"] else None

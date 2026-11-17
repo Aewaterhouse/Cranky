@@ -1,24 +1,24 @@
 import { ordinal } from '../modes/freeRide/roadLink'
 import type { RoadLobby, RoadSummary } from '../net/protocol'
 import '../moment.css'
-import { avatar, clock, fmt, h } from './dom'
+import { avatar, clock, h } from './dom'
 import { UNIT } from './units'
 
 const km = (m: number) => UNIT.dist(m)
 const lapsText = (n: number) => (n > 1 ? ` · ${n} laps` : '')
-const GAME_NAME = {
+/** The last two are games that have gone: an old summary still names them. */
+const GAME_NAME: Record<string, string> = {
   ride: 'social ride',
   race: 'race',
-  points: 'points race',
   crit: 'crit',
   handicap: 'handicap race',
+  points: 'points race',
   chaingang: 'chaingang',
 }
 
 /** The crew table for a road ride: place, time (or how far they got), average power, W/kg and watts saved drafting. */
 export function roadTable(g: RoadSummary, myId = '', faces = false) {
-  const pts = g.game === 'points'
-  const head = ['', 'Rider', ...(pts ? ['Points'] : []), 'Time', 'Avg power', 'W/kg', 'Draft saved']
+  const head = ['', 'Rider', 'Time', 'Avg power', 'W/kg', 'Draft saved']
   return h(
     'table',
     { class: 'road-table' },
@@ -36,7 +36,6 @@ export function roadTable(g: RoadSummary, myId = '', faces = false) {
           r.bot ? ' 🤖' : '',
           r.prime ? ' ★' : '',
         ),
-        pts ? h('td', {}, h('b', {}, String(r.pts ?? 0))) : '',
         h(
           'td',
           {},
@@ -70,14 +69,11 @@ export function podium(g: RoadSummary, myId = '') {
   return h('div', { class: 'podium' }, ...[top[1], top[0], top[2]].filter(Boolean).map(step))
 }
 
-/** The points or prime winner's own line, the hero of a crit whatever the finish. */
+/** The prime winner's own line, the hero of a crit whatever the finish. */
 function award(g: RoadSummary, myId: string) {
-  const r = g.award && g.riders.find((x) => x.id === g.award!.id)
+  const r = g.award?.kind === 'prime' && g.riders.find((x) => x.id === g.award!.id)
   if (!r) return ''
-  const who = r.id === myId ? 'You' : r.name
-  const what =
-    g.award!.kind === 'prime' ? `★ ${who} won the prime` : `🏅 ${who} won on points (${r.pts})`
-  return h('p', { class: 'race-award' }, what)
+  return h('p', { class: 'race-award' }, `★ ${r.id === myId ? 'You' : r.name} won the prime`)
 }
 
 /** Group-ride extras for the results screen. */
@@ -94,17 +90,10 @@ export function roadSection(g: RoadSummary, myId: string) {
       h(
         'p',
         { class: 'dim' },
-        `${g.name}${lapsText(g.laps)} · ${km(g.distance)} · ${g.game && g.game !== 'ride' ? GAME_NAME[g.game] : g.style === 'race' ? 'race' : 'social ride'}${g.together ? ' · kept together' : ''}`,
+        `${g.name}${lapsText(g.laps)} · ${km(g.distance)} · ${g.game && g.game !== 'ride' ? (GAME_NAME[g.game] ?? g.game) : g.style === 'race' ? 'race' : 'social ride'}${g.together ? ' · kept together' : ''}`,
       ),
       podium(g, myId),
       award(g, myId),
-      g.team
-        ? h(
-            'p',
-            { class: 'race-award' },
-            `⛓ Crew time ${g.team.time == null ? '–' : fmt(g.team.time)} · ${g.team.smooth} of ${g.team.turns} turns smooth`,
-          )
-        : '',
       roadTable(g, myId),
     ),
   )

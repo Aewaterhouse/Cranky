@@ -128,16 +128,6 @@ describe('group ride link', () => {
     expect(link.banner()).toBeUndefined()
   })
 
-  it("a points race tags each card with the rider's points and toasts each sprint", () => {
-    const { link } = make()
-    const m = tick(60, { me: at(500), kev: at(600) }, [{ k: 'points', id: 'kev', text: '+5' }])
-    link.tick({ ...m, game: { kind: 'points', lap: 2, laps: 3, pts: { kev: 5 } } })
-    expect(link.takeNotes()).toEqual(['Kev +5 points'])
-    expect(link.banner()).toEqual(['SPRINT POINTS', 'Kev 5 · You 0'])
-    expect(link.tag('me')).toBe('0 pts')
-    expect(link.others()[0].tag).toBe('5 pts')
-  })
-
   it("a crit's prime winner gets a star on their card and the PRIME! banner", () => {
     const { link } = make()
     const m = tick(60, { me: at(500), kev: at(600) }, [{ k: 'bell', id: 'kev', text: 'PRIME!' }])
@@ -186,7 +176,9 @@ describe('group ride link', () => {
     expect(p.title).toBe('CRIT · Nundah')
     expect(p.rest).toEqual([])
     expect(podiumOf({ ...g, award: null }, []).rest.map((r) => r.name)).toEqual(['Bob'])
-    expect(podiumOf({ ...g, game: 'points', award: null }, []).award).toBeUndefined()
+    // An old summary from a points race that has gone: no side box, its name over the steps.
+    const gone = podiumOf({ ...g, game: 'points', award: { kind: 'points', id: 'bob' } }, [])
+    expect([gone.award, gone.title, gone.rest.length]).toEqual([undefined, 'POINTS · Nundah', 1])
   })
 
   it('says who joined, who finished and who caught whom', () => {
