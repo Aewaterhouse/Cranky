@@ -5,9 +5,11 @@ Working rules
 • Work one phase at a time from PLAN.md. Tick checklist items as they are done.
 • Keep each change small and runnable. Commit after each checklist item.
 • Every feature must work with the simulated trainer. Never require real hardware to run tests.
-• Do not wait for the owner. This is a janky hobby project and the owner will not review most decisions. Make a reasonable assumption, log it in docs/decisions.md and keep going.
-• Do not build features from later phases.
-• Prefer simple and janky over clever. Fun first. You may invent or tune mechanics and numbers to make it more fun; log them in docs/decisions.md.
+• Scope freeze: docs/foundation-plan.md is the only backlog. It overrides PLAN.md, docs/roadmap.md and the work loop below until it is done.
+• No new games, mechanics, cosmetics or jokes. Build only what a foundation-plan item asks for.
+• If an item needs a decision, add it to docs/questions.md, skip the item and carry on. Log smaller judgement calls in docs/decisions.md.
+• Do not build features from later stages.
+• Prefer simple over clever.
 Safety rules for ERG
 • All ERG writes go through ergController.ts. No other module writes to the trainer.
 • Enforce the 150% FTP cap with unit tests. Sprint blocks must never send an ERG target; test this too.
@@ -42,8 +44,8 @@ Agents degrade when their context fills with code. Keep reading minimal and stat
 9. If the context is getting long, finish the current item, write status and start a fresh session.
 10. Use sub-agents for exploration or broad searches when available and keep only their summary.
 
-Work loop
-• The backlog is docs/roadmap.md. Pick the next unfinished item, build it, commit, mark it done in the roadmap, then repeat without waiting for the owner.
+Work loop (paused by the scope freeze; follow docs/foundation-plan.md instead)
+• The backlog is docs/roadmap.md. Pick the next unfinished item, build it, commit, mark it done in the roadmap, then repeat.
 • Order: follow the "Suggested milestones" table top to bottom. Within a milestone, take that milestone's items in the order they appear in their section tables. Skip anything marked parked or later.
 • Mark a finished item by putting ✅ at the start of its name in the roadmap table, in the same commit as the work. If an item is only partly done, leave it unticked and add a short note of what remains.
 • One item per commit. Tests, type-check and lint must pass before each commit. Log any assumption in docs/decisions.md.

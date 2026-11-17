@@ -31,7 +31,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
 - Badges, passport and weekly goals, with any scrap reward removed.
 
 ## Stage 1: cut
-- [ ] 1.1 AGENTS.md: replace the "do not wait for the owner / invent mechanics" rules with a scope freeze that
+- [x] 1.1 AGENTS.md: replace the "do not wait for the owner / invent mechanics" rules with a scope freeze that
       points at this plan. No new games, mechanics, cosmetics or jokes.
 - [ ] 1.2 Remove every crew game except Zombie Bus: VO2 Madness, Kidney Stone Express, Speed Dating, Climate
       Lawsuit, Watch Party, Last Standing, TTT, Pub Quiz, Galley Ship and Hunt. Server modes, config, protocol,
