@@ -144,7 +144,7 @@ Free ride, solo Slope mode and the Zombie Bus with ERG off (pick Gears in the bu
 
 The Click needs firmware 1.1.0 or later: 1.0.0 ignores the RideOn handshake. Update it in Zwift Companion: More > Equipment > Zwift Click > Update Firmware. On 1.1.0 the handshake write with response fails, so the driver writes it without response; keep it that way.
 
-Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (optional)". Plus shifts up and minus shifts down in free ride and Slope mode. In ERG mode they change intensity by 1%, and in Resistance mode they step the level. Zombie Bus, FTP tests and the TV view ignore the Click. To check a Click without riding, open `/spike.html` and use "Pair Zwift Click"; every raw message is logged to the browser console as `[Click]`.
+Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (optional)". Plus shifts up and minus shifts down in free ride and Slope mode. In ERG mode they change intensity by 1%, and in Resistance mode they step the level. Zombie Bus, FTP tests and the TV view ignore the Click. To check a Click without riding, open `/spike.html` and use "Pair Zwift Click"; every raw message is logged to the browser console as `[Click]`. The same page has a Gear log: shift with the keys, the buttons or the Click while pedalling, and each shift's gradient, the trainer's reply time and the time until power moves are listed (Copy log puts them on the clipboard).
 
 
 

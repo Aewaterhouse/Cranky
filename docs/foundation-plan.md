@@ -58,7 +58,7 @@ changes are skipped, (c) the trainer eases into a new gradient by itself.
       tick, still only through ergController.ts and still serialised with other writes.
 - [x] 2.2 Steady gears: the gear's gradient uses a smoothed cadence so it does not wander with every cadence
       report; a shift still applies in full straight away. Smoothing time in config.
-- [ ] 2.3 A "Gear log" on the trainer check page: time of each press, the gradient sent, the trainer's
+- [x] 2.3 A "Gear log" on the trainer check page: time of each press, the gradient sent, the trainer's
       acknowledgement and the time until power moves by a set amount, so lag is measured, not guessed.
 - [ ] 2.4 Research only, no trainer writes in the app: from public sources (QZ / qdomyos-zwift and similar
       open projects), write docs/zwift-gear-protocol.md describing how apps send a gear ratio straight to

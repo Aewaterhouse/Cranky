@@ -5,6 +5,7 @@ import { SimTrainer } from './trainer/simTrainer'
 import { BleClick } from './trainer/zwiftClick'
 import type { Trainer } from './types'
 import { h, show } from './ui/dom'
+import { gearLogPanel } from './ui/gearLogPanel'
 
 /** Phase 0 trainer check: connect, read power/cadence, set ERG. */
 const live = h('div', { class: 'big' }, '– W · – rpm')
@@ -18,8 +19,12 @@ const status = h(
 const ftp = h('input', { type: 'number', value: 200 })
 const watts = h('input', { type: 'number', value: 150 })
 let erg: ErgController | null = null
+const gearLog = gearLogPanel(() => erg)
 const use = (t: Trainer) => {
-  t.onData((d) => (live.textContent = `${d.power} W · ${Math.round(d.cadence)} rpm`))
+  t.onData((d) => {
+    live.textContent = `${d.power} W · ${Math.round(d.cadence)} rpm`
+    gearLog.data(d)
+  })
   t.onStatus(
     (s) => (status.textContent = s === 'connected' ? `Connected: ${t.name}` : 'Reconnecting…'),
   )
@@ -42,6 +47,7 @@ async function pairClick() {
       if (d > 0) ups++
       else downs++
       presses.textContent = `${d > 0 ? 'UP ▲' : 'DOWN ▼'} · up ${ups} · down ${downs}`
+      void gearLog.shift(d)
     }
     c.onStatus = () => (clickStatus.textContent = `${c.name}: ${c.status}`)
     await c.connect()
@@ -113,6 +119,7 @@ show(
       presses,
       h('button', { onclick: () => void pairClick() }, 'Pair Zwift Click'),
     ),
+    gearLog.el,
     h('p', { class: 'dim' }, 'Record results per device in docs/testing.md (iPad: try Bluefy).'),
   ),
 )

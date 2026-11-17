@@ -5,6 +5,8 @@ import type { Tier } from './types'
 export const CFG = {
   tierFactor: { hard: 1, medium: 0.9, easy: 0.8 } as Record<Tier, number>,
   erg: { capPct: 1.5, rampS: 2, failsafePct: 0.5, writeHz: 4, minStepW: 1, maxFails: 5 },
+  /** Trainer check page's gear log: power must move this far (W) within timeoutS to count; rows kept. */
+  gearLog: { movedW: 15, timeoutS: 10, rows: 40 },
   ftms: { resMax: 100, replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
   click: { backoffMs: [1000, 2000, 4000, 5000] },
