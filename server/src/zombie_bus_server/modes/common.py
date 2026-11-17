@@ -21,12 +21,16 @@ class CrewGame:
 
 
 def tally(active: Iterable[Rider], dt: float) -> None:
-    """Adds this tick's compliance to each rider who has a score."""
+    """Adds this tick's compliance to each rider who has a score.
+
+    Time in zone is power inside the band: a human's score is 1 only there; a bot's score is a separate
+    random walk, so its own power decides.
+    """
     for r in active:
         if r.s is not None:
             r.comp_sum += r.s
             r.comp_n += 1
-            r.band_s += dt if r.s >= 0.999 else 0
+            r.band_s += dt if (r.in_band if r.bot else r.s >= 0.999) else 0
 
 
 def compliance(rs: Iterable[Rider]) -> dict[str, float]:

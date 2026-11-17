@@ -288,6 +288,7 @@ BOT_BAD_PER_S = 1 / 600  # chance per second of starting a bad patch
 BOT_BAD_COMP = (0.4, 0.58)  # compliance in a bad patch (low enough that they can fall off)
 BOT_BAD_S = (30, 50)  # bad patch length in session seconds
 BOT_POWER_JITTER = 0.03  # power is target x (1 +/- this)
+BOT_ZONE_BAND = 0.05  # a bot is in the zone with power within this share of its target
 BOT_CAD_DEFAULT = 88
 BOT_CAD_JITTER = 3  # rpm either side of the human median
 BOT_SPRINT_X = (2.5, 3.5)  # sprint power as a multiple of FTP

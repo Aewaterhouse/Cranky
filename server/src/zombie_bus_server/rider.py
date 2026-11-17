@@ -37,6 +37,7 @@ class Rider(RideStats):
     comp_sum: float = 0.0
     comp_n: int = 0
     band_s: float = 0.0
+    in_band: bool = False  # bots only: power inside the target band this tick
     falls: int = 0
     rb_dmg: float = 0.0
     mega: int = 0

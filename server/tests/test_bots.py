@@ -210,3 +210,18 @@ def test_a_guest_can_say_they_are_ready_and_a_new_ride_clears_it():
         assert not room.riders["h1"].ready
 
     asyncio.run(main())
+
+
+def test_bots_log_time_in_zone_while_their_power_is_on_target():
+    async def main():
+        room, ws = await lobby_with(1, "ZONE")
+        await room.handle("h0", ws, {"t": "bots", "n": 2})
+        await room.handle("h0", ws, {"t": "start"})
+        await ride(room, ws, "h0", 100)
+        return next(m for m in ws.sent if m["t"] == "end")["summary"]
+
+    rows = {x["id"]: x for x in asyncio.run(main())["riders"]}
+    # SHORT has 70 s with a target; bots hold it to 3 % unless they hit a bad patch.
+    assert all(rows[i]["inBandSecs"] >= 40 for i in rows if i != "h0")
+    # A human's time in zone still comes from their score: 0.95 is just outside the band.
+    assert rows["h0"]["inBandSecs"] == 0
