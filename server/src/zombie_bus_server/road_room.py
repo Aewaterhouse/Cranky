@@ -11,7 +11,6 @@ from fastapi import WebSocket
 
 from . import config as C
 from . import road_bots
-from .avatars import wear_sash
 from .modes.road import RULES, RoadSim
 from .protocol import Bots, ClientMsg, Data, End, Join, RoadSetup, Start, Watch
 from .ride_stats import profile_kg
@@ -113,7 +112,7 @@ class RoadRoom(Room):
     async def join(self, rid: str, ws: WebSocket, msg: Join) -> None:
         r = self.riders.get(rid)
         if r:
-            r.name, r.ftp, r.look = msg.name, msg.ftp, wear_sash(self.store, rid, msg.look)
+            r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
         else:
             if len(self.riders) >= C.ROAD_MAX_RIDERS:
                 bots = sum(x.bot for x in self.riders.values())
@@ -121,8 +120,7 @@ class RoadRoom(Room):
                     await ws.send_json({"t": "error", "msg": "That ride is full. Start another one."})
                     return
                 road_bots.set_bots(self, bots - 1)
-            look = wear_sash(self.store, rid, msg.look)
-            r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, "hard", look=look)
+            r = self.riders[rid] = Rider(rid, msg.name, msg.ftp, "hard", look=msg.look)
             if self.state == "running" and self.sim:  # late: on the back of the group
                 self.sim.add(rid, self.kg_of(rid), r.ftp)
         r.note_sim(msg.sim, self.state == "running")

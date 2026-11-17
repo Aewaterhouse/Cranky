@@ -78,7 +78,9 @@ class Rider(RideStats):
 
     @classmethod
     def from_dict(cls, d: dict) -> Rider:
-        return cls(**d)
+        """Rebuilds a rider, ignoring fields an older snapshot has that riders no longer keep."""
+        names = {f.name for f in fields(cls)}
+        return cls(**{k: v for k, v in d.items() if k in names})
 
     def target(self, b: dict, bel: float, load: float = 1.0) -> int | None:
         """Returns the rider's target in watts (None on sprint blocks), never over 150% FTP.
@@ -94,9 +96,3 @@ class Rider(RideStats):
         if self.st != "riding":
             load = 1.0
         return min(round(f * self.ftp * load), round(self.ftp * C.TARGET_CAP))
-
-    def band_w(self, lo: float, hi: float) -> tuple[int, int]:
-        """Returns a band in watts from fractions of FTP, neither edge over the cap nor out of order."""
-        cap = round(self.ftp * C.TARGET_CAP)
-        top = min(cap, round(max(lo, hi) * self.ftp))
-        return max(0, min(top, round(min(lo, hi) * self.ftp))), top

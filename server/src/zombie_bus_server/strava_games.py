@@ -2,7 +2,19 @@
 
 from typing import Any
 
-from .discord import GAME_NAMES
+# Crew games that have gone: old rides in them still get a plain post with the game's name and the numbers.
+GONE = {
+    "madness": "🤯 VO2 Madness",
+    "ambo": "🚑 Kidney Stone Express",
+    "date": "💘 Speed Dating",
+    "climate": "🌊 Climate Lawsuit",
+    "watch": "📺 Watch Party",
+    "last": "🏁 Last Rider Standing",
+    "ttt": "⏱ Team Time Trial",
+    "quiz": "🍺 Pub Quiz",
+    "galley": "🛶 Galley Ship",
+    "hunt": "🦊 The Hunt",
+}
 
 
 def clock(secs: float) -> str:
@@ -30,56 +42,16 @@ def game(s: dict[str, Any], rider: str) -> tuple[str, str, list[str], list[str]]
     me = next((r for r in crew if r.get("id") == rider), {})
     plan = s.get("planName") or "Ride"
     secs = (s.get("record") or {}).get("secs") or 0
-    awards = [f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in g.get("awards", [])]
+    awards = [
+        f"🏆 {a.get('award', '?')}: {a.get('name', '?')} ({a.get('why', '')})"
+        for a in g.get("awards", [])
+        if isinstance(a, dict)
+    ]
     crew_line = f"Crew: {', '.join(r.get('name', '?') for r in crew)}"
-    if g.get("mode") == "madness":
-        title = f"🔥 VO2 Madness · {plan}"
-        top = [f"Crew score {g.get('score', 0)} · my effort points {round(me.get('points') or 0)}", power(s)]
-        red = f"{round(me.get('redSecs') or 0)} s in the red"
-        return title, "The madness", top, [red, crew_line, *awards]
-    if g.get("mode") == "date":
-        wed, div = g.get("married") or {}, g.get("divorced") or {}
-        title = f"💘 Speed Dating · {round((me.get('match') or 0) * 100)}% compatible"
-        flags = "; ".join(me.get("flags") or []) or "none, suspiciously"
-        lines = [
-            f"Best match: {me.get('best') or 'nobody'} · worst: {me.get('worst') or 'nobody'}",
-            f"Red flags: {flags}",
-            *([f"💒 {wed.get('a')} and {wed.get('b')} got married"] if wed else []),
-            *([f"⚖️ {div.get('winner')} kept the house"] if div else []),
-            crew_line,
-            *awards,
-        ]
-        top = [f"Chemistry {g.get('score', 0)} · {km(g.get('distance'))}", power(s)]
-        return title, "The dates", top, lines
-    if g.get("mode") == "ambo":
-        runs = [r for r in g.get("reviews", []) if isinstance(r, dict)]
-        title = f"🚑 Kidney Stone Express · {g.get('delivered', 0)}/{len(runs)} patients delivered"
-        lines = [
-            *(f"{r.get('icon', '')} {r.get('patient', '?')}: {'★' * int(r.get('stars') or 0)}" for r in runs),
-            f"Me: {me.get('spread', 0)}% rough · {me.get('spikes', 0)} spikes · {me.get('fines', 0)} fines",
-            crew_line,
-            *awards,
-        ]
-        top = [f"Shift score {g.get('score', 0)} · {km(g.get('distance'))}", power(s)]
-        return title, "The shift", top, lines
-    if g.get("mode") == "climate":
-        verdict = (g.get("verdicts") or {}).get(rider)
-        fate = "the town flooded" if g.get("flooded") else "the town survived"
-        title = f"🌊 Climate Lawsuit · {fate}" + (f" · {verdict}" if verdict else "")
-        lines = [
-            f"{me.get('company') or 'My company'}: {me.get('coins', 0)} coins · {me.get('emit', 0)} tonnes"
-            + (" · took the envelope" if me.get("bribed") else ""),
-            f"Sea reached {g.get('stageName') or 'nothing'}",
-            crew_line,
-            *awards,
-        ]
-        return title, "The trial", [f"Town profit {g.get('score', 0)}", power(s)], lines
-    if g.get("mode") in GAME_NAMES:
-        name, label = GAME_NAMES[g["mode"]]
-        mine = me.get("points") if me.get("points") is not None else me.get("reached")
-        top = [f"Crew {label} {g.get('score', 0)}" + (f" · mine {mine}" if mine is not None else "")]
-        top.append(power(s))
-        return f"{name.replace('**', '')} · {plan}", "The game", top, [crew_line, *awards]
+    if g.get("mode") in GONE:
+        score = g.get("score")
+        top = [*([f"Crew score {score}"] if score is not None else []), power(s)]
+        return f"{GONE[g['mode']]} · {plan}", "The game", top, [crew_line, *awards]
     gap = g.get("gap")
     fate = "survived" if (g.get("armour") or 0) > 0 else "caught"
     title = f"🧟 Zombie Bus · {plan} · {fate}" + (f" with a {gap} m gap" if gap is not None else "")

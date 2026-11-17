@@ -1,6 +1,5 @@
 import { api } from '../core/api'
-import { GAMES } from '../modes/crew/games'
-import type { Game } from '../net/protocol'
+import { gameOf } from '../modes/crew/games'
 import { avatar, h } from './dom'
 
 interface FeedRow {
@@ -10,7 +9,7 @@ interface FeedRow {
   date: string
   plan: string | null
   secs: number | null
-  game: Game | null
+  game: string | null
   score: number | null
   kudos: number
   prs: number | null
@@ -52,8 +51,8 @@ export function crewFeed(me: string) {
       },
       `👏 ${r.kudos || ''}`,
     )
-    const what =
-      r.game && GAMES[r.game] ? `${GAMES[r.game].icon} ${GAMES[r.game].name}` : (r.plan ?? 'a ride')
+    const g = gameOf(r.game)
+    const what = g ? `${g.icon} ${g.name}` : (r.plan ?? 'a ride')
     return h(
       'div',
       { class: 'feed-row' },

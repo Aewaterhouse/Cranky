@@ -10,7 +10,6 @@ from fastapi import WebSocket
 
 from . import bots
 from . import config as C
-from .avatars import wear_sash
 from .plan import load_plans
 from .protocol import (
     Act,
@@ -49,7 +48,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
     r = room.riders.get(rid)
     if isinstance(msg, Join):
         if r:
-            r.name, r.ftp, r.look = msg.name, msg.ftp, wear_sash(room.store, rid, msg.look)
+            r.name, r.ftp, r.look = msg.name, msg.ftp, msg.look
             if room.state != "running":
                 r.tier = msg.tier
         elif len(room.humans()) >= C.MAX_RIDERS:
@@ -58,8 +57,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         else:
             if len(room.riders) >= C.MAX_RIDERS:  # a bot gives up its seat
                 bots.set_bots(room, len(room.riders) - len(room.humans()) - 1)
-            look = wear_sash(room.store, rid, msg.look)
-            r = room.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=look)
+            r = room.riders[rid] = Rider(rid, msg.name, msg.ftp, msg.tier, look=msg.look)
         r.kg = profile_kg(room.store, rid)
         r.note_sim(msg.sim, room.state == "running")
         r.ws, r.connected, r.last_data = ws, True, time.monotonic()
@@ -88,7 +86,7 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
     elif isinstance(msg, Act):
         now, (most, window) = time.monotonic(), C.ACT_LIMIT
         recent = room.acts[rid] = [t for t in room.acts.get(rid, []) if now - t < window]
-        if room.state == "running" and (room.el >= 0 or room.mode.early_acts) and len(recent) < most:
+        if room.state == "running" and room.el >= 0 and len(recent) < most:
             recent.append(now)
             room.mode.on_act(room, r, msg.k, msg.v)
     elif isinstance(msg, Ready) and room.state != "running":
@@ -106,13 +104,8 @@ async def handle(room: Room, rid: str, ws: WebSocket, raw: dict) -> None:
         room.plan_id, room.minutes, room.state = msg.plan, msg.minutes, "lobby"
         room.deal()
         await room.lobby()
-    elif isinstance(msg, Game) and room.state != "running":
-        room.game, room.state = msg.game, "lobby"
-        # A workout game starts on a workout of its own, not the bus run the lobby opened with.
-        if msg.game in C.GAME_PLANS and room.plan_id.startswith("bus-"):
-            room.plan_id = C.GAME_PLANS[msg.game]
-        room.deal()
-        await room.lobby()
+    elif isinstance(msg, Game) and msg.game != "bus":  # a stale client picking a game that has gone
+        await room.send(r, {"t": "error", "msg": "That game has gone. Zombie Bus is the crew game now."})
     elif isinstance(msg, TrainerMode) and room.state != "running":
         room.trainers = msg.mode
         await room.lobby()

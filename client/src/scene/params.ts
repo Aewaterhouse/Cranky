@@ -1,6 +1,5 @@
 import { CAM } from './camVis'
 import { BOSS } from './bossVis'
-import { DATE } from './dateVis'
 import { FEEL } from './route/feelVis'
 import { WARN } from './route/warnVis'
 import { FLY, ORBIT, PARTY, PODIUM } from './route/shotVis'
@@ -60,12 +59,6 @@ export const VIS = {
   hordeSize: 220,
   /** Chest sphere radius on riders and zombies. Read once when a figure is built. */
   bust: 0.17,
-  /** VO2 Madness pack: z of last and first place, and the gap between lanes. */
-  packBack: 1.5,
-  packFront: -11,
-  packLane: 2,
-  /** How far the camera drops and closes in on the pack (0..1). */
-  packCam: 0.3,
   /** Heart-rate effort (fraction of max) where a rider starts to redden, and where they steam. */
   heatFrom: 0.7,
   steamFrom: 0.85,
@@ -80,12 +73,8 @@ export const VIS = {
   speedLines: 1,
   vignette: 0.45,
   busColour: '#f2b705',
-  amboColour: '#f4f1e8',
   /** How much higher (m) each row of riders' name tags sits than the row behind it on the bus roof. */
   tagRowLift: 0.45,
-  /** The hospital comes into view this many metres out, drawn at this many scene metres per metre. */
-  amboHospitalM: 400,
-  amboHospitalScale: 0.4,
   /** The smart trainer under every bike: body colour, size (read once when a bike is built) and 1 to show it in free ride too. */
   trainerColour: '#ff6a1a',
   trainerSize: 1,
@@ -110,8 +99,6 @@ export const VIS = {
   bigThingEvery: 520,
   bigThingX: 18,
   bigThingScale: 1.5,
-  /** Speed Dating's road dressing and its dusk (scene/dateVis.ts). */
-  date: DATE,
   /** The bosses behind the bus and the zombie types (scene/bossVis.ts). */
   boss: BOSS,
   /** The free-ride route world (scene/route/). Lengths in metres, angles in radians. */
@@ -407,7 +394,6 @@ export const VIS = {
       stars: 0,
       fogFar: 1100,
     },
-    date: DATE.mood,
     ...ROUTE_MOOD_DEFS,
   } as Record<string, MoodDef>,
 }

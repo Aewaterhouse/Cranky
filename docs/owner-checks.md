@@ -114,7 +114,7 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Install the app, press "Save for offline" on a route, switch to aeroplane mode, ride it. Finish, come back online, log in: the ride should be in History once and its segment times on the boards.
 
 ## Ride notes plan (2026-11-14)
-- [ ] Trainers: the orange trainer shows under every rider on the bus, in VO2 Madness, on the TV view and in free ride on a real screen. Say if riding outside on a trainer in free ride is wanted or should be a skin only.
+- [ ] Trainers: the orange trainer shows under every rider on the bus, on the TV view and in free ride on a real screen. Say if riding outside on a trainer in free ride is wanted or should be a skin only.
 - [ ] Gears: ride free ride or Slope mode at the default 150% shift strength and say whether each click feels right (answer in `docs/questions.md`).
 - [ ] Shift strength mid-ride: on a real screen and an iPad, the gear chip shows the strength and tapping it opens the menu with the slider; `;` and `'` step it with a keyboard.
 - [ ] Servo stop: on a bus ride, the bus pulls into the servo, stays parked for the stop, then drives off; nothing slides along with the bus.
@@ -128,7 +128,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Fallen riders: on a bus ride, when someone falls off, the red banner shows, everyone else's target goes up 5% (ERG follows), the crew list shows each share % and the 💪 carrier, and the extra feels fair. Answer in `docs/questions.md`.
 - [ ] Cables on the bus: visible from the chase camera on a real screen, brighter when riding hard, dark when someone falls off.
 - [ ] Bus on gears: pick Gears in the lobby, ride a bus with ERG off on a real trainer. Shifting with the Click (or Z X) should let you hold the target at a normal cadence; say if the 2% base road feels right.
-- [ ] VO2 Madness on gears: pick Gears in the lobby and ride a Madness round; the top gears on the 2% base road should be hard enough for a VO2 interval.
 - [ ] Wind noise: ride a free-ride descent over 50 km/h with sound on; the wind should be a steady rush, not overpowering, and not keep rising.
 - [ ] Descent camera: on a fast free-ride descent the camera should shake and lean into bends noticeably but not make you seasick (iPad and big screen).
 - [ ] Drafting on the trainer: in a group ride with bots on Strong, sit on a wheel at speed; the trainer should get noticeably easier (and harder again when you pull out). Try Realistic and Off too.
@@ -182,8 +181,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] A boss at the end: the road train, giant or bridge shows behind the bus and the health bar empties as you ride on target.
 - [ ] The 📯 horn honks, and the emoji float up for everyone; a rider who has fallen off can still heckle.
 - [ ] A campaign ride: tick Campaign in the lobby, finish, then the next ride starts on the carried armour at the next town.
-- [ ] Last Rider Standing: the steps climb to 150% and stop there; going out after 10 s off your step feels fair.
-- [ ] Pub Quiz, Galley Ship, The Hunt and Team Time Trial each play through with a mate; the question card, the drum's beat, the fox and the Red/Blue bars read at a glance mid-effort.
 - [ ] Handicap race and chaingang on a route with mates of different FTPs: the handicap is close, and "TO THE FRONT" calls work.
 
 ## Free-ride feedback, Strava post and passwords, 2026-11-15 (simulator only)

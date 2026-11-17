@@ -17,7 +17,6 @@ export function makeTag() {
   tag.scale.set(2.8, (2.8 * TAG_H) / 320, 1)
   tag.renderOrder = 10
   let lastTag = ''
-  let guilty = false
   /** Name pill, with a heart-rate chip above it when the rider has a strap: bpm and % of max. */
   const label = (
     name: string,
@@ -28,7 +27,7 @@ export function makeTag() {
   ) => {
     const col = c == null ? '#cfcfcf' : c > 0.85 ? '#6cff7a' : c > 0.6 ? '#ffd24a' : '#ff5a4a'
     const beat = hr ? `♥ ${hr}${hrp ? `  ${Math.round(hrp * 100)}%` : ''}` : ''
-    const key = name + col + state + beat + guilty
+    const key = name + col + state + beat
     if (key === lastTag) return
     lastTag = key
     const g = canvas.getContext('2d')!
@@ -60,19 +59,7 @@ export function makeTag() {
     g.beginPath()
     g.arc(30, 40, 9, 0, 7)
     g.fill()
-    if (guilty) {
-      // Climate Lawsuit's sash: a red ribbon across the corner of the name pill.
-      g.translate(262, 18)
-      g.rotate(0.22)
-      g.fillStyle = '#c4161c'
-      g.fillRect(-52, -13, 104, 26)
-      g.fillStyle = '#fff'
-      g.font = '900 19px system-ui, sans-serif'
-      g.fillText('GUILTY', 0, 1)
-    }
     tex.needsUpdate = true
   }
-  /** Brands the tag GUILTY (a rider convicted in Climate Lawsuit) on its next redraw. */
-  const brand = (on: boolean) => (guilty = on)
-  return { tag, label, brand }
+  return { tag, label }
 }

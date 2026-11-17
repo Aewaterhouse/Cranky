@@ -43,16 +43,16 @@ class Brain:
                 room.mode.on_sprint(r, self.last_i, grade, self.combo)
             self.last_i = i
         comp = self.compliance(room.el, dt)
-        tgt, band = room.aim(r, i, bel)
+        tgt = room.aim(r, i, bel)
         if tgt is not None:
             jitter = rng.uniform(1 - C.BOT_POWER_JITTER, 1 + C.BOT_POWER_JITTER)
             w = tgt * jitter * min(1.0, comp / C.BOT_COMP[0])
             r.s = comp
         else:
-            sprint = band == "sprint" or (i >= 0 and blocks[i]["type"] == "sprint")
+            sprint = i >= 0 and blocks[i]["type"] == "sprint"
             w = r.ftp * (rng.uniform(*C.BOT_SPRINT_X) if sprint else C.BOT_IDLE_X)
             r.s = None
-        r.p = r.w = w = room.mode.bot(room, r, w, tgt, rng)
+        r.p = r.w = w
         want = min(1.0, C.BOT_HR_REST + (C.BOT_HR_AT_FTP - C.BOT_HR_REST) * w / r.ftp)
         was = r.hrp or C.BOT_HR_REST
         r.hrp = was + (want - was) * min(1.0, dt / C.BOT_HR_LAG_S)

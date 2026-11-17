@@ -15,27 +15,7 @@ export const EVENTS: Record<string, EventStyle> = {
   servo: { name: 'Servo Stop', icon: '⛽', col: '#7fd13b' },
   cooldown: { name: 'Cool-down', icon: '❄️', col: '#44bba4' },
 }
-/** VO2 Madness names for the same block events. */
-const MAD_EVENTS: Record<string, EventStyle> = {
-  longhaul: { name: 'Interval', icon: '🔥', col: '#ff5a4e' },
-  rampup: { name: 'Ramp', icon: '📈', col: '#ff7a1a' },
-  surge: { name: 'On / Off', icon: '⚡', col: '#e040fb' },
-  roadblock: { name: 'Sprint', icon: '💥', col: '#ffd23f' },
-  servo: { name: 'Recover', icon: '🎁', col: '#44bba4' },
-}
-/** Plain workout names for the games that ride a workout without the bus: no servos or hordes. */
-export const WORKOUT_EVENTS: Record<string, EventStyle> = {
-  longhaul: { name: 'Steady', icon: '🚴', col: '#f2b705' },
-  rampup: { name: 'Climb', icon: '⛰️', col: '#8ecf6a' },
-  surge: { name: 'Over-unders', icon: '〰️', col: '#ff7a1a' },
-  roadblock: { name: 'Sprint', icon: '⚡', col: '#e040fb' },
-  servo: { name: 'Easy spin', icon: '😮‍💨', col: '#44bba4' },
-}
-let skin = EVENTS
-/** Skins the block events for a game: its own names over the bus's. `true` is VO2 Madness. */
-export const setEvents = (extra?: Record<string, EventStyle> | boolean) =>
-  (skin = extra ? { ...EVENTS, ...(extra === true ? MAD_EVENTS : extra) } : EVENTS)
-export const eventOf = (ev: string) => skin[ev] ?? skin.longhaul
+export const eventOf = (ev: string) => EVENTS[ev] ?? EVENTS.longhaul
 
 export const FX_ICON: Record<string, string> = {
   hit: '💥',
@@ -55,12 +35,6 @@ export const FX_ICON: Record<string, string> = {
   scrap: '⚙️',
   buy: '🛒',
   repel: '🛡️',
-  go: '🔥',
-  box: '🎁',
-  crown: '👑',
-  lead: '🥇',
-  sandbag: '🧺',
-  rest: '😮‍💨',
   drop: '📦',
   airstrike: '✈️',
   gunship: '🛩️',

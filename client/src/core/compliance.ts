@@ -17,21 +17,15 @@ export class RollingAvg {
   }
 }
 
-export type Band = [number, number] | 'sprint'
-
-/** How far outside the band the power is, as a share of the target: 0 inside. A game's own band replaces ±band. */
-const miss = (avg: number, target: number, b?: Band) => {
-  const half = target * CFG.compliance.band
-  const [lo, hi] = Array.isArray(b) ? b : [target - half, target + half]
-  return Math.max(0, lo - avg, avg - hi) / target
-}
+/** How far outside the band the power is, as a share of the target: 0 inside. */
+const miss = (avg: number, target: number) =>
+  Math.max(0, Math.abs(avg - target) - target * CFG.compliance.band) / target
 
 /** 1 inside the band, linearly to 0 at zeroAt past its edge; null when there is nothing to score against. */
-export function score(avg: number, target: number | null, b?: Band): number | null {
+export function score(avg: number, target: number | null): number | null {
   if (!target) return null
   const { band, zeroAt } = CFG.compliance
-  return Math.max(0, 1 - miss(avg, target, b) / (zeroAt - band))
+  return Math.max(0, 1 - miss(avg, target) / (zeroAt - band))
 }
 
-export const inBand = (avg: number, target: number | null, b?: Band) =>
-  !!target && miss(avg, target, b) <= 1e-9
+export const inBand = (avg: number, target: number | null) => !!target && miss(avg, target) <= 1e-9

@@ -113,7 +113,7 @@ def test_the_crew_feed_lists_rides_and_takes_kudos_once():
     ride = {
         "record": {"date": "2026-11-15T07:00:00Z", "secs": 1800},
         "planName": "Morning spin",
-        "group": {"mode": "quiz", "score": 42},
+        "group": {"mode": "quiz", "score": 42},  # a game that has gone: its old rides still list
         "prs": 2,
     }
     client.post("/api/rides", json={"summary": ride}, headers=ali)
@@ -137,10 +137,10 @@ def test_a_planned_ride_takes_rsvps_and_only_its_host_can_cancel_it():
     _, ali = auth("ali", "Ali")
     _, kat = auth("kat", "Kat")
     n = client.post(
-        "/api/schedule", json={"at": "2099-01-01T08:00", "game": "quiz", "note": "Pub night"}, headers=ali
+        "/api/schedule", json={"at": "2099-01-01T08:00", "game": "bus", "note": "Pub night"}, headers=ali
     ).json()["n"]
     plan = next(p for p in client.get("/api/schedule", headers=kat).json() if p["n"] == n)
-    assert (plan["hostName"], plan["game"], plan["names"]) == ("Ali", "quiz", ["Ali"])
+    assert (plan["hostName"], plan["game"], plan["names"]) == ("Ali", "bus", ["Ali"])
     assert client.post(f"/api/schedule/{n}/rsvp?on=true", headers=kat).json() == {"ok": True}
     plan = next(p for p in client.get("/api/schedule", headers=kat).json() if p["n"] == n)
     assert plan["names"] == ["Ali", "Kat"]

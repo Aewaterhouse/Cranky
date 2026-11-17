@@ -7,31 +7,16 @@ import type { GroupSummary } from './resultsViews'
 
 const ORD = ['th', 'st', 'nd', 'rd']
 const ordinal = (n: number) => `${n}${n % 100 > 10 && n % 100 < 14 ? 'th' : (ORD[n % 10] ?? 'th')}`
-/** The results headline says how it went: your place in a race, a limp home, a flooded town. */
+/** The results headline says how it went: your place in a race, or a limp home. */
 export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
   if (road?.game && road.game !== 'ride') {
     const at = road.riders.findIndex((r) => r.id === me)
     return at === 0 ? 'You won!' : at > 0 ? `${ordinal(at + 1)} place` : 'Race done'
   }
   if (!group) return 'Ride done'
-  if (group.flooded) return 'The town flooded'
-  if (group.mode === undefined || group.mode === 'bus')
-    return group.armour <= 0 ? 'Limped home!' : 'Made it!'
-  // The ranked games list their riders best first.
-  const at = group.riders.findIndex((r) => r.id === me)
-  const place =
-    at === 0 ? 'You won!' : at > 0 ? `${ordinal(at + 1)} of ${group.riders.length}` : 'Done'
-  if (group.mode === 'last') return at === 0 ? 'Last one standing!' : place
-  if (group.mode === 'quiz' || group.mode === 'hunt') return place
-  if (group.mode === 'ttt' && group.teams) {
-    const mine = group.riders[at]?.team
-    const won = group.teams.names[group.teams.winner]
-    return mine === won
-      ? 'Your team won!'
-      : `Team ${won} won · you rode for the ${mine ?? 'other side'}`
-  }
-  if (group.mode === 'galley') return group.armour <= 0 ? 'Taken by pirates' : 'Made port!'
-  return 'Made it!'
+  // An old ride from a crew game that has gone: no story to tell.
+  if ((group.mode ?? 'bus') !== 'bus') return 'Ride done'
+  return group.armour <= 0 ? 'Limped home!' : 'Made it!'
 }
 
 /**
@@ -40,15 +25,6 @@ export function headline(me: string, group?: GroupSummary, road?: RoadSummary) {
  */
 export function scoreContext(me: string, g: GroupSummary) {
   const key = `cranky.scores.${me}.${g.mode ?? 'bus'}`
-  // The ranked games score each rider: the big number is the crew's top, so lead with your own.
-  const row = g.riders.find((r) => r.id === me)
-  const own =
-    g.mode === 'last'
-      ? row?.reached
-      : g.mode === 'quiz' || g.mode === 'hunt'
-        ? row?.points
-        : undefined
-  const score = own ?? g.score
   let was: { best: number; last: number } | null = null
   try {
     was = JSON.parse(localStorage.getItem(key) ?? 'null')
@@ -58,13 +34,11 @@ export function scoreContext(me: string, g: GroupSummary) {
   try {
     localStorage.setItem(
       key,
-      JSON.stringify({ best: Math.max(was?.best ?? 0, score), last: score }),
+      JSON.stringify({ best: Math.max(was?.best ?? 0, g.score), last: g.score }),
     )
   } catch {
     /* storage blocked: the score still shows */
   }
-  if (own != null)
-    return `You: ${own.toLocaleString()}${was ? ` · your best ${was.best.toLocaleString()}` : ' · your first go'}`
   const crew = g.crewBest
   if (crew != null && g.score > crew)
     return `New crew record! The old best was ${crew.toLocaleString()}.`

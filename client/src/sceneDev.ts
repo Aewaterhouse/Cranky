@@ -8,7 +8,7 @@ import { runCamCheck } from './scene/camCheck'
  *   mood=drill|longhaul|surge|roadblock|servo|finish  gap=0..120 (or none)  trophies=N  weather=clear|rain|dust|night  armour=0..100 (or none)
  *   boss=roadtrain|giant|bridge  left=0..1 (its health)  zed=runners|brutes
  *   speed=m/s  roadblock=0..1  paint=paint-rust  bullbar=1  spikes=1  riders=1..6  debug=1  hud=0
- *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  mad=1 (VO2 Madness pack)  date=1 (Speed Dating couples)  ambo=1 siren=1 (ambulance)  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
+ *   vis.camHeight=5 (any numeric VIS tunable)  gunship=1  fx=hit|shake|slowmo|smash|drop|airstrike (fires once after fxAt ms, default 1500)
  * Keys: 1-6 mood, [ ] gap, - = armour, , . speed, r roadblock (hold to approach), h hit, j shake,
  *       k slowmo, m smash, d supply drop, a air strike, u gunship, b bull bar, n spikes, p paint cycle, g toggle debug panel,
  *       c camera view (a, d and u also play the cinematics).
@@ -27,7 +27,7 @@ const stage = document.getElementById('stage')!
 const world = new World(stage)
 ;(window as unknown as { world: World }).world = world
 const st = {
-  mood: q.get('mood') ?? (q.has('date') ? 'date' : 'drill'),
+  mood: q.get('mood') ?? 'drill',
   gap: num('gap', 40) as number | null,
   armour: num('armour', 100) as number | null,
   speed: num('speed', 12) as number,
@@ -49,7 +49,7 @@ const CREW: SceneRider[] = [
     cadence: 90,
     hr: 171,
     hrp: 0.95,
-    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis', sash: q.has('sash') },
+    look: { hat: q.get('hat1') ?? 'hat-cap', outfit: 'outfit-hivis' },
   },
   {
     id: 'b',
@@ -104,25 +104,6 @@ function apply() {
       : null,
     zed: { runners: '🏃 RUNNERS', brutes: '💪 BRUTES' }[q.get('zed') ?? ''] ?? null,
     gunship: st.gunship,
-    mad: q.has('date')
-      ? {
-          pts: {},
-          crown: null,
-          lead: null,
-          work: true,
-          pairs: [
-            ['a', 'b', 0.9],
-            ['d', 'f', 0.25],
-          ],
-          rite: (q.get('rite') as 'wedding' | 'divorce' | null) ?? null,
-          tug: num('tug', 0),
-        }
-      : q.has('mad')
-        ? { pts: { a: 320, b: 140, c: 20, d: 260, f: 90 }, crown: 'a', lead: 'a', work: true }
-        : null,
-    ambo: q.has('ambo')
-      ? { siren: q.get('siren') === '1', dist: num('dist', null), fell: q.has('fell') }
-      : null,
   }
 }
 apply()

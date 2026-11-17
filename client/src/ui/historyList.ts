@@ -1,5 +1,4 @@
-import { GAMES } from '../modes/crew/games'
-import type { Game } from '../net/protocol'
+import { gameLabel } from '../modes/crew/games'
 import { api } from '../core/api'
 import type { Profile } from '../core/curve'
 import type { RideSummary } from '../core/ride'
@@ -25,8 +24,8 @@ export interface RideRow {
   /** Free and group rides: the route's id and metres ridden. */
   route: string | null
   distance: number | null
-  /** A crew game's id and score (older rides have none). */
-  game?: Game | null
+  /** A crew game's id (perhaps one that has gone) and score (older rides have none). */
+  game?: string | null
   score?: number | null
   /** A test ride (simulated trainer): kept here, counted nowhere. */
   test?: boolean
@@ -59,12 +58,8 @@ function list(rows: RideRow[], open: (n: number) => void, strava?: Record<string
                 ` ${r.distance == null ? '' : `${kmStr(r.distance)} km `}${r.crew ? 'group ride' : 'free ride'}`,
               )
             : '',
-          r.game && GAMES[r.game]
-            ? h(
-                'small',
-                {},
-                ` ${GAMES[r.game].icon} ${GAMES[r.game].name}${r.score != null ? ` · ${GAMES[r.game].score} ${Math.round(r.score).toLocaleString()}` : ''}`,
-              )
+          gameLabel(r.game)
+            ? h('small', {}, gameLabel(r.game, r.score))
             : r.crew
               ? h('em', { class: 'crew-tag' }, 'Crew')
               : '',

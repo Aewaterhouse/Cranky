@@ -69,7 +69,7 @@ export function makeRider(colour: string, id: string, road = false) {
   head.add(skull)
   person.add(bodyMesh, head)
   let tagLift = 0
-  const { tag, label, brand } = makeTag()
+  const { tag, label } = makeTag()
   person.add(tag)
 
   let body: Body = defaultBody(id)
@@ -156,7 +156,6 @@ export function makeRider(colour: string, id: string, road = false) {
   let bare = false
   let bodyKey: string | undefined
   const setLook = (look: Look = {}) => {
-    brand(!!look.sash)
     const key = `${look.hat}|${look.outfit}|${look.bike}|${look.body}`
     if (key === hatKey) return
     hatKey = key

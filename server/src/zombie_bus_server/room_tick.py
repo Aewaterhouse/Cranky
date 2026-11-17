@@ -39,12 +39,11 @@ def step(room: Room, dt: float) -> dict:
     bots.drive(room, dt, i, bel)
     update_states(room, dt)
     fx = room.mode.tick(room, dt, i, bel, ev) if i >= 0 else []
-    ev = room.mode.event(room, i) if i >= 0 else ev  # a game's phase can change within its tick
     stats = None
     if i >= 0:
         for r in room.riders.values():
             if r.st != "spectator":
-                r.sample(r.p, dt, r.ftp)
+                r.sample(r.p, dt)
         if round(room.el * C.TICK_HZ) % round(C.STATS_EVERY_S * C.TICK_HZ) == 0:
             stats = {
                 r.id: r.report(r.ftp, r.kg, on_target(r.band_s, r.comp_n), r.falls)
@@ -52,12 +51,10 @@ def step(room: Room, dt: float) -> dict:
             }
     riders = {}
     for r in room.riders.values():
-        tgt, band = room.aim(r, i, bel)
         riders[r.id] = {
             "name": r.name,
             "tier": r.tier,
-            "tgt": tgt,
-            "band": band,
+            "tgt": room.aim(r, i, bel),
             "w": round(r.w),
             "cad": round(r.cad),
             "s": r.s,
@@ -77,7 +74,5 @@ def step(room: Room, dt: float) -> dict:
         fx=fx,
         load=load,
         stats=stats,
-        game=room.mode.game(room, i, bel) if i >= 0 or room.mode.early_acts else None,
-        hold=room.mode.holds(room),
     )
     return tick.model_dump()

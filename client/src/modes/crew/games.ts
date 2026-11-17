@@ -1,6 +1,6 @@
 import type { Game } from '../../net/protocol'
 
-/** What the shared crew screens (lobby, HUD, results) need to know about each game. */
+/** What the crew screens (lobby, HUD, results) say about the game. */
 export interface GameInfo {
   icon: string
   name: string
@@ -12,12 +12,6 @@ export interface GameInfo {
   how: [string, string, string]
   countdown: string
   score: string
-  /** The host picks a workout and a difficulty; false when the game deals its own session. */
-  plan: boolean
-  /** The game runs its own script with no ERG: no workout, effort tier or trainer mode to choose. */
-  fixed?: boolean
-  /** Listed in the lobby but not yet playable. */
-  soon?: boolean
 }
 
 export const GAMES: Record<Game, GameInfo> = {
@@ -34,169 +28,33 @@ export const GAMES: Record<Game, GameInfo> = {
     start: 'Start the bus',
     countdown: 'BUS LEAVES IN',
     score: 'Bus score',
-    plan: true,
   },
-  madness: {
-    icon: '🤯',
-    name: 'VO2 Madness',
-    how: [
-      'Recover, then the mystery box picks the interval.',
-      'Points for effort: heart rate with a strap, power without.',
-      "The hardest trier wears the crown. Don't get caught having a picnic.",
-    ],
-    tag: 'Mystery VO2 rounds',
-    blurb:
-      'Warm-up, then mystery rounds: recover, the box opens, and the whole pack gets the same VO2 interval. Points for effort: heart rate if you wear a strap, power if you don’t.',
-    start: 'Start the madness',
-    countdown: 'MADNESS STARTS IN',
-    score: 'Pack effort points',
-    plan: false,
-  },
-  ambo: {
-    icon: '🚑',
-    name: 'Kidney Stone Express',
-    how: [
-      "Team power is the ambulance's speed.",
-      'Smooth power keeps the patient comfortable. Spikes hurt.',
-      'Ease off at the hospital doors, or out the back they go.',
-    ],
-    tag: 'Ambulance co-op · 40 min',
-    blurb:
-      'Crew an ambulance across South East Queensland. Five patients, each one a different interval. Team power is your speed; smooth power keeps them comfortable. No ERG. 40 min.',
-    start: 'Start the shift',
-    countdown: 'SHIFT STARTS IN',
-    score: 'Shift score',
-    plan: false,
-    fixed: true,
-  },
-  date: {
-    icon: '💘',
-    name: 'Speed Dating',
-    how: [
-      "Match your date's effort, both inside the band.",
-      "Five emoji a date. That's all the talking you get.",
-      'Best couple marries. Worst couple divorces.',
-    ],
-    tag: 'Match your date · 40 min',
-    blurb:
-      'Six dates in rotating pairs. Match your date’s effort as closely as you can, with only emoji to talk. Odd one out is the Chaperone. Ends in a wedding and a divorce. No ERG. 40 min.',
-    start: 'Open the bar',
-    countdown: 'THE BAR OPENS IN',
-    score: 'Chemistry',
-    plan: false,
-    fixed: true,
-  },
-  climate: {
-    icon: '🌊',
-    name: 'Climate Lawsuit',
-    how: [
-      'Watts earn coins. Each fuel pays a different way.',
-      'Emissions raise the sea for everyone. Seawalls buy time.',
-      'The worst polluter stands trial at the end.',
-    ],
-    tag: 'Profit or flood · 45 min',
-    blurb:
-      'Everyone runs an energy company in the same coastal town. Watts earn coins; emissions raise the sea. Flood the town and everyone loses, then the worst polluter stands trial. No ERG. 45 min.',
-    start: 'Start the 1980s',
-    countdown: 'THE 1980s START IN',
-    score: 'Town profit',
-    plan: false,
-    fixed: true,
-  },
-  watch: {
-    icon: '📺',
-    name: 'Watch Party',
-    how: [
-      'The driver picks the workout and holds the remote.',
-      'Anyone can paste a YouTube or Twitch link.',
-      'Pause the video and the workout waits too.',
-    ],
-    tag: 'Ride to a video',
-    blurb:
-      'Ride the same workout while you watch the same YouTube video, in sync. The driver picks the workout and holds the remote; anyone can queue a video. No Premium needed.',
-    start: 'Start the show',
-    countdown: 'THE SHOW STARTS IN',
-    score: 'Crew score',
-    plan: true,
-  },
-  last: {
-    icon: '🏁',
-    name: 'Last Rider Standing',
-    how: [
-      'A ramp test for everyone: the target climbs every minute.',
-      'Fall off your step for 12 seconds and you are out.',
-      'The last one still holding wins. Everyone gets a victory lap.',
-    ],
-    tag: 'Elimination ramp test',
-    blurb:
-      'A shared ramp test as an elimination game. One-minute steps climb to 150% of FTP; drop off your step for 10 s and you are out. Last one standing wins.',
-    start: 'Start the ramp',
-    countdown: 'THE RAMP STARTS IN',
-    score: 'Crew’s top step (% FTP)',
-    plan: false,
-  },
-  ttt: {
-    icon: '⏱',
-    name: 'Team Time Trial',
-    how: [
-      'Two teams, Maroons and Blues, on the same workout.',
-      'Your team scores by staying on target, all of you.',
-      'The team more on target at the end wins.',
-    ],
-    tag: 'Maroons against Blues',
-    blurb:
-      'The crew splits into two teams for the same workout. Every rider counts: the team that holds its targets better wins.',
-    start: 'Start the trial',
-    countdown: 'THE TRIAL STARTS IN',
-    score: 'Winning team on target (%)',
-    plan: true,
-  },
-  quiz: {
-    icon: '🍺',
-    name: 'Pub Quiz',
-    how: [
-      'Ride the workout; every 90 s a question pops up.',
-      'Tap your answer: 10 points, 5 more if you are on target.',
-      'Fastest right answer gets a bonus. Most points wins.',
-    ],
-    tag: 'Trivia on the trainer',
-    blurb:
-      'Aussie trivia over the driver’s workout. Answer while you ride: right answers score, on target scores more, and the quickest gets a bonus.',
-    start: 'Open the pub',
-    countdown: 'THE PUB OPENS IN',
-    score: 'Crew’s top score',
-    plan: true,
-  },
-  galley: {
-    icon: '🛶',
-    name: 'Galley Ship',
-    how: [
-      'The drum sets a cadence. Pedal at it, within 4 rpm.',
-      'The more of the crew in time, the faster the ship.',
-      'Fall out of time and the pirates board. The beat changes every 2 minutes.',
-    ],
-    tag: 'Row in time',
-    blurb:
-      'Row the galley over the driver’s workout: match the drum’s cadence to outrun the pirates. ERG holds your power; your legs keep the time.',
-    start: 'Cast off',
-    countdown: 'CASTING OFF IN',
-    score: 'Voyage score',
-    plan: true,
-  },
-  hunt: {
-    icon: '🦊',
-    name: 'The Hunt',
-    how: [
-      'Each round one rider is the fox, the rest are hounds.',
-      'Speed comes from staying on target, not from watts.',
-      'Fox: ride clean to escape. Hounds: ride cleaner to catch them.',
-    ],
-    tag: 'One fox, many hounds',
-    blurb:
-      'A round each as the fox over the driver’s workout. Riding on target is speed, so the fox escapes by holding steadier than the whole pack, and the hounds run them down by doing better.',
-    start: 'Release the fox',
-    countdown: 'THE HUNT STARTS IN',
-    score: 'Crew’s top points',
-    plan: true,
-  },
+}
+
+/** Crew games that have gone (icon, name), so old rides and scheduled rides still show what they were. */
+const GONE: Record<string, [string, string]> = {
+  madness: ['🤯', 'VO2 Madness'],
+  ambo: ['🚑', 'Kidney Stone Express'],
+  date: ['💘', 'Speed Dating'],
+  climate: ['🌊', 'Climate Lawsuit'],
+  watch: ['📺', 'Watch Party'],
+  last: ['🏁', 'Last Rider Standing'],
+  ttt: ['⏱', 'Team Time Trial'],
+  quiz: ['🍺', 'Pub Quiz'],
+  galley: ['🛶', 'Galley Ship'],
+  hunt: ['🦊', 'The Hunt'],
+}
+
+/** A crew game's icon, name and score label by id, the bus or one that has gone; undefined for anything else. */
+export function gameOf(id?: string | null): Pick<GameInfo, 'icon' | 'name' | 'score'> | undefined {
+  if (id === 'bus') return GAMES.bus
+  const gone = id ? GONE[id] : undefined
+  return gone && { icon: gone[0], name: gone[1], score: 'Score' }
+}
+
+/** " 🧟 Zombie Bus · Bus score 1,234" for a list row; empty when the ride was not a crew game. */
+export function gameLabel(id?: string | null, score?: number | null) {
+  const g = gameOf(id)
+  if (!g) return ''
+  return ` ${g.icon} ${g.name}${score != null ? ` · ${g.score} ${Math.round(score).toLocaleString()}` : ''}`
 }

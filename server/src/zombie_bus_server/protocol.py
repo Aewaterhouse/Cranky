@@ -21,7 +21,7 @@ class Join(BaseModel):
     @field_validator("look", mode="before")
     @classmethod
     def no_sash(cls, look: object) -> object:
-        """Only the server puts a sash on: one in the join message is dropped before it is checked."""
+        """An old client's sash (Climate Lawsuit, now gone) is dropped before the look is checked."""
         return {k: v for k, v in look.items() if k != "sash"} if isinstance(look, dict) else look
 
     @field_validator("look")
@@ -60,9 +60,7 @@ class Difficulty(BaseModel):
 
 class Game(BaseModel):
     t: Literal["game"]
-    game: Literal[
-        "bus", "madness", "ambo", "date", "climate", "watch", "last", "ttt", "quiz", "galley", "hunt"
-    ]
+    game: str = Field(max_length=20)  # only "bus" is left; an old client's other games are refused
 
 
 class RoadSetup(BaseModel):
@@ -181,7 +179,6 @@ class RiderTick(BaseModel):
     hr: int | None = None
     hrp: float | None = None
     erg: bool = True
-    band: tuple[int, int] | Literal["sprint", "free"] | None = None  # the game's own target for this rider
     ask: dict | None = None  # the game's question to this rider; answered with an `act` of its `k`
 
 
@@ -203,7 +200,6 @@ class Bus(BaseModel):
     streak: float = 0
     next: str = "drop"
     gunship: bool = False
-    mad: dict | None = None
 
 
 class Fx(BaseModel):
@@ -236,5 +232,3 @@ class Tick(BaseModel):
     fx: list[Fx]
     load: float = 1.0  # targets of riders still on the bus are multiplied by this while others have fallen
     stats: dict[str, RideStatsMsg] | None = None  # the ride so far, once a second at most
-    game: dict | None = None  # the crew game's own state (games newer than VO2 Madness)
-    hold: bool = False  # the game has stopped the clock (a watch party paused by its driver)

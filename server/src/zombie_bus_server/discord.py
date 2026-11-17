@@ -9,73 +9,9 @@ from . import config
 log = logging.getLogger(__name__)
 
 
-# The crew games without their own format: a title and what their score means.
-GAME_NAMES = {
-    "last": ("🏁 **Last Rider Standing**", "top step"),
-    "ttt": ("⏱ **Team Time Trial**", "winning team on target"),
-    "quiz": ("🍺 **Pub Quiz**", "top score"),
-    "galley": ("🛶 **Galley Ship**", "voyage"),
-    "hunt": ("🦊 **The Hunt**", "top points"),
-    "watch": ("📺 **Watch Party**", "crew on target"),
-}
-
-
 def format_summary(plan_name: str, s: dict) -> str:
     """Builds the chat message for a finished Zombie Bus ride."""
-    if s.get("mode") == "madness":
-        crew = ", ".join(f"{r['name']} {r['points']}" for r in s["riders"])
-        return "\n".join(
-            [
-                f"🤯 **VO2 Madness** · {s['score']} effort points",
-                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
-                f"Pack: {crew}",
-            ]
-        )
-    if s.get("mode") == "date":
-        wed, div = s.get("married"), s.get("divorced")
-        return "\n".join(
-            [
-                f"💘 **Speed Dating** · chemistry **{s['score']}**",
-                *([f"💒 {wed['a']} and {wed['b']} got married"] if wed else []),
-                *([f"⚖️ {div['winner']} kept the house; {div['loser']} kept the tandem"] if div else []),
-                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
-                *(f"🚩 {r['name']}: {'; '.join(r['flags'])}" for r in s["riders"] if r.get("flags")),
-            ]
-        )
-    if s.get("mode") == "ambo":
-        return "\n".join(
-            [
-                f"🚑 **Kidney Stone Express** · {s['delivered']}/{len(s['reviews'])} patients"
-                f" · score **{s['score']}**",
-                *(
-                    f"{r['icon']} {'★' * r['stars']}{'☆' * (5 - r['stars'])} {r['text']}"
-                    for r in s["reviews"]
-                ),
-                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
-            ]
-        )
-    if s.get("mode") == "climate":
-        guilty = [r["name"] for r in s["riders"] if s["verdicts"].get(r["id"]) == "guilty"]
-        return "\n".join(
-            [
-                f"🌊 **Climate Lawsuit** · {'the town FLOODED' if s['flooded'] else 'the town survived'}"
-                f" · profit **{s['score']}**",
-                *(f"🏭 {r['company']} ({r['name']}): {r['coins']} coins, {r['emit']} t" for r in s["riders"]),
-                *([f"⚖️ Guilty: {', '.join(guilty)}"] if guilty else []),
-                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
-            ]
-        )
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
-    if s.get("mode") in GAME_NAMES:
-        name, score = GAME_NAMES[s["mode"]]
-        return "\n".join(
-            [
-                f"{name} · {plan_name} · {score} **{s['score']}**",
-                *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
-                *s.get("titles", []),
-                f"Crew: {crew}",
-            ]
-        )
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",
         f"{s['distance'] / 1000:.1f} km · armour {s['armour']} · sync {s['syncPct']}% · {s['scrap']} scrap",

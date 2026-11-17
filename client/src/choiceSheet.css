@@ -1,4 +1,4 @@
-/* A crew game's question to the rider: cards, fuels, votes. */
+/* The bus's question to the rider: the servo's route vote. */
 .choice {
   position: absolute;
   left: 58%;

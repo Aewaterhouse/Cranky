@@ -1,11 +1,9 @@
 import { keyHint } from '../core/keys'
 import { CFG } from '../config'
 import type { Profile } from '../core/curve'
-import type { Difficulty, Game, Lobby, TrainerMode } from '../net/protocol'
+import type { Difficulty, Lobby, TrainerMode } from '../net/protocol'
 import { GAMES } from '../modes/crew/games'
-import { FIRST_VIDEO, videoSource } from '../core/watchSync'
 import { campaignRow } from './campaignRow'
-import { gameCard } from './gameCard'
 import { seat } from './lobbySeat'
 import { TIER_NAME, TIERS, type Tier } from '../types'
 import { settings } from '../core/settings'
@@ -28,7 +26,6 @@ export interface LobbyCtx {
   trainers(mode: TrainerMode): void
   bots(n: number): void
   difficulty(level: Difficulty): void
-  game(game: Game): void
   start(): void
   /** Host: this bus ride is the crew's next campaign leg. */
   campaign(on: boolean): void
@@ -118,31 +115,18 @@ export function lobbyView(c: LobbyCtx) {
   )
   const mutRow = h('div', { class: 'bot-row mut-row' })
   const camp = campaignRow(c.campaign)
-  // Watch Party: a link pasted here goes on the moment the countdown starts.
-  const firstNote = h('span', { class: 'dim' })
-  const firstIn = h('input', {
-    placeholder: 'Paste a YouTube or Twitch link to start with',
-    value: sessionStorage.getItem(FIRST_VIDEO) ?? '',
-    oninput: () => {
-      const v = videoSource(firstIn.value)
-      if (v) sessionStorage.setItem(FIRST_VIDEO, v)
-      else sessionStorage.removeItem(FIRST_VIDEO)
-      firstNote.textContent = !firstIn.value
-        ? ''
-        : v
-          ? '✓ It starts with the ride'
-          : 'That doesn’t look like a video link'
-    },
-  }) as HTMLInputElement
-  const firstRow = h(
+  const info = GAMES.bus
+  const gameRow = h(
     'div',
-    { class: 'bot-row first-video' },
-    h('span', {}, '📺 First video'),
-    firstIn,
-    firstNote,
+    { class: 'game-cards' },
+    h(
+      'button',
+      { class: 'game-card on', disabled: true },
+      h('span', { class: 'gc-icon' }, info.icon),
+      h('b', {}, info.name),
+      h('small', {}, info.blurb),
+    ),
   )
-  const gameRow = h('div', { class: 'game-cards' })
-  let allGames = false
   const startSlot = h('div', { class: 'start-slot' })
   const pickerBox = h('section', { class: 'panel', hidden: true })
   let picker: ReturnType<typeof planPicker> | null = null
@@ -159,26 +143,6 @@ export function lobbyView(c: LobbyCtx) {
     bots = l.riders.filter((r) => r.bot).length
     botN.textContent = String(bots)
     botRow.hidden = !isHost
-    const game = l.game ?? 'bus'
-    const info = GAMES[game]
-    // Only the game on; the host opens the rest with Switch game, so the run and Start stay above the fold.
-    const ids = isHost && allGames ? (Object.keys(GAMES) as Game[]) : [game]
-    const pick = (g: Game) => ((allGames = false), c.game(g))
-    gameRow.replaceChildren(
-      ...ids.map((g) => gameCard(g, g === game, isHost, pick)),
-      isHost
-        ? h(
-            'button',
-            { class: 'ghost switch-game', onclick: () => ((allGames = !allGames), update(l)) },
-            allGames ? 'Close ▴' : 'Switch game ▾',
-          )
-        : '',
-    )
-    diffRow.hidden = game !== 'bus' // the horde only chases the bus
-    firstRow.hidden = game !== 'watch'
-    title.textContent = game === 'bus' ? 'Bus lobby' : `${info.name} lobby`
-    roof.textContent = info.name.toUpperCase()
-    effort.hidden = trainRow.hidden = !!info.fixed
     const trainers = l.trainers ?? 'choose'
     trainSeg.set(trainers)
     trainSeg.hidden = !isHost
@@ -213,7 +177,7 @@ export function lobbyView(c: LobbyCtx) {
     tierSeg.set(tier)
     tierNote.textContent = `${mainWatts(l.plan, tier, me.ftp)} on the big block at ${me.ftp} W FTP.`
 
-    const key = `${l.plan.id}|${l.minutes}|${l.plan.blocks.length}|${tier}|${isHost}|${game}`
+    const key = `${l.plan.id}|${l.minutes}|${l.plan.blocks.length}|${tier}|${isHost}`
     if (key !== runKey) {
       runKey = key
       run.replaceChildren(
@@ -225,19 +189,19 @@ export function lobbyView(c: LobbyCtx) {
           h('span', { class: 'dur-big' }, minsLabel(l.plan.blocks)),
         ),
         h('div', { class: 'tags' }, ...tagEls(l.plan)),
-        info.plan ? planGraph(l.plan.blocks, tier) : h('p', {}, `${info.icon} ${info.blurb}`),
+        planGraph(l.plan.blocks, tier),
         h('p', { class: 'dim' }, l.plan.desc ?? ''),
         isHost ? '' : h('p', { class: 'dim' }, `${driver} picks the run. It updates here live.`),
       )
     }
 
-    pickerBox.hidden = !isHost || !!info.fixed || !info.plan
+    pickerBox.hidden = !isHost
     if (isHost) {
       if (!picker) {
         picker = planPicker({
           plan: l.plan.id,
           minutes: l.minutes,
-          first: game === 'bus' ? 'bus' : 'workout',
+          first: 'bus',
           onChange: c.setup,
         })
         pickerBox.replaceChildren(h('h2', { class: 'label' }, 'Choose the run'), picker)
@@ -310,7 +274,6 @@ export function lobbyView(c: LobbyCtx) {
           seats,
           botRow,
           gameRow,
-          firstRow,
           diffRow,
           trainRow,
           mutRow,

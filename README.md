@@ -104,11 +104,11 @@ Auto-pause: after 3 s of zero power or cadence the clock stops, and resumes afte
 | `D` | open or close every crew card (group rides) |
 | Esc | end the ride (asks first) |
 
-Crew games (Zombie Bus, VO2 Madness and the rest): `E` ERG on or off, with ERG off ↑ or `X` / ↓ or `Z` shift and `;` / `'` set the shift strength, `C` camera, `D` crew cards, `S` (or Tab) stats, `R` crew, `H` clean view, `1` to `9` answer a game's question card.
+Zombie Bus: `E` ERG on or off, with ERG off ↑ or `X` / ↓ or `Z` shift and `;` / `'` set the shift strength, `C` camera, `D` crew cards, `S` (or Tab) stats, `R` crew, `H` clean view, `1` to `9` answer the bus's question card.
 
 ## Camera
 
-In the Zombie Bus, VO2 Madness, free ride and both TV views (bus and group ride), the 3D camera is yours to move:
+In the Zombie Bus, free ride and both TV views (bus and group ride), the 3D camera is yours to move:
 
 | Input | Effect |
 | --- | --- |
@@ -123,7 +123,7 @@ With no camera input for 8 s the view eases back by itself. HUD panels, buttons,
 
 ## Crew cards
 
-On the bus, in VO2 Madness, the TV view and group free rides, the crew is a column of cards down the right edge (`R` shows or hides it on the bus).
+On the bus, the TV view and group free rides, the crew is a column of cards down the right edge (`R` shows or hides it on the bus).
 
 | Input | Effect |
 | --- | --- |
@@ -155,7 +155,7 @@ Pair a Zwift Click (the original v1) in the trainer window under "Zwift Click (o
 
 ## Scene dev harness
 
-`pnpm dev` only: open `/scene-dev.html` to look at the 3D scene without a server or trainer. Params: `mood=drill|longhaul|surge|roadblock|servo|finish`, `gap=0..120|none`, `armour=0..100|none`, `speed=m/s`, `roadblock=0..1`, `paint=paint-rust`, `bullbar=1`, `spikes=1`, `riders=1..6`, `gunship=1`, `mad=1` (VO2 Madness pack), `debug=1`, `hud=0`, `vis.<name>=n` (any numeric visual tunable, e.g. `vis.camHeight=5`), `fx=hit|shake|slowmo|smash|drop|airstrike` with `fxAt=ms`, `camcheck=1` (poses every camera view at its zoom and orbit extremes and lists any blank background below the horizon, bottom left). Keys: 1-6 mood, `[` `]` gap, `\` horde on/off, `-` `=` armour, `,` `.` speed, `r` roadblock, `h` `j` `k` `m` fx, `d` supply drop, `a` air strike, `u` gunship, `b` bull bar, `n` spikes, `p` paint, `g` debug panel, `c` camera view (Chase, High, Rear, Side; `a`, `d` and `u` also play the air strike, supply drop and gunship cinematics).
+`pnpm dev` only: open `/scene-dev.html` to look at the 3D scene without a server or trainer. Params: `mood=drill|longhaul|surge|roadblock|servo|finish`, `gap=0..120|none`, `armour=0..100|none`, `speed=m/s`, `roadblock=0..1`, `paint=paint-rust`, `bullbar=1`, `spikes=1`, `riders=1..6`, `gunship=1`, `debug=1`, `hud=0`, `vis.<name>=n` (any numeric visual tunable, e.g. `vis.camHeight=5`), `fx=hit|shake|slowmo|smash|drop|airstrike` with `fxAt=ms`, `camcheck=1` (poses every camera view at its zoom and orbit extremes and lists any blank background below the horizon, bottom left). Keys: 1-6 mood, `[` `]` gap, `\` horde on/off, `-` `=` armour, `,` `.` speed, `r` roadblock, `h` `j` `k` `m` fx, `d` supply drop, `a` air strike, `u` gunship, `b` bull bar, `n` spikes, `p` paint, `g` debug panel, `c` camera view (Chase, High, Rear, Side; `a`, `d` and `u` also play the air strike, supply drop and gunship cinematics).
 
 `pnpm dev` only: open `/route-dev.html` to look at the free-ride road world on any bundled route. Params: `route=<id>` (default `mount-coot-tha`; `nomap` is a made-up climb with no coordinates), `d=<metres along>`, `speed=<m/s>` (auto-rides), `cadence=rpm`, `offset=<metres right of the centre line>`, `riders=N` (extra riders around you), `terrain=0` (ignore the height grid), `gfx=potato|low|medium|high`, `next=odd|sign|chalk|life` (start just before the next roadside oddity, funny sign, chalk or animal; `kind=couch` or `kind=roos` narrows it, `back=14` sets how far before), `odd=couch` (every oddity a couch; `odd=*` cycles the kinds), `mood=routeDawn|route|routeGolden|routeDusk|routeMist|routeShower`, `debug=1`, `hud=0`, `vis.route.<name>=n` (any numeric tunable, e.g. `vis.route.camHeight=60`), `camcheck=1` (the same camera check as the scene page). Keys: `,` `.` speed, `[` `]` jump 500 m, `n` next oddity, `g` debug panel, `c` camera view, `q` gear clunk sound. The debug panel's Route world folder has the camera, fog, skyline, road, ground and colour settings.
 

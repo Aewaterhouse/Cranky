@@ -14,9 +14,8 @@ import { freeRideSetup } from './freeRideSetup'
 import { weekCard } from './weekCard'
 import { crewFeed } from './crewFeed'
 import { comingUp } from './comingUp'
-import { gamePicker } from './gamePicker'
+import { GAMES } from '../modes/crew/games'
 import { hello, mode } from './homeCards'
-import type { Game } from '../net/protocol'
 import { soloSetup } from './solo'
 import { planScreen, todayCard } from './planCalendar'
 import { needTrainer } from './trainer'
@@ -28,8 +27,8 @@ export interface HomeActions {
   /** Make a group-ride room on a bundled route. Joining one by code is `join`. */
   groupRide(route: string, laps: number): void
   resume(snap: SoloSnap): void
-  /** Opens a new crew room, set to `game` if given. */
-  create(game?: Game): void
+  /** Opens a new Zombie Bus room. */
+  create(): void
   join(code: string): void
   watch(code: string): void
   logout(): void
@@ -178,7 +177,7 @@ export function rideTab(p: Profile, act: HomeActions) {
               { class: 'empty' },
               h('span', { class: 'big-emoji' }, '🛣️'),
               h('b', {}, 'Nobody is riding yet'),
-              h('span', {}, 'Pick a crew game above and it shows up here for your mates to join.'),
+              h('span', {}, 'Start the bus above and it shows up here for your mates to join.'),
             ),
           ]),
     )
@@ -256,9 +255,19 @@ export function rideTab(p: Profile, act: HomeActions) {
       h(
         'p',
         { class: 'lede' },
-        'Everyone rides at their own FTP. Pick a game, share the code, bots fill the empty seats.',
+        'Everyone rides at their own FTP. Start the bus, share the code, bots fill the empty seats.',
       ),
-      gamePicker((g) => needTrainer(() => act.create(g))()),
+      h(
+        'div',
+        { class: 'home-games' },
+        h(
+          'button',
+          { class: 'home-game', onclick: () => needTrainer(() => act.create())() },
+          h('span', { class: 'gc-icon' }, GAMES.bus.icon),
+          h('b', {}, GAMES.bus.name),
+          h('small', {}, GAMES.bus.tag),
+        ),
+      ),
       h(
         'div',
         { class: 'hero-grid' },

@@ -8,8 +8,6 @@ export const CFG = {
   ftms: { resMax: 100, replyMs: 2000, backoffMs: [1000, 2000, 4000, 5000], silentMs: 60 },
   hr: { backoffMs: [1000, 2000, 4000, 5000], rest: 60, atFtp: 175, max: 200, lagS: 30 },
   click: { backoffMs: [1000, 2000, 4000, 5000] },
-  /** Watch party: a player more than `driftS` seconds off the room's position jumps back to it. */
-  watch: { driftS: 2, duckS: 5, duckVolume: 25 },
   /** Shortest password a rider may set (the server's PASSWORD_MIN says the same). */
   account: { passwordMin: 8, username: /^[A-Za-z0-9 _-]{3,24}$/ },
   /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */

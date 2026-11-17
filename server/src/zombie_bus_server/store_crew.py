@@ -1,4 +1,4 @@
-"""The crew's shared records in the store: Climate's sash, crew bests, held titles, LEGEND trophies and the
+"""The crew's shared records in the store: crew bests, held titles, LEGEND trophies and the
 campaign. Kept apart from profiles, which riders write, so nobody can award themselves any of it."""
 
 import json
@@ -14,23 +14,6 @@ class CrewStore:
 
     db: sqlite3.Connection
     lock: threading.RLock
-
-    def sash_until(self, rid: str) -> float | None:
-        """When this rider's Climate Lawsuit GUILTY sash comes off (epoch seconds), or None if they have none.
-
-        Kept apart from the profile, which the rider writes, so nobody can put one on or take one off.
-        """
-        with self.lock:
-            row = self.db.execute("SELECT until FROM sashes WHERE id = ?", (rid,)).fetchone()
-        return row[0] if row and row[0] > time.time() else None
-
-    def set_sash(self, rid: str, until: float | None) -> None:
-        """Puts the sash on until `until` (epoch seconds), or takes it off with None."""
-        with self.lock, self.db:
-            if until is None:
-                self.db.execute("DELETE FROM sashes WHERE id = ?", (rid,))
-            else:
-                self.db.execute("INSERT OR REPLACE INTO sashes VALUES (?, ?)", (rid, until))
 
     def crew_best(self, game: str, score: float) -> float | None:
         """The crew's best score in this game before this one (None the first time), then keeps the higher."""
@@ -60,9 +43,10 @@ class CrewStore:
         return said
 
     def titles_of(self, rid: str) -> list[str]:
-        """The titles this rider holds right now."""
+        """The titles this rider holds right now (titles of games that have gone are left out)."""
         with self.lock:
-            return [t for (t,) in self.db.execute("SELECT title FROM titles WHERE holder = ?", (rid,))]
+            rows = self.db.execute("SELECT title FROM titles WHERE holder = ?", (rid,)).fetchall()
+        return [t for (t,) in rows if t in config.TITLES.values()]
 
     def legends(self) -> int:
         """Every LEGEND sprint ever ridden on the bus: each one bolts a trophy on it."""

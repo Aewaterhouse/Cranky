@@ -1,5 +1,4 @@
-import { GAMES } from '../modes/crew/games'
-import type { Game } from '../net/protocol'
+import { gameOf } from '../modes/crew/games'
 import { api } from '../core/api'
 import { avatar, h, pctStr } from './dom'
 
@@ -95,7 +94,7 @@ export function ladderTab() {
                 r.rides,
                 r.awards,
                 Object.entries(r.by)
-                  .map(([g, n]) => `${GAMES[g as Game]?.icon ?? '🎲'} ${n}`)
+                  .map(([g, n]) => `${gameOf(g)?.icon ?? '🎲'} ${n}`)
                   .join('  '),
               ]),
             ),

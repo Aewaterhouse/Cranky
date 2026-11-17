@@ -783,11 +783,6 @@
   line-height: 1.25;
   opacity: 0.8;
 }
-.first-video input {
-  flex: 1;
-  min-width: 0;
-  max-width: 420px;
-}
 /* The lobby's action bar: always in view at the top while the host sets up below. */
 .lobby-bar {
   position: sticky;
@@ -827,10 +822,6 @@
   width: 40px;
   height: 46px;
   font-size: 1.6rem;
-}
-.game-cards .switch-game {
-  align-self: center;
-  justify-self: start;
 }
 details.ftp-card > summary {
   cursor: pointer;

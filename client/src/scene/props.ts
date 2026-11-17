@@ -26,8 +26,6 @@ export interface Spec {
   show?: (wz: number) => boolean
   wild?: boolean
   sink?: number
-  /** Ruins, wrecks and burnt trees: hidden on a date. */
-  grim?: boolean
 }
 
 /** One kind of roadside thing, instanced, each one sent back `LOOP` m once it passes the camera. */
@@ -114,7 +112,7 @@ export class Props {
       { geo: g.pine, n: 16, xr: [14, 90], s: [0.9, 1.8], tint: GREENS },
       { geo: plantGeo('gum'), n: 34, xr: [12, 90], s: [0.55, 1], tint: GREENS },
       { geo: plantGeo('scribbly'), n: 24, xr: [10, 60], s: [0.8, 1.3], tint: GREENS },
-      { geo: g.dead, n: 36, xr: [9, 50], s: [0.8, 1.4], grim: true },
+      { geo: g.dead, n: 36, xr: [9, 50], s: [0.8, 1.4] },
       { geo: g.bush, n: 70, xr: [8.8, 40], s: [0.7, 1.5], tint: GREENS },
       { geo: g.rock, n: 50, xr: [8.5, 60], s: [0.6, 2.2], sink: 0.1 },
       {
@@ -125,7 +123,6 @@ export class Props {
         yaw: vehicleYaw,
         tint: CAR_COLS,
         wild: true,
-        grim: true,
       },
       {
         geo: g.ute,
@@ -135,7 +132,6 @@ export class Props {
         yaw: vehicleYaw,
         tint: CAR_COLS,
         wild: true,
-        grim: true,
       },
       {
         geo: g.van,
@@ -145,9 +141,8 @@ export class Props {
         yaw: vehicleYaw,
         tint: CAR_COLS,
         wild: true,
-        grim: true,
       },
-      { geo: g.junk, n: 9, xr: [8.8, 14], s: [1, 1.2], grim: true },
+      { geo: g.junk, n: 9, xr: [8.8, 14], s: [1, 1.2] },
       { geo: g.pole, n: 11, xr: [10.5, 0], side: -1, gap: 40, yaw: () => 0 },
       { geo: g.pylon, n: 4, xr: [60, 0], side: 1, gap: LOOP / 4, yaw: () => 0, s: [1.2, 1.2] },
       {
@@ -174,7 +169,6 @@ export class Props {
         xr: [14, 40],
         yaw: (s) => (s > 0 ? -0.2 : 0.2) + rand(-0.3, 0.3),
         tint: ['#ffffff', '#e0d0c0'],
-        grim: true,
       },
       { geo: g.warn, n: 8, xr: [8.6, 9.6], yaw: () => rand(-0.2, 0.2) },
       { geo: g.green, n: 4, xr: [8.8, 9.6], yaw: () => rand(-0.15, 0.15) },
@@ -186,10 +180,7 @@ export class Props {
     this.sets.forEach((s) => this.group.add(s.mesh))
   }
 
-  update(dz: number, dist: number, date = false) {
-    for (const s of this.sets) {
-      s.mesh.visible = !(date && s.spec.grim)
-      s.update(dz, dist)
-    }
+  update(dz: number, dist: number) {
+    for (const s of this.sets) s.update(dz, dist)
   }
 }

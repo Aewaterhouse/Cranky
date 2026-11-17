@@ -18,8 +18,7 @@ import { choiceSheet } from './choiceSheet'
 import { emojiFloat } from './emojiFloat'
 import { makeBusPanel } from './hudBus'
 import { makeHeader } from './hudHeader'
-import { eventOf, FX_DEFAULT, setEvents } from './hudKit'
-import { makeMadPanel } from './hudMad'
+import { eventOf, FX_DEFAULT } from './hudKit'
 import { GAMES } from '../modes/crew/games'
 import { hudMenu, hudToast, hudUnit } from './hudParts'
 import { powerPanel } from './hudPower'
@@ -30,25 +29,22 @@ import { VIS } from '../scene/params'
 import { makeStats } from './hudStats'
 import type { HudOpts } from './hudOpts'
 
-export type { GamePanel, HudOpts } from './hudOpts'
+export type { HudOpts } from './hudOpts'
 
 /** Events whose title card replaces a feed line. */
 const CARD_FX = new Set(['surge', 'longhaul', 'rampup', 'roadblock', 'servo'])
 
 /**
  * Bus ride overlay. The rider's own numbers sit where every mode has them (power top left, the block clock
- * top centre, the crew on the right edge, the plan along the bottom); the game's panels (bus status or the
- * Madness box, shop, feed, splashes) are grouped in the layer underneath.
+ * top centre, the crew on the right edge, the plan along the bottom); the game's panels (bus status, shop,
+ * feed, splashes) are grouped in the layer underneath.
  */
 export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpts = {}) {
   const sp = makeSplash()
   const power = powerPanel(true)
-  setEvents(o.events ?? !!o.mad)
-  const header = makeHeader(o.mad ? undefined : o.plan, o.tier ?? 'hard')
+  const header = makeHeader(o.plan, o.tier ?? 'hard')
   header.root.classList.add('glass', 'speed')
   const bus = makeBusPanel()
-  const mad = o.mad ? makeMadPanel(o.mad) : null
-  let mask: string | undefined
   const shop = makeShop((i) => o.onBuy?.(i))
   const sheet = choiceSheet((k, v) => o.onAct?.(k, v))
   // The bus: quick reactions and the horn, for riders and anyone who has fallen off to heckle with.
@@ -116,7 +112,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         { class: 'hud-tl' },
         power.el,
         ...(o.erg ? [o.erg.tile] : []),
-        ...(o.panel ? [o.panel.root] : []),
         ...(stats ? [stats.root] : []),
       ),
       h('div', { class: 'hud-tc' }, header.root, cues.load, sprint, cues.next, cues.count),
@@ -137,20 +132,17 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
               : []),
           ),
         ),
-        ...(mad ? [] : [h('div', { class: 'glass strip' }, header.tl)]),
+        h('div', { class: 'glass strip' }, header.tl),
       ),
     ),
     toast.el,
     h(
       'div',
       { class: 'hud' },
-      h(
-        'div',
-        { class: `hud-left${mad || o.panel ? ' mad' : ''}` },
-        o.panel ? '' : (mad?.root ?? bus.root),
-      ),
-      h('div', { class: 'hud-right' }, sp.feed, o.panel || !o.onAct ? '' : emoji.tray),
-      ...(o.panel ? [sheet.root] : [shop.root, sheet.root]),
+      h('div', { class: 'hud-left' }, bus.root),
+      h('div', { class: 'hud-right' }, sp.feed, o.onAct ? emoji.tray : ''),
+      shop.root,
+      sheet.root,
       sp.flash,
       sp.layer,
     ),
@@ -160,9 +152,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
   const fit = () => {
     const z = hudUnit() / CFG.hud.designU
     if (z !== gz) root.style.setProperty('--gz', String((gz = z)))
-    // The crew cards start under the rear-view mirror (the bus only; Madness has no mirror).
+    // The crew cards start under the rear-view mirror.
     const mb = `calc(${VIS.mirrorY * 100}vh + ${(VIS.mirrorW * 100) / 3}vw)`
-    root.style.setProperty('--mirror-b', VIS.mirror && !mad && !o.panel ? mb : '0px')
+    root.style.setProperty('--mirror-b', VIS.mirror ? mb : '0px')
   }
   const onKey = (e: KeyboardEvent) => {
     if (!root.isConnected) return removeEventListener('keydown', onKey)
@@ -221,7 +213,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       fit()
       setPower(f, live)
       sprint.hidden = f.type !== 'sprint'
-      header.update(f, e, f.el, total, rbProg, mask)
+      header.update(f, e, f.el, total, rbProg)
       stats?.update()
       quit.firstChild!.textContent = o.quitLabel?.() ?? 'End ride'
       if (f.i !== lastI) {
@@ -251,26 +243,16 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       root.classList.add('pre')
       fit()
       setPower(null, live)
-      sp.splash(
-        'sp-count sp-pre',
-        `${n}`,
-        GAMES[o.game ?? (o.mad ? 'madness' : 'bus')].countdown,
-        1100,
-        0,
-      )
+      sp.splash('sp-count sp-pre', `${n}`, GAMES.bus.countdown, 1100, 0)
     },
     /** Everything that comes from the server tick: bus, roster, shop, fx. */
     tick(m: Tick) {
       const meId = o.meId ?? ''
       rbProg = m.bus.rb
       bus.update(m.bus, m.riders, meId)
-      const ms = m.bus.mad
-      if (ms) mad?.update(ms, m.riders, meId)
-      o.panel?.update(m, meId)
       sheet.update(m.riders[meId]?.ask)
       // A question on screen: splashes go small and high so they never sit on the card.
       root.classList.toggle('asking', !!m.riders[meId]?.ask)
-      mask = ms?.box ? (ms.next ?? '❓ MYSTERY BOX') : undefined
       roster.update(m, meId)
       cues.tick(m)
       shop.update(m.bus.shop, m.bus.scrap, m.bus.wares)
@@ -278,10 +260,9 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
         if (fx.id !== meId || fx.k === 'fell')
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
         if (CARD_FX.has(fx.k)) continue
-        o.panel?.fx?.(fx, sp)
         if (fx.k === 'emoji') {
-          if (!o.panel && fx.text) emoji.show(fx.text)
-          if (!o.panel && fx.text === '📯') SFX.horn(fx.id ? o.hornOf?.(fx.id) : undefined)
+          if (fx.text) emoji.show(fx.text)
+          if (fx.text === '📯') SFX.horn(fx.id ? o.hornOf?.(fx.id) : undefined)
           continue
         }
         const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
@@ -294,13 +275,6 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
             3200,
             2,
           )
-        else if (fx.k === 'box') {
-          mad?.spin(text.split('!')[0])
-          sp.splash('sp-smash', '🎁 MYSTERY BOX', text, 4500, 2)
-        } else if (fx.k === 'go')
-          sp.splash('sp-go', text, 'Heart rate up. Who wants it most?', 1800, 2)
-        else if (fx.k === 'crown')
-          sp.splash('sp-smash', `👑 ${fx.id === meId ? 'YOU' : who.toUpperCase()}`, text, 2600, 1)
         else if (fx.k === 'challenge' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR CHALLENGE!', text.replace(/^[^:]*: /, ''), 4000, 2)
         else if (fx.k === 'smash')

@@ -3,7 +3,7 @@ import type { Ask } from '../net/protocol'
 import { h } from './dom'
 
 /**
- * A crew game's question to this rider (a card to play, a fuel, a vote), bottom centre. The server sends the
+ * The bus's question to this rider (the servo's route vote), bottom centre. The server sends the
  * question in the rider's tick; a tap or the number keys 1 to 9 answer it with an `act` of the same key.
  */
 export function choiceSheet(onPick: (k: string, v: string) => void) {

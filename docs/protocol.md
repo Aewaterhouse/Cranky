@@ -61,7 +61,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 | t | Fields |
 | --- | --- |
-| `lobby` | `code, host, difficulty, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot, erg, titles, ready}], mutator`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`); `titles` are held titles (`config.TITLES`) such as "🚑 Paramedic of the Week"; `mutator` is this week's twist `{id, name, desc, ...}` or null. The crew game's `end` summary carries `titles`: lines like "Kat takes 🚑 Paramedic of the Week from Dazza". |
+| `lobby` | `code, host, difficulty, state ('lobby'/'running'/'done'), plan (expanded Plan), minutes, riders: [{id, name, tier, ftp, connected, look, bot, erg, titles, ready}], mutator`; `bot` is true for NPC riders (always `connected`, never host, hidden from `/api/rooms`); `titles` are held titles (`config.TITLES`) such as "🔨 Roadblock MVP"; `mutator` is this week's twist `{id, name, desc, ...}` or null. The crew game's `end` summary carries `titles`: lines like "Kat takes 🔨 Roadblock MVP from Dazza". |
 | `tick` | `el, i, bel, ev, riders: {id: {name, tier, tgt, w, cad, s, st}}, bus, fx, load` |
 | `end` | `summary` (GroupSummary, see `client/src/ui/results.ts`) |
 | `error` | `msg` |
@@ -70,7 +70,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 
 `join` and `data` (bus and road rooms alike) may carry `sim: true`: the rider is on the simulated trainer, a test rider. In the lobby the join's value is the trainer now; once riding it only sticks. Lobby riders carry `sim`, and the `end` summary marks a test rider's row `test: true`. Test riders count for nothing: the ladder, crew best, campaign, titles and Discord see the result without them, and nothing at all when no real rider rode. A saved ride (`POST /api/rides`) carries `test: true` when the simulator was used; it is kept but counted nowhere.
 
-`{t:'game', game:'bus'|'madness'}` (host, not while running) picks the crew game; the lobby carries `game`. In VO2 Madness the plan is dealt by the server and `bus.mad` holds `{pts, red, crown, lead, round, rounds, work, box, next, twist}`; extra fx kinds are `go, rest, box, crown, lead, sandbag`.
+Zombie Bus is the only crew game (the others went on 17/11/2026); the lobby still carries `game: 'bus'`. An old client's `{t:'game', game}` with any other id gets `error` "That game has gone. Zombie Bus is the crew game now." and the room stays a bus; `game: 'bus'` does nothing. A saved room of a game that has gone comes back as an empty bus lobby.
 
 `tick.load` is what the targets of riders still on the bus are multiplied by while others have fallen off (1 when nobody has). `tick.i` is -1 during the countdown. `tgt` is the rider's target watts or null (ERG off).
 
@@ -135,13 +135,9 @@ position, through `ErgController.setGrade`.
 ## Drafting (road rooms)
 - The host's `road` message can carry `draft: 'off' | 'realistic' | 'strong'` (left out keeps the room's level, strong by default). The road lobby carries `draft`.
 
-## Crew game kit (bus rooms, from 2026-11-14)
-- Tick riders carry `band`: `[lo, hi]` watts when the game sets this rider's target itself (then `tgt` is the middle of it), `"sprint"` or `"free"` for no target at all (`tgt` null), or null when the target is the plan's. Neither edge is ever over 150% of the rider's FTP.
-- `tick.game` is the game's own state (null for Zombie Bus and VO2 Madness, which use `bus`).
-- Client `{t: 'act', k, v?}`: a rider's input to the game (an emoji, a card, a choice, a vote). `k` is up to 24 of `a-z0-9_`; `v` is a boolean, a number, a string of up to 64 characters or absent. Dropped outside a running ride and past 8 in 4 s per rider. What `k` means is the game's business.
-- Tick riders carry `ask`: the game's question to that rider right now, or null. `{k, title, sub?, opts: [{v, label, icon?, sub?, off?}], left?, v?}`: `left` is seconds to answer, `v` their answer so far, `off` an option they cannot pick. The rider answers with `{t: 'act', k, v}` using the question's `k` and an option's `v` (always a string).
-- Speed Dating (`game: 'date'`): `tick.game` is `{g: 'date', phase: 'bar'|'date'|'gap'|'proposal'|'wedding'|'divorce'|'cool', n, of, theme: {id, name, icon, text} | null, pairs: [[a, b, match 0..1, points this date]], chap, card, profiles, emoji, emojiLeft, said, table: [{a, b, pts}], couple, exes, tandem, tug, chat}`; `tick.ev` is the phase. During the walk (`gap`) `n`, `theme` and `pairs` are already the next date's.
-- A game can be marked never-ERG on the server. Its lobby then reports `trainers: 'gears'` and every rider's `erg` is false, whatever the host or the rider picked. Such a game deals its own plan of `free` blocks, so no client ever has a block target to send a trainer.
+## Crew game input (bus rooms)
+- Client `{t: 'act', k, v?}`: a rider's input to the bus (an emoji, the servo's route vote). `k` is up to 24 of `a-z0-9_`; `v` is a boolean, a number, a string of up to 300 characters or absent. Dropped outside a running ride, during the countdown and past 8 in 4 s per rider.
+- Tick riders carry `ask`: the bus's question to that rider right now, or null. `{k, title, sub?, opts: [{v, label, icon?, sub?, off?}], left?, v?}`: `left` is seconds to answer, `v` their answer so far, `off` an option they cannot pick. The rider answers with `{t: 'act', k, v}` using the question's `k` and an option's `v` (always a string).
 
 ## ERG or gears (bus rooms)
 - Client `{t: 'erg', on}` at any time: this rider's trainer mode (ERG, or ERG off on virtual gears). Lobby riders and tick riders carry `erg` (default true).
@@ -151,30 +147,7 @@ position, through `ErgController.setGrade`.
 - `PUT /api/rides/files/<name>` (logged in; body is the file, a .fit, .json or .png up to 8 MB) returns `{"url": "/api/rides/files/<key>/<name>"}`.
 - `GET /api/rides/files/<key>/<name>` (no login) serves it as an attachment for 10 minutes; `?inline=1` serves it inline.
 
-## Climate Lawsuit (`game: 'climate'`)
-- A bus room, never on ERG. The plan is free blocks with `kind` (`eighties`, `decade`, `trial`, `cool`); decades also carry `decade` ("1990s") and `n` (1 to 4). `tick.ev` is the kind.
-- `tick.game`: `{g: 'climate', phase, decade (on a decade, else null), n, level (0..1), stage (0..4), stageName ('' | 'Beach' | 'Surf club' | 'Main Street' | 'Everything'), walls, wallCost, cos: {id: {name, fuel, coins, on}}, event: {k: 'heat' | 'kettle' | 'miner', name, text, left} | null, cue: {id: {k: 'gust' | 'surge', left}}, trial, ledger, flooded}`.
-- `trial` (null before the Trial): `{defendants, target (% FTP, null while the jury votes), held (the first defendant's share of the dock held so far), heldBy: {id: share}, verdicts: {id: 'acquitted' | 'guilty'}}`. `ledger` (null before the Trial): `{id: {emit (tonnes), bribed, walls}}`.
-- Questions (`ask`, answered with `act` of the same `k`): `fuel` (`coal` | `gas` | `solar` | `wind`, in the last 30 s before each decade), `bribe` (`yes` | `no`, the lobbyist's envelope to one company), `appeal` (`yes` | `no`, to a sashed rider while the jury votes), `verdict_target` (`90` | `100` | `105`, to everyone but the defendants while the jury votes). Plus `act` `wall` (any value): build a seawall.
-- fx: `stage` (a new flood stage), `flood`, `blackout`, `wall` (id: who built it), `verdict` (id: the defendant), `say`.
-- Summary: `mode: 'climate'`, `score` (all companies' coins, 0 if flooded), `distance`, `flooded`, `level`, `stageName`, `walls`, `verdicts`, `awards`, rider rows with `company`, `coins`, `emit`, `bribed`, `walls`, `fuel`, `verdict`.
-- The GUILTY sash: the server adds `look.sash: true` to a rider's look on join (bus and road rooms) while they wear one; a `sash` in a join message or a saved profile is dropped. It is stored apart from the profile (`sashes` table) for 30 days from a guilty verdict in a flooded town, and comes off on an acquittal.
-
-## Kidney Stone Express (`game: 'ambo'`)
-- A bus room, never on ERG. The plan is free blocks with `kind` (`base`, `run`, `ramp`, `cool`) and, on runs, `patient` (`hook`, `kidney`, `magpie`, `bin`, `trainer`). `tick.ev` is the phase: `base`, `run`, `ramp`, `reverse` or `cool` (a crew that arrives early is already in `ramp` while the run block finishes).
-- `tick.game`: `{g: 'ambo', phase, run, runs, patient: {id, name, icon, line} | null, comfort (0..100), dist (metres left), total, speed (km/h), par (seconds left in the run block), eta (seconds at this speed, or null when stopped), event, brake, perk: null | 'spike' | 'green', sweet (0..1), queue (seconds left in the hospital queue), reviews, score, siren}`. `patient` is null once they are delivered or have walked.
-- `reviews` (finished runs, also in the summary): `{id, patient, icon, comfort, delta (seconds early, negative late), walked, fell, pts, stars (1..5), text}`.
-- `event` (the road event in progress, or null): `{k: 'green' | 'roadworks' | 'hump' | 'siren', name, text, left (seconds), who (the siren rider's id, else null)}`. `siren` repeats `who`. In the first half of a `hump` the text is the 3-2-1 and no band has changed yet. The siren rider's `band` is `"sprint"`.
-- fx kinds: `say` (radio banter, patient lines and how each road event ended; `id` is the siren rider on a siren result), `delivered`, `fellout`, `walked`, `perk`, `fine` (`id` is the rider) and `review` (stars and the review, right after `delivered` or `walked`). All carry `text`.
-- Summary: `mode: 'ambo'`, `score`, `distance`, `delivered`, `reviews`, `awards` and rider rows with `spread` (mean roughness, % of FTP), `spikes` and `fines`. Not on the season ladder.
-- No `act` keys: the game takes no input but power and cadence.
-- `tick.ev` is now read from the game after its tick (it was read before), so it always matches `game.phase`.
-
-## Watch party (`game: "watch"`, from 2026-11-14)
-- A crew game on the host's workout, with ERG as in the bus. `tick.game` is `{g: "watch", vid, title, playing, pos, at, queue: [{vid, title, by}]}`: the video is `pos` seconds in at ride time `at`, and runs on from there while `playing`. Each client keeps its player within 2 s of that.
-- `act` keys: `add` (an 11-character YouTube video id; anyone; the first one starts playing, the rest queue, at most 20), and for the host only `play`, `pause`, `seek` (seconds, plus or minus, at most 600) and `next`. A watch party takes `act` during the countdown too (`CrewGame.early_acts`).
-- `tick.hold` (bool): the game has stopped the room's clock (`CrewGame.holds`). A watch party holds while its driver has the video paused, so the workout waits too; clients freeze their local plan clock while it is set. A watch party sends `tick.game` during the countdown as well.
-- Watch party `act` keys, more: `emoji` (one of six; anyone; comes back to everyone as fx `emoji` with the rider's id), and for the host `up` and `drop` with a queued video's id.
-- Watch party sources: `add` takes a YouTube id, `tw:<channel>` (a Twitch stream: live, shown but never synced) or `url:https://…` (a .mp4, .webm, .ogv or .mov file, synced like YouTube). `title` is the source, a tab, then the title. `act` values may be up to 300 characters, for links.
+## Bus rooms, more
 - `GET /api/rooms/{code}`: `{code, kind, state}` for a ride that exists (any case), 404 otherwise. The home screen checks a typed code with it before asking for a trainer.
-- Crew ride summaries carry `crewBest`: the crew's best score in that game before this ride (null the first time). The server keeps one best per game (`bests` table).
+- Crew ride summaries carry `crewBest`: the crew's best score in that game before this ride (null the first time). The server keeps one best per game (`bests` table; rows for games that have gone stay, unread).
+- Old saved rides may carry `group.mode` of a game that has gone (`madness`, `ambo`, `date`, `climate`, `watch`, `last`, `ttt`, `quiz`, `galley`, `hunt`). History, results, postcards and the Strava post show the game's name and the plain numbers for them. A `sash` in a look (Climate Lawsuit's, now gone) is dropped on join.

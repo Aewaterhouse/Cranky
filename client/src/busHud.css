@@ -1,5 +1,5 @@
 /* Zombie Bus ride screen: the shared ride HUD (rideHud.css, rideHudAim.css) for the rider's own numbers, the
-   clock, the crew and the plan strip, with the game's own panels (bus status or the VO2 Madness box, shop,
+   clock, the crew and the plan strip, with the game's own panels (bus status, shop,
    feed, splashes) kept in the older `.hud` layer, which is zoomed to match (--gz, set in ui/hud.ts). */
 .bus-ride {
   position: absolute;
@@ -216,33 +216,12 @@
     bottom: 236px;
   }
 }
-/* Madness has nothing bottom right, and its board fills the left column */
-.bus-ride .hud-left.mad + .hud-right {
-  left: auto;
-  right: 22px;
-  bottom: 62px;
-}
-.bus-ride .md {
-  min-width: 0;
-  padding: 10px 12px 12px;
-}
-/* VO2 Madness has no bus: its box and effort board sit in the left column, under the power panel */
-.bus-ride .hud-left.mad {
-  top: 232px;
-  left: 22px;
-  bottom: auto;
-  width: 262px;
-  translate: none;
-}
-.hud-stats .hud-left.mad {
-  visibility: hidden;
-}
 .bus-ride .sh {
   bottom: 190px;
 }
 
 /* Phone landscape: bus status runs from beside the corner buttons (menu, Stats, camera: --corner-w) to the right
-   edge, inside the notch insets, and the Madness board takes the top right corner (the crew list starts hidden). */
+   edge, inside the notch insets. */
 .bus-ride {
   --corner-w: 196px;
 }
@@ -258,12 +237,6 @@
         var(--gz, 1)
     );
     translate: none;
-  }
-  .bus-ride .hud-left.mad {
-    top: max(12px, env(safe-area-inset-top));
-    left: auto;
-    right: max(14px, env(safe-area-inset-right));
-    width: 262px;
   }
 }
 

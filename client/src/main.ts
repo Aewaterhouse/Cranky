@@ -51,7 +51,7 @@ function home(p: Profile = profile) {
       groupRide(null, { route, laps }, profile, currentTrainer()!, home)
     ),
     resume: (s) => (keepAwake(true), runDrill(s.plan, profile, currentTrainer()!, home, s)),
-    create: (game) => (keepAwake(true), crew(null, profile, currentTrainer()!, home, game)),
+    create: () => (keepAwake(true), crew(null, profile, currentTrainer()!, home)),
     join: (code) => (keepAwake(true), crew(code, profile, currentTrainer()!, home)),
     watch: (code) => (lockZoom(true), spectate(code, () => home())),
     logout: () => {

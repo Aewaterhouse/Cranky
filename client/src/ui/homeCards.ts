@@ -15,7 +15,7 @@ export function hello(p: Profile, act: HomeActions) {
   if (!last)
     return h(
       'button',
-      { class: 'panel hello', onclick: needTrainer(() => act.create('bus')) },
+      { class: 'panel hello', onclick: needTrainer(() => act.create()) },
       h('span', { class: 'big-emoji' }, '🧟'),
       h(
         'span',

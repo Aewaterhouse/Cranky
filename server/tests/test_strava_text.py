@@ -100,3 +100,20 @@ def test_context_has_the_old_bests_and_the_crew_placings():
     assert ctx["places"] == {"ctx:climb:0": (1, 2)}  # 390 s beats Steve's 400 s
     ctx = ride_context(store, "luke", {**ride, "segments": [{"segment": "ctx:climb:0", "secs": 420}]})
     assert ctx["places"]["ctx:climb:0"] == (2, 2)
+
+
+def test_old_rides_in_games_that_have_gone_still_get_a_plain_post():
+    ambo = {
+        **copy.deepcopy(BUS),
+        "group": {"mode": "ambo", "score": 4321, "riders": [{"id": "luke", "name": "Luke"}], "reviews": [1]},
+    }
+    title, about = describe(ambo, "luke")
+    assert (
+        title.startswith("🚑 Kidney Stone Express · ")
+        and "Crew score 4321" in about
+        and "Crew: Luke" in about
+    )
+    for mode in ("madness", "date", "climate", "watch", "last", "ttt", "quiz", "galley", "hunt"):
+        title, about = describe({"group": {"mode": mode, "awards": [{"award": "X"}, "junk"]}}, "luke")
+        assert " · Ride" in title and "Crew score" not in about and "🏆 X: ?" in about
+    assert describe({"group": {"mode": "madness"}}, "luke")[0] == "🤯 VO2 Madness · Ride"

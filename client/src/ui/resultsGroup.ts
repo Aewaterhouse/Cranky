@@ -1,9 +1,12 @@
-import type { Game } from '../net/protocol'
-import { GAMES } from '../modes/crew/games'
+import { gameOf } from '../modes/crew/games'
 import { fmt, h, pctStr } from './dom'
-import { VIEWS, mvpLine, tile } from './resultsViews'
+import { BUS_VIEW, mvpLine, tile } from './resultsViews'
 import type { GroupSummary } from './results'
 import { savePng } from './ridePostcard'
+
+/** The game's icon, name and score label; a game nobody knows reads as a plain crew ride. */
+const name = (g: GroupSummary) =>
+  gameOf(g.mode ?? 'bus') ?? { icon: '🚴', name: 'Crew ride', score: 'Score' }
 
 const TROPHY =
   '<svg viewBox="0 0 24 24" width="32" height="32" fill="currentColor"><path d="M7 3h10v6a5 5 0 0 1-10 0V3z"/><path d="M3 4h4v2H5a2 2 0 0 0 2 3v2a4 4 0 0 1-4-4V4zm18 0h-4v2h2a2 2 0 0 1-2 3v2a4 4 0 0 0 4-4V4z"/><rect x="11" y="14" width="2" height="4"/><rect x="8" y="18" width="8" height="3" rx="1"/></svg>'
@@ -22,7 +25,8 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
       h('div', { class: 'dim' }, a.why),
     )
   }
-  const view = VIEWS[g.mode ?? 'bus'] ?? VIEWS.bus
+  // An old ride from a crew game that has gone shows its name and the plain numbers.
+  const bus = (g.mode ?? 'bus') === 'bus'
   // No sprints in the ride, no Sprints column.
   const sprinted = g.riders.some((r) => r.sprints.length)
   return h(
@@ -34,14 +38,13 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
       h(
         'div',
         { class: 'res-score' },
-        h('span', {}, GAMES[(g.mode ?? 'bus') as Game].score),
-        h('b', {}, g.score.toLocaleString()),
+        h('span', {}, name(g).score),
+        h('b', {}, (g.score ?? 0).toLocaleString()),
         context ? h('small', {}, context) : '',
       ),
-      tile('Distance', `${(g.distance / 1000).toFixed(1)} km`),
-      ...view.tiles(g),
+      tile('Distance', `${((g.distance ?? 0) / 1000).toFixed(1)} km`),
+      ...(bus ? BUS_VIEW.tiles(g) : []),
     ),
-    view.extra?.(g) ?? '',
     g.campaign ? h('div', { class: 'card hl' }, h('b', {}, '🗺️ Campaign: '), g.campaign) : '',
     g.awards.length
       ? h(
@@ -80,7 +83,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
             'Rider',
             'Compliance',
             'Time in zone',
-            view.col,
+            BUS_VIEW.col,
             ...(sprinted ? ['Sprints'] : []),
           ].map((x) => h('th', {}, x)),
         ),
@@ -91,7 +94,7 @@ export function groupSection(g: GroupSummary, myId: string, context = '') {
             h('td', {}, r.name, h('small', { class: 'mvp' }, mvpLine(r, g.riders))),
             h('td', {}, pctStr(r.compliance)),
             h('td', {}, fmt(r.inBandSecs)),
-            h('td', {}, view.cell(r)),
+            h('td', {}, BUS_VIEW.cell(r)),
             sprinted ? h('td', {}, r.sprints.join(' ') || '–') : '',
           ),
         ),
@@ -109,7 +112,7 @@ export const postcard = async (
 ) =>
   savePng(
     await busCard(g, planName),
-    `${GAMES[(g.mode ?? 'bus') as Game].name.toLowerCase().replace(/\W+/g, '-')}-${new Date(date).toLocaleDateString('en-CA')}`,
+    `${name(g).name.toLowerCase().replace(/\W+/g, '-')}-${new Date(date).toLocaleDateString('en-CA')}`,
   )
 
 /** The bus postcard: the scene still (when there is one), the score, the crew and the awards. */
@@ -140,7 +143,7 @@ export async function busCard(g: GroupSummary, planName: string) {
     x.fill()
     x.font = '200px system-ui'
     x.textAlign = 'center'
-    x.fillText(GAMES[(g.mode ?? 'bus') as Game].icon, 600, 400)
+    x.fillText(name(g).icon, 600, 400)
     x.textAlign = 'start'
   } else {
     const img = new Image()
@@ -153,19 +156,19 @@ export async function busCard(g: GroupSummary, planName: string) {
   x.fillRect(0, 470, 1200, 330)
   x.fillStyle = '#f2b705'
   x.font = '900 64px system-ui'
-  x.fillText(GAMES[(g.mode ?? 'bus') as Game].name.toUpperCase(), 40, 80)
+  x.fillText(name(g).name.toUpperCase(), 40, 80)
   x.font = 'bold 40px system-ui'
-  x.fillText(`Score ${g.score}`, 40, 530)
+  x.fillText(`Score ${g.score ?? 0}`, 40, 530)
   x.fillStyle = '#eee'
   x.font = '28px system-ui'
   x.fillText(
-    `${planName} · ${(g.distance / 1000).toFixed(1)} km${(g.mode ?? 'bus') === 'bus' ? ` · armour ${Math.round(g.armour)}` : ''} · sync ${Math.round(g.syncPct)}% · ${g.scrap} scrap`,
+    `${planName} · ${((g.distance ?? 0) / 1000).toFixed(1)} km${(g.mode ?? 'bus') === 'bus' ? ` · armour ${Math.round(g.armour)}` : ''} · sync ${Math.round(g.syncPct ?? 0)}% · ${g.scrap ?? 0} scrap`,
     40,
     580,
   )
-  x.fillText(`Crew: ${g.riders.map((r) => r.name).join(', ')}`, 40, 625)
+  x.fillText(`Crew: ${(g.riders ?? []).map((r) => r.name).join(', ')}`, 40, 625)
   x.font = '24px system-ui'
-  g.awards.slice(0, 6).forEach((a, i) => {
+  ;(g.awards ?? []).slice(0, 6).forEach((a, i) => {
     // Each award keeps to its own column, cut short with an ellipsis rather than running into the next.
     let t = `🏆 ${a.award}: ${a.name} (${a.why})`
     while (x.measureText(t).width > 550 && t.length > 4) t = t.slice(0, -2).trimEnd() + '…'

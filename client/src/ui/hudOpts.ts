@@ -1,8 +1,6 @@
 import type { RideRecorder } from '../core/ride'
-import type { Fx, Game, ShopItem, Tick } from '../net/protocol'
+import type { ShopItem } from '../net/protocol'
 import type { Plan, Tier } from '../types'
-import type { EventStyle } from './hudKit'
-import type { makeSplash } from './hudSplash'
 
 export interface HudOpts {
   plan?: Plan
@@ -27,16 +25,4 @@ export interface HudOpts {
     tile: HTMLElement
     slider: HTMLElement
   }
-  /** VO2 Madness: the interval names in the deck. Swaps the bus panel for the effort board. */
-  mad?: string[]
-  /** A newer crew game: its id, its panel in place of the bus's and its names for the block events. */
-  game?: Game
-  panel?: GamePanel
-  events?: Record<string, EventStyle>
-}
-/** A crew game's own HUD panel, fed the whole tick (its state is `tick.game`) and each fx. */
-export interface GamePanel {
-  root: HTMLElement
-  update(m: Tick, meId: string): void
-  fx?(fx: Fx, sp: ReturnType<typeof makeSplash>): void
 }

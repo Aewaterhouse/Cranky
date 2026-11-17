@@ -198,7 +198,11 @@ def test_titles_and_descriptions_by_mode():
     mad["group"].update(mode="madness")
     mad["group"]["riders"][0].update(points=812, redSecs=95)
     title, about = describe(mad, "luke")
-    assert title.startswith("🔥 VO2 Madness") and "my effort points 812" in about
+    assert (
+        title == "🤯 VO2 Madness · Bus Quick 30"
+        and "Crew score 1234" in about
+        and "Crew: Luke, Steve" in about
+    )
     free = {
         "planName": "x",
         "route": {"name": "Mount Coot-tha"},

@@ -1,8 +1,7 @@
 import { moreNumbers } from './moreNumbers'
 import '../results.css'
 import { CFG } from '../config'
-import { GAMES } from '../modes/crew/games'
-import type { Game } from '../net/protocol'
+import { gameOf } from '../modes/crew/games'
 import { badgeCard, headline, lastTime, nextUp, scoreContext } from './resultsTop'
 import { ftpSuggestion, level, recordFtp, type Profile } from '../core/curve'
 import { rideRewards } from './resultsRewards'
@@ -178,8 +177,8 @@ export function finishRide(
           'p',
           {},
           // A crew game leads with its name; the workout underneath it is the detail.
-          group?.mode && group.mode !== 'bus' && GAMES[group.mode as Game]
-            ? h('b', {}, `${GAMES[group.mode as Game].icon} ${GAMES[group.mode as Game].name}`)
+          group?.mode && group.mode !== 'bus' && gameOf(group.mode)
+            ? h('b', {}, `${gameOf(group.mode)!.icon} ${gameOf(group.mode)!.name}`)
             : '',
           group?.mode && group.mode !== 'bus' ? ` · ${s.planName}` : h('b', {}, s.planName),
           ` · ${when}`,

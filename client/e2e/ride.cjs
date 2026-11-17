@@ -1,5 +1,5 @@
-// End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride, a Kidney Stone
-// Express shift, a Speed Dating night, a Climate Lawsuit game and the three road races, the last ones with bots.
+// End-to-end smoke test in headless Chromium: a solo workout, a two-rider Zombie Bus ride and the three road
+// races, the last ones with bots.
 // Run with scripts/e2e.sh, which starts a sped-up server on E2E_URL.
 const { chromium } = require('playwright')
 
@@ -17,7 +17,9 @@ async function rider(browser, name) {
   await page.fill('input[placeholder="Password"]', name.toLowerCase())
   await page.keyboard.press('Enter')
   await page.waitForSelector('.home-games').catch(async (e) => {
-    console.error(`${name} login failed; page says:\n${(await page.innerText('body')).slice(0, 400)}`)
+    console.error(
+      `${name} login failed; page says:\n${(await page.innerText('body')).slice(0, 400)}`,
+    )
     throw e
   })
   await page.waitForTimeout(600)
@@ -60,7 +62,8 @@ async function crew(host, guest) {
   }
   for (const p of [host, guest]) await p.waitForSelector('.res-hero', { timeout: 240000 })
   const text = await host.innerText('body')
-  for (const want of ['Bus score', 'Awards', 'Crew', 'Luke']) if (!new RegExp(want, 'i').test(text)) throw new Error(`crew results missing "${want}"`)
+  for (const want of ['Bus score', 'Awards', 'Crew', 'Luke'])
+    if (!new RegExp(want, 'i').test(text)) throw new Error(`crew results missing "${want}"`)
 }
 
 // A road race with three bots on Nundah: the game picked in the group-ride lobby, the podium, then the results.
@@ -70,102 +73,31 @@ async function race(page, game, laps, want) {
   await page.click('button:text-is("Group ride")')
   await useSim(page).catch(() => {})
   await page.waitForSelector('.road-lobby')
-  for (let i = 0; i < 3; i++) await page.click('[aria-label="One more bot"]'), await page.waitForTimeout(400)
+  for (let i = 0; i < 3; i++)
+    (await page.click('[aria-label="One more bot"]'), await page.waitForTimeout(400))
   await page.click(`.road-opts .seg >> text=${game}`)
   await page.waitForTimeout(500)
   const lapText = laps === 1 ? '1 lap' : `${laps} laps`
-  for (let i = 0; i < 20 && !(await page.locator(`.road-opts b:text-is("${lapText}")`).count()); i++)
-    await page.click('[aria-label="One lap fewer"]'), await page.waitForTimeout(500)
+  for (
+    let i = 0;
+    i < 20 && !(await page.locator(`.road-opts b:text-is("${lapText}")`).count());
+    i++
+  )
+    (await page.click('[aria-label="One lap fewer"]'), await page.waitForTimeout(500))
   await page.click('text=Start the ride')
   await page.waitForSelector('text=Back to the lobby', { timeout: 180000 })
   const text = await page.innerText('body')
-  for (const w of want) if (!new RegExp(w, 'i').test(text)) throw new Error(`${game} results missing "${w}"`)
+  for (const w of want)
+    if (!new RegExp(w, 'i').test(text)) throw new Error(`${game} results missing "${w}"`)
   await page.click('text=Back to the lobby')
   await page.click('text=Leave the ride')
   await page.waitForSelector('.home-games')
 }
 
-// A scripted crew game with no ERG: one rider and three bots through a whole shift.
-async function shift(page) {
-  await page.click('.home-game:has-text("Kidney Stone Express")')
-  await useSim(page)
-  await page.waitForSelector('.code-letters')
-  await page.click('.game-card:has-text("Kidney Stone Express")')
-  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
-  await page.click('text=Start the shift')
-  await page.waitForSelector('.am', { timeout: 20000 })
-  await page.waitForSelector('.res-hero', { timeout: 240000 })
-  const text = await page.innerText('body')
-  for (const want of ['Shift score', 'Google reviews', 'Paramedic of the Week', 'Kat'])
-    if (!new RegExp(want, 'i').test(text)) throw new Error(`shift results missing "${want}"`)
-}
-
-// Speed Dating with three bots: six dates, the wedding and the divorce.
-async function night(page) {
-  await page.click('.home-game:has-text("Speed Dating")')
-  await useSim(page)
-  await page.waitForSelector('.code-letters')
-  await page.click('.game-card:has-text("Speed Dating")')
-  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
-  await page.click('text=Open the bar')
-  await page.waitForSelector('.dt', { timeout: 20000 })
-  await page.waitForSelector('.res-hero', { timeout: 300000 })
-  const text = await page.innerText('body')
-  for (const want of ['Chemistry', 'Couples', 'The leaked group chat', 'Best Match'])
-    if (!new RegExp(want, 'i').test(text)) throw new Error(`dating results missing "${want}"`)
-}
-
-// Climate Lawsuit with three bots: four decades, a fuel change, the Trial and Sentencing.
-async function town(page) {
-  await page.click('.home-game:has-text("Climate Lawsuit")')
-  await useSim(page)
-  await page.waitForSelector('.code-letters')
-  await page.click('.game-card:has-text("Climate Lawsuit")')
-  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
-  await page.click('text=Start the 1980s')
-  await page.waitForSelector('.cl', { timeout: 20000 })
-  await page.locator('.ch-opt:has-text("Solar")').click({ timeout: 120000 })
-  await page.waitForSelector('.res-hero', { timeout: 300000 })
-  const text = await page.innerText('body')
-  for (const want of ['Town profit', 'The Trial', 'Polluter of the Decade', 'Coal|Solar|Gas|Wind|Pty|Corp'])
-    if (!new RegExp(want, 'i').test(text)) throw new Error(`climate results missing "${want}"`)
-}
-
-// Last Rider Standing with three bots: the simulator holds every step, so the bots drop out and you win.
-async function ramp(page) {
-  await page.click('.home-game:has-text("Last Rider Standing")')
-  await useSim(page)
-  await page.waitForSelector('.code-letters')
-  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
-  await page.click('text=Start the ramp')
-  await page.waitForSelector('.last-list', { timeout: 20000 })
-  await page.waitForSelector('.res-hero', { timeout: 300000 })
-  const text = await page.innerText('body')
-  for (const want of ['Last One Standing', 'Lasted to', 'Top step'])
-    if (!new RegExp(want, 'i').test(text)) throw new Error(`ramp results missing "${want}"`)
-}
-
-// A crew game over the driver's workout with three bots: its panel shows, and the results carry its own words.
-async function workoutGame(page, name, start, panel, wants) {
-  await page.click(`.home-game:has-text("${name}")`)
-  await useSim(page)
-  await page.waitForSelector('.code-letters')
-  for (let i = 0; i < 3; i++) await page.click('button[aria-label="More bot"]')
-  await page.click(`text=${start}`)
-  await page.waitForSelector(`text=${panel}`, { timeout: 30000 })
-  // E2E_SHOTS=<folder> keeps a mid-ride picture of each game, to look at its panel.
-  if (process.env.E2E_SHOTS) {
-    await page.waitForTimeout(15000)
-    await page.screenshot({ path: `${process.env.E2E_SHOTS}/${name.replace(/\W+/g, '-')}.png`, timeout: 120000 })
-  }
-  await page.waitForSelector('.res-hero', { timeout: 400000 })
-  const text = await page.innerText('body')
-  for (const want of wants)
-    if (!new RegExp(want, 'i').test(text)) throw new Error(`${name} results missing "${want}"`)
-}
-
 ;(async () => {
-  const browser = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] })
+  const browser = await chromium.launch({
+    args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'],
+  })
   try {
     const alex = await rider(browser, 'Alex')
     await solo(alex)
@@ -173,19 +105,6 @@ async function workoutGame(page, name, start, panel, wants) {
     const luke = await rider(browser, 'Luke')
     await crew(alex, luke)
     console.log('crew ride: ok')
-    await shift(await rider(browser, 'Kat'))
-    console.log('Kidney Stone Express: ok')
-    await night(await rider(browser, 'Jack'))
-    console.log('Speed Dating: ok')
-    await town(await rider(browser, 'Angus'))
-    console.log('Climate Lawsuit: ok')
-    await ramp(await rider(browser, 'Steve'))
-    console.log('Last Rider Standing: ok')
-    await workoutGame(await rider(browser, 'Ali'), 'Pub Quiz', 'Open the pub', 'PUB QUIZ', ['Points', 'Quizmaster|Knows Nothing'])
-    await workoutGame(await rider(browser, 'Luke'), 'Galley Ship', 'Cast off', 'ROW AT', ['On the beat', 'Hull'])
-    await workoutGame(await rider(browser, 'Jack'), 'The Hunt', 'Release the fox', 'THE HUNT', ['Points'])
-    await workoutGame(await rider(browser, 'Angus'), 'Team Time Trial', 'Start the trial', 'TEAM TIME TRIAL', ['Team Maroons|Team Blues'])
-    console.log('Pub Quiz, Galley Ship, The Hunt, Team Time Trial: ok')
     const racer = await rider(browser, 'Kat')
     await race(racer, 'Race', 1, ['Nundah', 'race'])
     await race(racer, 'Points', 2, ['points race', 'won on points'])

@@ -11,19 +11,12 @@ DB_PATH = Path(os.environ.get("ZB_DB", ROOT / "server" / "zombie_bus.db"))
 
 TICK_HZ = 2
 NP_WINDOW_S = 30  # normalised power rolls over this many seconds
-SHAPE_WINDOW_S = 30  # power shape: 3 s power is compared with the rider's own mean over this long
-SPIKE_PCT = 0.15  # 3 s power this share of FTP off that mean is a spike
-SHAPE_MIN_S = 60  # a rider needs this much riding to be up for the smoothest award
 STATS_EVERY_S = 1  # each rider's ride so far goes out on the tick this often
 TIME_SCALE = float(os.environ.get("ZB_TIME_SCALE", "1"))
 COUNTDOWN_S = 5
 MAX_RIDERS = 6
 TARGET_CAP = 1.5  # no target or band edge is ever over this share of FTP
 ACT_LIMIT = (8, 4.0)  # a rider's game inputs (`act`): at most this many in this many seconds
-SCRIPT_GAP_S = (40.0, 75.0)  # scripted games: quiet seconds between one event ending and the next starting
-SCRIPT_CLEAR_S = 5.0  # an event ends at least this long before its segment does
-SCRIPT_MAX_GAP_S = 90.0  # the longest a scripted game may go with nothing happening
-SCRIPT_SCALE = float(os.environ.get("ZB_SCRIPT_SCALE", "1"))  # 0.125 squeezes a 40 min game into 5
 ROOM_IDLE_S = 600
 DISCORD_WEBHOOK = os.environ.get("ZB_DISCORD_WEBHOOK", "")
 BACKUP_DIR = Path(os.environ.get("ZB_BACKUPS", DB_PATH.parent / "backups"))
@@ -140,62 +133,6 @@ DROP_SCRAP = 15
 AIRSTRIKE_GAP = 15  # metres of gap, at once
 GUNSHIP_S = 20
 GUNSHIP_GAP = 2.0  # extra m/s of gap while the gunship is up
-
-# VO2 Madness: mystery-box VO2 intervals for the whole pack, scored on heart-rate effort.
-MAD_MINUTES = 40  # session length when the host has not picked one
-MAD_WARM_S = (300, 600)  # warm-up ramp, about 15% of the session inside these limits
-MAD_COOL_S = (180, 420)  # cool-down, about 10% of the session
-MAD_REST_PCT = 50
-MAD_BOX_S = 10  # the mystery box opens this long before the interval starts
-MAD_TWIST_CHANCE = 0.6
-# The deck: each card is one VO2 interval with its recovery. Work and recovery are roughly 1:1.
-MAD_DECK = [
-    {"name": "Three-Minute Monster", "rest": 180, "blocks": [{"type": "steady", "dur": 180, "pct": 110}]},
-    {"name": "Two-Minute Terror", "rest": 120, "blocks": [{"type": "steady", "dur": 120, "pct": 115}]},
-    {"name": "Rocket Minute", "rest": 90, "blocks": [{"type": "steady", "dur": 60, "pct": 125}]},
-    {
-        "name": "30/30 Mayhem",
-        "rest": 150,
-        "blocks": [{"type": "over-under", "dur": 240, "step": 30, "pct": [125, 55]}],
-    },
-    {
-        "name": "40/20 Meltdown",
-        "rest": 150,
-        "blocks": [
-            {"type": "steady", "dur": 40 if k % 2 == 0 else 20, "pct": 120 if k % 2 == 0 else 50}
-            for k in range(8)
-        ],
-    },
-    {"name": "Ramp of Doom", "rest": 150, "blocks": [{"type": "ramp", "dur": 150, "pct": [95, 125]}]},
-    {
-        "name": "Stairway to Hell",
-        "rest": 180,
-        "blocks": [{"type": "steady", "dur": 60, "pct": p} for p in (105, 112, 120)],
-    },
-    {"name": "Mystery Sprint", "rest": 75, "weight": 0.6, "blocks": [{"type": "sprint", "dur": 15}]},
-]
-# Twists: (name, what it does). Dealt with some rounds and applied to that round's scoring.
-MAD_TWISTS = {
-    "double": ("Double Points", "Everything scores twice."),
-    "redline": ("Redline Bonus", "Extra points every second over 90% of max."),
-    "sync": ("Hive Mind", "Match cadence as a pack for half as much again."),
-    "underdog": ("Underdog", "Last place scores triple."),
-    "tax": ("Leader Tax", "First place scores half."),
-}
-MAD_ZONES = (0.6, 0.7, 0.8, 0.9)  # heart-rate zone edges as fractions of max
-MAD_POWER_EFFORT = (0.45, 0.4)  # no strap: effort = 0.45 + 0.4 x power/FTP (50% FTP ~ 65% of max, FTP ~ 85%)
-MAD_ZONE_PTS = (0, 1, 2, 4, 7)  # points per second in each zone during an interval
-MAD_REDLINE_PTS = 5
-MAD_SPRINT_PTS = {"FAIL": 0, "HIT": 20, "GREAT": 40, "MEGA": 70, "LEGEND": 100}
-MAD_CROWN_PTS = 1  # extra points per second for wearing the crown
-MAD_CROWN_MIN = 0.75  # nobody is "trying hardest" below this
-MAD_CROWN_MARGIN = 0.02  # a challenger must beat the holder by this much...
-MAD_CROWN_HOLD_S = 4  # ...for this long
-MAD_LEAD_MIN = 50  # points before lead changes are called
-MAD_SANDBAG = (0.7, 0.82)  # called out under the first while the rest average over the second
-MAD_SANDBAG_S = 20
-MAD_SANDBAG_COOL_S = 90
-MAD_SPEED = (5.0, 14.0)  # pack speed in m/s at zero and full compliance
 
 # Personal challenges: a quick cadence drill for one human rider during long hauls and ramp-ups.
 CHALLENGE_EVERY_S = (150, 240)  # random wait between challenges
@@ -526,15 +463,4 @@ ROAD_BOT_FORM = (0.94, 1.06)  # a road bot's form on the day, drawn once per rid
 TITLES = {
     "Fell Off King": "👑 Fell Off King",
     "Roadblock MVP": "🔨 Roadblock MVP",
-    "Paramedic of the Week": "🚑 Paramedic of the Week",
-    "Best Match": "💘 Best Match",
-    "Red Flag": "🚩 Red Flag",
-    "Last One Standing": "🏁 Last One Standing",
-    "Quizmaster": "🍺 Quizmaster",
-    "Drummer's Pet": "🥁 Drummer's Pet",
-    "Top Dog": "🦊 Top Dog",
 }
-
-# The workout each workout game starts on (the driver can change it): a chat for the quiz, steady cadence
-# for the galley, sweet spot for the hunt, threshold for the time trial.
-GAME_PLANS = {"quiz": "coffee-spin-45", "galley": "tempo-2x20", "hunt": "ss-2x15", "ttt": "thr-2x15"}

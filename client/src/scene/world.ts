@@ -1,11 +1,9 @@
 import * as THREE from 'three'
 import type { Look } from '../core/cosmetics'
-import { makeAmboProps } from './ambulance'
 import { makeBus } from './bus'
 import { BusCam } from './busCam'
 import { BigThings } from './bigThings'
 import { Crew } from './crew'
-import { DateDress } from './dateDress'
 import { busEmitters, hordeDust, smashBurst } from './emitters'
 import { FxLayer } from './fxLayer'
 import { Ground, ROAD_HALF, groundH } from './ground'
@@ -13,7 +11,6 @@ import { Billboards, Servo } from './landmarks'
 import { Mirror } from './mirror'
 import { MoodBlend, weatherEnv, type Env, type Weather } from './moods'
 import { Rain } from './route/rain'
-import { Pack, type MadScene } from './pack'
 import { Particles } from './particles'
 import { VIS, type Mood } from './params'
 import { Props } from './props'
@@ -58,18 +55,10 @@ export interface SceneState {
   weather?: Weather
   /** The crew's gunship is up and firing on the horde. */
   gunship?: boolean
-  /** VO2 Madness: no bus, the riders race along the road as a pack. */
-  mad?: MadScene | null
-  /** The next change of target is seconds away: a video stage turns its sound down so the countdown is heard. */
-  duck?: boolean
-  /** A crew game's own state, for a game that brings its own scene (Climate Lawsuit's town). */
-  game?: Record<string, unknown> | null
   /** A boss fight behind the bus, as the server names it, and its health, 1 to 0. */
   boss?: { name: string; left: number } | null
   /** The server's zombie-type tip (runners on long hauls, brutes on ramp-ups), or null. */
   zed?: string | null
-  /** Kidney Stone Express: the bus is an ambulance; `siren` flashes the light bar. */
-  ambo?: { siren: boolean; dist?: number | null; fell?: boolean } | null
 }
 export type FxKind = 'hit' | 'shake' | 'slowmo' | 'smash' | 'drop' | 'airstrike'
 
@@ -95,18 +84,15 @@ export class World {
   private props = new Props(0)
   private boards = new Billboards(0)
   private servo = new Servo()
-  private dateDress = new DateDress(0)
   private bigThings = new BigThings()
   private mirror!: Mirror
   private wenv = {} as Env
   private rain = new Rain()
   private bus = makeBus()
-  private ambo = makeAmboProps()
   private horde = new Horde()
   private bosses = new Bosses()
   private block = new Roadblock()
   private strikes = new Strikes()
-  private pack = new Pack()
   private crew = new Crew(this.scene, this.bus.shell)
   private smoke = new Particles(500)
   private sparks = new Particles(300, true)
@@ -156,16 +142,13 @@ export class World {
       this.props.group,
       this.boards.group,
       this.servo.group,
-      this.dateDress.group,
       this.bigThings.group,
       this.bus.group,
-      this.ambo.group,
       this.horde.group,
       this.bosses.group,
       this.block.group,
       this.block.debris,
       this.strikes.group,
-      this.pack.group,
       this.smoke.points,
       this.sparks.points,
       this.key,
@@ -236,7 +219,7 @@ export class World {
     this.mirror.render(
       this.renderer,
       this.scene,
-      this.state.gap !== null && !this.state.mad && this.state.weather !== 'dust',
+      this.state.gap !== null && this.state.weather !== 'dust',
     )
   }
 
@@ -262,13 +245,8 @@ export class World {
     const dz = v * dt
     this.dist += dz
     this.ground.update(this.dist, env)
-    const date = !!s.mad?.pairs
-    this.props.update(dz, this.dist, date)
-    this.boards.theme(date)
+    this.props.update(dz, this.dist)
     this.boards.update(dz, this.dist)
-    this.dateDress.group.visible = date
-    if (date) this.dateDress.update(dz, this.dist)
-    this.bigThings.group.visible = !date
     this.bigThings.update(dz, this.dist)
     this.servo.update(dz, s.mood === 'servo', dt)
     this.sky.update(env, this.t, this.camera.position)
@@ -280,8 +258,8 @@ export class World {
     this.brake += ((acc < -0.6 ? 1 : 0) - this.brake) * clamp(dt * 8)
     this.hit = Math.max(0, this.hit - dt * 2.2)
     this.flash = Math.max(0, this.flash - dt * 2)
-    this.bus.setLook(s.busLook ?? {}, !!s.ambo)
-    this.bus.setTrophies(s.ambo ? 0 : (s.trophies ?? 0))
+    this.bus.setLook(s.busLook ?? {})
+    this.bus.setTrophies(s.trophies ?? 0)
     this.bus.update({
       t: this.t,
       speed: v,
@@ -291,11 +269,8 @@ export class World {
       hit: this.hit,
       pitch: this.pitch,
       dz,
-      siren: s.ambo?.siren ? 1 : 0,
     })
-    this.bus.group.visible = !s.mad
-    this.pack.group.visible = !!s.mad
-    if (!s.mad) busEmitters(this.smoke, this.sparks, dt, s, this.bus, env.fog)
+    busEmitters(this.smoke, this.sparks, dt, s, this.bus, env.fog)
 
     // horde
     const g = s.gap
@@ -310,13 +285,9 @@ export class World {
 
     // roadblock
     this.block.update(this.t, dt, night, s.roadblock)
-    this.ambo.update(s.ambo)
-    if (s.mad) this.pack.update(s.riders, s.mad, this.t, dt, s.speed, this.smoke, this.sparks)
-    else
-      this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
+    this.crew.update(s.riders, this.t, dt, g === null ? null : this.hordeZ, this.smoke, s.speed)
     const hz = g === null ? null : this.hordeZ
-    const boss =
-      s.mad || g === null || !s.boss ? null : { kind: bossKind(s.boss.name), left: s.boss.left }
+    const boss = g === null || !s.boss ? null : { kind: bossKind(s.boss.name), left: s.boss.left }
     if (this.bosses.update(boss, this.hordeZ, this.t, dt, this.smoke, this.sparks))
       this.cam.rig.shake = Math.max(this.cam.rig.shake, VIS.boss.stomp)
     if (this.strikes.update(this.t, dt, s, hz, this.horde, this.sparks, this.smoke))
@@ -328,7 +299,6 @@ export class World {
       gap: g,
       hit: this.hit,
       slow: sm < 1,
-      pack: !!s.mad,
       climb,
       horde: hz,
       boss: tall,

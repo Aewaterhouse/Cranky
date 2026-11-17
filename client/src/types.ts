@@ -18,9 +18,6 @@ export interface Block {
   /** Coach messages shown `at` seconds into the block. */
   cues?: { at: number; text: string }[]
   blocks?: Block[]
-  /** VO2 Madness: an interval block (it scores) and its round's twist. */
-  work?: boolean
-  twist?: string | null
 }
 export interface Plan {
   id: string
@@ -58,8 +55,6 @@ export interface Frame {
   dur: number
   /** Target watts, or null when ERG is off (sprint, free). */
   tgt: number | null
-  /** A crew game's own band in watts (then `tgt` is its middle), or its all-out sprint with no target. */
-  band?: [number, number] | 'sprint'
   /** Cadence band for this block, when the plan sets one. */
   cad?: [number, number]
   next?: { type: BlockType; label: string; in: number; tgt: number | null }

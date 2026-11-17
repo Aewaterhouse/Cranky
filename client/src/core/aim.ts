@@ -35,15 +35,13 @@ export function soloAim(f: Frame, mode: string | null): Aim {
 /** The crew rides' power panel, on the solo rule. A sprint shows the rider's best so far, never a target. */
 export function busAim(f: Frame | null, power: number, best: number, erg = true): Aim {
   if (!f) return { cap: 'Power · 3 s', note: 'Get ready' }
-  if (f.type === 'sprint' || f.band === 'sprint')
+  if (f.type === 'sprint')
     return {
       cap: 'Sprint',
       chip: 'ERG off',
       note: power >= best ? 'All out · new best!' : `All out · best ${Math.round(best)} W`,
       fill: power / best / CFG.hud.sprintBarOver,
     }
-  if (Array.isArray(f.band))
-    return { cap: 'Power · 3 s', chip: `${f.band[0]}–${f.band[1]} W`, target: f.tgt!, cad: f.cad }
   // As in solo: on ERG the trainer holds the target, so it leads; on gears the rider steers their power, so that leads.
   return f.tgt
     ? erg

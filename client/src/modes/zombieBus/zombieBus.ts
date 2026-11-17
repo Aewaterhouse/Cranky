@@ -17,10 +17,8 @@ import type { Mood } from '../../scene/params'
 import { mood as moodAudio, SFX, stopAudio } from '../../ui/audio'
 import { h, show } from '../../ui/dom'
 import { makeHud } from '../../ui/hud'
-import type { Frame, Trainer } from '../../types'
-import { GAME_UI } from '../crew/gameUi'
+import type { Trainer } from '../../types'
 import { howTo } from '../crew/howTo'
-import { FIRST_VIDEO } from '../../core/watchSync'
 import { RideController } from '../rideController'
 import { busGears } from './busGears'
 import { camButton, camKey } from '../../ui/camButton'
@@ -40,24 +38,12 @@ const FX_SOUND: Record<string, () => void> = {
   hauled: SFX.scrap,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
-  go: SFX.go,
-  box: SFX.MEGA,
-  crown: SFX.GREAT,
-  lead: SFX.scrap,
-  sandbag: SFX.FAIL,
   drop: SFX.scrap,
   airstrike: SFX.GREAT,
   gunship: SFX.MEGA,
 }
 
 /** Zombie Bus ride view driven by server ticks. */
-/** Team Time Trial: everyone rides in their team's State of Origin kit, whatever they own. */
-const TEAM_KIT = ['outfit-maroon', 'outfit-skyblue']
-const teamKit = (m: Tick, id: string) => {
-  const g = m.game as { g?: string; team?: Record<string, number> } | null
-  return g?.g === 'ttt' && g.team?.[id] != null ? { outfit: TEAM_KIT[g.team[id]] } : undefined
-}
-
 export function startBusRide(
   lobby0: Lobby,
   profile: Profile,
@@ -70,13 +56,7 @@ export function startBusRide(
   holdBack()
   if (location.search.includes('debug')) debugPanel()
   let l = lobby0
-  const ui = GAME_UI[l.game ?? 'bus']
-  const world =
-    ui?.world?.(
-      stage,
-      (t) => hud?.toast(t),
-      (k, v) => net.send({ t: 'act', k, v }),
-    ) ?? new World(stage)
+  const world = new World(stage)
   const plan = l.plan
   const total = planTotal(plan.blocks)
   const key = busKey(profile.id, l.code)
@@ -137,19 +117,12 @@ export function startBusRide(
       onBuy: (item) => net.send({ t: 'buy', item }),
       onAct: (k, v) => net.send({ t: 'act', k, v }),
       hornOf: (id) => lk[id]?.horn,
-      game: l.game,
-      panel: ui?.panel((k, v) => net.send({ t: 'act', k, v }), isHost),
-      events: ui?.events,
-      mad:
-        l.game === 'madness'
-          ? [...new Set(plan.blocks.filter((x) => x.work).map((x) => x.label ?? ''))]
-          : undefined,
     },
   )
   hud.setTier(profile.tier)
   stage.append(hud.root)
   // How to play, during the countdown.
-  const how = howTo(l.game ?? 'bus')
+  const how = howTo()
   stage.append(how.el)
   // C or the camera button: the next camera view (Chase, High, Rear, Side).
   const cycleView = () => {
@@ -193,30 +166,19 @@ export function startBusRide(
   // Block changes are scheduled off a local estimate of the server clock, not the 2 Hz tick.
   const clock = new ClockSync()
   let running = false
-  // A crew game's own target for me, from the last tick; it holds between ticks and across the game's blocks.
-  let mine: { tgt: number | null; band?: Frame['band'] } | null = null
   const localFrame = () => {
     const el = running ? clock.now(performance.now()) : null
-    const f = el === null ? null : frameAt(plan.blocks, el, profile.tier, profile.ftp)
-    return f && mine ? { ...f, ...mine } : f
+    return el === null ? null : frameAt(plan.blocks, el, profile.tier, profile.ftp)
   }
   const scheduler = setInterval(() => {
     const f = localFrame()
     if (f) ride.setFrame(f)
   }, 1000 / CFG.clock.hz)
   let lastI = -2
-  let held = false
-  let duck = false // the last seconds before a change of target: a watch party dips its video
   let lastEv = ''
   let lastCount = 0
 
   function tick(m: Tick) {
-    // A watch party's first video, pasted in the lobby, goes on as the countdown starts.
-    const first = l.game === 'watch' && sessionStorage.getItem(FIRST_VIDEO)
-    if (first) {
-      sessionStorage.removeItem(FIRST_VIDEO)
-      net.send({ t: 'act', k: 'add', v: first })
-    }
     const me = m.riders[profile.id]
     if (me && me.tier !== profile.tier) {
       profile.tier = me.tier
@@ -224,15 +186,8 @@ export function startBusRide(
       saveProfile(profile)
     }
     clock.tick(m.el, performance.now())
-    const mb = me?.band
-    mine = mb ? { tgt: me.tgt ?? null, band: mb === 'free' ? undefined : mb } : null
-    running = m.i >= 0 && !m.hold
+    running = m.i >= 0
     if (running) how.show(false)
-    if (!!m.hold !== held)
-      hud.banner(
-        (held = !!m.hold) ? 'Paused by the driver: the workout waits too' : 'Back on',
-        2500,
-      )
     if (m.i < 0) {
       hud.countdown(Math.ceil(-m.el), ride.live)
       how.show(true)
@@ -242,7 +197,6 @@ export function startBusRide(
       if (f) {
         if (f.i === m.i) f.tgt = me?.tgt ?? f.tgt
         ride.setFrame(f)
-        duck = !!f.next && f.next.in <= CFG.watch.duckS
         hud.frame(f, ride.live, total, m.ev)
         const count = f.next?.type === 'sprint' ? Math.ceil(f.next.in) : 0
         if (count !== lastCount && count > 0 && count <= 3) SFX.countdown()
@@ -258,8 +212,7 @@ export function startBusRide(
       FX_SOUND[fx.k]?.()
       if (fx.k === 'hit' || fx.k === 'crash') world.fx('hit')
       if (fx.k === 'smash' || fx.k === 'crash') world.fx('smash')
-      if (fx.k === 'shake' || fx.k === 'go' || fx.k === 'crown') world.fx('shake')
-      if (fx.k === 'box') world.fx('slowmo')
+      if (fx.k === 'shake') world.fx('shake')
       if (fx.k === 'drop' || fx.k === 'airstrike') world.fx(fx.k)
       if (fx.k === 'slowmo') {
         world.fx('slowmo')
@@ -267,12 +220,10 @@ export function startBusRide(
       }
     }
     const b = m.bus
-    const calm = m.i < 0 || m.ev in { warmup: 1, cooldown: 1 } || (b.mad && m.ev === 'servo')
+    const calm = m.i < 0 || m.ev in { warmup: 1, cooldown: 1 }
     world.state = {
-      duck,
       speed: b.speed,
-      gap: b.mad ? null : b.gap,
-      mad: b.mad,
+      gap: b.gap,
       armour: b.armour,
       weather: b.weather,
       boss: b.boss,
@@ -282,16 +233,14 @@ export function startBusRide(
       busLook: lk[l.host],
       trophies: l.trophies,
       gunship: b.gunship,
-      ...ui?.scene(m),
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         me: id === profile.id,
-        name: (m.game as { fox?: string } | null)?.fox === id ? `🦊 ${r.name}` : r.name,
+        name: r.name,
         c: r.s,
-        // Out of Last Rider Standing: drop back out of the bunch like a fallen rider.
-        st: (m.game as { out?: string[] } | null)?.out?.includes(id) ? 'fell' : r.st,
+        st: r.st,
         cadence: r.cad,
-        look: teamKit(m, id) ?? lk[id],
+        look: lk[id],
         hr: r.hr,
         hrp: r.hrp,
         effort: r.tgt ? r.w / r.tgt : r.w > 0 ? 1 : 0,

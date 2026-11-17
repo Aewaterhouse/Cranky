@@ -345,19 +345,6 @@ tr.me td {
 .seg-pr {
   color: var(--acc);
 }
-.res-review {
-  margin: 0 0 10px;
-  line-height: 1.35;
-}
-.res-stars {
-  color: var(--acc);
-  letter-spacing: 1px;
-}
-/* Tiles that hold words (names, a town's fate) wrap and shrink instead of being cut off. */
-.res-tile.words b {
-  white-space: normal;
-  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
-}
 .more-num .mn-row {
   display: grid;
   grid-template-columns: 7.5rem 4.5rem 1fr;

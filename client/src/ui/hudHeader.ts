@@ -35,15 +35,7 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
     /** The plan timeline, so a layout can put it somewhere else (the bus HUD's bottom strip). */
     tl,
     setTier: build,
-    /** `mask` replaces the next block's name and watts (the VO2 Madness mystery box). */
-    update(
-      f: Frame,
-      ev: string,
-      elapsedS: number,
-      totalS: number,
-      rbProg: number | null,
-      mask?: string,
-    ) {
+    update(f: Frame, ev: string, elapsedS: number, totalS: number, rbProg: number | null) {
       const e = eventOf(ev)
       root.style.setProperty('--ev', e.col)
       set(icon, e.icon)
@@ -53,7 +45,7 @@ export function makeHeader(plan: Plan | undefined, tier: Tier) {
       set(
         next,
         f.next
-          ? `Next: ${mask ?? `${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''}`} in ${fmt(f.next.in)}`
+          ? `Next: ${f.next.label}${f.next.tgt ? ` · ${f.next.tgt} W` : ''} in ${fmt(f.next.in)}`
           : 'Last block',
       )
       graph?.setProgress(elapsedS)

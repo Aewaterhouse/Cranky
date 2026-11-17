@@ -9,7 +9,6 @@ from datetime import date
 from typing import TYPE_CHECKING
 
 from .. import config as C
-from .. import config_games as G
 from ..plan import is_over
 from .bus_boost import Boosts
 from .bus_crew import CrewPlay
@@ -27,11 +26,9 @@ def roll_weather(rng: random.Random) -> str:
     return rng.choices(kinds, [C.WEATHER[k]["weight"] for k in kinds])[0]
 
 
-def weekly_mutator(today: date | None = None, game: str = "bus") -> dict | None:
-    """This ISO week's twist for a game, or None for a game without any."""
-    week = (today or date.today()).isocalendar().week
-    twists = C.MUTATORS if game == "bus" else G.GAME_MUTATORS.get(game)
-    return twists[week % len(twists)] if twists else None
+def weekly_mutator(today: date | None = None) -> dict:
+    """This ISO week's twist for the bus."""
+    return C.MUTATORS[(today or date.today()).isocalendar().week % len(C.MUTATORS)]
 
 
 class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):

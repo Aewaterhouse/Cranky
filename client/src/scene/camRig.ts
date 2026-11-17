@@ -8,7 +8,6 @@ export class CamRig {
   shake = 0
   /** Where the chase camera aims this frame, for the player's orbit. */
   look = new THREE.Vector3()
-  private near = 0
   /** 0 to 1: how far the camera has swung round to face the horde. */
   dread = 0
   private tmp = new THREE.Vector3()
@@ -24,16 +23,12 @@ export class CamRig {
       hit: number
       slow: boolean
       climb?: number
-      /** VO2 Madness: sit lower and closer, behind the pack. */
-      pack?: boolean
       /** Where the horde front is (z behind the bus), for the dread shot. */
       horde?: number | null
       /** A boss is on, this tall (m): the camera looks back at it. */
       boss?: number
     },
   ) {
-    this.near += ((o.pack ? 1 : 0) - this.near) * clamp(dt * 2)
-    const low = 1 - this.near * VIS.packCam
     const want = o.gap === null ? 0 : 1 - smooth(5, 45, o.gap)
     this.pull += (want - this.pull) * clamp(dt * 1.5)
     const sway = VIS.sway
@@ -46,12 +41,12 @@ export class CamRig {
         Math.sin(t * 0.25) * 1.6 * sway +
         nx * sh * 0.35 +
         Math.sin(t * 0.13) * 0.8 * sway,
-      VIS.camHeight * low -
+      VIS.camHeight -
         (o.climb ?? 0) * VIS.climbDrop +
         this.pull * 4 +
         Math.sin(t * 0.4) * 0.25 * sway +
         ny * sh * 0.3,
-      VIS.camDist * low + this.pull * 7 + Math.sin(t * 0.17) * 0.6 * sway - o.hit * 0.8,
+      VIS.camDist + this.pull * 7 + Math.sin(t * 0.17) * 0.6 * sway - o.hit * 0.8,
     )
     this.look.set(
       0,
@@ -60,7 +55,7 @@ export class CamRig {
     )
     // The horde nearly on us: swing round to look back past the bus at it, so the tension is on screen.
     const D = VIS.dread
-    const near = o.gap === null || o.horde == null || o.pack ? 0 : 1 - smooth(D.near, D.far, o.gap)
+    const near = o.gap === null || o.horde == null ? 0 : 1 - smooth(D.near, D.far, o.gap)
     const want2 = Math.max(near, o.boss && o.horde != null ? VIS.boss.dread : 0)
     this.dread += (want2 - this.dread) * clamp(dt * 1.2)
     if (this.dread > 0.001 && o.horde != null) {

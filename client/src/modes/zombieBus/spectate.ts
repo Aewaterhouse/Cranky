@@ -11,10 +11,8 @@ import { mood as moodAudio, SFX, stopAudio } from '../../ui/audio'
 import { h, show } from '../../ui/dom'
 import { makeBusPanel } from '../../ui/hudBus'
 import { makeHeader } from '../../ui/hudHeader'
-import { eventOf, FX_DEFAULT, setEvents } from '../../ui/hudKit'
+import { eventOf, FX_DEFAULT } from '../../ui/hudKit'
 import { makeSplash } from '../../ui/hudSplash'
-import type { GamePanel } from '../../ui/hudOpts'
-import { GAME_UI, type GameUi, type Stage } from '../crew/gameUi'
 import { GAMES } from '../crew/games'
 import { makeRoster } from '../../ui/hudRoster'
 import { VIS } from '../../scene/params'
@@ -45,7 +43,7 @@ const GRADE_RE = /: (FAIL|HIT|GREAT|MEGA|LEGEND)\b/
 export function spectate(code: string, leaveTo: () => void) {
   const stage = h('div', { class: 'stage' })
   show(stage)
-  let world: Stage = new World(stage)
+  const world = new World(stage)
   const sp = makeSplash()
   const bus = makeBusPanel()
   const board = makeRoster('crew tv-cards')
@@ -118,34 +116,14 @@ export function spectate(code: string, leaveTo: () => void) {
   let lastI = -2
   let lastEv = ''
   let lastCount = 0
-  let gui: GameUi | undefined
-  let panel: GamePanel | undefined
   function tick(m: Tick) {
     if (!l) return
     screen()
     root.classList.remove('idle')
     root.classList.toggle('pre', m.i < 0)
     const lk = looks()
-    const game = l.game ?? 'bus'
-    if (!panel && (gui = GAME_UI[game])) {
-      panel = gui.panel(
-        () => {},
-        () => false,
-      )
-      if (gui.world) {
-        world.dispose()
-        world = gui.world(
-          stage,
-          () => {},
-          () => {},
-        )
-      }
-      bus.root.replaceWith(panel.root)
-      setEvents(gui.events)
-    }
-    panel?.update(m, '')
     const f = m.i >= 0 ? frameAt(l.plan.blocks, m.el, 'hard', 100) : null
-    if (m.i < 0) sp.splash('sp-count sp-pre', `${Math.ceil(-m.el)}`, GAMES[game].countdown, 1100, 0)
+    if (m.i < 0) sp.splash('sp-count sp-pre', `${Math.ceil(-m.el)}`, GAMES.bus.countdown, 1100, 0)
     if (f) {
       if (f.next) f.next.tgt = null
       header.update(f, m.ev, f.el, total, m.bus.rb)
@@ -183,7 +161,6 @@ export function spectate(code: string, leaveTo: () => void) {
         world.fx('shake')
       }
       if (CARD_FX.has(fx.k)) continue
-      panel?.fx?.(fx, sp)
       const text = fx.text ?? FX_DEFAULT[fx.k] ?? ''
       const who = (fx.id && m.riders[fx.id]?.name) || 'Someone'
       const grade = fx.k === 'sprint' ? (GRADE_RE.exec(text)?.[1] as Grade | undefined) : undefined
@@ -206,8 +183,7 @@ export function spectate(code: string, leaveTo: () => void) {
     const b = m.bus
     world.state = {
       speed: b.speed,
-      gap: b.mad ? null : b.gap,
-      mad: b.mad,
+      gap: b.gap,
       armour: b.armour,
       weather: b.weather,
       boss: b.boss,
@@ -217,7 +193,6 @@ export function spectate(code: string, leaveTo: () => void) {
       busLook: lk[l.host],
       trophies: l.trophies,
       gunship: b.gunship,
-      ...gui?.scene(m),
       riders: Object.entries(m.riders).map(([id, r]) => ({
         id,
         name: r.name,

@@ -133,7 +133,6 @@ Simulated trainer throughout. `?fast=20` speeds a solo workout up; `[` and `]` c
 18. Servo Stop: the shop opens above the bus status block and buying still works; the feed lines show bottom left, above the bus status block and clear of it.
 19. A rider who stops pedalling falls off: their row says "fell · 20 s" counting down in red.
 20. ☰: tier, Stats, Crew, Clean view, End ride (Leave the bus for a guest), display size. S or Tab opens my stats under the power panel; R hides the crew; H hides the HUD and the game panels, splashes still show.
-21. VO2 Madness: the mystery box and "who's trying hardest" board are in the left column under the power panel; everything else as above.
 22. TV (`?watch=CODE`): the board is laid out as before; numbers do not jiggle as they change.
 
 **Everywhere**
@@ -306,48 +305,18 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Difficulty: in the bus lobby, each Horde level shows a line saying what it means. A sped-up Normal ride with bots should see the horde catch the bus several times; Easy should rarely see it close.
 - Fallen riders: a bus ride with three bots. The crew list shows `212 W 31%` per rider. When a bot falls off, a red banner "X is off the bus: everyone else +5% …" shows under the event header, the top rider gets 💪, and both go when they are hauled back.
 - Bus on gears: in the bus lobby pick Gears under Your effort; your seat shows "⚙ Gears". Start with bots and the simulator: the power panel says "⚙ Gears", the GEAR tile sits under it, Z X and the arrows shift, `;` `'` change shift strength, and `E` switches back to ERG (the tile hides).
-- VO2 Madness on gears: in the lobby pick VO2 Madness and Gears; in the ride the GEAR tile shows and Z X shift; the effort leaderboard still scores heart rate.
 - Trainer mode per ride: as driver pick 🚲 Trainers "All gears"; a second rider's ERG / Gears switch hides and their seat shows "⚙ Gears". In the ride `E` only shows a toast. Back to "Each rider" and their own pick returns.
 - Drafting: in a group-ride lobby the host sees Drafting Off / Realistic / Strong; a guest sees the level and what it means. In the ride on Strong behind bots, the HUD's drafting watts climb as more riders are close ahead.
 - Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.
 - Bike skins: with scrap (or a test profile), buy and equip Indoor Escapee in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
 - Rarity: the Garage shows a Common / Rare / Epic / Legendary badge on every item, epic and legendary cards have a coloured frame, and the four new silly items have 3D previews.
 
-## Kidney Stone Express (2026-11-14)
+## Crew games cut to Zombie Bus (17/11/2026, foundation plan 1.2)
 
-Built against the simulated trainer and bots, and looked at in headless Chromium stills only (`docs/screenshots/games/`). Nobody has ridden it. `scripts/e2e.sh` now plays a whole shift with three bots after the bus ride. For a quick look by hand run the server with `ZB_TIME_SCALE=20` (a 41 min shift in about two minutes) or `ZB_SCRIPT_SCALE=0.125` (a five minute shift at real speed).
-
-- Lobby: the game picker is a row of cards; Kidney Stone Express is live, Speed Dating and Climate Lawsuit say "Coming soon". Pick it, add three bots, "Start the shift". Everyone is on gears whatever was chosen: no ERG target is ever sent.
-- Ride: the game panel sits under the power panel and a smaller gear tile. It shows the patient and their latest line, Comfort (green, amber, red), the van on its way to the hospital with distance, speed and ETA against par, and the last review. The power panel's chip shows your band in watts and the needle is green anywhere inside it.
-- Events: a green wave, M1 roadworks, a speed hump and "somebody won't pull over" each fill the orange box with a countdown. As the siren rider the box turns red, says YOU, the power panel reads Sprint and the light bar flashes. Bluey (a bot) is fined in every roadworks.
-- Hospital: the last 15 s shows "Hospital ahead"; the hospital slides up on the right. Arrive hot and the splash says "OUT THE BACK DOORS", the phase reads Reversing for 30 s and a stretcher sits by the van. Let Comfort hit zero and "THE PATIENT IS WALKING".
-- Ramping: "Sweet-talk triage" fills when the crew spins easy and fast; a full bar gives "One free spike" or "Green wave next run".
-- Results: Shift score, Delivered n / 5, Rating, a Google review per patient, the awards (Paramedic of the Week, Learner Driver, Lead Foot) and the crew table with spread, spikes and fines.
-- TV view (`/?watch=CODE`): the same panel in place of the bus status, the ambulance and the hospital.
-- Dev pages: `/hud-dev.html?game=ambo&state=run|event|siren|me|brake|ramp|reverse|base|cool` (add `&fx=fellout` or `&ask=1`), `/scene-dev.html?ambo=1&siren=1&dist=40&fell=1`.
-- Not checked: any of it on a real trainer (how noisy real power is against the Comfort tolerances is the big unknown), phones and tablets, the announcer's lines, the postcard, Strava text against the real Strava.
-
-## Speed Dating and Climate Lawsuit (2026-11-14)
-
-Same footing as Kidney Stone Express: simulated trainer and bots, headless stills only (`docs/screenshots/games/`), and both are in `scripts/e2e.sh`. Nobody has ridden either.
-
-- Speed Dating: pick it, add three bots, "Open the bar". In The Bar a sheet asks for your dating profile (keys 1 to 3). On each date the panel shows your date, their profile and last emoji, both of you against the band (you ▼, them ▲), chemistry, the emoji tray (five a date) and the couples table; couples ride side by side with a heart that grows with the match. A Chaperone card turns the box orange (red when it is aimed at you). The Wedding rides as a tandem under confetti; the Divorce pulls a rope. Results: Chemistry, Married, Kept the house, the couples, the leaked group chat, the awards and each rider's red flags.
-- Climate Lawsuit: pick it, add three bots, "Start the 1980s". The town replaces the road; your station and its rider sit on the ridge. Before each decade a sheet offers coal, gas, solar and wind with their costs. Solar earns only in its band ("Clouds came over" when you leave it), wind only on gusts. The sea rises through Beach, Surf club, Main Street and Everything; "Build a seawall" spends coins. At the Trial everyone's emissions and bribes come out, the jury votes on an effort and the defendant holds it or is found guilty. A guilty rider in a flooded town wears a red GUILTY ribbon on their name tag in every game for 30 days.
-- Not checked: real trainers, phones and tablets, the announcer, and whether the flood mark suits real riders (bots ride band middles; real riders above them will flood sooner).
-- Test speed-up artefact: with `?fast=` in the browser and `ZB_TIME_SCALE` on the server, your own Time in zone (server game time) can read longer than the Duration (the browser's sped-up recording). They agree at normal speed.
-
-## Watch Party (2026-11-14)
-
-Needs the internet (YouTube). Not in `scripts/e2e.sh` for that reason.
-
-- In the lobby pick Watch Party, pick a workout (ERG works as on the bus), "Start the show". Paste a YouTube link in the panel and Add: the video starts behind the workout HUD for everyone. Later links queue; anyone can add.
-- Driver only: ⏪ 30 s, Pause/Play, 30 s ⏩ and Next. Everyone's video follows within a couple of seconds. A guest's panel has no remote.
-- Join late from a second browser: the video starts at the room's spot, not the beginning. Drag a guest's own YouTube scrubber away: it jumps back.
-- A guest whose browser blocks sound on autoplay sees "▶ Tap to start the video" after about three seconds.
-- A video whose owner blocks embedding shows a toast saying so. An ad on one rider's video holds only that rider's video; it jumps to the room's spot when the ad ends.
-- `/watch-dev.html` has two players on one clock with play, pause, +30 s and load.
-- Volume dip: in a watch party with sound on, the video goes quiet for the five seconds before each change of target (the 5, 4, 3, 2, 1 beeps) and comes back after. Not yet checked by ear.
-- Other sources: paste a Twitch channel link (twitch.tv/name) or a link to a video file (.mp4, .webm). Twitch shows the live stream with no syncing; a file plays in step like YouTube. Checked in headless Chromium with a Wikimedia WebM and Twitch's gcn channel.
+- Home: "Crew games" shows one Zombie Bus card; it opens a bus lobby. The lobby shows the bus card with no Switch game button.
+- A ride, solo and crew, plays exactly as before: lobby, workout and difficulty, ERG or gears, bots, roadblocks, falling off, bosses, streak air support and cinematics, crew cards, TV view (`/?watch=CODE`), results.
+- History: an old ride from VO2 Madness, Kidney Stone Express or another game that has gone still lists with the game's name, opens, shows the plain crew numbers and saves a postcard.
+- Not checked yet: any of it in a browser.
 
 ## Training plans (2026-11-14)
 

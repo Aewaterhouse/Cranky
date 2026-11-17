@@ -22,14 +22,6 @@ const LINES: Record<string, string[]> = {
     'Gunship is up. The crew has the high ground.',
     'Gunship overhead. Zombies, meet the boys.',
   ],
-  go: ['Go. Make it hurt.', 'Interval on. Find the red.', 'Off you go. No hiding.'],
-  box: ['Mystery box. Brace yourselves.', 'Box is open. Somebody is going to cry.'],
-  crown: [
-    '{name} is trying hardest. Look at that heart rate.',
-    'Crown to {name}. Suffering beautifully.',
-  ],
-  lead: ['{name} takes the lead.'],
-  sandbag: ['{name} is having a picnic.', '{name}, the interval started a while ago.'],
   challenge: ['{name}, you are up.', 'Challenge for {name}.'],
   challenge_won: ['Nailed it.'],
   challenge_lost: ['Never mind.'],
@@ -40,31 +32,6 @@ const LINES: Record<string, string[]> = {
   GREAT: ['Not bad at all.', 'Good sprint.'],
   MEGA: ['Now we are talking.', 'Ripper.'],
   LEGEND: ['Strewth. All-time best.', 'Legend. Bolt a trophy on the bus.'],
-  delivered: [
-    'Patient delivered. Mostly intact.',
-    'Signed for. Next.',
-    'Handed over. Lovely driving.',
-  ],
-  fellout: [
-    'The patient has left the vehicle. Reverse. Slowly.',
-    'Back doors. Somebody check the back doors.',
-  ],
-  walked: [
-    'The patient is walking. They will beat us there.',
-    'They have got out. That is a one star review.',
-  ],
-  fine: ['{name}, that is a speeding fine.', 'Roadworks, {name}. Sixty means sixty.'],
-  perk: ['Triage owes us a favour.'],
-  match: ['Now that is chemistry.', 'Get a room. A well ventilated one.'],
-  card: ['The Chaperone has opinions.', 'Card played. Somebody is about to suffer.'],
-  engaged: ['They are engaged. Somebody tell the group chat.'],
-  married: ['Just married. Tandem for life.'],
-  divorced: ['{name} keeps the house.'],
-  stage: ['The sea is coming up. Nobody panic.', 'That used to be a beach.'],
-  flood: ['The town has flooded. Lawyers, start your engines.'],
-  blackout: ['Blackout. The whole town is in the dark.'],
-  wall: ['A seawall. Not designed by an engineer.'],
-  verdict: ['The court has reached a verdict.'],
 }
 const MIN_GAP_MS = 3500
 let last = 0

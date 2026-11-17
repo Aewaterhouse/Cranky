@@ -1,13 +1,13 @@
 import { api } from '../core/api'
-import { GAMES } from '../modes/crew/games'
-import type { Game } from '../net/protocol'
+import { gameOf } from '../modes/crew/games'
 import { h } from './dom'
 import { toast } from './toast'
 
 interface Planned {
   n: number
   at: string
-  game: Game
+  /** The crew game: the bus, or one that has gone on a ride planned before it went. */
+  game: string
   note: string
   host: string
   hostName: string
@@ -27,7 +27,7 @@ const when = (at: string) =>
 /** An .ics file for a planned ride, so it lands in the rider's own calendar with a 10 minute reminder. */
 function ics(p: Planned) {
   const t = p.at.replace(/[-:]/g, '') + '00Z'
-  const name = GAMES[p.game]?.name ?? p.game
+  const name = gameOf(p.game)?.name ?? p.game
   const body = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -59,13 +59,6 @@ function ics(p: Planned) {
  */
 export function comingUp(me: string) {
   const list = h('div', { class: 'feed' })
-  const game = h(
-    'select',
-    {},
-    ...(Object.keys(GAMES) as Game[]).map((g) =>
-      h('option', { value: g }, `${GAMES[g].icon} ${GAMES[g].name}`),
-    ),
-  )
   const at = h('input', { type: 'datetime-local' })
   const note = h('input', { placeholder: 'A note (optional)', maxlength: 120 })
   // Quick picks: tonight, tomorrow morning, the weekend mornings.
@@ -107,13 +100,12 @@ export function comingUp(me: string) {
         const utc = new Date(at.value).toISOString().slice(0, 16)
         api('/api/schedule', {
           method: 'POST',
-          body: JSON.stringify({ at: utc, game: game.value, note: note.value }),
+          body: JSON.stringify({ at: utc, game: 'bus', note: note.value }),
         })
           .then(() => ((form.hidden = true), load()))
           .catch(() => toast('Could not plan that ride', 'bad'))
       },
     },
-    game,
     chips,
     at,
     note,
@@ -136,11 +128,11 @@ export function comingUp(me: string) {
     return h(
       'div',
       { class: 'feed-row' },
-      h('span', { class: 'gc-icon' }, GAMES[p.game]?.icon ?? '🗓️'),
+      h('span', { class: 'gc-icon' }, gameOf(p.game)?.icon ?? '🗓️'),
       h(
         'span',
         {},
-        h('b', {}, `${GAMES[p.game]?.name ?? p.game} · ${when(p.at)}`),
+        h('b', {}, `${gameOf(p.game)?.name ?? p.game} · ${when(p.at)}`),
         h('small', { class: 'dim' }, ` ${p.note ? `${p.note} · ` : ''}${p.names.join(', ')}`),
       ),
       h(
@@ -186,7 +178,7 @@ export function comingUp(me: string) {
         )
         if (soon)
           toast(
-            `${GAMES[soon.game]?.name ?? 'Your ride'} starts ${when(soon.at)}. Open the lobby when the crew is ready.`,
+            `${gameOf(soon.game)?.name ?? 'Your ride'} starts ${when(soon.at)}. Open the lobby when the crew is ready.`,
             'good',
           )
       })

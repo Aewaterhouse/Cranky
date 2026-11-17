@@ -11,17 +11,7 @@ from fastapi import WebSocket
 
 from . import bots, discord, room_handle, room_tick
 from . import config as C
-from .modes.ambulance import Ambulance
-from .modes.climate import Climate
 from .modes.common import counted, mark_test
-from .modes.dating import Dating
-from .modes.galley import Galley
-from .modes.hunt import Hunt
-from .modes.last_standing import LastStanding
-from .modes.pub_quiz import PubQuiz
-from .modes.ttt import TeamTrial
-from .modes.vo2_madness import Vo2Madness
-from .modes.watch import Watch
 from .modes.zombie_bus import ZombieBus, roll_weather, weekly_mutator
 from .plan import generate, load_plans, total
 from .rider import Rider
@@ -30,19 +20,7 @@ if TYPE_CHECKING:
     from .store import Store
 
 __all__ = ["MODES", "Rider", "Room"]
-MODES = {
-    "bus": ZombieBus,
-    "madness": Vo2Madness,
-    "ambo": Ambulance,
-    "date": Dating,
-    "climate": Climate,
-    "watch": Watch,
-    "last": LastStanding,
-    "ttt": TeamTrial,
-    "quiz": PubQuiz,
-    "galley": Galley,
-    "hunt": Hunt,
-}
+MODES = {"bus": ZombieBus}
 
 
 class Room:
@@ -124,14 +102,15 @@ class Room:
     def from_dict(cls, d: dict, store: Store | None = None) -> Room:
         """Rebuilds a room with every rider disconnected. A running room stays paused until a rider joins."""
         room = cls(d["code"], store)
+        if d.get("game", "bus") not in MODES:  # a room of a game that has gone: an empty bus lobby
+            return room
         room.host, room.state, room.plan_id = d["host"], d["state"], d["plan_id"]
         room.minutes, room.plan, room.el = d["minutes"], d["plan"], d["el"]
         room.difficulty = d.get("difficulty", "normal")
         room.campaign = d.get("campaign", False)
         room.trainers = d.get("trainers", "choose")
         room.riders = {x["id"]: Rider.from_dict(x) for x in d["riders"]}
-        room.game = d.get("game", "bus")
-        room.mode = MODES[room.game].from_dict(d["mode"])
+        room.mode = ZombieBus.from_dict(d["mode"])
         room.paused = room.state == "running"
         for r in room.riders.values():
             r.connected = r.bot
@@ -156,11 +135,11 @@ class Room:
             "state": self.state,
             "plan": self.plan,
             "minutes": self.minutes,
-            "mutator": weekly_mutator(game=self.game) if self.difficulty != "easy" else None,
+            "mutator": weekly_mutator() if self.difficulty != "easy" else None,
             "difficulty": self.difficulty,
             "trainers": self.trainer_mode,
             "game": self.game,
-            "trophies": self.store.legends() if hasattr(self.store, "legends") and self.game == "bus" else 0,
+            "trophies": self.store.legends() if hasattr(self.store, "legends") else 0,
             "campaign": self.campaign_view(),
             "riders": [
                 {
@@ -182,7 +161,7 @@ class Room:
 
     def campaign_view(self) -> dict | None:
         """The campaign leg this bus ride counts as, for the lobby, or None when it is a one-off."""
-        if not (self.campaign and self.game == "bus" and hasattr(self.store, "campaign")):
+        if not (self.campaign and hasattr(self.store, "campaign")):
             return None
         c, stops = self.store.campaign(), C.CAMPAIGN_STOPS
         return {
@@ -233,42 +212,29 @@ class Room:
 
     @property
     def trainer_mode(self) -> str:
-        """The ride's trainer mode: the host's pick, or gears for everyone in a game that is never on ERG."""
-        return "gears" if MODES[self.game].no_erg else self.trainers
+        """The ride's trainer mode: the host's pick (erg, gears or choose)."""
+        return self.trainers
 
     def erg_of(self, r: Rider) -> bool:
         """Whether the rider is on ERG: the ride's mode, or the rider's own when they choose."""
         return r.erg if self.trainer_mode == "choose" else self.trainer_mode == "erg"
 
-    def aim(self, r: Rider, i: int, bel: float) -> tuple[int | None, tuple[int, int] | str | None]:
-        """A rider's target watts and band in block `i`: the game's band if it sets one, else the plan's."""
-        band = self.mode.band(self, r, i, bel) if i >= 0 else None
-        if band is None:
-            return (r.target(self.plan["blocks"][i], bel, self.load) if i >= 0 else None), None
-        if isinstance(band, str):
-            return None, band
-        lo, hi = r.band_w(*band)
-        return round((lo + hi) / 2), (lo, hi)
+    def aim(self, r: Rider, i: int, bel: float) -> int | None:
+        """A rider's target watts in block `i`, from the plan and the rider's tier."""
+        return r.target(self.plan["blocks"][i], bel, self.load) if i >= 0 else None
 
     def deal(self) -> None:
-        """Builds the plan for the chosen game: its own (a fresh one each time), or the picked workout."""
-        self.plan = MODES[self.game].deal(self.minutes) or generate(load_plans()[self.plan_id], self.minutes)
+        """Builds the plan from the picked workout."""
+        self.plan = generate(load_plans()[self.plan_id], self.minutes)
 
     def start(self) -> None:
-        # a game that deals its own plan deals again, so nobody has seen the order in the lobby
-        self.plan = MODES[self.game].deal(self.minutes) or self.plan
-        mut = weekly_mutator(game=self.game) if self.difficulty != "easy" else None
-        mode = ZombieBus(self.difficulty, mut) if self.game == "bus" else MODES[self.game](self.difficulty)
-        if self.game != "bus":
-            mode.mut = mut or {}
-        else:
-            mode.weather = roll_weather(random.Random())
-            if self.campaign_view():
-                mode.armour = float(self.store.campaign()["armour"])
+        mode = ZombieBus(self.difficulty, weekly_mutator() if self.difficulty != "easy" else None)
+        mode.weather = roll_weather(random.Random())
+        if self.campaign_view():
+            mode.armour = float(self.store.campaign()["armour"])
         self.state, self.el, self.mode, self.summary = ("running", -float(C.COUNTDOWN_S), mode, None)
         for r in self.riders.values():
             r.reset_stats()
-        self.mode.begin(self)
         self.task = asyncio.create_task(self.run())
 
     async def run(self) -> None:
@@ -276,12 +242,11 @@ class Room:
         total_s = total(self.plan["blocks"])
         while self.state == "running":
             await asyncio.sleep(dt / C.TIME_SCALE)
-            held = self.mode.holds(self)
-            self.el += 0 if held else dt
+            self.el += dt
             if self.el >= total_s:
                 await self.finish()
                 return
-            await self.broadcast(self.step(0 if held else dt))
+            await self.broadcast(self.step(dt))
             if time.monotonic() - self.saved_at >= C.SNAPSHOT_S:
                 self.save()
 
@@ -306,9 +271,7 @@ class Room:
         await self.broadcast({"t": "end", "summary": self.summary})
         if not real:
             return await self.lobby()
-        if (
-            self.store and self.game != "watch"
-        ):  # the season ladder: bus scores, and rides and awards in every game
+        if self.store:  # the season ladder
             self.store.add_result(self.plan["name"], {**real, "game": self.game})
         text = discord.format_summary(self.plan["name"], real)
         self.chat = asyncio.create_task(asyncio.to_thread(discord.post, text))
