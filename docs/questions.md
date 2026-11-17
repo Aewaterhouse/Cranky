@@ -15,3 +15,8 @@ Items from `docs/ride-notes-plan.md` that need a decision or a real trainer. Eac
 3. The crew chooses who takes the extra: a "Carry them" button gives one rider the whole load for double scrap.
 4. Haul-back as a team job: the fallen rider comes back sooner the harder the rest ride over target.
 **Recommendation:** 2 then 4. Splitting the real watts is the fairest and reads well with the share % now in the crew list; a team haul-back gives the crew something to do about it. Option 3 needs a new control mid-ride and is the least clear on a trainer.
+
+## Zombie Bus bits that only paid scrap (foundation plan 1.4)
+**Question:** the lookout crew role, the "Short and brutal" leg at the servo vote and the Scrap Rush weekly twist only ever paid scrap, so they went with it. Should any come back with a different reward?
+**Options:** leave them out; bring back the lookout with a gap or armour reward; bring back the brutal leg with a gap reward.
+**Recommendation:** leave them out. The vote may go with the Servo Stop in 1.5 anyway, and three roles still deal round the bus.

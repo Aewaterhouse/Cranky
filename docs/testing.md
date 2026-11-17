@@ -49,12 +49,12 @@ Close MyWhoosh/Wahoo apps first.
 
 ## Phase 3: Zombie Bus rules
 
-- Fell off: hold under 60% compliance for 30 s. Rider drops one tier, ERG eases, others get a 20 s haul-back effort for bonus scrap.
+- Fell off: hold under 60% compliance for 30 s. Rider drops one tier, ERG eases, others get a 20 s haul-back effort to haul them back aboard.
 - Roadblock: all riders sprint with ERG off; grades add damage; MEGA/LEGEND give slow-mo. A fail costs armour and gap.
 - Horde surge: unders let zombies grab, clean overs shake them off.
 - Engine in tune: all riders within 5 rpm of each other for 8 s gives the x1.25 speed bonus and indicator.
 - Long haul: staying out of zone lets the horde close in; armour at zero means limp.
-- Servo Stop: the shop appears in the HUD; buy plating, repellent and sync with the tin's scrap and check the bus numbers change.
+- Servo Stop: the shop appears in the HUD; take one free upgrade (plating, repellent or sync) and check the bus numbers change and the shop closes.
 - Awards at the end: Iron Lungs, Fell Off King, Roadblock MVP, Sync Master, PR Hunter.
 
 ## Results log
@@ -225,8 +225,8 @@ Everything here was built against the simulated trainer and looked at in still s
 
 **The week**
 
-13. Free ride setup shows "This week": a route of the week (outlined in the grid, "Pick it" selects it) and the weekly climb bar. Finish the route of the week: the summary shows "+30 scrap", the card says "Banked", and the balance in the header goes up. Finish it again: no second payment.
-14. Climb past the weekly target (600 m for a new rider): "+50 scrap" once.
+13. Free ride setup shows "This week": a route of the week (outlined in the grid, "Pick it" selects it) and the weekly climb bar. Finish the route of the week: the summary shows "Done: Route of the week: …" and the card says "Done". Finish it again: it is not ticked off a second time.
+14. Climb past the weekly target (600 m for a new rider): "Done: Weekly climb: …" once.
 
 **History**
 
@@ -298,9 +298,9 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Downloads through the server: on a desktop, results screen and History, Download .fit, Export JSON and Save postcard each download straight away (the network tab shows a `PUT /api/rides/files/...` first). With touch emulation on (pointer: coarse), each shows the sheet with Save and Copy link; a postcard shows its picture. The link stops working after 10 minutes.
 - History with a ride waiting to upload: stop the server, finish a 1 min solo ride, open History. The ride shows under "Waiting to upload" with Download .fit and Export JSON. Start the server and reopen History: it has gone up and is in the list.
 - Postcards in History: open a free ride and a solo workout in History and tap Save postcard. Each gives a PNG on the sky with the ride's power as hills; the free ride shows distance and climbing, the workout NP and TSS.
-- Bus postcard in History: ride a short bus ride with bots, then open it in History and tap Save postcard. The Zombie Bus card shows the score, distance, armour, sync, scrap, crew and awards on the sky background.
+- Bus postcard in History: ride a short bus ride with bots, then open it in History and tap Save postcard. The Zombie Bus card shows the score, distance, armour, sync, crew and awards on the sky background.
 - Bus countdown: a sped-up bus ride with bots (`ZB_TIME_SCALE`). Before each change of target the top centre shows "Next: 250 W" and a big 5, 4, 3, 2, 1 with a beep each; before a sprint only the SPRINT INCOMING splash shows.
-- Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with the scrap count and "Open shop", which brings the cards back. At the next servo stop it opens in full.
+- Servo Shop close: on a bus ride at a servo stop, tap "✕ Close": the shop folds to a bar with "Open shop", which brings the cards back. At the next servo stop it opens in full.
 - Rear-view mirror: `/scene-dev.html?riders=3&gap=60` shows a framed strip top centre with the horde in it; `gap=none` hides it; `mad=1` has none. Debug panel (`g`), Rear-view mirror folder, changes its size and place.
 - Difficulty: in the bus lobby, each Horde level shows a line saying what it means. A sped-up Normal ride with bots should see the horde catch the bus several times; Easy should rarely see it close.
 - Fallen riders: a bus ride with three bots. The crew list shows `212 W 31%` per rider. When a bot falls off, a red banner "X is off the bus: everyone else +5% …" shows under the event header, the top rider gets 💪, and both go when they are hauled back.
@@ -308,7 +308,7 @@ Built against the simulated trainer and looked at in still screenshots from head
 - Trainer mode per ride: as driver pick 🚲 Trainers "All gears"; a second rider's ERG / Gears switch hides and their seat shows "⚙ Gears". In the ride `E` only shows a toast. Back to "Each rider" and their own pick returns.
 - Drafting: in a group-ride lobby the host sees Drafting Off / Realistic / Strong; a guest sees the level and what it means. In the ride on Strong behind bots, the HUD's drafting watts climb as more riders are close ahead.
 - Route sections: Free ride shows "Real rides" (Mondo, Full Gas Friday, Mount Coot-tha Back, Darren Smith, Metros, Nundah, Howick Street) above "Classic climbs and roads"; the state and length filters still apply to both.
-- Bike skins: with scrap (or a test profile), buy and equip Indoor Escapee in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
+- Bike skins: equip Indoor Escapee (free) in the Garage; in free ride your bike sits on its trainer on the road, and the crew sees it in a group ride. A frame colour skin recolours the frame on the bus and the road.
 - Rarity: the Garage shows a Common / Rare / Epic / Legendary badge on every item, epic and legendary cards have a coloured frame, and the four new silly items have 3D previews.
 
 ## Crew games cut to Zombie Bus (17/11/2026, foundation plan 1.2)

@@ -47,7 +47,7 @@ export const SFX = {
   MEGA: () => seq([523, 659, 784, 1047, 1319], 0.08),
   LEGEND: () => seq([523, 659, 784, 1047, 784, 1047, 1319, 1568], 0.1, 'sawtooth'),
   cue: () => (beep(784, 0.5, 'sine', 0.05), beep(1047, 0.7, 'sine', 0.05, 0.15)),
-  scrap: () => seq([1200, 1600], 0.05, 'triangle'),
+  clink: () => seq([1200, 1600], 0.05, 'triangle'),
   /** A rider's 📯: the stock bus horn (two notes, twice), or the Garage horn they bought. */
   horn: (kind?: string) => {
     if (kind === 'horn-cow') return seq([196, 185, 175, 165, 147], 0.14, 'sawtooth')

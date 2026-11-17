@@ -89,7 +89,7 @@ describe('test rides (simulated trainer)', () => {
     expect(RideRecorder.fromJSON(old as ReturnType<RideRecorder['toJSON']>).sim).toBe(false)
   })
 
-  it('a test ride earns nothing: no bests, totals, streak, scrap or badges', () => {
+  it('a test ride earns nothing: no bests, totals, streak or badges', () => {
     const rec = new RideRecorder(plan, 200)
     for (let i = 0; i < 1200; i++) rec.sample(0, 250, 90, 180, 1, true, null)
     const p = newProfile('a', 'A', 200)
@@ -98,7 +98,7 @@ describe('test rides (simulated trainer)', () => {
     rec.sim = true
     const test = rideRewards(p, rec.summary())
     expect(test.p).toBe(p)
-    expect([test.unlocked, test.banked, test.week.won]).toEqual([[], 0, []])
+    expect([test.unlocked, test.week.won]).toEqual([[], []])
   })
 
   it("a test rider has no best bit and doesn't push a real rider down the crew", () => {

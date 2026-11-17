@@ -188,7 +188,7 @@ def test_the_room_hands_the_weeks_twist_to_the_bus(monkeypatch):
     from zombie_bus_server import session
 
     async def main():
-        want = config.MUTATORS[3]
+        want = next(m for m in config.MUTATORS if m["id"] == "bolts")
         monkeypatch.setattr(session, "weekly_mutator", lambda: want)
         room, ws = await lobby_with(1, code="TWST")
         assert room.lobby_msg()["mutator"] == want

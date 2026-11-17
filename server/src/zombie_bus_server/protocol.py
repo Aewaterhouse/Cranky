@@ -130,7 +130,7 @@ class Ready(BaseModel):
 
 class Buy(BaseModel):
     t: Literal["buy"]
-    item: Literal["plating", "repellent", "sync", "nitro", "ram", "magnet"]
+    item: Literal["plating", "repellent", "sync", "nitro", "ram"]
 
 
 class Act(BaseModel):
@@ -187,7 +187,6 @@ class Bus(BaseModel):
     dist: float
     armour: float
     gap: float
-    scrap: int
     sync: bool
     tune: bool
     rb: float | None

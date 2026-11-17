@@ -22,17 +22,17 @@ import type { Grade } from '../../types'
 import { roadSpectate } from '../freeRide/roadSpectate'
 
 const FX_SOUND: Record<string, () => void> = {
-  buy: SFX.scrap,
+  buy: SFX.clink,
   repel: SFX.shake,
   hit: SFX.hit,
   grab: SFX.grab,
   shake: SFX.shake,
   smash: SFX.MEGA,
   crash: SFX.hit,
-  hauled: SFX.scrap,
+  hauled: SFX.clink,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
-  drop: SFX.scrap,
+  drop: SFX.clink,
   airstrike: SFX.GREAT,
   gunship: SFX.MEGA,
 }
@@ -176,8 +176,7 @@ export function spectate(code: string, leaveTo: () => void) {
           3200,
           2,
         )
-      else if (fx.k === 'smash')
-        sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
+      else if (fx.k === 'smash') sp.splash('sp-smash', 'ROADBLOCK SMASHED!', '', 2800, 2)
       if (text) sp.line(fx.k, text, ['hit', 'grab', 'crash', 'fell'].includes(fx.k) ? 'bad' : '')
     }
     const b = m.bus

@@ -115,6 +115,10 @@ export const postcard = async (
     `${name(g).name.toLowerCase().replace(/\W+/g, '-')}-${new Date(date).toLocaleDateString('en-CA')}`,
   )
 
+/** The postcard's numbers line: plan, distance, armour on the bus, sync. */
+export const cardLine = (g: GroupSummary, planName: string) =>
+  `${planName} · ${((g.distance ?? 0) / 1000).toFixed(1)} km${(g.mode ?? 'bus') === 'bus' ? ` · armour ${Math.round(g.armour)}` : ''} · sync ${Math.round(g.syncPct ?? 0)}%`
+
 /** The bus postcard: the scene still (when there is one), the score, the crew and the awards. */
 export async function busCard(g: GroupSummary, planName: string) {
   const c = document.createElement('canvas')
@@ -161,11 +165,7 @@ export async function busCard(g: GroupSummary, planName: string) {
   x.fillText(`Score ${g.score ?? 0}`, 40, 530)
   x.fillStyle = '#eee'
   x.font = '28px system-ui'
-  x.fillText(
-    `${planName} · ${((g.distance ?? 0) / 1000).toFixed(1)} km${(g.mode ?? 'bus') === 'bus' ? ` · armour ${Math.round(g.armour)}` : ''} · sync ${Math.round(g.syncPct ?? 0)}% · ${g.scrap ?? 0} scrap`,
-    40,
-    580,
-  )
+  x.fillText(cardLine(g, planName), 40, 580)
   x.fillText(`Crew: ${(g.riders ?? []).map((r) => r.name).join(', ')}`, 40, 625)
   x.font = '24px system-ui'
   ;(g.awards ?? []).slice(0, 6).forEach((a, i) => {

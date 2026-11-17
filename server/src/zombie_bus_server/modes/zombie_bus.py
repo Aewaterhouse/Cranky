@@ -45,7 +45,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.dist = 0.0
         self.armour = float(self.mut.get("armour", 100))
         self.gap = float(C.GAP_START)
-        self.scrap = 0.0
         self.sync = False
         self.tune = False
         self.sync_s = 0.0
@@ -58,7 +57,7 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.hauls: dict[str, dict] = {}
         self.fx: list[dict] = []
         self.ev = ""
-        self.shopped = False  # anyone bought at this servo stop
+        self.shopped = False  # the crew took its free pick at this servo stop
         self.boss: dict | None = None  # the final fight: {i, kind, need (s on target), done}
         self.roles: dict[str, dict] = {}  # rider -> {role, held (s on the cue), ready (ride time)}
         self.highlights: list[dict] = []  # the ride's best moments for the results: {t (ride s), text}
@@ -68,9 +67,8 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.front: dict | None = None  # rolling turns: {id, t (turn start), s (compliance sum), n}
         self.wares: list[str] = []  # what this stop's shop offers
         self.ram = False
-        self.magnet = 1.0
         self.road_votes: dict[str, str] = {}  # the next leg, voted at the servo
-        self.leg: dict = {}  # the leg the crew picked: damage and scrap multipliers until the next stop
+        self.leg: dict = {}  # the leg the crew picked: its damage multiplier until the next stop
         self.repel = 0
         self.syncw = 0
         self.streak = 0.0
@@ -132,15 +130,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
         self.gap += C.NITRO_GAP * dt if boost else 0
         self.speed *= C.LIMP_MULT if self.armour <= 0 else 1
         self.dist += self.speed * dt
-        self.scrap += (
-            self.speed
-            * dt
-            * C.SCRAP_PER_M
-            * self.mut.get("scrap", 1)
-            * self.leg.get("scrap", 1)
-            * self.magnet
-            * C.WEATHER[self.weather].get("scrap", 1)
-        )
         neutral = C.NEUTRAL[ev]
         if ev == "longhaul":
             neutral += min(C.LONGHAUL_CREEP_MAX, C.LONGHAUL_CREEP * bel / 60)
@@ -197,11 +186,8 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             self.shopped = False
             rng = random.Random(f"{room.code}:{i}")
             self.road_votes = {r.id: rng.choice(list(C.LEGS)) for r in room.riders.values() if r.bot}
-            self.wares, self.magnet = (
-                sorted(rng.sample(sorted(C.SHOP), C.SHOP_OFFER), key=list(C.SHOP).index),
-                1.0,
-            )
-            self.emit("servo", f"Servo stop! {int(self.scrap)} scrap in the tin. Shop's open.")
+            self.wares = sorted(rng.sample(C.SHOP, C.SHOP_OFFER), key=C.SHOP.index)
+            self.emit("servo", "Servo stop! Shop's open: one free pick.")
         elif ev == "surge":
             self.emit("surge", "HORDE SURGE! Clean overs shake them off.")
         elif ev == "longhaul":
@@ -232,7 +218,6 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             if self.over and self.over["on"] and self.over["n"]:
                 if self.over["sum"] / self.over["n"] >= C.SHAKE_COMPLIANCE:
                     self.gap += C.SHAKE_GAP
-                    self.scrap += C.SHAKE_SCRAP
                     self.emit("shake", "Clean over! Shook them off.")
             if not over:
                 self.gap -= C.SURGE_GRAB
@@ -274,8 +259,7 @@ class ZombieBus(Boosts, BusView, Servo, CrewPlay, CrewGame):
             if r.st == "fell":
                 r.st = "riding"
             if others and h["sum"] / h["n"] >= C.HAUL_MIN:
-                self.scrap += C.HAUL_SCRAP
-                self.emit("hauled", f"Crew hauled {r.name} back aboard! +{C.HAUL_SCRAP} scrap", rid)
+                self.emit("hauled", f"Crew hauled {r.name} back aboard!", rid)
             else:
                 self.emit("hauled", f"{r.name} clambered back on.", rid)
 

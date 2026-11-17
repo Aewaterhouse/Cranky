@@ -1,6 +1,6 @@
 import type { BusState, RiderTick } from '../net/protocol'
 import { h } from './dom'
-import { pulse, set, tween } from './hudKit'
+import { pulse, set } from './hudKit'
 
 const GAP_MAX = 120
 const GAP_CLOSE = 25
@@ -17,15 +17,14 @@ const median = (a: number[]) => {
   return s.length ? (s[s.length >> 1] + s[(s.length - 1) >> 1]) / 2 : 0
 }
 
-/** Top-left bus status: armour, horde gap, speed/distance/scrap, engine sync and upgrade pips. */
+/** Top-left bus status: armour, horde gap, speed/distance, engine sync and upgrade pips. */
 export function makeBusPanel() {
   const t = (cls: string, v = '') => h('b', { class: cls }, v)
   const armourN = t('bs-n'),
     armourFill = h('i', {}),
     gapN = t('bs-n'),
     speed = t('bs-v'),
-    dist = t('bs-v'),
-    scrap = t('bs-v', '0')
+    dist = t('bs-v')
   const zombie = h('span', { class: 'bs-zed' }, '🧟')
   const busIco = h('span', { class: 'bs-bus' }, '🚌')
   const gapTrack = h('div', { class: 'bs-gap' }, zombie, busIco)
@@ -58,13 +57,7 @@ export function makeBusPanel() {
     armour,
     h('div', { class: 'bs-head' }, h('label', {}, 'HORDE GAP'), gapN),
     gapTrack,
-    h(
-      'div',
-      { class: 'bs-stats' },
-      stat('SPEED', speed, 'km/h'),
-      stat('DIST', dist, 'km'),
-      stat('SCRAP', scrap, '⚙'),
-    ),
+    h('div', { class: 'bs-stats' }, stat('SPEED', speed, 'km/h'), stat('DIST', dist, 'km')),
     h('div', { class: 'bs-head' }, h('label', {}, 'ENGINE SYNC'), syncState),
     syncTrack,
     h('div', { class: 'bs-head' }, h('label', {}, 'NITRO'), nitroState),
@@ -118,7 +111,6 @@ export function makeBusPanel() {
       gapTrack.classList.toggle('close', b.gap < GAP_CLOSE)
       set(speed, `${Math.round(b.speed * 3.6)}`)
       set(dist, (b.dist / 1000).toFixed(2))
-      tween(scrap, b.scrap)
       const ridersOn = Object.entries(riders).filter(
         ([, r]) => r.st === 'riding' && r.cad >= SYNC_MIN_CADENCE,
       )

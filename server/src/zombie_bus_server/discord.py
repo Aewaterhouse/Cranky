@@ -14,7 +14,7 @@ def format_summary(plan_name: str, s: dict) -> str:
     crew = ", ".join(f"{r['name']} {r['compliance']:.0%}" for r in s["riders"])
     lines = [
         f"🧟 **Zombie Bus** · {plan_name} · score **{s['score']}**",
-        f"{s['distance'] / 1000:.1f} km · armour {s['armour']} · sync {s['syncPct']}% · {s['scrap']} scrap",
+        f"{s['distance'] / 1000:.1f} km · armour {s['armour']} · sync {s['syncPct']}%",
         *(f"🏆 {a['award']}: {a['name']} ({a['why']})" for a in s["awards"]),
         f"Crew: {crew}",
     ]

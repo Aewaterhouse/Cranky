@@ -278,34 +278,6 @@ kbd {
   flex-wrap: wrap;
   margin-bottom: 12px;
 }
-.balance {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: baseline;
-  column-gap: 8px;
-  padding: 14px 22px;
-  border-radius: var(--r);
-  background: var(--card);
-  border: 2px solid var(--acc);
-  margin-bottom: 24px;
-}
-.balance b {
-  font: 2.4rem/1 var(--display);
-  color: var(--acc);
-}
-.balance .scrap-ico {
-  grid-row: span 2;
-  font-size: 2rem;
-  color: var(--acc);
-}
-.balance small {
-  grid-column: 2 / -1;
-  color: var(--dim);
-}
-.balance span:not(.scrap-ico) {
-  color: var(--dim);
-  font-weight: 600;
-}
 .slot {
   margin-bottom: 28px;
 }
@@ -348,9 +320,6 @@ kbd {
   margin-top: 4px;
   padding: 8px;
 }
-.item.owned .meta {
-  color: var(--fg);
-}
 .item.on {
   border-color: var(--tox);
   box-shadow: 0 0 0 3px rgb(127 209 59 / 0.15);
@@ -358,9 +327,6 @@ kbd {
 .item.on .meta {
   color: var(--tox);
   font-weight: 700;
-}
-.scrap-ico {
-  color: var(--acc);
 }
 
 /* Rider */

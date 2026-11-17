@@ -119,10 +119,10 @@
   gap: 12px;
   flex-wrap: wrap;
 }
-.res-scrap {
+.res-won {
   font-size: 1.05rem;
 }
-.res-scrap b {
+.res-won b {
   color: var(--tox);
   font: 400 1.3rem var(--display);
 }

@@ -17,11 +17,11 @@ describe('daily challenge', () => {
     expect(new Set(days).size).toBe(CHALLENGES.length)
     for (let d = 0; d < 20; d++) expect(dailyChallenge(d).id).not.toBe(dailyChallenge(d + 1).id)
   })
-  it('pays once a day for a ride that does it', () => {
-    const p = { ...newProfile('a'), scrap: 10 }
+  it('ticks off once a day for a ride that does it, with no scrap', () => {
+    const p = { ...newProfile('a'), scrap: 10 } // an old stored balance, left alone
     const first = dailyReward(p, ride(), 100)
-    expect(first.won?.scrap).toBe(25)
-    expect(first.p.scrap).toBe(35)
+    expect(first.won).toEqual({ text: `Daily challenge: ${dailyChallenge(100).text}` })
+    expect(first.p).toMatchObject({ dailyPaid: 100, scrap: 10 })
     expect(dailyReward(first.p, ride(), 100).won).toBeNull()
     expect(dailyReward(first.p, ride(), 101).won).not.toBeNull()
   })

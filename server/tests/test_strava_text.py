@@ -117,3 +117,11 @@ def test_old_rides_in_games_that_have_gone_still_get_a_plain_post():
         title, about = describe({"group": {"mode": mode, "awards": [{"award": "X"}, "junk"]}}, "luke")
         assert " · Ride" in title and "Crew score" not in about and "🏆 X: ?" in about
     assert describe({"group": {"mode": "madness"}}, "luke")[0] == "🤯 VO2 Madness · Ride"
+
+
+def test_an_old_bus_ride_with_scrap_still_posts_and_never_mentions_it():
+    old = copy.deepcopy(BUS)
+    old["group"]["scrap"] = 412
+    title, about = describe(old, "luke")
+    assert title.startswith("🧟 Zombie Bus · ") and "Score 1234" in about
+    assert "scrap" not in (title + about).lower()

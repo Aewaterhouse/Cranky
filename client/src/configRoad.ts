@@ -206,11 +206,10 @@ export const ROAD_CFG = {
     /** Brisbane routes start within `km` of the city. */
     brisbane: { at: [153.03, -27.47], km: 25 },
   },
-  /** Weekly goals: scrap for finishing the featured route, and the rider's own climbing target. */
+  /** Weekly goals: finishing the featured route, and the rider's own climbing target. */
   weekly: {
-    featuredScrap: 30,
     /** The target is `stretch` times the average of the last `weeks` weeks with any climbing, to the nearest `roundM`. */
-    vert: { defaultM: 600, minM: 300, maxM: 6000, stretch: 1.1, roundM: 50, weeks: 4, scrap: 50 },
+    vert: { defaultM: 600, minM: 300, maxM: 6000, stretch: 1.1, roundM: 50, weeks: 4 },
   },
   /**
    * Group rides. `draft` and `band` mirror DRAFT_* and BAND_* in the server's config.py (the server decides; the

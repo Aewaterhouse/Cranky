@@ -1,13 +1,9 @@
-import { CFG } from '../config'
 import type { Profile } from '../core/curve'
 import { ROUTE_INDEX, type RouteSummary } from '../core/routeLibrary'
 import { dailyChallenge, dayOf } from '../core/daily'
 import { featuredRoute, weekState } from '../core/weekly'
 import { h } from './dom'
-import { scrapIcon } from './garage'
 import { UNIT } from './units'
-
-const W = CFG.weekly
 
 /**
  * This week's two goals: the featured route (the same for every rider) and the rider's own climbing target
@@ -17,14 +13,6 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
   const feat = featuredRoute(ROUTE_INDEX)
   const s = weekState(p)
   const frac = Math.min(1, s.vertM / s.targetM)
-  const reward = (scrap: number, done: boolean) =>
-    h(
-      'span',
-      { class: `wk-pay${done ? ' done' : ''}` },
-      done ? 'Banked ' : '',
-      scrapIcon(),
-      ` ${scrap}`,
-    )
   return h(
     'section',
     { class: 'panel week' },
@@ -53,9 +41,8 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
               s.featuredDone
                 ? 'Done. It will still be there next time.'
                 : feat.loop
-                  ? 'Finish a lap of it for a bonus.'
-                  : 'Finish it for a bonus.',
-              reward(W.featuredScrap, s.featuredDone),
+                  ? 'Finish a lap of it.'
+                  : 'Finish it.',
               pick ? h('button', { class: 'ghost', onclick: () => pick(feat) }, 'Pick it') : '',
             ),
           )
@@ -71,7 +58,6 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
           p.dailyPaid === dayOf()
             ? 'Done. A new one tomorrow.'
             : 'Any ride counts. A new one every day.',
-          reward(CFG.daily.scrap, p.dailyPaid === dayOf()),
         ),
       ),
       h(
@@ -90,7 +76,6 @@ export function weekCard(p: Profile, pick?: (r: RouteSummary) => void) {
           s.vertDone
             ? 'Target climbed. The stairs at work can wait.'
             : 'Free-ride climbing this week, Monday to Sunday.',
-          reward(W.vert.scrap, s.vertDone),
         ),
       ),
     ),

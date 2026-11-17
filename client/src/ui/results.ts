@@ -75,7 +75,7 @@ export function finishRide(
     return onDone(profile)
   }
   const before = profile.allTime
-  const { p: earned, unlocked, banked, myAwards, week } = rideRewards(profile, s, group)
+  const { p: earned, unlocked, week } = rideRewards(profile, s, group)
   let p = earned
   saveProfile(p)
   // The crew's result rides along (without the scene still) so History can rebuild the bus postcard.
@@ -192,7 +192,7 @@ export function finishRide(
               'div',
               { class: 'card test-ride' },
               h('b', {}, 'Test ride (simulator). '),
-              'It is in your History, but it counts for nothing: no bests, streaks, scrap, badges, ladder or Strava.',
+              'It is in your History, but it counts for nothing: no bests, streaks, badges, ladder or Strava.',
             )
           : '',
       level(p).n > level(profile).n
@@ -204,15 +204,6 @@ export function finishRide(
           )
         : '',
       ...unlocked.map(badgeCard),
-      banked
-        ? h(
-            'div',
-            { class: 'card hl res-scrap' },
-            h('b', {}, `+${banked} scrap`),
-            ` earned${myAwards ? ` (incl. ${myAwards} award bonus)` : ''}. You have ${p.scrap}. `,
-            h('a', { href: '#garage' }, 'Spend it in the Garage →'),
-          )
-        : '',
       // The weekly streak, the same count home shows, so it is one number everywhere.
       p !== profile && p.stats.streak > 1
         ? h(
@@ -279,12 +270,7 @@ export function finishRide(
       road && !race ? roadSection(road, profile.id) : '',
       segmentSection(s.segments),
       ...week.won.map((w) =>
-        h(
-          'div',
-          { class: 'card hl res-scrap' },
-          h('b', {}, `+${w.scrap} scrap`),
-          ` ${w.text}. Balance: ${p.scrap}.`,
-        ),
+        h('div', { class: 'card hl res-won' }, h('b', {}, 'Done: '), `${w.text}.`),
       ),
       ftpBox,
       p === profile ? '' : nextUp(p),

@@ -1,43 +1,17 @@
 import type { ShopItem } from '../net/protocol'
 import { h } from './dom'
-import { pulse, set } from './hudKit'
+import { pulse } from './hudKit'
 
-const ITEMS: { id: ShopItem; icon: string; name: string; desc: string; cost: number }[] = [
-  {
-    id: 'plating',
-    icon: '🛡️',
-    name: 'Armour plating',
-    desc: '+25 armour, bolted on now',
-    cost: 40,
-  },
-  { id: 'repellent', icon: '🧴', name: 'Horde repellent', desc: 'Cancels the next hit', cost: 60 },
-  { id: 'sync', icon: '🔧', name: 'Wider sync window', desc: '+3 rpm engine tolerance', cost: 50 },
-  {
-    id: 'nitro',
-    icon: '🧨',
-    name: 'Can of nitro',
-    desc: 'Fires the nitro straight away',
-    cost: 45,
-  },
-  {
-    id: 'ram',
-    icon: '🐏',
-    name: 'Bull-bar ram',
-    desc: 'Next roadblock takes half as much again',
-    cost: 55,
-  },
-  {
-    id: 'magnet',
-    icon: '🧲',
-    name: 'Scrap magnet',
-    desc: '+50% scrap until the next stop',
-    cost: 50,
-  },
+const ITEMS: { id: ShopItem; icon: string; name: string; desc: string }[] = [
+  { id: 'plating', icon: '🛡️', name: 'Armour plating', desc: '+25 armour, bolted on now' },
+  { id: 'repellent', icon: '🧴', name: 'Horde repellent', desc: 'Cancels the next hit' },
+  { id: 'sync', icon: '🔧', name: 'Wider sync window', desc: '+3 rpm engine tolerance' },
+  { id: 'nitro', icon: '🧨', name: 'Can of nitro', desc: 'Fires the nitro straight away' },
+  { id: 'ram', icon: '🐏', name: 'Bull-bar ram', desc: 'Next roadblock takes half as much again' },
 ]
 
-/** Servo Stop shop: the stop's three upgrade cards (of six) plus a "who bought what" feed. Closes to a small bar until the next stop. */
+/** Servo Stop shop: the stop's three upgrade cards (of five), one free pick, plus a "who took what" feed. Closes to a small bar until the next stop. */
 export function makeShop(buy: (item: ShopItem) => void) {
-  const scrapN = h('b', {}, '0')
   let shut = false
   const exit = h('button', { class: 'sh-x', 'aria-label': 'Close the shop' }, '✕ Close')
   const fold = () => {
@@ -47,7 +21,6 @@ export function makeShop(buy: (item: ShopItem) => void) {
   exit.onclick = () => ((shut = !shut), fold())
   const log = h('div', { class: 'sh-log' })
   const cards = ITEMS.map((it) => {
-    const need = h('span', { class: 'sh-need' })
     const btn = h(
       'button',
       {
@@ -60,10 +33,8 @@ export function makeShop(buy: (item: ShopItem) => void) {
       h('span', { class: 'sh-ico' }, it.icon),
       h('b', {}, it.name),
       h('span', { class: 'sh-desc' }, it.desc),
-      h('span', { class: 'sh-cost' }, `⚙ ${it.cost}`),
-      need,
     )
-    return { it, btn, need }
+    return { it, btn }
   })
   const root = h(
     'section',
@@ -72,7 +43,7 @@ export function makeShop(buy: (item: ShopItem) => void) {
       'div',
       { class: 'sh-head' },
       h('span', {}, '⛽ SERVO SHOP'),
-      h('span', {}, 'BUS SCRAP ', scrapN),
+      h('span', {}, 'ONE FREE PICK'),
       exit,
     ),
     h('div', { class: 'sh-cards' }, ...cards.map((c) => c.btn)),
@@ -81,18 +52,13 @@ export function makeShop(buy: (item: ShopItem) => void) {
   root.hidden = true
   return {
     root,
-    update(open: boolean, scrap: number, wares?: ShopItem[]) {
+    update(open: boolean, wares?: ShopItem[]) {
       root.hidden = !open
       if (!open) {
         shut = false // the next servo stop opens it again
         return fold()
       }
-      set(scrapN, `${scrap}`)
-      for (const { it, btn, need } of cards) {
-        btn.hidden = !!wares && !wares.includes(it.id)
-        btn.disabled = scrap < it.cost
-        set(need, scrap < it.cost ? `need ${it.cost - scrap} more` : 'tap to buy')
-      }
+      for (const { it, btn } of cards) btn.hidden = !!wares && !wares.includes(it.id)
     },
     bought(text: string) {
       log.prepend(h('div', {}, text))

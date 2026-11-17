@@ -188,10 +188,6 @@ a {
   flex-direction: column;
   line-height: 1.15;
 }
-.who small {
-  color: var(--acc);
-  font-weight: 600;
-}
 .caret {
   color: var(--dim);
   font-size: 0.8em;
@@ -563,15 +559,6 @@ a.button.primary {
 }
 .welcome-points li + li {
   margin-top: 8px;
-}
-.tab-dot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 5px;
-  vertical-align: super;
-  border-radius: 50%;
-  background: var(--acc);
 }
 
 /* Lobbies and rides on the simulated trainer: the ride counts for nothing (ui/simNote.ts). */

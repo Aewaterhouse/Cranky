@@ -1,5 +1,3 @@
-import pytest
-
 from zombie_bus_server import config as C
 from zombie_bus_server.modes.zombie_bus import ZombieBus
 from zombie_bus_server.session import Rider
@@ -50,7 +48,7 @@ def test_fell_off_drops_tier_and_haul_back():
     r0 = room.riders["r0"]
     assert r0.st == "fell" and r0.tier == "medium" and any(f["k"] == "fell" for f in fx)
     fx = run(room, bus, 21, bel0=31 + C.FELL_STEP_GRACE_S)
-    assert r0.st == "riding" and any(f["k"] == "hauled" and "+" in f["text"] for f in fx)
+    assert r0.st == "riding" and any(f["k"] == "hauled" and "Crew hauled" in f["text"] for f in fx)
 
 
 def test_cadence_sync_tunes_engine():
@@ -109,21 +107,22 @@ def test_servo_shop_upgrades():
     set_all(room, 1.0)
     r0 = room.riders["r0"]
     run(room, bus, 1, ev="longhaul")
-    bus.scrap, bus.armour = 500, 50
+    bus.armour = 50
     bus.buy(r0, "plating")
     assert bus.armour == 50, "shop is closed outside servo stops"
     run(room, bus, 1, ev="servo")
-    bus.scrap, bus.wares = 500, list(C.SHOP)
+    bus.wares = list(C.SHOP)
+    assert bus.state(room, 1, 0)["shop"]
     bus.buy(r0, "plating")
+    assert bus.armour == 75 and not bus.state(room, 1, 0)["shop"], "one free pick a stop"
     bus.buy(r0, "repellent")
-    bus.buy(r0, "sync")
-    assert bus.armour == 75 and bus.repel == 1 and bus.syncw == 3
-    assert bus.scrap == 500 - 40 - 60 - 50
+    assert bus.repel == 0
+    run(room, bus, 1, i=0)
+    run(room, bus, 1, ev="servo")
+    bus.wares = list(C.SHOP)
+    bus.buy(r0, "repellent")
     bus.damage(10, "x")
     assert bus.armour == 75 and bus.repel == 0
-    bus.scrap = 10
-    bus.buy(r0, "plating")
-    assert bus.armour == 75
 
 
 def test_bus_is_full_at_six():
@@ -200,11 +199,9 @@ def test_personal_challenge_pays_when_held():
         start = [f for f in fx if f["k"] == "challenge"]
         assert len(start) == 1 and bus.challenge
         bus.challenge["kind"] = "spin"
-        scrap = bus.scrap
         fx = run(room, bus, C.CHALLENGE_S + 1)
         kinds = {f["k"] for f in fx}
         assert ("challenge_won" in kinds) == won and ("challenge_lost" in kinds) != won
-        assert (bus.scrap - scrap > C.CHALLENGE_SCRAP - 1) == won
         assert bus.challenge is None and bus.next_challenge > room.el
 
 
@@ -222,7 +219,7 @@ def test_weekly_mutators_apply_above_easy():
     room, bus = FakeRoom(STEADY), ZombieBus("normal", closed)
     set_all(room, 1.0)
     run(room, bus, 1, ev="servo")
-    bus.scrap, bus.armour = 500, 50
+    bus.armour = 50
     bus.buy(room.riders["r0"], "plating")
     assert bus.armour == 50 and not bus.state(room, 1, 0)["shop"]
 
@@ -235,8 +232,7 @@ def test_streak_pays_out_in_order_then_starts_again():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 0.92)
     assert kinds(run(room, bus, 44)) == []
-    scrap = bus.scrap
-    assert kinds(run(room, bus, 2)) == ["drop"] and bus.scrap >= scrap + C.DROP_SCRAP
+    assert kinds(run(room, bus, 2)) == ["drop"]
     assert bus.state(room, 1, 0)["next"] == "airstrike"
     assert kinds(run(room, bus, 46)) == ["airstrike"]
     assert kinds(run(room, bus, 60)) == ["gunship"]
@@ -306,13 +302,12 @@ def test_a_servo_stop_where_nobody_buys_picks_for_the_crew():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0)
     run(room, bus, 1, ev="servo")
-    bus.scrap, bus.armour, bus.wares = 100, 50, list(C.SHOP)
+    bus.armour, bus.wares = 50, list(C.SHOP)
     fx = run(room, bus, 1, ev="longhaul")
-    assert bus.armour == 50 + C.PLATING_ARMOUR and bus.scrap < 100 - C.SHOP["plating"] + 5
+    assert bus.armour == 50 + C.PLATING_ARMOUR
     assert any(f["k"] == "buy" and f["id"] is None and "servo" in f["text"] for f in fx)
     run(room, bus, 1, ev="servo")
     bus.buy(room.riders["r0"], "sync")
-    bus.scrap = 500
     fx = run(room, bus, 1, ev="longhaul")
     assert not [
         f for f in fx if f["k"] == "buy" and f["id"] is None
@@ -327,15 +322,15 @@ def test_the_crew_votes_the_next_leg_at_the_servo():
     q = bus.ask(room, room.riders["r0"])
     assert q["k"] == "road" and [o["v"] for o in q["opts"]] == list(C.LEGS)
     for rid in ("r0", "r1", "r2"):
-        bus.on_act(room, room.riders[rid], "road", "brutal")
+        bus.on_act(room, room.riders[rid], "road", "easy")
     bus.on_act(room, room.riders["r3"], "road", "nowhere")
-    assert bus.ask(room, room.riders["r0"])["v"] == "brutal" and "r3" not in bus.road_votes
+    assert bus.ask(room, room.riders["r0"])["v"] == "easy" and "r3" not in bus.road_votes
     fx = run(room, bus, 1, ev="longhaul")
-    assert bus.leg == C.LEGS["brutal"] and any(f["k"] == "leg" for f in fx)
+    assert bus.leg == C.LEGS["easy"] and any(f["k"] == "leg" for f in fx)
     assert bus.ask(room, room.riders["r0"]) is None
-    armour = bus.armour
+    armour, bus.repel = bus.armour, 0  # the servo's free pick may have been repellent
     bus.damage(10, "ouch")
-    assert armour - bus.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 1.5
+    assert armour - bus.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 0.5
 
 
 def test_the_shortcut_moves_the_horde_one_way_or_the_other():
@@ -357,13 +352,11 @@ def test_each_stop_offers_three_upgrades_and_only_those_sell():
     assert len(bus.wares) == C.SHOP_OFFER and set(bus.wares) <= set(C.SHOP)
     assert bus.state(room, 1, 0)["wares"] == bus.wares
     off = next(k for k in C.SHOP if k not in bus.wares)
-    bus.scrap = 500
     bus.buy(room.riders["r0"], off)
-    assert bus.scrap == 500
-    bus.wares = ["nitro", "ram", "magnet"]
-    for k in bus.wares:
-        bus.buy(room.riders["r0"], k)
-    assert bus.nitro == 1.0 and bus.ram and bus.magnet == C.MAGNET_SCRAP
+    assert not bus.shopped
+    bus.wares = ["nitro", "ram", "sync"]
+    bus.buy(room.riders["r0"], "nitro")
+    assert bus.nitro == 1.0 and bus.shopped
 
 
 def test_riders_and_the_fallen_can_honk_and_heckle():
@@ -411,17 +404,12 @@ def test_weather_is_mostly_clear_and_each_kind_bites():
     rng = rnd.Random(4)
     rolls = [roll_weather(rng) for _ in range(2000)]
     assert set(rolls) == set(C.WEATHER) and rolls.count("clear") > 1000
-    room, wet = FakeRoom(STEADY), ZombieBus()
+    wet = ZombieBus()
     wet.weather = "rain"
     wet.damage(10, "x")
     assert 100 - wet.armour == 10 * C.DIFFICULTY["normal"]["damage"] * 1.2
-    room2, night, clear = FakeRoom(STEADY), ZombieBus(), ZombieBus()
+    room2, night = FakeRoom(STEADY), ZombieBus()
     night.weather = "night"
-    set_all(room, 1.0)
-    set_all(room2, 1.0)
-    run(room, clear, 10)
-    run(room2, night, 10)
-    assert night.scrap == pytest.approx(clear.scrap * 1.25, rel=0.01)
     assert night.state(room2, 1, 0)["weather"] == "night"
 
 
@@ -443,19 +431,19 @@ def boss_ride(s):
     assert bus.state(room, 2, 0)["boss"]["left"] > 0.9
     set_all(room, s)
     run(room, bus, 99, i=2)
-    armour, scrap = bus.armour, bus.scrap
+    armour = bus.armour
     fx = run(room, bus, 1, i=3, ev="cooldown")
     assert bus.state(room, 3, 0)["boss"] is None
-    return bus, fx, armour, scrap
+    return bus, fx, armour
 
 
 def test_the_last_long_effort_is_a_boss_and_riding_on_target_beats_it():
-    bus, fx, armour, scrap = boss_ride(1.0)
-    assert any(f["k"] == "bosswin" for f in fx) and bus.scrap >= scrap + C.BOSS_SCRAP
+    bus, fx, armour = boss_ride(1.0)
+    assert any(f["k"] == "bosswin" for f in fx) and bus.armour == min(100, armour + C.BOSS_ARMOUR)
 
 
 def test_a_boss_the_crew_cannot_hold_lands_a_big_hit():
-    bus, fx, armour, scrap = boss_ride(0.5)
+    bus, fx, armour = boss_ride(0.5)
     assert not any(f["k"] == "bosswin" for f in fx) and bus.armour < armour
 
 
@@ -478,7 +466,7 @@ def test_crew_roles_fire_on_their_cue_then_cool_down():
     room, bus = FakeRoom(STEADY), ZombieBus()
     set_all(room, 1.0, cad=90)
     run(room, bus, 1)
-    assert [bus.roles[f"r{i}"]["role"] for i in range(4)] == list(C.ROLES)
+    assert [bus.roles[f"r{i}"]["role"] for i in range(4)] == [*C.ROLES, "driver"]
     room.riders["r0"].cad = 105  # the driver spins it up
     gap = bus.gap
     fx = run(room, bus, 6)

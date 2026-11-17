@@ -1,20 +1,9 @@
-import { CFG } from '../config'
-import {
-  buy,
-  COSMETICS,
-  cosmetic,
-  equip,
-  priceOf,
-  SLOT_NAMES,
-  weeklyDeal,
-  type Cosmetic,
-  type Slot,
-} from '../core/cosmetics'
+import { COSMETICS, equip, SLOT_NAMES, type Cosmetic, type Slot } from '../core/cosmetics'
 import type { Profile } from '../core/curve'
 import { saveProfile } from '../core/profile'
 import { h } from './dom'
 import { portrait, shopPreview } from './shopPreview'
-import { modal, toast } from './toast'
+import { modal } from './toast'
 
 const ICON: Partial<Record<Slot, string>> = { bullbar: '🦘', spikes: '🔱', bike: '🚲', horn: '📯' }
 /** Each horn its own picture. */
@@ -34,34 +23,12 @@ const WHERE: Record<Slot, string> = {
   horn: 'Your 📯 on the bus: everyone hears it',
 }
 
-export const scrapIcon = () => h('span', { class: 'scrap-ico', 'aria-hidden': 'true' }, '⚙')
-
-/** Cosmetics shop grouped by slot. `changed` re-renders the shell so the balance updates. */
-let armed = ''
-let lockUntil = 0
-
+/** Cosmetics grouped by slot, every one free to wear. `changed` re-renders the shell. */
 export function garageTab(p: Profile, changed: () => void) {
   const item = (c: Cosmetic) => {
-    const owned = p.owned.includes(c.id)
     const on = p.look[c.slot] === c.id
-    const price = priceOf(c)
-    const short = price - p.scrap
-    const act = (e: Event) => {
-      // Buying takes two taps (Buy, then Confirm), and a fresh purchase ignores taps for a moment, so a double
-      // tap can never buy something and take it off again.
-      if (performance.now() < lockUntil) return
-      if (!owned && armed !== c.id) {
-        armed = c.id
-        ;(e.target as HTMLElement).textContent = `Confirm ⚙ ${price}`
-        setTimeout(() => armed === c.id && ((armed = ''), changed()), CFG.garage.confirmMs)
-        return
-      }
-      armed = ''
-      if (!owned) lockUntil = performance.now() + CFG.garage.lockMs
-      const r = owned ? equip(p, c.id) : buy(p, c.id)
-      if (typeof r === 'string') return toast(r, 'bad')
-      if (!owned) toast(`Bought ${c.name}`, 'good')
-      Object.assign(p, r)
+    const act = () => {
+      Object.assign(p, equip(p, c.id))
       saveProfile(p)
       changed()
     }
@@ -86,54 +53,15 @@ export function garageTab(p: Profile, changed: () => void) {
     }
     return h(
       'div',
-      { class: `item ${c.rarity}${on ? ' on' : owned ? ' owned' : ''}` },
+      { class: `item ${c.rarity}${on ? ' on' : ''}` },
       sw,
       h('b', {}, c.name),
       h('span', { class: `rarity ${c.rarity}` }, c.rarity),
-      h(
-        'span',
-        { class: 'meta' },
-        on
-          ? 'Equipped'
-          : owned
-            ? 'Owned'
-            : h(
-                'span',
-                {},
-                scrapIcon(),
-                ` ${price}`,
-                price < c.price ? h('s', { class: 'dim' }, ` ${c.price}`) : '',
-              ),
-      ),
-      !owned && short > 0
-        ? h(
-            'div',
-            { class: 'need-bar', title: `${p.scrap} of ${price} scrap` },
-            h('i', { style: `width:${Math.round((p.scrap / price) * 100)}%` }),
-            h('span', {}, `${short} to go`),
-          )
-        : h(
-            'button',
-            { class: owned ? 'ghost' : 'primary', onclick: act },
-            owned ? (on ? 'Take off' : 'Equip') : 'Buy',
-          ),
+      h('span', { class: 'meta' }, on ? 'Equipped' : ''),
+      h('button', { class: on ? 'ghost' : 'primary', onclick: act }, on ? 'Take off' : 'Equip'),
     )
   }
   const slots = Object.keys(SLOT_NAMES) as Slot[]
-  // The dearest things you can buy right now, one per slot.
-  const treats = slots
-    .map(
-      (s) =>
-        COSMETICS.filter(
-          (c) =>
-            c.slot === s &&
-            c.id !== weeklyDeal() &&
-            priceOf(c) <= p.scrap &&
-            !p.owned.includes(c.id),
-        ).sort((a, b) => b.price - a.price)[0],
-    )
-    .filter((c) => c)
-    .slice(0, 4)
   return h(
     'div',
     { class: 'garage' },
@@ -144,36 +72,9 @@ export function garageTab(p: Profile, changed: () => void) {
         'div',
         {},
         h('h1', {}, 'Garage'),
-        h('p', { class: 'lede' }, 'Spend scrap on paint and parts. The crew sees what you wear.'),
-      ),
-      h(
-        'div',
-        { class: 'balance' },
-        scrapIcon(),
-        h('b', {}, String(p.scrap)),
-        h('span', {}, 'scrap'),
-        h('small', {}, 'Earned on every ride of 10 minutes or more, plus a bonus per award'),
+        h('p', { class: 'lede' }, 'Paint and parts, free to wear. The crew sees what you wear.'),
       ),
     ),
-    h(
-      'section',
-      { class: 'slot' },
-      h(
-        'h2',
-        { class: 'label' },
-        'Deal of the week',
-        h('small', {}, `${Math.round(CFG.garage.dealOff * 100)}% off until Monday`),
-      ),
-      h('div', { class: 'shopgrid' }, item(cosmetic(weeklyDeal())!)),
-    ),
-    treats.length
-      ? h(
-          'section',
-          { class: 'slot' },
-          h('h2', { class: 'label' }, 'Treat yourself', h('small', {}, 'You can afford these now')),
-          h('div', { class: 'shopgrid' }, ...treats.map(item)),
-        )
-      : '',
     // Shelf chips: jump straight to a slot instead of scrolling the whole shop.
     h(
       'nav',

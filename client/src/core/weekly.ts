@@ -5,7 +5,7 @@ import type { RouteSummary } from './routeLibrary'
 
 const W = CFG.weekly
 
-/** A week's climbing and which of its rewards have been paid. */
+/** A week's climbing and which of its goals are done (`paid` is the stored key). */
 export interface WeekLog {
   vertM: number
   paid?: ('featured' | 'vert')[]
@@ -58,11 +58,11 @@ export function weekState(p: Profile, week = weekOf()) {
 }
 
 /**
- * Adds a free ride's climbing to its week and pays any reward it has just earned: finishing the featured
- * route, and reaching the week's climbing target. Each is paid once a week however often it is earned.
+ * Adds a free ride's climbing to its week and ticks off any goal it has just reached: finishing the featured
+ * route, and reaching the week's climbing target. Each counts once a week however often it is reached.
  */
 export function weeklyRewards(p: Profile, s: RodeRoute, routes: RouteSummary[]) {
-  const won: { text: string; scrap: number }[] = []
+  const won: { text: string }[] = []
   if (!s.route) return { p, won }
   const week = weekOf(Date.parse(s.record.date))
   const was = p.weeks?.[week] ?? { vertM: 0 }
@@ -71,28 +71,18 @@ export function weeklyRewards(p: Profile, s: RodeRoute, routes: RouteSummary[]) 
     paid: [...(was.paid ?? [])],
   }
   const finished = (s.segments ?? []).some((e) => e.kind === 'route' || e.kind === 'lap')
-  const pay = (what: 'featured' | 'vert', earned: boolean, scrap: number, text: string) => {
+  const pay = (what: 'featured' | 'vert', earned: boolean, text: string) => {
     if (!earned || log.paid!.includes(what)) return
     log.paid!.push(what)
-    won.push({ text, scrap })
+    won.push({ text })
   }
   const feat = featuredRoute(routes, week)
-  pay(
-    'featured',
-    finished && feat?.id === s.route.id,
-    W.featuredScrap,
-    `Route of the week: ${feat?.name}`,
-  )
+  pay('featured', finished && feat?.id === s.route.id, `Route of the week: ${feat?.name}`)
   const target = vertTarget(p, week)
-  pay(
-    'vert',
-    log.vertM >= target,
-    W.vert.scrap,
-    `Weekly climb: ${target.toLocaleString('en-AU')} m`,
-  )
+  pay('vert', log.vertM >= target, `Weekly climb: ${target.toLocaleString('en-AU')} m`)
   // Only the weeks the target looks back over are kept.
   const weeks = Object.fromEntries(
     Object.entries({ ...p.weeks, [week]: log }).filter(([k]) => +k >= week - W.vert.weeks),
   )
-  return { p: { ...p, weeks, scrap: p.scrap + won.reduce((a, w) => a + w.scrap, 0) }, won }
+  return { p: { ...p, weeks }, won }
 }

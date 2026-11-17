@@ -57,8 +57,6 @@ export interface Profile {
     freezes?: number
   }
   updated: number
-  scrap: number
-  owned: string[]
   look: Look
 }
 
@@ -71,8 +69,6 @@ export const newProfile = (id: string, name = '', ftp = 200, tier: Tier = 'hard'
   allTime: {},
   rides: [],
   updated: 0,
-  scrap: 0,
-  owned: [],
   look: {},
   stats: { rides: 0, secs: 0, kj: 0, zones: Array(7).fill(0), streak: 0, lastWeek: 0 },
 })

@@ -1,4 +1,3 @@
-import { COSMETICS } from '../core/cosmetics'
 import { setBack } from './back'
 import { ladderTab } from './ladder'
 import { settingsTab } from './settings'
@@ -7,7 +6,7 @@ import type { Profile } from '../core/curve'
 import { adminTab } from './admin'
 import { changeMyPassword } from './password'
 import { avatar, h, show } from './dom'
-import { garageTab, scrapIcon } from './garage'
+import { garageTab } from './garage'
 import { rideTab, type HomeActions } from './home'
 import { logo } from './login'
 import { riderTab } from './rider'
@@ -44,12 +43,7 @@ function riderChip(p: Profile, act: HomeActions, admin: boolean) {
       'button',
       { class: 'chip-btn', 'aria-haspopup': 'menu', onclick: () => (menu.hidden = !menu.hidden) },
       avatar(p.name),
-      h(
-        'span',
-        { class: 'who' },
-        h('b', {}, p.name),
-        h('small', {}, scrapIcon(), ` ${p.scrap} scrap`),
-      ),
+      h('span', { class: 'who' }, h('b', {}, p.name)),
       h('span', { class: 'caret' }, '▾'),
     ),
     menu,
@@ -88,15 +82,7 @@ export function showHome(p: Profile, act: HomeActions) {
         'nav',
         { class: 'tabs' },
         ...Object.entries(TABS).map(([k, v]) =>
-          h(
-            'a',
-            { href: `#${k}`, class: k === tab ? 'on' : '' },
-            v,
-            // A dot on the Garage when there is something new you can afford.
-            k === 'garage' && COSMETICS.some((c) => c.price <= p.scrap && !p.owned.includes(c.id))
-              ? h('i', { class: 'tab-dot', title: 'You can afford something' })
-              : '',
-          ),
+          h('a', { href: `#${k}`, class: k === tab ? 'on' : '' }, v),
         ),
       ),
       h('div', { class: 'right' }, trainerPill(), riderChip(p, act, admin)),

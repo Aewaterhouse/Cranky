@@ -10,9 +10,6 @@ export const CFG = {
   click: { backoffMs: [1000, 2000, 4000, 5000] },
   /** Shortest password a rider may set (the server's PASSWORD_MIN says the same). */
   account: { passwordMin: 8, username: /^[A-Za-z0-9 _-]{3,24}$/ },
-  /** Garage: how long a Buy waits for its Confirm tap, and how long a fresh purchase ignores taps. */
-  /** `dealOff`: the share off this week's deal (one rare-or-better item, the same for the whole crew). */
-  garage: { confirmMs: 3000, lockMs: 800, dealOff: 0.3 },
   /** The body creator saves itself this long after the last change. */
   bodySaveMs: 1200,
   /**
@@ -71,8 +68,8 @@ export const CFG = {
   funStats: { pieKj: 420, timTamKj: 95 },
   /** Rider level: XP is kJ plus `perRide` a ride; level n starts at base × (n − 1)². */
   level: { base: 300, perRide: 50 },
-  /** The daily challenge: its scrap and the numbers in its goals. */
-  daily: { scrap: 25, kj: 500, rpm: 90 },
+  /** The daily challenge: the numbers in its goals. */
+  daily: { kj: 500, rpm: 90 },
   /** Training plans: a ride this share of a session's length on its day counts it done, whatever was ridden. */
   trainingPlan: { doneFrac: 0.8, gradFrac: 0.8 },
   zones: [0.55, 0.75, 0.9, 1.05, 1.2, 1.5],

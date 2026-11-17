@@ -28,17 +28,17 @@ import { totalMass } from '../../core/physics'
 import { onClickShift } from '../../trainer/zwiftClick'
 
 const FX_SOUND: Record<string, () => void> = {
-  buy: SFX.scrap,
+  buy: SFX.clink,
   repel: SFX.shake,
   hit: SFX.hit,
   grab: SFX.grab,
   shake: SFX.shake,
   smash: SFX.MEGA,
   crash: SFX.hit,
-  hauled: SFX.scrap,
+  hauled: SFX.clink,
   tune: SFX.GREAT,
   fell: SFX.FAIL,
-  drop: SFX.scrap,
+  drop: SFX.clink,
   airstrike: SFX.GREAT,
   gunship: SFX.MEGA,
 }

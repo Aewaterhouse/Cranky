@@ -105,14 +105,6 @@
   color: var(--dim);
   font-size: 0.85rem;
 }
-.wk-pay {
-  color: var(--acc);
-  font-weight: 700;
-  white-space: nowrap;
-}
-.wk-pay.done {
-  color: #7fd13b;
-}
 .wk-bar {
   height: 8px;
   border-radius: 4px;

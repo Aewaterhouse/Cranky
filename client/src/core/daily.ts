@@ -41,12 +41,12 @@ export const dayOf = (t = Date.now()) =>
 /** The challenge for a day: stepping through them so it is never yesterday's again. */
 export const dailyChallenge = (day = dayOf()) => CHALLENGES[(((day * 5) % 6) + 6) % 6]
 
-/** Pays today's challenge once if this ride did it. */
+/** Ticks off today's challenge once if this ride did it. */
 export function dailyReward(p: Profile, r: DayRide, day = dayOf()) {
   const c = dailyChallenge(day)
   if (p.dailyPaid === day || !c.done(r)) return { p, won: null }
   return {
-    p: { ...p, scrap: p.scrap + D.scrap, dailyPaid: day },
-    won: { text: `Daily challenge: ${c.text}`, scrap: D.scrap },
+    p: { ...p, dailyPaid: day },
+    won: { text: `Daily challenge: ${c.text}` },
   }
 }

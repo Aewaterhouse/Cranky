@@ -45,7 +45,7 @@ export type ClientMsg =
   | { t: 'trainers'; mode: TrainerMode }
   | { t: 'sprint'; blk: number; dur: number; avg: number; pct: number; grade: Grade; combo: number }
 
-export type ShopItem = 'plating' | 'repellent' | 'sync' | 'nitro' | 'ram' | 'magnet'
+export type ShopItem = 'plating' | 'repellent' | 'sync' | 'nitro' | 'ram'
 export interface LobbyRider {
   id: string
   name: string
@@ -119,7 +119,6 @@ export interface BusState {
   dist: number
   armour: number
   gap: number
-  scrap: number
   sync: boolean
   tune: boolean
   rb: number | null
@@ -127,7 +126,7 @@ export interface BusState {
   shop: boolean
   /** The three upgrades this servo stop offers. */
   wares?: ShopItem[]
-  /** The ride's weather: rain hurts more, a night run pays more scrap, dust hides the gap. */
+  /** The ride's weather: rain hurts more, dust hides the gap, a night run is dark. */
   weather?: 'clear' | 'rain' | 'dust' | 'night'
   /** The boss fight while it is on: its name and the share of its health left. */
   boss?: { name: string; left: number } | null

@@ -39,7 +39,7 @@ and any "invent mechanics, don't wait for the owner" rule in AGENTS.md.
       text, tests. The home screen's "Crew games" picker becomes a single Zombie Bus card.
 - [x] 1.3 Group rides on routes keep the plain ride, race, crit and handicap, with the podium. Remove points
       and chaingang only.
-- [ ] 1.4 Remove scrap everywhere: earning, balances, displays, results rewards, daily and weekly scrap, the
+- [x] 1.4 Remove scrap everywhere: earning, balances, displays, results rewards, daily and weekly scrap, the
       week's deal.
 - [ ] 1.5 Remove the Servo Stop shop and its upgrades from Zombie Bus. The bus no longer stops to shop; keep the
       roadside servo as scenery only if it costs nothing to keep.

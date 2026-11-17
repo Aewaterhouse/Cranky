@@ -15,7 +15,7 @@ class Boosts:
     """Mixed into `ZombieBus`, which holds the state."""
 
     def run_challenge(self, room: Room, active: list[Rider], ev: str) -> None:
-        """Hands one human rider a 20 s cadence drill now and then; pays scrap if they hold it."""
+        """Hands one human rider a 20 s cadence drill now and then; cheers them if they hold it."""
         ch = self.challenge
         if ch:
             r = room.riders.get(ch["id"])
@@ -29,8 +29,7 @@ class Boosts:
             self.next_challenge = room.el + random.randint(*C.CHALLENGE_EVERY_S)
             name = r.name if r else "Someone"
             if ch["ok"] / ch["n"] >= C.CHALLENGE_PASS:
-                self.scrap += C.CHALLENGE_SCRAP
-                self.emit("challenge_won", f"{name} nailed it! +{C.CHALLENGE_SCRAP} scrap", ch["id"])
+                self.emit("challenge_won", f"{name} nailed it!", ch["id"])
             else:
                 self.emit("challenge_lost", f"{name} fluffed the challenge.", ch["id"])
             return
@@ -51,8 +50,7 @@ class Boosts:
             self.nitro = max(0.0, self.nitro - dt / C.NITRO_DECAY_S)
         if self.nitro >= 1:
             self.nitro, self.nitro_until = 0.0, room.el + C.NITRO_S
-            self.scrap += C.NITRO_SCRAP
-            self.emit("nitro", f"NITRO! Perfect riding lit the afterburner. +{C.NITRO_SCRAP} scrap")
+            self.emit("nitro", "NITRO! Perfect riding lit the afterburner.")
             return True
         return False
 
@@ -78,8 +76,7 @@ class Boosts:
             return
         self.streak_n += 1
         if kind == "drop":
-            self.scrap += C.DROP_SCRAP
-            self.emit("drop", f"{need} s streak: supply drop! +{C.DROP_SCRAP} scrap")
+            self.emit("drop", f"{need} s streak: supply drop!")
         elif kind == "airstrike":
             self.gap += C.AIRSTRIKE_GAP
             self.emit("airstrike", f"{need} s streak: air strike on the horde! +{C.AIRSTRIKE_GAP} m")
@@ -102,7 +99,6 @@ class Boosts:
         dmg = C.RB_DAMAGE[grade] * mult * (C.RAM_MULT if self.ram else 1)
         rb["dmg"] += dmg
         r.rb_dmg += dmg
-        self.scrap += C.RB_SCRAP[grade] * mult
         combo_txt = f" (combo x{combo})" if combo > 1 else ""
         if grade == "FAIL":
             self.gap -= C.RB_FAIL_GAP
@@ -117,9 +113,8 @@ class Boosts:
         rb, self.rb, self.ram = self.rb, None, False
         assert rb
         if rb["dmg"] >= rb["hp"]:
-            self.scrap += C.RB_SMASH_SCRAP
             self.gap += C.RB_SMASH_GAP
-            self.emit("smash", f"Roadblock SMASHED! +{C.RB_SMASH_SCRAP} scrap")
+            self.emit("smash", "Roadblock SMASHED!")
             # A team move: every rider on the bus landed their sprint, so the harpoon drags the bus clear.
             if len(rb["expect"]) > 1 and rb["expect"] <= rb["landed"]:
                 self.gap += C.HARPOON_GAP

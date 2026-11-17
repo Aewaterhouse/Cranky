@@ -32,7 +32,6 @@ export const FX_ICON: Record<string, string> = {
   challenge: '🎯',
   challenge_won: '🎯',
   challenge_lost: '🎯',
-  scrap: '⚙️',
   buy: '🛒',
   repel: '🛡️',
   drop: '📦',
@@ -42,7 +41,6 @@ export const FX_ICON: Record<string, string> = {
 export const FX_DEFAULT: Record<string, string> = {
   crash: 'The bus hit the roadblock!',
   hit: 'The bus took a hit!',
-  scrap: 'Scrap collected',
 }
 
 /** Set text only when it changed, so the DOM isn't churned at 2 Hz. */
@@ -65,20 +63,6 @@ export const GRADE_COLOUR: Record<SprintResult['grade'], string> = {
   GREAT: '#7fd13b',
   MEGA: '#e040fb',
   LEGEND: '#ffd54a',
-}
-
-/** Animate a counter to its new value. */
-export function tween(el: HTMLElement, to: number) {
-  const from = +(el.dataset.v ?? to)
-  el.dataset.v = String(to)
-  if (from === to) return set(el, String(to))
-  const t0 = performance.now()
-  const step = (t: number) => {
-    const k = Math.min(1, (t - t0) / 700)
-    set(el, String(Math.round(from + (to - from) * k)))
-    if (k < 1 && el.isConnected) requestAnimationFrame(step)
-  }
-  requestAnimationFrame(step)
 }
 
 /** Restart a one-shot CSS animation class. */

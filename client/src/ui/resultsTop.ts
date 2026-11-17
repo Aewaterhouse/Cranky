@@ -1,5 +1,4 @@
 import { badges, type Badge } from '../core/badges'
-import { COSMETICS } from '../core/cosmetics'
 import type { Profile } from '../core/curve'
 import type { RoadSummary } from '../net/protocol'
 import { h } from './dom'
@@ -58,11 +57,8 @@ export const badgeCard = (b: Badge) =>
     h('span', {}, h('b', {}, `Badge unlocked: ${b.name}`), h('small', {}, b.desc)),
   )
 
-/** One thing to chase next: the Garage item nearest in reach, else the locked badge nearest done. */
+/** One thing to chase next: the locked badge nearest done. */
 export function nextUp(p: Profile) {
-  const item = COSMETICS.filter((c) => !p.owned.includes(c.id) && c.price > p.scrap).sort(
-    (a, b) => a.price - b.price,
-  )[0]
   const badge = badges(p)
     .filter((b) => !b.earned && b.progress && b.progress[0] > 0)
     .sort((a, b) => b.progress![0] / b.progress![1] - a.progress![0] / a.progress![1])[0]
@@ -72,13 +68,6 @@ export function nextUp(p: Profile) {
       { class: 'need-bar' },
       h('i', { style: `width:${Math.round((have / need) * 100)}%` }),
       h('span', {}, `${have} of ${need}`),
-    )
-  if (item && (!badge || p.scrap / item.price >= 0.5))
-    return h(
-      'a',
-      { class: 'card next-up', href: '#garage' },
-      h('b', {}, `Next up: ${item.name}, ${item.price - p.scrap} scrap to go`),
-      bar(p.scrap, item.price),
     )
   if (badge)
     return h(

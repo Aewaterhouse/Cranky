@@ -171,20 +171,18 @@ describe('weekly route and climb', () => {
     expect(vertTarget({ ...p, weeks: { [week - 1]: { vertM: 90000 } } }, week)).toBe(c.maxM)
   })
 
-  it('pays for the featured route and the climbing target once each a week', () => {
+  it('ticks off the featured route and the climbing target once each a week', () => {
     const feat = featuredRoute(ROUTE_INDEX, week)!
     const done = ride(feat.id, '2026-11-11T10:00:00Z', 400, 900)
     let { p, won } = weeklyRewards(newProfile('me'), done, ROUTE_INDEX)
-    expect(won.map((w) => w.scrap)).toEqual([CFG.weekly.featuredScrap])
-    expect(p.scrap).toBe(CFG.weekly.featuredScrap)
+    expect(won).toEqual([{ text: `Route of the week: ${feat.name}` }])
+    expect(p).not.toHaveProperty('scrap')
     expect(weekState(p, week)).toMatchObject({ vertM: 400, featuredDone: true, vertDone: false })
     // Riding it again the same week pays nothing more, but the climbing still counts to the target.
     ;({ p, won } = weeklyRewards(p, done, ROUTE_INDEX))
-    expect(won.map((w) => w.scrap)).toEqual([CFG.weekly.vert.scrap])
-    expect(p.scrap).toBe(CFG.weekly.featuredScrap + CFG.weekly.vert.scrap)
+    expect(won.map((w) => w.text)).toEqual([expect.stringMatching(/^Weekly climb: /)])
     ;({ p, won } = weeklyRewards(p, done, ROUTE_INDEX))
     expect(won).toEqual([])
-    expect(p.scrap).toBe(CFG.weekly.featuredScrap + CFG.weekly.vert.scrap)
     expect(weekState(p, week)).toMatchObject({ vertM: 1200, featuredDone: true, vertDone: true })
   })
 

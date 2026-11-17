@@ -80,7 +80,7 @@ describe('rider body data', () => {
   })
 
   it('rides in the profile beside the Garage items without disturbing them', () => {
-    let p = { ...newProfile('luke', 'Luke'), owned: ['hat-cap'] }
+    let p = newProfile('luke', 'Luke')
     p = { ...p, look: withBody(p.look, presetBody('Sprinter')) }
     p = equip(p, 'hat-cap')
     expect(p.look.hat).toBe('hat-cap')

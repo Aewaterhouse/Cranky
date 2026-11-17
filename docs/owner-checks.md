@@ -37,7 +37,7 @@ The Click needs firmware 1.1.0 or later (1.0.0 ignores the RideOn handshake). Up
 ## Group ride
 - [ ] First real crew ride: do block changes and over-under steps land on time for everyone?
 - [ ] Restart the server mid-ride (`scripts/run.sh`). Riders should reconnect and the ride should resume where it stopped.
-- [ ] Tune the game numbers afterwards (horde speed, damage, fell-off threshold, scrap). They live in `server/src/zombie_bus_server/config.py`.
+- [ ] Tune the game numbers afterwards (horde speed, damage, fell-off threshold). They live in `server/src/zombie_bus_server/config.py`.
 
 ## Devices and extras
 - [ ] iPad with Bluefy: does pairing and ERG work at all?
@@ -96,7 +96,6 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Leaderboards from the setup screen and the Passport, by time and by W/kg, with two real riders.
 - [ ] Download a .fit from a free ride and upload it to Strava: does the map show, and distance, climbing and laps?
 - [ ] Passport map: are the dots in the right places, and does Australia look like Australia?
-- [ ] The weekly route and climbing target: are 30 and 50 scrap the right size of carrot?
 
 ### Frame rate (real devices)
 - [ ] Add `?perf=1` to the address on a ride and read the overlay on: the PC you ride on, a laptop, a tablet, a phone. Write down average fps, 1% low and the level Auto settles at for Coot-tha, the Nundah crit and Mondo. (All the numbers in `docs/decisions.md` are from a software renderer.)
@@ -194,7 +193,7 @@ Everything in free ride was built on a PC with no graphics driver, no speakers, 
 - [ ] Usernames: after deploying, open the site logged out and check no names or faces show. Log in as `LUKE` / your password (any case works). Change your username in Settings → Account, log out, log back in with the new one, and check your History, the Ladder and your Strava connection are all still there and your name on the ride screen hasn't changed.
 
 ## Don't keep this ride, 2026-11-16 (unit tests only)
-- [ ] Ride a short solo workout, End ride → Discard ride → Bin it: you land back home, and History, the crew feed, Trends and scrap show nothing new.
+- [ ] Ride a short solo workout, End ride → Discard ride → Bin it: you land back home, and History, the crew feed and Trends show nothing new.
 - [ ] Finish a ride with Strava connected: the results screen says "Posting to Strava in 60 s" and counts down. Tap Don't post: History shows "Not posted", and its Upload button posts it. Finish another and wait out the minute: it appears on Strava, and Discard is gone.
 - [ ] On the bus with a mate: Discard ride on your results; their ride and the crew result are still there.
 

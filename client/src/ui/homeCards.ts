@@ -46,7 +46,6 @@ export function hello(p: Profile, act: HomeActions) {
           (liveStreak(p) > 1 ? ` · ${liveStreak(p)} week streak` : ''),
       ),
     ),
-    p.scrap > 0 ? h('a', { class: 'arrow', href: '#garage' }, `⚙ ${p.scrap} to spend →`) : '',
   )
 }
 

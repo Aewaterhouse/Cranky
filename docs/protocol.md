@@ -53,7 +53,7 @@ All messages are JSON objects with a `t` field. Times are seconds of session tim
 | `tier` | `tier` | Rider changes own tier. |
 | `data` | `p, w, cad, s` | 2 Hz. Instant power, 3 s power, cadence, compliance (0..1 or null). |
 | `sprint` | `blk, dur, avg, pct, grade, combo` | Sent once when a sprint block ends; graded client-side. |
-| `buy` | `item` | `plating`, `repellent`, `sync`, `nitro`, `ram` or `magnet` (prices in `config.SHOP`). Only at a Servo Stop and only the three that stop offers (`bus.wares`), paid from the bus scrap tin. |
+| `buy` | `item` | `plating`, `repellent`, `sync`, `nitro` or `ram` (`config.SHOP`). Only at a Servo Stop, only the three that stop offers (`bus.wares`), and one free pick a stop for the whole crew. |
 | `ready` | `on` | A guest in the lobby is ready (or not). The lobby carries `ready` per rider (bots always true); every ride starts everyone unready. |
 | `end` | | Host only: finish the ride now. |
 
@@ -78,10 +78,10 @@ Zombie Bus is the only crew game (the others went on 17/11/2026); the lobby stil
 `st` is `riding`, `fell` or `spectator`. `ev` is `warmup`, `longhaul`, `rampup`, `surge`, `roadblock`,
 `servo` or `cooldown`.
 
-`bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), scrap, sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open), repel (repellent charges), syncw, nitro (0..1 charge), boost (bool) (extra sync window, rpm), streak (0..1 progress to the next streak reward), next (`drop`, `airstrike` or `gunship`), gunship (bool, gunship up)}`.
+`bus`: `{speed (m/s), dist (m), armour (0..100), gap (m), sync (bool), tune (bool), rb (0..1 roadblock progress or null), combo, shop (bool, Servo Stop open and its free pick not yet taken), repel (repellent charges), syncw, nitro (0..1 charge), boost (bool) (extra sync window, rpm), streak (0..1 progress to the next streak reward), next (`drop`, `airstrike` or `gunship`), gunship (bool, gunship up)}`.
 
 `fx`: list of `{k, text?, id?}`, one-shot effects since the last tick. `k` is one of
-`drop, airstrike, gunship, nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, scrap, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.
+`drop, airstrike, gunship, nitro, challenge, challenge_won, challenge_lost, hit, grab, shake, smash, crash, fell, hauled, sprint, tune, slowmo, buy, repel, roadblock, servo, surge, longhaul`. `roadblock`, `servo`, `surge` and `longhaul` mark event starts; `buy` and `repel` carry shop text.
 
 ## Road rooms (group free ride)
 

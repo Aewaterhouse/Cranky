@@ -20,14 +20,13 @@ class BusView:
             "dist": round(self.dist),
             "armour": round(self.armour, 1),
             "gap": round(self.gap, 1),
-            "scrap": int(self.scrap),
             "sync": self.sync,
             "tune": self.tune,
             "rb": self.rb_progress(room, i, bel),
             "combo": self.combo,
             "nitro": round(self.nitro, 2),
             "boost": room.el < self.nitro_until,
-            "shop": self.ev == "servo" and not self.mut.get("no_shop"),
+            "shop": self.ev == "servo" and not self.shopped and not self.mut.get("no_shop"),
             "wares": self.wares,
             "weather": self.weather,
             "zed": C.ZED_TYPES[self.ev]["tip"] if self.ev in C.ZED_TYPES else None,
@@ -69,14 +68,11 @@ class BusView:
             lambda r: f"{r.sync_hits / r.sync_n:.0%} in sync",
         )
         award(awards, rs, "PR Hunter", lambda r: r.mega, lambda r: f"{r.mega} MEGA+ sprints")
-        score = round(
-            (self.dist / 10 * (0.5 + self.armour / 200) + self.scrap) * C.DIFFICULTY[self.level]["score"]
-        )
+        score = round(self.dist / 10 * (0.5 + self.armour / 200) * C.DIFFICULTY[self.level]["score"])
         return {
             "distance": round(self.dist),
             "armour": round(self.armour),
             "gap": round(self.gap),
-            "scrap": int(self.scrap),
             "score": score,
             "difficulty": self.level,
             "syncPct": round(100 * self.sync_ticks / self.ticks) if self.ticks else 0,

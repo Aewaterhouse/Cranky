@@ -63,18 +63,15 @@ class Servo:
             "ram",
             "nitro",
             "sync",
-            "magnet",
         ]
-        item = next((k for k in order if k in self.wares and self.scrap >= C.SHOP[k]), None)
+        item = next((k for k in order if k in self.wares), None)
         if item:
             self.buy(None, item)
 
     def buy(self, r: Rider | None, item: str) -> None:
-        """Servo Stop shop: session-only upgrades paid from the bus scrap tin (no rider: the servo picked)."""
-        cost = C.SHOP[item]
-        if self.ev != "servo" or item not in self.wares or self.scrap < cost or self.mut.get("no_shop"):
+        """Servo Stop shop: one free session-only upgrade a stop for the crew (no rider: the servo picked)."""
+        if self.ev != "servo" or item not in self.wares or self.shopped or self.mut.get("no_shop"):
             return
-        self.scrap -= cost
         self.shopped = True
         name = r.name if r else "Nobody let go of the bars, so the servo"
         if item == "plating":
@@ -89,9 +86,6 @@ class Servo:
         elif item == "ram":
             self.ram = True
             text = f"{name} welded on a ram: the next roadblock takes half as much again"
-        elif item == "magnet":
-            self.magnet = C.MAGNET_SCRAP
-            text = f"{name} hung a scrap magnet off the back: more scrap until the next stop"
         else:
             self.syncw += C.SYNC_WIDEN_RPM
             text = f"{name} tuned the carby: sync window ±{C.SYNC_RPM + self.syncw} rpm"

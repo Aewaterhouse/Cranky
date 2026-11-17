@@ -64,7 +64,6 @@ FELL_LOAD = 0.05
 FELL_LOAD_MAX = 0.15
 HAUL_S = 20
 HAUL_MIN = 0.85
-HAUL_SCRAP = 30
 SPECTATOR_NO_POWER_S = 60
 
 # Cadence sync
@@ -95,13 +94,11 @@ SURGE_UNDER_NEUTRAL = 0.95
 SURGE_GRAB = 12
 SHAKE_COMPLIANCE = 0.8
 SHAKE_GAP = 15
-SHAKE_SCRAP = 5
 TUNE_GAP_BONUS = 1.0
 GAP_START = 30
 GAP_MAX = 70
 HIT_DAMAGE = 5
 HIT_KNOCKBACK = 25
-SCRAP_PER_M = 1 / 100
 
 # Difficulty: shifts every event's neutral compliance, closes the gap at `creep` m/s whatever the crew does,
 # scales armour damage and the final score, and sets the compliance a rider falls off under. Tuned on
@@ -121,7 +118,6 @@ NITRO_DECAY_S = 150  # seconds to drain when the crew is below NITRO_MIN
 NITRO_S = 15  # boost length
 NITRO_SPEED = 1.3
 NITRO_GAP = 2.5  # extra m/s of gap while boosting
-NITRO_SCRAP = 15
 NITRO_EVENTS = ("longhaul", "rampup", "surge")
 
 # Streak rewards: unbroken clean group riding earns air support, in order, then the streak starts again.
@@ -129,7 +125,6 @@ STREAK_MIN = 0.9  # group compliance that keeps the streak alive
 STREAK_GRACE_S = 3  # seconds under STREAK_MIN before the streak resets
 STREAK_EVENTS = NITRO_EVENTS  # the streak holds (no gain, no reset) in every other event
 STREAKS = [(45, "drop"), (90, "airstrike"), (150, "gunship")]  # streak seconds needed, reward
-DROP_SCRAP = 15
 AIRSTRIKE_GAP = 15  # metres of gap, at once
 GUNSHIP_S = 20
 GUNSHIP_GAP = 2.0  # extra m/s of gap while the gunship is up
@@ -138,12 +133,11 @@ GUNSHIP_GAP = 2.0  # extra m/s of gap while the gunship is up
 CHALLENGE_EVERY_S = (150, 240)  # random wait between challenges
 CHALLENGE_S = 20
 CHALLENGE_PASS = 0.7  # fraction of the window that must be on the cadence target
-CHALLENGE_SCRAP = 12
 CHALLENGES = {"spin": (105, "spin it up! 105+ rpm"), "grind": (65, "big gear! 65 rpm or lower")}
 CHALLENGE_EVENTS = ("longhaul", "rampup")
 
 # Weekly mutator: one twist per ISO week, applied to every bus ride above easy difficulty.
-# Keys: damage (x), scrap (x distance scrap), armour (starting armour), nitro (x charge rate), no_shop.
+# Keys: damage (x), armour (starting armour), nitro (x charge rate), no_shop.
 MUTATORS = [
     {
         "id": "hungry",
@@ -152,7 +146,6 @@ MUTATORS = [
         "damage": 1.5,
     },
     {"id": "closed", "name": "Closed Servos", "desc": "The servo shop stays shut all ride.", "no_shop": True},
-    {"id": "rush", "name": "Scrap Rush", "desc": "Double scrap for distance.", "scrap": 2.0},
     {"id": "bolts", "name": "Loose Bolts", "desc": "The bus starts on 70 armour.", "armour": 70},
     {"id": "tailwind", "name": "Tailwind", "desc": "Nitro charges twice as fast.", "nitro": 2.0},
 ]
@@ -160,18 +153,16 @@ MUTATORS = [
 # Roadblock
 RB_HP_PER_RIDER = 40
 RB_DAMAGE = {"FAIL": 0, "HIT": 40, "GREAT": 80, "MEGA": 100, "LEGEND": 120}
-RB_SCRAP = {"FAIL": 0, "HIT": 2, "GREAT": 10, "MEGA": 25, "LEGEND": 50}
 RB_FAIL_ARMOUR = 6
 RB_FAIL_GAP = 10
-RB_SMASH_SCRAP = 20
 RB_SMASH_GAP = 20
-# The bus ride's weather, rolled as it starts. damage and scrap multiply; dust hides the gap and the
+# The bus ride's weather, rolled as it starts. damage multiplies; dust hides the gap and the
 # mirror on the client. Weights are chances out of their sum.
 WEATHER = {
     "clear": {"weight": 60, "name": "Clear"},
     "rain": {"weight": 15, "name": "Rain", "damage": 1.2},
     "dust": {"weight": 12, "name": "Dust storm"},
-    "night": {"weight": 13, "name": "Night run", "scrap": 1.25},
+    "night": {"weight": 13, "name": "Night run"},
 }
 # Zombie types by event: each gains `pull` m/s on the bus while the crew rides the way it hunts.
 ZED_TYPES = {
@@ -208,15 +199,6 @@ ROLES = {
         "tip": "Stay spot on target 20 s to patch the bus",
         "done": "patched the bus, +5 armour",
     },
-    "lookout": {
-        "name": "Lookout",
-        "cue": "steady",
-        "rpm": 3,
-        "hold": 15,
-        "scrap": 12,
-        "tip": "Match the crew's cadence 15 s to spot scrap",
-        "done": "spotted a scrap pile, +12",
-    },
 }
 ROLE_CD = 90
 ROLE_QUIET = ("warmup", "cooldown", "roadblock", "servo")
@@ -241,7 +223,6 @@ CAMPAIGN_REPAIR = 30
 # once BOSS_SHARE of the block's seconds have been ridden at full compliance (the crew's mean).
 BOSS_EVENTS = ("longhaul", "surge", "rampup")
 BOSS_SHARE = 0.75
-BOSS_SCRAP = 60
 BOSS_ARMOUR = 15
 BOSS_HIT = 30
 BOSSES = {
@@ -272,27 +253,18 @@ RB_CRASH_ARMOUR = 10
 RB_GRACE_S = 4
 COMBO_STEP = 0.25
 
-# Servo Stop session shop (costs in bus scrap)
-SHOP = {"plating": 40, "repellent": 60, "sync": 50, "nitro": 45, "ram": 55, "magnet": 50}
-SHOP_OFFER = 3  # each stop offers this many of SHOP, drawn at random
+# Servo Stop session shop: each stop offers SHOP_OFFER of SHOP, drawn at random, and the crew takes one free.
+SHOP = ["plating", "repellent", "sync", "nitro", "ram"]
+SHOP_OFFER = 3
 RAM_MULT = 1.5  # bull-bar ram: the next roadblock takes this much more damage
-MAGNET_SCRAP = 1.5  # scrap magnet: distance scrap until the next stop
-# Route vote at each servo stop: the crew picks the next leg; damage and scrap scale until the next stop. The
+# Route vote at each servo stop: the crew picks the next leg; damage scales until the next stop. The
 # shortcut is a coin flip worth SHORTCUT_GAP metres either way.
 LEGS = {
-    "brutal": {
-        "name": "Short and brutal",
-        "icon": "⛰️",
-        "desc": "Double scrap, but hits hurt half as much again.",
-        "damage": 1.5,
-        "scrap": 2.0,
-    },
     "easy": {
         "name": "Long and easy",
         "icon": "🛣️",
-        "desc": "Hits hurt half as much, half the scrap.",
+        "desc": "Hits hurt half as much.",
         "damage": 0.5,
-        "scrap": 0.5,
     },
     "shortcut": {
         "name": "Risky shortcut",

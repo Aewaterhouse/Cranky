@@ -255,7 +255,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
       root.classList.toggle('asking', !!m.riders[meId]?.ask)
       roster.update(m, meId)
       cues.tick(m)
-      shop.update(m.bus.shop, m.bus.scrap, m.bus.wares)
+      shop.update(m.bus.shop, m.bus.wares)
       for (const fx of m.fx) {
         if (fx.id !== meId || fx.k === 'fell')
           announce(fx.k, (fx.id && m.riders[fx.id]?.name) || 'Someone')
@@ -277,8 +277,7 @@ export function makeHud(onTier: (t: Tier) => void, onQuit: () => void, o: HudOpt
           )
         else if (fx.k === 'challenge' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR CHALLENGE!', text.replace(/^[^:]*: /, ''), 4000, 2)
-        else if (fx.k === 'smash')
-          sp.splash('sp-smash', 'ROADBLOCK SMASHED!', text.match(/\+\d+ scrap/)?.[0] ?? '', 2800, 2)
+        else if (fx.k === 'smash') sp.splash('sp-smash', 'ROADBLOCK SMASHED!', '', 2800, 2)
         else if (fx.k === 'turn' && fx.id === meId)
           sp.splash('sp-smash', 'YOUR TURN ON THE FRONT', 'Hold your target for a minute', 2600, 1)
         if (fx.k === 'boss') SFX.boss()

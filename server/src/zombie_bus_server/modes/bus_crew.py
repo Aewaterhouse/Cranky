@@ -45,8 +45,6 @@ class CrewPlay:
             self.roles.setdefault(rid, {"role": list(C.ROLES)[n % len(C.ROLES)], "held": 0.0, "ready": 0.0})
         if ev in C.ROLE_QUIET:
             return
-        cads = [r.cad for r in active]
-        mean = statistics.fmean(cads) if cads else 0.0
         for r in active:
             st = self.roles[r.id]
             role = C.ROLES[st["role"]]
@@ -54,7 +52,6 @@ class CrewPlay:
                 "spin": r.cad >= role.get("rpm", 0),
                 "grind": 0 < r.cad <= role.get("rpm", 0),
                 "target": (r.s or 0) >= role.get("s", 1),
-                "steady": abs(r.cad - mean) <= role.get("rpm", 0) and r.cad > 0,
             }[role["cue"]]
             st["held"] = st["held"] + dt if cue and room.el >= st["ready"] else 0.0
             if st["held"] < role["hold"]:
@@ -62,7 +59,6 @@ class CrewPlay:
             st["held"], st["ready"] = 0.0, room.el + C.ROLE_CD
             self.gap += role.get("gap", 0)
             self.armour = min(100.0, self.armour + role.get("armour", 0))
-            self.scrap += role.get("scrap", 0)
             self.emit("role", f"{r.name}, {role['name'].lower()}: {role['done']}", r.id)
 
     def zed_pull(self, ev: str, active: list[Rider], comp: float) -> float:
@@ -88,12 +84,11 @@ class CrewPlay:
         return {"i": i, "kind": kind, "need": blocks[i]["dur"] * C.BOSS_SHARE, "done": 0.0}
 
     def end_boss(self) -> None:
-        """The boss block is over: beaten for scrap and armour, or it lands its blow."""
+        """The boss block is over: beaten for armour, or it lands its blow."""
         b, boss = self.boss, C.BOSSES[self.boss["kind"]]
         b["over"] = True
         if b["done"] >= b["need"]:
-            self.scrap += C.BOSS_SCRAP
             self.armour = min(100.0, self.armour + C.BOSS_ARMOUR)
-            self.emit("bosswin", f"{boss['win']} +{C.BOSS_SCRAP} scrap")
+            self.emit("bosswin", boss["win"])
         else:
             self.damage(C.BOSS_HIT, boss["lose"])

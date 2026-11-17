@@ -61,7 +61,6 @@ export function tvEnd(g: GroupSummary & { score: number }, onLeave: () => void) 
       stat('DISTANCE', `${(g.distance / 1000).toFixed(1)} km`),
       stat('ARMOUR', String(Math.round(g.armour))),
       stat('SYNC', `${Math.round(g.syncPct)}%`),
-      stat('SCRAP', String(g.scrap)),
     ),
     h(
       'div',

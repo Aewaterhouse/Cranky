@@ -67,15 +67,9 @@
     transform 0.15s,
     filter 0.15s;
 }
-.sh-card:hover:not(:disabled) {
+.sh-card:hover {
   transform: translateY(-3px);
   filter: brightness(1.2);
-}
-.sh-card:disabled {
-  opacity: 1;
-  border-color: rgb(255 255 255 / 0.12);
-  background: rgb(255 255 255 / 0.04);
-  filter: grayscale(0.8) brightness(0.8);
 }
 .sh-ico {
   font-size: 1.8rem;
@@ -88,27 +82,6 @@
   color: var(--dim);
   font-size: 0.7rem;
   font-weight: 600;
-}
-.sh-cost {
-  padding: 2px 12px;
-  border-radius: 999px;
-  background: var(--acc);
-  color: var(--acc-ink);
-  font: 800 0.85rem var(--ui);
-  text-shadow: none;
-}
-.sh-card:disabled .sh-cost {
-  background: rgb(255 255 255 / 0.18);
-  color: var(--dim);
-}
-.sh-need {
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--tox);
-}
-.sh-card:disabled .sh-need {
-  color: var(--bad);
 }
 .sh-card.bought {
   animation: sh-buy 0.5s;

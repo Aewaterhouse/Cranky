@@ -6,7 +6,6 @@ export interface GroupSummary {
   distance: number
   armour: number
   syncPct: number
-  scrap: number
   score: number
   riders: {
     id: string
