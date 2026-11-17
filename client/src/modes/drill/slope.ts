@@ -1,5 +1,5 @@
 import { CFG } from '../../config'
-import { gearGrade } from '../../core/gears'
+import { cadenceSmoother, gearGrade } from '../../core/gears'
 import { settings } from '../../core/settings'
 import type { ErgController } from '../../trainer/ergController'
 import { gearTile, strengthSlider } from '../../ui/gearTile'
@@ -11,6 +11,7 @@ import type { ModeState } from '../../ui/soloMode'
  */
 export function slopeGears(erg: ErgController, mass: number, root: HTMLElement) {
   let sent = NaN
+  const smooth = cadenceSmoother()
   const tile = gearTile()
   const slider = strengthSlider()
   // The shared ride HUD has no tile row, so both sit with the mode switch there.
@@ -19,7 +20,16 @@ export function slopeGears(erg: ErgController, mass: number, root: HTMLElement) 
   ;(root.querySelector('.bigrow')?.children[2] ?? sw)?.after(tile.el)
   const send = (m: ModeState, cadence: number, force = false, now = false) => {
     const { chainring, shiftStrength } = settings
-    const g = gearGrade(m.grade, cadence, m.gear, mass, CFG.ride.grade, chainring, 1, shiftStrength)
+    const g = gearGrade(
+      m.grade,
+      smooth(cadence),
+      m.gear,
+      mass,
+      CFG.ride.grade,
+      chainring,
+      1,
+      shiftStrength,
+    )
     if (force || Math.abs(g - sent) > CFG.freeRide.sendDeltaPct)
       void erg.setGrade((sent = g), CFG.ride.grade, now)
   }

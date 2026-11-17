@@ -15,6 +15,23 @@ export const busErgOn = (mode: TrainerMode | undefined, own: boolean) =>
 export const gearSpeed = (cadence: number, gear: number) =>
   (cadence / 60) * G.wheelM * G.ratios[gear - 1]
 
+/**
+ * Cadence for the gear's gradient, eased over `tau` seconds so the gradient holds still while the rider spins
+ * steadily. Starting or stopping (below minCadence) it follows at once. Calls at the same moment (a shift) see
+ * the same value, so a shift moves the gradient by the whole gear straight away.
+ */
+export function cadenceSmoother(tau = G.cadenceSmoothS, clock = () => performance.now() / 1000) {
+  let v = 0
+  let t = -Infinity
+  return (cadence: number) => {
+    const now = clock()
+    const k = 1 - Math.exp(-Math.max(0, now - t) / tau)
+    t = now
+    v = cadence < G.minCadence || v < G.minCadence ? cadence : v + (cadence - v) * k
+    return v
+  }
+}
+
 /** One gear up (d = 1) or down (d = -1), stopping at the first and last gear. */
 export const shiftGear = (gear: number, d: number) => Math.min(gearCount, Math.max(1, gear + d))
 

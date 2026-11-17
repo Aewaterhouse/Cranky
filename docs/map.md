@@ -35,7 +35,7 @@
 - `segWarn.ts` the sprints and KOMs of a ride (`rideMarks`, every lap) and the heads-up for the next one: banners at 1 km, 500 m and 200 m and the 3-2-1 to the line (`SegWarnings`, no DOM).
 - `laps.ts` lap counter, lap times and the lap toast for lap rides (no DOM).
 - `physics.ts` free-ride speed from power, gradient and mass, plus the drafting and keep-together factors (mirrored in the server's `road_physics.py`); `gears.ts` virtual gears and the gear-adjusted trainer gradient; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage; `routeLibrary.ts` bundled route index, lazy pack loader, difficulty and time estimate.
-- `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears: gear offset, the gear's speed at a cadence and the trainer gradient (difficulty, shift strength); `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
+- `physics.ts` free-ride speed from power, gradient and mass; `gears.ts` virtual gears: gear offset, the gear's speed at a cadence and the trainer gradient (difficulty, shift strength) and the smoothed cadence it uses; `settings.ts` per-device settings (incl. chainring); `route.ts` GPX parsing, resampling, route queries; `routeStore.ts` imported routes in localStorage.
 - `curve.ts` profile, power curve, best efforts, sprint grading, FTP suggestion (increase only).
 - `effects.ts` resistance modifier bus with caps.
 - `builder.ts` workout builder logic (block list ops, conversion to plans, clamps, TSS/IF); `plan.ts` plan parsing, flattening, frame lookup, workout length/IF/TSS, session generator; `trainingPlan.ts` multi-week plans: laying weeks onto the rider's weekdays and matching sessions to rides (`tests/trainingPlan.test.ts`).
@@ -104,7 +104,7 @@
 
 ### tests/ and assets
 - `tests/compliance|curve|erg|load|plan|gears|zwiftClick.test.ts` and others: vitest unit tests.
-- `tests/shiftWrite.test.ts` shifts write at once, never in ERG, never overlapping a tick.
+- `tests/shiftWrite.test.ts` shifts write at once, never overlapping a tick; `tests/gearCadence.test.ts` the gear's smoothed cadence.
 - `tests/noScrap.test.ts` rides and profiles saved with scrap still open, earn and make a postcard line without it.
 - `tests/builder.test.ts` builder core; `tests/compliance|curve|erg|load|plan.test.ts` vitest unit tests.
 - `tests/laps.test.ts` lap maths; `tests/riderPose.test.ts` rider poses and camera extras; `tests/soundMix.test.ts` sound levels by speed, place and sky; `tests/physics.test.ts` and `tests/freeRide.test.ts` bends, wind and the trainer's look-ahead.

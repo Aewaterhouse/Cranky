@@ -1,7 +1,7 @@
 import { holdBack } from '../../ui/back'
 import { CFG } from '../../config'
 import type { Profile } from '../../core/curve'
-import { shiftGear } from '../../core/gears'
+import { cadenceSmoother, shiftGear } from '../../core/gears'
 import type { GhostSpec } from '../../core/ghost'
 import { LapTimer, lapToast } from '../../core/laps'
 import { normalisedPower } from '../../core/ride'
@@ -74,6 +74,7 @@ export function runFreeRide(
   let shifted = false
   /** A shift since the last frame: its gradient goes out this frame, without waiting for the next ERG tick. */
   let shiftNow = false
+  const gearCadence = cadenceSmoother()
 
   const view = freeRideView(
     route,
@@ -190,7 +191,7 @@ export function runFreeRide(
       speed,
       difficulty,
       flat,
-      live.cadence,
+      gearCadence(live.cadence),
       gear,
       mass,
       settings.chainring,

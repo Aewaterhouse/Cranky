@@ -1,5 +1,5 @@
 import { CFG } from '../../config'
-import { gearGrade, shiftGear } from '../../core/gears'
+import { cadenceSmoother, gearGrade, shiftGear } from '../../core/gears'
 import { settings } from '../../core/settings'
 import type { ErgController } from '../../trainer/ergController'
 import { gearTile, stepStrength, strengthSlider } from '../../ui/gearTile'
@@ -11,6 +11,7 @@ import { gearTile, stepStrength, strengthSlider } from '../../ui/gearTile'
 export function busGears(erg: ErgController, mass: number, ergOn: () => boolean) {
   let gear: number = CFG.gears.start
   let sent = NaN
+  const smooth = cadenceSmoother()
   const tile = gearTile()
   const slider = strengthSlider()
   /** Sends the gear-adjusted gradient when it has moved enough (always when `force`; at once when `now`). */
@@ -19,7 +20,7 @@ export function busGears(erg: ErgController, mass: number, ergOn: () => boolean)
     const { chainring, shiftStrength } = settings
     const g = gearGrade(
       CFG.ride.gradeStart,
-      cadence,
+      smooth(cadence),
       gear,
       mass,
       CFG.ride.grade,

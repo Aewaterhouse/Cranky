@@ -196,6 +196,8 @@ export const CFG = {
     wheelM: 2.1,
     /** Below this cadence (rpm) the trainer just gets the road's gradient. */
     minCadence: 20,
+    /** The gear's gradient uses cadence eased over this many seconds, so it does not wander with every report. */
+    cadenceSmoothS: 2,
     /** Shift strength: multiplies the gear offset. Setting range and step. */
     strength: { min: 0.5, max: 3, step: 0.1, start: 1 },
   },

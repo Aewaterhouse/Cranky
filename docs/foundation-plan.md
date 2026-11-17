@@ -56,7 +56,7 @@ recalculated from live cadence, which the trainer reports late, (b) writes happe
 changes are skipped, (c) the trainer eases into a new gradient by itself.
 - [x] 2.1 Shifts go out at once: a shift writes to the trainer immediately instead of waiting for the next
       tick, still only through ergController.ts and still serialised with other writes.
-- [ ] 2.2 Steady gears: the gear's gradient uses a smoothed cadence so it does not wander with every cadence
+- [x] 2.2 Steady gears: the gear's gradient uses a smoothed cadence so it does not wander with every cadence
       report; a shift still applies in full straight away. Smoothing time in config.
 - [ ] 2.3 A "Gear log" on the trainer check page: time of each press, the gradient sent, the trainer's
       acknowledgement and the time until power moves by a set amount, so lag is measured, not guessed.
